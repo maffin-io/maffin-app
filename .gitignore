@@ -16,6 +16,7 @@
 /build
 
 account.gz*
+amplify/team-provider-info.json
 
 # misc
 .DS_Store
