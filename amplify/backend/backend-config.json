@@ -1,0 +1,44 @@
+{
+  "api": {
+    "stocker": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "stockerlambda"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
+  "auth": {},
+  "function": {
+    "stockerlambda": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_stockerlambda_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "stockerlambda"
+        }
+      ]
+    },
+    "AMPLIFY_function_stockerlambda_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "stockerlambda"
+        }
+      ]
+    }
+  }
+}

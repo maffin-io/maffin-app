@@ -1,0 +1,42 @@
+@tailwind base;
+
+@layer base {
+  html {
+    @apply text-slate-400;
+  } 
+
+  a {
+    @apply text-cyan-700 hover:text-cyan-600;
+  }
+
+  input, select {
+    @apply bg-gunmetal-800 rounded-md border-none my-3 p-2;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn-primary {
+    @apply bg-cyan-700 hover:bg-cyan-600 disabled:hover:bg-cyan-700 disabled:opacity-50 text-white py-2 px-4 rounded-lg inline-flex items-center;
+  }
+
+  .badge {
+    @apply bg-slate-500/20 text-slate-300 inline-block my-1 px-1 py-1 text-xs text-center rounded-md hover:text-slate-300
+  }
+
+  button.link {
+    @apply text-cyan-700 hover:text-cyan-600;
+  }
+
+  .invalid-feedback {
+    @apply text-xs mt-1 text-red-400/70
+  }
+}

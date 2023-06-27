@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "paths": {
+    "/api/prices/live": {
+      "name": "/api/prices/live",
+      "lambdaFunction": "stockerlambda",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/api/funds/{isin}": {
+      "name": "/api/funds/{isin}",
+      "lambdaFunction": "stockerlambda",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

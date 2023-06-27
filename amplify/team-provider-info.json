@@ -1,0 +1,23 @@
+{
+  "master": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-maffinapp-master-161929-authRole",
+      "UnauthRoleArn": "arn:aws:iam::650534923181:role/amplify-maffinapp-master-161929-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::650534923181:role/amplify-maffinapp-master-161929-authRole",
+      "Region": "eu-central-1",
+      "DeploymentBucketName": "amplify-maffinapp-master-161929-deployment",
+      "UnauthRoleName": "amplify-maffinapp-master-161929-unauthRole",
+      "StackName": "amplify-maffinapp-master-161929",
+      "StackId": "arn:aws:cloudformation:eu-central-1:650534923181:stack/amplify-maffinapp-master-161929/ca165f80-bcc0-11ed-bb03-022def382602",
+      "AmplifyAppId": "d199ayutgsrlxn"
+    },
+    "categories": {
+      "function": {
+        "stockerlambda": {
+          "deploymentBucketName": "amplify-maffinapp-master-161929-deployment",
+          "s3Key": "amplify-builds/stockerlambda-625267674d6b78532b31-build.zip"
+        }
+      }
+    }
+  }
+}

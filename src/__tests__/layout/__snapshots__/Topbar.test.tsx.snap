@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Topbar renders as expected 1`] = `
+<div>
+  <div
+    class="grid grid-cols-12 bg-gunmetal-700 h-20 fixed z-10 top-0 px-6 left-20 right-0"
+  >
+    <div
+      class="col-span-3"
+    >
+      <div
+        class="AccountSelector"
+      >
+        <span>
+          globalSearch
+        </span>
+        <span>
+          Search (cmd + k)...
+        </span>
+      </div>
+    </div>
+    <div
+      class="col-span-1 col-end-11 h-20 mb-0"
+    >
+      <div
+        class="flex h-full justify-center items-center"
+      >
+        <button
+          class="btn-primary"
+          type="button"
+        >
+          ...
+        </button>
+      </div>
+    </div>
+    <div
+      class="col-span-2 col-end-13 h-20"
+    >
+      <div
+        class="ProfileDropdown"
+      />
+    </div>
+  </div>
+</div>
+`;

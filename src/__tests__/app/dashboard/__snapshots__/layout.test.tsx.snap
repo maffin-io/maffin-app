@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DashboardLayout renders as expected when user available 1`] = `
+<div>
+  <div
+    class="w-full h-full overflow-hidden"
+  >
+    <div
+      class="LeftSidebar"
+    />
+    <div
+      class="mt-20 ml-20 p-3 z-0"
+    >
+      <div
+        class="Topbar"
+      />
+      <span
+        data-testid="child"
+      >
+        child
+      </span>
+    </div>
+    <div
+      class="Footer"
+    />
+  </div>
+</div>
+`;
+
+exports[`DashboardLayout returns loading when no user available 1`] = `
+<div>
+  <div>
+    Loading...
+  </div>
+</div>
+`;
+
+exports[`DashboardLayout returns loading when user available but not logged in 1`] = `
+<div>
+  <div>
+    Loading...
+  </div>
+</div>
+`;

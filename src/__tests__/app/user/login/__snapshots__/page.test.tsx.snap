@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LoginPage shows loading... when not finished 1`] = `
+<div>
+  <button
+    class="btn-primary"
+    type="button"
+  >
+    Sign In
+  </button>
+</div>
+`;

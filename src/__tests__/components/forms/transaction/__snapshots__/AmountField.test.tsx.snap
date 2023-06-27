@@ -1,0 +1,67 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AmountField adds split inverse amounts with negative result 1`] = `
+<span
+  class="flex gap-1 items-center py-2 px-4 rounded-lg bg-gunmetal-800 text-sm bg-red-500/20 text-red-300"
+>
+  <svg
+    fill="currentColor"
+    height="1em"
+    stroke="currentColor"
+    stroke-width="0"
+    viewBox="0 0 448 512"
+    width="1em"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M413.1 222.5l22.2 22.2c9.4 9.4 9.4 24.6 0 33.9L241 473c-9.4 9.4-24.6 9.4-33.9 0L12.7 278.6c-9.4-9.4-9.4-24.6 0-33.9l22.2-22.2c9.5-9.5 25-9.3 34.3.4L184 343.4V56c0-13.3 10.7-24 24-24h32c13.3 0 24 10.7 24 24v287.4l114.8-120.5c9.3-9.8 24.8-10 34.3-.4z"
+    />
+  </svg>
+  -99.80 €
+</span>
+`;
+
+exports[`AmountField adds split inverse amounts with positive result 1`] = `
+<span
+  class="flex gap-1 items-center py-2 px-4 rounded-lg bg-gunmetal-800 text-sm bg-green-500/20 text-green-300"
+>
+  <svg
+    fill="currentColor"
+    height="1em"
+    stroke="currentColor"
+    stroke-width="0"
+    viewBox="0 0 448 512"
+    width="1em"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"
+    />
+  </svg>
+  99.80 €
+</span>
+`;
+
+exports[`AmountField shows 0 when no amount in split 1`] = `
+<span
+  class="block py-2 px-4 rounded-lg bg-gunmetal-800 text-sm"
+>
+  0.00 €
+</span>
+`;
+
+exports[`AmountField shows 0 when no splits 1`] = `
+<span
+  class="block py-2 px-4 rounded-lg bg-gunmetal-800 text-sm"
+>
+  0.00 €
+</span>
+`;
+
+exports[`AmountField shows 0 when no toAccount in split 1`] = `
+<span
+  class="block py-2 px-4 rounded-lg bg-gunmetal-800 text-sm"
+>
+  0.00 €
+</span>
+`;

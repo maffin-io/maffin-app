@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LogoutPage matches snapshot 1`] = `
+<div>
+  <div
+    class="text-center"
+  >
+    <p>
+      See you soon!
+    </p>
+    <a
+      href="/user/login"
+    >
+      <b>
+        Log In again
+      </b>
+    </a>
+  </div>
+</div>
+`;

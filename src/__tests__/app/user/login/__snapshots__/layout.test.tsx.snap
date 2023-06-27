@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LoginLayout loads renders child after loading google account script 1`] = `
+<div>
+  <div>
+    <span>
+      child
+    </span>
+  </div>
+</div>
+`;
+
+exports[`LoginLayout returns loading when script not loaded 1`] = `
+<div>
+  <div>
+    Loading...
+  </div>
+</div>
+`;

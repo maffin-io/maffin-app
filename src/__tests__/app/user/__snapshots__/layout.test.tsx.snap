@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AccountLayout renders as expected 1`] = `
+<div>
+  <div
+    class="flex h-screen place-content-center place-items-center"
+  >
+    <div
+      class="flex p-6 bg-gunmetal-700 items-center rounded-md"
+    >
+      <img
+        alt=""
+        class="m-0"
+        data-nimg="1"
+        decoding="async"
+        height="54"
+        loading="lazy"
+        src="/_next/image?url=%2Fimg.jpg&w=128&q=75"
+        srcset="/_next/image?url=%2Fimg.jpg&w=64&q=75 1x, /_next/image?url=%2Fimg.jpg&w=128&q=75 2x"
+        style="color: transparent;"
+        width="54"
+      />
+      <div
+        class="p-4"
+      >
+        <span>
+          child
+        </span>
+      </div>
+    </div>
+  </div>
+  <footer
+    class="bottom-0 w-full fixed flex justify-end bg-gunmetal-700 text-sm px-3 z-1"
+  >
+    2023
+    ©
+     
+    maffin.io
+  </footer>
+</div>
+`;
