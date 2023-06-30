@@ -1,17 +1,14 @@
-import { DateTime } from 'luxon';
 import React from 'react';
-import { validate } from 'class-validator';
 import { useForm, useFieldArray } from 'react-hook-form';
+import { DateTime } from 'luxon';
 
 import {
   Account,
   Split,
-  Transaction,
   Commodity,
-  Price,
 } from '@/book/entities';
 import { toAmountWithScale } from '@/helpers/number';
-import { getMainCurrency } from '@/book/queries';
+import { createTransaction } from '@/book/lib/transaction';
 import SplitField from './SplitField';
 import AmountField from './AmountField';
 import type { FormValues } from './types';
@@ -137,15 +134,6 @@ export default function TransactionForm({ onSave, account }: TransactionFormProp
 async function onSubmit(data: FormValues, onSave: Function) {
   const { fromAccount } = data;
 
-  const transaction = await Transaction.create({
-    guid: crypto.randomUUID().substring(0, 31),
-    fk_currency: fromAccount.commodity,
-    date: DateTime.fromISO(data.date),
-    description: data.description,
-  });
-
-  // THIS IS WRONG, main currency can be different for others
-  const mainCurrency = await getMainCurrency();
   const splits: Split[] = [];
   let splitsTotal = 0;
   data.splits.forEach(splitData => {
@@ -157,8 +145,7 @@ async function onSubmit(data: FormValues, onSave: Function) {
 
     const split = Split.create({
       guid: crypto.randomUUID().substring(0, 31),
-      fk_account: toAccount.guid,
-      fk_transaction: transaction,
+      fk_account: toAccount,
       valueNum: amount,
       valueDenom: parseInt('1'.padEnd(scale + 1, '0'), 10),
       quantityNum: exAmount,
@@ -166,52 +153,27 @@ async function onSubmit(data: FormValues, onSave: Function) {
     });
     splits.push(split);
     splitsTotal -= splitData.amount;
-
-    if (fromAccount.commodity.guid !== mainCurrency.guid) {
-      const { amount: rateAmount, scale: rateScale } = toAmountWithScale(
-        splitData.exchangeRate || 1,
-      );
-      // THIS IS WRONG, will probably explode at some point as mainCurrency is not EUR always
-      Price.upsert(
-        {
-          guid: crypto.randomUUID().substring(0, 31),
-          fk_commodity: fromAccount.commodity,
-          fk_currency: mainCurrency.guid,
-          date: DateTime.fromISO(data.date),
-          valueNum: toAccount.commodity.mnemonic === 'EUR' ? rateAmount : 1,
-          valueDenom: toAccount.commodity.mnemonic === 'EUR' ? parseInt(
-            '1'.padEnd(rateScale + 1, '0'),
-            10,
-          ) : 1,
-        },
-        {
-          conflictPaths: ['fk_commodity', 'fk_currency', 'date'],
-        },
-      );
-    }
   });
 
   const { amount, scale } = toAmountWithScale(splitsTotal);
   const quantityNum = amount;
   const quantityDenom = parseInt('1'.padEnd(scale + 1, '0'), 10);
-  const split = Split.create({
+  const mainSplit = Split.create({
     guid: crypto.randomUUID().substring(0, 31),
-    fk_account: fromAccount.guid,
-    fk_transaction: transaction,
+    fk_account: fromAccount,
     valueNum: quantityNum,
     valueDenom: quantityDenom,
     quantityNum,
     quantityDenom,
   });
-  splits.push(split);
 
-  const validationErrors = await validate(transaction);
-  if (validationErrors.length > 0) {
-    throw new Error(`Transaction is invalid ${validationErrors}`);
-  }
+  await createTransaction(
+    DateTime.fromISO(data.date),
+    data.description,
+    mainSplit,
+    splits,
+  );
 
-  await Transaction.save(transaction);
-  await Split.insert(splits);
   onSave();
 }
 

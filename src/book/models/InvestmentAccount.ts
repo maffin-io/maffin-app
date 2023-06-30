@@ -65,6 +65,7 @@ export default class InvestmentAccount {
       this.quantity.toNumber(),
     );
   }
+
   get costInCurrency(): Money {
     return new Money(
       this._avgPriceInCurrency,
@@ -147,7 +148,7 @@ export default class InvestmentAccount {
       (a, b) => a.transaction.date.toMillis() - b.transaction.date.toMillis(),
     );
 
-    sortedSplits.forEach((split, index) => {
+    sortedSplits.forEach((split) => {
       const numSplits = split.transaction.splits.length;
 
       if (numSplits > 1 && split.value > 0 && split.quantity > 0) {
@@ -232,11 +233,11 @@ export default class InvestmentAccount {
 
     const originalCost = sellQuantity.multiply(
       this._avgPrice,
-    ).convert(split.transaction.currency.mnemonic, 1);
+    ).convert(this.currency, 1);
     this.realizedProfit = this.realizedProfit.add(sellValue.subtract(originalCost).multiply(-1));
 
     const mainCurrencyPrice = this._priceDBMap.getPrice(
-      split.transaction.currency.mnemonic,
+      this.currency,
       this.mainCurrency,
       split.transaction.date,
     );

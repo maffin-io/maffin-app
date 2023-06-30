@@ -67,7 +67,6 @@ export default class PriceDB {
    * Scans Price data to return all the historical data for a given commodity
    * specified as 'from'.
    *
-   * @param from - array of strings containing the source commodity to convert from
    * @param to - the commodity to convert to
    * @returns - object where key is from.to.date and value is the Price object
    */

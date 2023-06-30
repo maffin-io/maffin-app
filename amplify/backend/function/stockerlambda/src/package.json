@@ -6,6 +6,7 @@
   "dependencies": {
     "aws-serverless-express": "^3.3.5",
     "axios": "^0.24.0",
+    "luxon": "^3.3.0",
     "body-parser": "^1.17.1",
     "cors": "^2.8.5",
     "express": "^4.17.3"

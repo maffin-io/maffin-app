@@ -1,4 +1,5 @@
 import { Amplify, API } from 'aws-amplify';
+import { DateTime } from 'luxon';
 
 import awsExports from '../aws-exports';
 
@@ -18,6 +19,18 @@ export default class Stocker {
       },
     };
     const resp = await API.get(this.apiName, '/api/prices/live', options);
+
+    return resp;
+  }
+
+  async getPrice(ticker: string, when: DateTime): Promise<{ price: number, currency: string }> {
+    const options = {
+      queryStringParameters: {
+        id: ticker,
+        when: Math.floor(when.toSeconds()),
+      },
+    };
+    const resp = await API.get(this.apiName, '/api/price', options);
 
     return resp;
   }

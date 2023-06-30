@@ -1,8 +1,5 @@
 import { DateTime } from 'luxon';
-import {
-  createConnection,
-  getConnection,
-} from 'typeorm';
+import { DataSource } from 'typeorm';
 
 import { InvestmentAccount } from '../../models';
 import {
@@ -16,22 +13,24 @@ import { PriceDB, PriceDBMap } from '../../prices';
 import Money from '../../Money';
 
 describe('InvestmentAccount', () => {
+  let datasource: DataSource;
+
   beforeEach(async () => {
-    await createConnection({
+    datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Commodity, Account, Split, Transaction, Price],
+      entities: [Account, Commodity, Price, Split, Transaction],
       synchronize: true,
       logging: false,
     });
+    await datasource.initialize();
 
     jest.spyOn(PriceDB, 'getTodayQuotes').mockResolvedValue(new PriceDBMap([]));
     jest.spyOn(PriceDB, 'getHistory').mockResolvedValue(new PriceDBMap([]));
   });
 
   afterEach(async () => {
-    const conn = await getConnection();
-    await conn.close();
+    await datasource.destroy();
   });
 
   describe.each(
