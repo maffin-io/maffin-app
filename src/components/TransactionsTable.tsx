@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 
 import Table from '@/components/Table';
+import Tooltip from '@/components/Tooltip';
 import useDataSource from '@/hooks/useDataSource';
 import Money from '@/book/Money';
 import {
@@ -77,9 +78,13 @@ const columns: ColumnDef<Split>[] = [
     id: 'date',
     accessorFn: (row: Split) => row.transaction.date.toMillis(),
     cell: ({ row }) => (
-      <span>
-        {row.original.transaction.date.toISODate()}
-      </span>
+      <Tooltip
+        text={row.original.transaction.guid}
+      >
+        <span>
+          {row.original.transaction.date.toISODate()}
+        </span>
+      </Tooltip>
     ),
   },
   {

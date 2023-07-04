@@ -31,7 +31,7 @@ export default function AddTransactionButton(
         />
       </Modal>
       <Tooltip
-        text="Add transactions from accounts that are not INCOME/EXPENSE/STOCK/MUTUAL"
+        text="Add transactions from accounts that are not INCOME/EXPENSE"
         show={disabled}
       >
         <button
