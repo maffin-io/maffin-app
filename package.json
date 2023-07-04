@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@dinero.js/currencies": "^2.0.0-alpha.14",
-    "@fontsource/inter": "^5.0.3",
+    "@fontsource/inter": "^5.0.4",
     "@tanstack/react-table": "^8.9.3",
     "@testing-library/jest-dom": "^5.16.5",
     "apexcharts": "^3.41.0",
