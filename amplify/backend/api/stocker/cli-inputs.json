@@ -8,8 +8,8 @@
         "setting": "open"
       }
     },
-    "/api/funds/{isin}": {
-      "name": "/api/funds/{isin}",
+    "/api/price": {
+      "name": "/api/price",
       "lambdaFunction": "stockerlambda",
       "permissions": {
         "setting": "open"
