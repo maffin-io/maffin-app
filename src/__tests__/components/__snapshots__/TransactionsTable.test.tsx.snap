@@ -103,9 +103,18 @@ exports[`TransactionsTable displays splits as expected 1`] = `
           <td
             class="px-6 py-4"
           >
-            <span>
-              2023-01-01
-            </span>
+            <div
+              class="group flex relative"
+            >
+              <span>
+                2023-01-01
+              </span>
+              <span
+                class="opacity-0 absolute rounded-md bg-black text-center z-50 -translate-x-1/2 left-1/2 mt-2 top-full text-xs p-2 transition-opacity group-hover:opacity-40"
+              >
+                tx_guid
+              </span>
+            </div>
           </td>
           <td
             class="px-6 py-4"
