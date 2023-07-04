@@ -2,9 +2,9 @@ const cors = require('cors');
 const express = require('express');
 const bodyParser = require('body-parser');
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
+const luxon = require('luxon');
 
 const yahoo = require('./yahoo');
-const helpers = require('./helpers');
 
 const app = express()
 app.use(bodyParser.json())
@@ -62,6 +62,32 @@ app.get('/api/prices/live', async (req, res) => {
   }
 
   res.json(result);
+});
+
+app.get('/api/price', async (req, res) => {
+  let ticker = req.query.id;
+  let when = Number(req.query.when) || luxon.DateTime.now().toMillis();
+
+  if (!ticker) {
+    res.status(400).json({
+      error: 'IDS_REQUIRED',
+      description: 'You need to pass \'id\' queryparam to select the quote',
+    });
+    return;
+  }
+
+  try {
+    price = await yahoo.getPrice(ticker, when);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      error: 'UNKNOWN_ERROR',
+      description: 'Failed to retrieve prices',
+    });
+    return;
+  }
+
+  res.json(price);
 });
 
 module.exports = app;

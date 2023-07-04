@@ -1,4 +1,5 @@
-const axios= require('axios');
+const axios = require('axios');
+const luxon = require('luxon');
 
 const { HTTPError } = require('./errors');
 
@@ -17,7 +18,7 @@ async function getLiveSummary(ticker) {
     );
   } catch (error) {
     throw new YahooError(
-      `${ticker} failed: error.message`,
+      `${ticker} failed: ${error.message}`,
       error.response.status,
       'UNKNOWN',
     );
@@ -51,6 +52,58 @@ async function getLiveSummary(ticker) {
   };
 }
 
+async function getPrice(ticker, when) {
+  const end = luxon.DateTime.fromSeconds(when, {zone: 'utc'}).endOf('day');
+  const start = end.startOf('day');
+
+  if (ticker === 'SGDCAD=X') {
+    ticker = 'SGDCAX=X';
+  }
+
+  try {
+    resp = await axios.get(
+      `${HOST}/v8/finance/chart/${ticker}?period1=${Math.floor(start.toSeconds())}&period2=${Math.floor(end.toSeconds())}&interval=1d`,
+    );
+  } catch (error) {
+    throw new YahooError(
+      `${ticker} failed: ${error.message}`,
+      error.response.status,
+      'UNKNOWN',
+    );
+  }
+
+  const { result, error } = resp.data.chart;
+
+  if (error !== null) {
+    if (error.code === 'Not Found') {
+      throw new YahooError(
+        `ticker '${ticker}' not found`,
+        404,
+        'NOT_FOUND',
+      );
+    }
+
+    throw new YahooError(
+      `unknown error '${error.description}'`,
+      resp.status,
+      'UNKNOWN',
+    );
+  }
+
+  if (!result[0].indicators.quote[0].close) {
+    throw new YahooError(
+      `no historical data for '${ticker}' found`,
+      404,
+      'NOT_FOUND',
+    );
+  }
+
+  return {
+    price: result[0].indicators.quote[0].close[0],
+    currency: toCurrency(result[0].meta.currency),
+  };
+}
+
 function toStandardUnit(currency) {
   if (currency === 'GBp') {
     return 0.01;
@@ -69,5 +122,6 @@ function toCurrency(currency) {
 
 module.exports = {
   getLiveSummary,
+  getPrice,
   YahooError,
 };

@@ -12,6 +12,7 @@ import crypto from 'crypto';
 
 import * as dataSourceHooks from '@/hooks/useDataSource';
 import * as queries from '@/book/queries';
+import * as transactionLib from '@/book/lib/transaction';
 import {
   Account,
   Commodity,
@@ -24,6 +25,11 @@ import TransactionForm from '@/components/forms/transaction/TransactionForm';
 jest.mock('@/hooks/useDataSource', () => ({
   __esModule: true,
   ...jest.requireActual('@/hooks/useDataSource'),
+}));
+
+jest.mock('@/book/lib/transaction', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/book/lib/transaction'),
 }));
 
 Object.defineProperty(global.self, 'crypto', {
@@ -88,9 +94,12 @@ describe('TransactionForm', () => {
     jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
       assetAccount, expenseAccount,
     ]);
+
+    jest.spyOn(transactionLib, 'createTransaction').mockImplementation(async () => {});
   });
 
   afterEach(async () => {
+    jest.resetAllMocks();
     await datasource.destroy();
   });
 
@@ -145,7 +154,7 @@ describe('TransactionForm', () => {
     screen.getByText('Description is required');
   });
 
-  it('creates transaction with single split', async () => {
+  it('calls createTransaction with expected data for single split', async () => {
     jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
 
     const mockSave = jest.fn();
@@ -165,65 +174,34 @@ describe('TransactionForm', () => {
 
     await user.click(screen.getByRole('button', { name: /save/i }));
 
-    const transactions = await Transaction.find({
-      relations: {
-        splits: {
-          fk_account: true,
-        },
+    expect(transactionLib.createTransaction).toHaveBeenCalledWith(
+      DateTime.fromISO('2023-01-01'),
+      'My expense',
+      {
+        action: '',
+        guid: expect.any(String),
+        fk_account: assetAccount,
+        quantityDenom: 1,
+        quantityNum: -100,
+        valueDenom: 1,
+        valueNum: -100,
       },
-      order: {
-        splits: {
-          fk_account: {
-            name: 'DESC',
-          },
-        },
-      },
-    });
-
-    expect(transactions).toHaveLength(1);
-    expect(transactions[0]).toMatchObject({
-      date: DateTime.fromISO('2023-01-01'),
-      description: 'My expense',
-      enterDate: expect.any(Date),
-      fk_currency: eur,
-      guid: expect.any(String),
-      splits: [
+      [
         {
           action: '',
           guid: expect.any(String),
-          quantityDenom: 1,
-          quantityNum: -100,
-          valueDenom: 1,
-          valueNum: -100,
-          fk_account: {
-            fk_commodity: eur,
-            guid: 'account_guid_1',
-            name: 'bank',
-            type: 'ASSET',
-          },
-        },
-        {
-          action: '',
-          guid: expect.any(String),
+          fk_account: expenseAccount,
           quantityDenom: 1,
           quantityNum: 100,
           valueDenom: 1,
           valueNum: 100,
-          fk_account: {
-            fk_commodity: eur,
-            guid: 'account_guid_2',
-            name: 'Expense',
-            type: 'EXPENSE',
-          },
         },
       ],
-    });
-
-    expect(await Price.find()).toHaveLength(0);
+    );
     expect(mockSave).toHaveBeenCalledTimes(1);
   });
 
-  it('creates transaction with single split with different currency', async () => {
+  it('calls createTransaction with expected data for different currency', async () => {
     jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
 
     const usd = await Commodity.create({
@@ -252,73 +230,34 @@ describe('TransactionForm', () => {
 
     await user.click(screen.getByRole('button', { name: /save/i }));
 
-    const transactions = await Transaction.find({
-      relations: {
-        splits: {
-          fk_account: true,
-        },
+    expect(transactionLib.createTransaction).toHaveBeenCalledWith(
+      DateTime.fromISO('2023-01-01'),
+      'My expense',
+      {
+        action: '',
+        guid: expect.any(String),
+        fk_account: assetAccount,
+        quantityDenom: 1,
+        quantityNum: -100,
+        valueDenom: 1,
+        valueNum: -100,
       },
-      order: {
-        splits: {
-          fk_account: {
-            name: 'DESC',
-          },
-        },
-      },
-    });
-
-    expect(transactions).toHaveLength(1);
-    expect(transactions[0]).toMatchObject({
-      date: DateTime.fromISO('2023-01-01'),
-      description: 'My expense',
-      enterDate: expect.any(Date),
-      fk_currency: usd,
-      guid: expect.any(String),
-      splits: [
+      [
         {
           action: '',
           guid: expect.any(String),
-          quantityDenom: 1,
-          quantityNum: -100,
-          valueDenom: 1,
-          valueNum: -100,
-          fk_account: {
-            fk_commodity: usd,
-            guid: 'account_guid_1',
-            name: 'bank',
-            type: 'ASSET',
-          },
-        },
-        {
-          action: '',
-          guid: expect.any(String),
+          fk_account: expenseAccount,
           quantityDenom: 10,
           quantityNum: 987,
           valueDenom: 1,
           valueNum: 100,
-          fk_account: {
-            fk_commodity: eur,
-            guid: 'account_guid_2',
-            name: 'Expense',
-            type: 'EXPENSE',
-          },
         },
       ],
-    });
-
-    const prices = await Price.find();
-    expect(prices).toHaveLength(1);
-    expect(prices[0]).toMatchObject({
-      date: DateTime.fromISO('2023-01-01'),
-      fk_commodity: usd,
-      fk_currency: eur,
-      valueNum: 987,
-      valueDenom: 1000,
-    });
+    );
     expect(mockSave).toHaveBeenCalledTimes(1);
   });
 
-  it('creates transaction with multiple splits', async () => {
+  it('calls createTransaction with expected data with multiple splits', async () => {
     jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
 
     const expenseAccount2 = await Account.create({
@@ -357,74 +296,39 @@ describe('TransactionForm', () => {
 
     await user.click(screen.getByRole('button', { name: /save/i }));
 
-    const transactions = await Transaction.find({
-      relations: {
-        splits: {
-          fk_account: true,
-        },
+    expect(transactionLib.createTransaction).toHaveBeenCalledWith(
+      DateTime.fromISO('2023-01-01'),
+      'My expense',
+      {
+        action: '',
+        guid: expect.any(String),
+        fk_account: assetAccount,
+        quantityDenom: 1,
+        quantityNum: -150,
+        valueDenom: 1,
+        valueNum: -150,
       },
-      order: {
-        splits: {
-          fk_account: {
-            name: 'DESC',
-          },
-        },
-      },
-    });
-
-    expect(transactions).toHaveLength(1);
-    expect(transactions[0]).toMatchObject({
-      date: DateTime.fromISO('2023-01-01'),
-      description: 'My expense',
-      enterDate: expect.any(Date),
-      fk_currency: eur,
-      guid: expect.any(String),
-      splits: [
+      [
         {
           action: '',
           guid: expect.any(String),
-          quantityDenom: 1,
-          quantityNum: -150,
-          valueDenom: 1,
-          valueNum: -150,
-          fk_account: {
-            fk_commodity: eur,
-            guid: 'account_guid_1',
-            name: 'bank',
-            type: 'ASSET',
-          },
-        },
-        {
-          action: '',
-          guid: expect.any(String),
-          quantityDenom: 1,
-          quantityNum: 50,
-          valueDenom: 1,
-          valueNum: 50,
-          fk_account: {
-            fk_commodity: eur,
-            guid: 'account_guid_3',
-            name: 'Expense2',
-            type: 'EXPENSE',
-          },
-        },
-        {
-          action: '',
-          guid: expect.any(String),
+          fk_account: expenseAccount,
           quantityDenom: 1,
           quantityNum: 100,
           valueDenom: 1,
           valueNum: 100,
-          fk_account: {
-            fk_commodity: eur,
-            guid: 'account_guid_2',
-            name: 'Expense',
-            type: 'EXPENSE',
-          },
+        },
+        {
+          action: '',
+          guid: expect.any(String),
+          fk_account: expenseAccount2,
+          quantityDenom: 1,
+          quantityNum: 50,
+          valueDenom: 1,
+          valueNum: 50,
         },
       ],
-    });
-
+    );
     expect(mockSave).toHaveBeenCalledTimes(1);
   });
 });

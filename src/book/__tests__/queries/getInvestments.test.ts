@@ -1,8 +1,5 @@
 import { DateTime } from 'luxon';
-import {
-  createConnection,
-  getConnection,
-} from 'typeorm';
+import { DataSource } from 'typeorm';
 
 import {
   Account,
@@ -20,6 +17,7 @@ jest.mock('../../models', () => ({
 }));
 
 describe('getInvestments', () => {
+  let datasource: DataSource;
   let mockGetHistory: jest.SpyInstance;
   let mockGetTodayQuotes: jest.SpyInstance;
   let mockAccountFind: jest.SpyInstance;
@@ -27,13 +25,14 @@ describe('getInvestments', () => {
   let price2: Price;
 
   beforeEach(async () => {
-    await createConnection({
+    datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Commodity, Account, Split, Transaction, Price],
+      entities: [Account, Commodity, Price, Split, Transaction],
       synchronize: true,
       logging: false,
     });
+    await datasource.initialize();
 
     price1 = Price.create({
       guid: 'price1',
@@ -64,8 +63,7 @@ describe('getInvestments', () => {
   });
 
   afterEach(async () => {
-    const conn = await getConnection();
-    await conn.close();
+    await datasource.destroy();
   });
 
   it('returns empty investments when no investment accounts', async () => {
@@ -96,7 +94,9 @@ describe('getInvestments', () => {
       relations: {
         splits: {
           fk_transaction: {
-            splits: true,
+            splits: {
+              fk_account: true,
+            },
           },
         },
       },

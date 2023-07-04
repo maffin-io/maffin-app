@@ -1,4 +1,4 @@
-const axios= require('axios');
+const axios = require('axios');
 
 const yh = require('./yahoo');
 
@@ -62,7 +62,7 @@ describe('getLiveSummary', () => {
       await yh.getLiveSummary('ticker');
     } catch (error) {
       expect(error instanceof yh.YahooError).toBe(true);
-      expect(error.message).toEqual('ticker failed: error.message');
+      expect(error.message).toEqual('ticker failed: message');
       expect(error.status).toEqual(500);
       expect(error.code).toEqual('UNKNOWN');
     }
@@ -175,5 +175,132 @@ describe('getLiveSummary', () => {
       changePct: -10,
       changeAbs: -1,
     });
+  });
+});
+
+describe('getPrice', () => {
+  let mockAxiosGet;
+
+  beforeEach(() => {
+    mockAxiosGet = jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve({
+      data: {
+        chart: {
+          result: [
+            {
+              meta: {
+                currency: 'USD',
+              },
+              indicators: {
+                quote: [
+                  {
+                    close: [
+                      1.89,
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+          error: null,
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+    }));
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('calls api with expected params', async () => {
+    await yh.getPrice('ticker', 1684139670);
+
+    expect(mockAxiosGet).toHaveBeenNthCalledWith(
+      1,
+      'https://query2.finance.yahoo.com/v8/finance/chart/ticker?period1=1684108800&period2=1684195199&interval=1d',
+    );
+  });
+
+  it('fails when axios call fails', async () => {
+    mockAxiosGet.mockRejectedValue({
+      message: 'message',
+      url: 'url',
+      response: {
+        status: 500,
+      },
+    });
+
+    await expect(yh.getPrice('ticker', 1684139670)).rejects.toThrow(
+      'ticker failed: message',
+    );
+  });
+
+  it('fails when unknown ticker', async () => {
+    mockAxiosGet.mockImplementation(() => Promise.resolve({
+      data: {
+        chart: {
+          result: null,
+          error: {
+            code: 'Not Found',
+            description: 'No data found, symbol may be delisted',
+          },
+        },
+      },
+      status: 404,
+    }));
+
+    await expect(yh.getPrice('ticker', 1684139670)).rejects.toThrow(
+      'ticker \'ticker\' not found',
+    );
+  });
+
+  it('fails when unknown error', async () => {
+    mockAxiosGet.mockImplementation(() => Promise.resolve({
+      data: {
+        chart: {
+          result: null,
+          error: {
+            code: 'Unknown error',
+            description: 'error message',
+          },
+        },
+      },
+      status: 404,
+    }));
+
+    await expect(yh.getPrice('ticker', 1684139670)).rejects.toThrow(
+      'error message',
+    );
+  });
+
+  it('fails gracefully when no quote data', async () => {
+    mockAxiosGet.mockImplementation(() => Promise.resolve({
+      data: {
+        chart: {
+          result: [
+            {
+              meta: {
+                currency: null,
+              },
+              indicators: {
+                quote: [{}],
+              },
+            },
+          ],
+          error: null,
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+    }));
+
+    await expect(yh.getPrice('SGDCAD=X', 1684139670)).rejects.toThrow(
+      'no historical data for \'SGDCAX=X\' found',
+    );
+    expect(mockAxiosGet).toHaveBeenNthCalledWith(
+      1,
+      'https://query2.finance.yahoo.com/v8/finance/chart/SGDCAX=X?period1=1684108800&period2=1684195199&interval=1d',
+    );
   });
 });

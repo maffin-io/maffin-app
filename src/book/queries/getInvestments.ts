@@ -13,7 +13,9 @@ export async function getInvestments(mainCurrency: string): Promise<InvestmentAc
       relations: {
         splits: {
           fk_transaction: {
-            splits: true,
+            splits: {
+              fk_account: true,
+            },
           },
         },
       },
@@ -34,11 +36,18 @@ export async function getInvestments(mainCurrency: string): Promise<InvestmentAc
     ...Object.values(todayPrices.map),
   ]);
   const investments = accounts.map(
-    account => new InvestmentAccount(
-      account,
-      mainCurrency,
-      pricesMap,
-    ),
+    account => {
+      try {
+        const investment = new InvestmentAccount(
+          account,
+          mainCurrency,
+          pricesMap,
+        );
+        return investment;
+      } catch (e) {
+        throw new Error(`Failed to create investment from account ${account.guid}: ${e}`);
+      }
+    },
   );
   const end = performance.now();
   console.log(`get investments: ${end - start}ms`);
