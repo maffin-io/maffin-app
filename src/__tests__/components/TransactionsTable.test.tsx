@@ -5,6 +5,7 @@ import {
   screen,
 } from '@testing-library/react';
 import { DataSource } from 'typeorm';
+import type { LinkProps } from 'next/link';
 
 import {
   Account,
@@ -12,6 +13,7 @@ import {
   Split,
   Transaction,
 } from '@/book/entities';
+import Table, { TableProps } from '@/components/Table';
 import TransactionsTable from '@/components/TransactionsTable';
 import * as dataSourceHooks from '@/hooks/useDataSource';
 
@@ -20,8 +22,32 @@ jest.mock('@/hooks/useDataSource', () => ({
   ...jest.requireActual('@/hooks/useDataSource'),
 }));
 
+jest.mock('@/components/Table', () => jest.fn(
+  (props: TableProps<Split>) => (
+    <div data-testid="table">
+      <span data-testid="data">{JSON.stringify(props.data)}</span>
+      <span data-testid="columns">{JSON.stringify(props.columns)}</span>
+    </div>
+  ),
+));
+
+const TableMock = Table as jest.MockedFunction<typeof Table>;
+
+jest.mock('next/link', () => jest.fn(
+  (
+    props: LinkProps & { children?: React.ReactNode } & React.HTMLAttributes<HTMLAnchorElement>,
+  ) => (
+    <a className={props.className} href={props.href.toString()}>{props.children}</a>
+  ),
+));
+
 describe('TransactionsTable', () => {
   let datasource: DataSource;
+  let eur: Commodity;
+  let root: Account;
+  let account1: Account;
+  let transaction: Transaction;
+  let split1: Split;
 
   beforeEach(async () => {
     datasource = new DataSource({
@@ -32,10 +58,64 @@ describe('TransactionsTable', () => {
       logging: false,
     });
     await datasource.initialize();
+
+    eur = await Commodity.create({
+      guid: 'commodity_guid',
+      namespace: 'CURRENCY',
+      mnemonic: 'EUR',
+    }).save();
+
+    root = await Account.create({
+      guid: 'root_account_guid',
+      name: 'Root account',
+      type: 'ROOT',
+    }).save();
+
+    account1 = await Account.create({
+      guid: 'account_guid_1',
+      name: 'bank',
+      type: 'ASSET',
+      fk_commodity: eur,
+      parent: root,
+    }).save();
+
+    await Account.create({
+      guid: 'account_guid_2',
+      name: 'expense',
+      type: 'EXPENSE',
+      fk_commodity: eur,
+      parent: root,
+    }).save();
+
+    transaction = await Transaction.create({
+      guid: 'tx_guid',
+      description: 'random expense',
+      fk_currency: 'commodity_guid',
+      date: DateTime.fromISO('2023-01-01'),
+    }).save();
+
+    split1 = await Split.create({
+      guid: 'split1_guid',
+      valueNum: 10,
+      valueDenom: 100,
+      quantityNum: 15,
+      quantityDenom: 100,
+      fk_transaction: 'tx_guid',
+      fk_account: 'account_guid_1',
+    }).save();
+
+    await Split.create({
+      guid: 'split2_guid',
+      valueNum: -10,
+      valueDenom: 100,
+      quantityNum: -15,
+      quantityDenom: 100,
+      fk_transaction: 'tx_guid',
+      fk_account: 'account_guid_2',
+    }).save();
   });
 
   afterEach(async () => {
-    jest.resetAllMocks();
     await datasource.destroy();
   });
 
@@ -50,65 +130,10 @@ describe('TransactionsTable', () => {
     await screen.findByText('Select an account to see transactions');
   });
 
-  it('displays splits as expected', async () => {
+  it('creates Table with expected params', async () => {
     jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
 
-    await Commodity.create({
-      guid: 'commodity_guid',
-      namespace: 'CURRENCY',
-      mnemonic: 'EUR',
-    }).save();
-
-    const root = await Account.create({
-      guid: 'root_account_guid',
-      name: 'Root account',
-      type: 'ROOT',
-    }).save();
-
-    await Account.create({
-      guid: 'account_guid_1',
-      name: 'bank',
-      type: 'ASSET',
-      fk_commodity: 'commodity_guid',
-      parent: root,
-    }).save();
-
-    await Account.create({
-      guid: 'account_guid_2',
-      name: 'expense',
-      type: 'EXPENSE',
-      fk_commodity: 'commodity_guid',
-      parent: root,
-    }).save();
-
-    await Transaction.create({
-      guid: 'tx_guid',
-      description: 'random expense',
-      fk_currency: 'commodity_guid',
-      date: DateTime.fromISO('2023-01-01'),
-    }).save();
-
-    await Split.create({
-      guid: 'split1_guid',
-      valueNum: 10,
-      valueDenom: 100,
-      quantityNum: 15,
-      quantityDenom: 100,
-      fk_transaction: 'tx_guid',
-      fk_account: 'account_guid_1',
-    }).save();
-
-    await Split.create({
-      guid: 'split2_guid',
-      valueNum: 10,
-      valueDenom: 100,
-      quantityNum: 15,
-      quantityDenom: 100,
-      fk_transaction: 'tx_guid',
-      fk_account: 'account_guid_2',
-    }).save();
-
-    const { container } = render(
+    render(
       <TransactionsTable
         accountId="account_guid_1"
         accounts={[
@@ -127,6 +152,296 @@ describe('TransactionsTable', () => {
     );
 
     await screen.findByText(/random expense/i);
+
+    expect(Table).toHaveBeenLastCalledWith({
+      columns: [
+        {
+          header: 'Date',
+          id: 'date',
+          enableSorting: false,
+          accessorFn: expect.any(Function),
+          cell: expect.any(Function),
+        },
+        {
+          header: 'Description',
+          enableSorting: false,
+          accessorFn: expect.any(Function),
+        },
+        {
+          header: 'From/To',
+          enableSorting: false,
+          cell: expect.any(Function),
+        },
+        {
+          accessorKey: 'value',
+          header: 'Amount',
+          enableSorting: false,
+          cell: expect.any(Function),
+        },
+        {
+          header: 'Total',
+          enableSorting: false,
+          cell: expect.any(Function),
+        },
+      ],
+      data: [
+        {
+          ...split1,
+          fk_account: {
+            guid: 'account_guid_1',
+            name: 'bank',
+            type: 'ASSET',
+            fk_commodity: eur,
+          },
+          fk_transaction: {
+            ...transaction,
+            fk_currency: eur,
+            splits: [
+              {
+                action: '',
+                fk_account: {
+                  guid: 'account_guid_1',
+                  name: 'bank',
+                  type: 'ASSET',
+                  fk_commodity: eur,
+                },
+                guid: 'split1_guid',
+                quantityDenom: 100,
+                quantityNum: 15,
+                valueDenom: 100,
+                valueNum: 10,
+              },
+              {
+                action: '',
+                fk_account: {
+                  guid: 'account_guid_2',
+                  name: 'expense',
+                  type: 'EXPENSE',
+                  fk_commodity: eur,
+                },
+                guid: 'split2_guid',
+                quantityDenom: 100,
+                quantityNum: -15,
+                valueDenom: 100,
+                valueNum: -10,
+              },
+            ],
+          },
+        },
+      ],
+    }, {});
+  });
+
+  it('renders Date column as expected', async () => {
+    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
+
+    render(
+      <TransactionsTable
+        accountId="account_guid_1"
+        accounts={[
+          {
+            guid: 'account_guid_1',
+            path: 'Assets:bank',
+            type: 'ASSET',
+          } as Account,
+          {
+            guid: 'account_guid_2',
+            path: 'Expenses:expense',
+            type: 'EXPENSE',
+          } as Account,
+        ]}
+      />,
+    );
+
+    await screen.findByText(/random expense/i);
+
+    const dateCol = TableMock.mock.calls[1][0].columns[0];
+
+    expect(
+      // @ts-ignore
+      dateCol.accessorFn({ transaction: { date: DateTime.fromISO('2023-01-01', { zone: 'utc' }) } }),
+    ).toEqual(1672531200000);
+
+    expect(dateCol.cell).not.toBeUndefined();
+    const { container } = render(
+      // @ts-ignore
+      dateCol.cell({
+        row: {
+          original: {
+            transaction,
+          },
+        },
+      }),
+    );
+
+    expect(container).toMatchSnapshot();
+  });
+
+  it('renders FromTo column as expected', async () => {
+    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
+
+    render(
+      <TransactionsTable
+        accountId="account_guid_1"
+        accounts={[
+          {
+            guid: 'account_guid_1',
+            path: 'Assets:bank',
+            type: 'ASSET',
+          } as Account,
+          {
+            guid: 'account_guid_2',
+            path: 'Expenses:expense',
+            type: 'EXPENSE',
+          } as Account,
+        ]}
+      />,
+    );
+
+    await screen.findByText(/random expense/i);
+
+    const fromToCol = TableMock.mock.calls[1][0].columns[2];
+
+    expect(fromToCol.cell).not.toBeUndefined();
+
+    const { container } = render(
+      // @ts-ignore
+      fromToCol.cell({
+        row: {
+          original: {
+            transaction: {
+              ...transaction,
+              splits: [
+                {
+                  action: '',
+                  account: {
+                    guid: 'account_guid_1',
+                    name: 'bank',
+                    type: 'ASSET',
+                    fk_commodity: eur,
+                  },
+                  guid: 'split1_guid',
+                  quantityDenom: 100,
+                  quantityNum: 15,
+                  valueDenom: 100,
+                  valueNum: 10,
+                },
+                {
+                  action: '',
+                  account: {
+                    guid: 'account_guid_2',
+                    name: 'expense',
+                    type: 'EXPENSE',
+                    fk_commodity: eur,
+                  },
+                  guid: 'split2_guid',
+                  quantityDenom: 100,
+                  quantityNum: -15,
+                  valueDenom: 100,
+                  valueNum: -10,
+                },
+              ],
+            },
+            account: account1,
+          },
+        },
+      }),
+    );
+
+    expect(container).toMatchSnapshot();
+  });
+
+  it('renders Amount column as expected', async () => {
+    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
+
+    render(
+      <TransactionsTable
+        accountId="account_guid_1"
+        accounts={[
+          {
+            guid: 'account_guid_1',
+            path: 'Assets:bank',
+            type: 'ASSET',
+          } as Account,
+          {
+            guid: 'account_guid_2',
+            path: 'Expenses:expense',
+            type: 'EXPENSE',
+          } as Account,
+        ]}
+      />,
+    );
+
+    await screen.findByText(/random expense/i);
+
+    const amountCol = TableMock.mock.calls[1][0].columns[3];
+
+    expect(amountCol.cell).not.toBeUndefined();
+    const { container } = render(
+      // @ts-ignore
+      amountCol.cell({
+        row: {
+          original: {
+            quantity: 100,
+            account: account1,
+          },
+        },
+      }),
+    );
+
+    expect(container).toMatchSnapshot();
+  });
+
+  it('renders Total column as expected', async () => {
+    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
+
+    render(
+      <TransactionsTable
+        accountId="account_guid_1"
+        accounts={[
+          {
+            guid: 'account_guid_1',
+            path: 'Assets:bank',
+            type: 'ASSET',
+          } as Account,
+          {
+            guid: 'account_guid_2',
+            path: 'Expenses:expense',
+            type: 'EXPENSE',
+          } as Account,
+        ]}
+      />,
+    );
+
+    await screen.findByText(/random expense/i);
+
+    const totalCol = TableMock.mock.calls[1][0].columns[4];
+
+    expect(totalCol.cell).not.toBeUndefined();
+
+    const row1 = {
+      original: {
+        guid: 'split0',
+        quantity: 100,
+        account: account1,
+      },
+    };
+    const row2 = {
+      original: {
+        guid: 'split1',
+        quantity: 150,
+        account: account1,
+      },
+    };
+    const { container } = render(
+      // @ts-ignore
+      totalCol.cell({
+        row: row1,
+        table: {
+          getCoreRowModel: () => ({ rows: [row1, row2] }),
+        },
+      }),
+    );
 
     expect(container).toMatchSnapshot();
   });

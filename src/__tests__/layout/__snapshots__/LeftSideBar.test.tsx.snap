@@ -62,7 +62,6 @@ exports[`LeftSidebar renders as expected 1`] = `
                   >
                     <a
                       class="block pt-3 pb-3"
-                      data-menu-key="home"
                       href="/dashboard/accounts"
                     >
                       <span
@@ -89,7 +88,6 @@ exports[`LeftSidebar renders as expected 1`] = `
                   >
                     <a
                       class="block pt-3 pb-3"
-                      data-menu-key="investments"
                       href="/dashboard/investments"
                     >
                       <span

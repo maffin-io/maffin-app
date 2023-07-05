@@ -43,8 +43,12 @@ export default function TransactionsTable({
         },
         order: {
           fk_transaction: {
-            date: 'ASC',
+            date: 'DESC',
           },
+          // This is so debit is always before credit
+          // so we avoid negative amounts when display
+          // partial totals
+          quantityNum: 'ASC',
         },
       });
       setSplits(newSplits);
@@ -67,7 +71,6 @@ export default function TransactionsTable({
     <Table<Split>
       columns={columns}
       data={splits}
-      initialSort={{ id: 'date', desc: true }}
     />
   );
 }
@@ -76,6 +79,7 @@ const columns: ColumnDef<Split>[] = [
   {
     header: 'Date',
     id: 'date',
+    enableSorting: false,
     accessorFn: (row: Split) => row.transaction.date.toMillis(),
     cell: ({ row }) => (
       <Tooltip
@@ -130,8 +134,8 @@ const columns: ColumnDef<Split>[] = [
       const currentRow = rows.findIndex(
         (otherRow: Row<Split>) => otherRow.original.guid === row.original.guid,
       );
-      const previousRows = rows.slice(0, currentRow + 1);
-      const totalPreviousSplits = previousRows.reduce(
+      const nextRows = rows.slice(currentRow, rows.length + 1);
+      const totalPreviousSplits = nextRows.reverse().reduce(
         (total: Money, otherRow: Row<Split>) => {
           if (otherRow.original.account.type === 'INCOME') {
             return total.add(
