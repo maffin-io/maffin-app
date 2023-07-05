@@ -25,6 +25,7 @@ export default function TransactionForm({ onSave, account }: TransactionFormProp
     formState: { errors },
     watch,
     control,
+    setValue,
   } = useForm<FormValues>({
     defaultValues: {
       splits: [defaultSplit],
@@ -37,6 +38,7 @@ export default function TransactionForm({ onSave, account }: TransactionFormProp
     name: 'splits',
   });
   const watchSplits = watch('splits');
+  const watchDate = watch('date');
 
   return (
     <form onSubmit={handleSubmit((data) => onSubmit(data, onSave))}>
@@ -69,11 +71,13 @@ export default function TransactionForm({ onSave, account }: TransactionFormProp
           <SplitField
             key={item.id}
             id={item.id}
+            date={watchDate}
             split={watchSplits[index]}
             fromAccount={account}
             index={index}
             control={control}
             register={register}
+            setValue={setValue}
             remove={remove}
             errors={errors}
           />

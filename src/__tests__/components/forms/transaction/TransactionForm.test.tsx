@@ -5,11 +5,10 @@ import {
   screen,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {
-  DataSource,
-} from 'typeorm';
+import { DataSource } from 'typeorm';
 import crypto from 'crypto';
 
+import Stocker from '@/apis/Stocker';
 import * as dataSourceHooks from '@/hooks/useDataSource';
 import * as queries from '@/book/queries';
 import * as transactionLib from '@/book/lib/transaction';
@@ -96,6 +95,10 @@ describe('TransactionForm', () => {
     ]);
 
     jest.spyOn(transactionLib, 'createTransaction').mockImplementation(async () => {});
+    jest.spyOn(Stocker.prototype, 'getPrice').mockResolvedValue({
+      price: 0.987,
+      currency: 'USD',
+    });
   });
 
   afterEach(async () => {
@@ -226,6 +229,7 @@ describe('TransactionForm', () => {
     await user.click(screen.getByText(/expenses:expense1/i));
 
     await user.type(screen.getByPlaceholderText('0.0'), '100');
+    await user.clear(screen.getByPlaceholderText('$ -> €'));
     await user.type(screen.getByPlaceholderText('$ -> €'), '0.987');
 
     await user.click(screen.getByRole('button', { name: /save/i }));
