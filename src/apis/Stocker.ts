@@ -32,7 +32,10 @@ export default class Stocker {
     };
     const resp = await API.get(this.apiName, '/api/price', options);
 
-    return resp;
+    return {
+      price: Number(resp.price.toFixed(4)),
+      currency: resp.currency,
+    };
   }
 }
 

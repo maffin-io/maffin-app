@@ -9,6 +9,7 @@ import type { UseFieldArrayRemove } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import type { DataSource } from 'typeorm';
 
+import Stocker from '@/apis/Stocker';
 import type { Account, Commodity } from '@/book/entities';
 import SplitField from '@/components/forms/transaction/SplitField';
 import type { FormValues } from '@/components/forms/transaction/types';
@@ -26,6 +27,10 @@ jest.mock('@/book/queries', () => ({
 }));
 
 describe('SplitField', () => {
+  beforeEach(() => {
+    jest.spyOn(Stocker.prototype, 'getPrice').mockResolvedValue({ price: 0.0, currency: '' });
+  });
+
   it('renders with empty data', () => {
     const { container } = render(
       <FormWrapper
@@ -321,7 +326,7 @@ describe('SplitField', () => {
       />,
     );
 
-    const exchangeRateInput = screen.getByPlaceholderText('$ -> €');
+    const exchangeRateInput = await screen.findByPlaceholderText('$ -> €');
     user.clear(exchangeRateInput);
 
     await user.click(screen.getByText('Submit'));
@@ -355,12 +360,157 @@ describe('SplitField', () => {
       />,
     );
 
-    const exchangeRateInput = screen.getByPlaceholderText('$ -> €');
+    const exchangeRateInput = await screen.findByPlaceholderText('$ -> €');
     user.clear(exchangeRateInput);
     await user.type(exchangeRateInput, '-0.978');
 
     await user.click(screen.getByText('Submit'));
     screen.getByText('Exchange rate must be positive');
+  });
+
+  it('autopopulates exchangeRate for non investments', async () => {
+    const user = userEvent.setup();
+    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
+    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
+      {
+        guid: '',
+        path: 'path1',
+        type: '',
+        commodity: {
+          mnemonic: 'SGD',
+        } as Commodity,
+      } as Account,
+    ]);
+    jest.spyOn(Stocker.prototype, 'getPrice')
+      .mockResolvedValueOnce({ price: 0.987, currency: '' })
+      .mockResolvedValue({ price: 0.7, currency: '' });
+
+    render(
+      <FormWrapper
+        toAccount={
+          {
+            guid: '',
+            path: '',
+            type: '',
+            commodity: {
+              mnemonic: 'EUR',
+            } as Commodity,
+          } as Account
+        }
+        fromAccount={
+          {
+            guid: '',
+            path: '',
+            type: '',
+            commodity: {
+              mnemonic: 'USD',
+            } as Commodity,
+          } as Account
+        }
+      />,
+    );
+
+    const exchangeRateInput = await screen.findByPlaceholderText('$ -> €');
+    expect(exchangeRateInput).toHaveValue(0.987);
+  });
+
+  it('autopopulates exchangeRate with fromAccount being an investment', async () => {
+    jest.spyOn(Stocker.prototype, 'getPrice')
+      .mockResolvedValueOnce({ price: 17.15, currency: '' });
+
+    render(
+      <FormWrapper
+        toAccount={
+          {
+            guid: '',
+            path: '',
+            type: '',
+            commodity: {
+              mnemonic: 'EUR',
+            } as Commodity,
+          } as Account
+        }
+        fromAccount={
+          {
+            guid: '',
+            path: '',
+            type: 'STOCK',
+            commodity: {
+              mnemonic: 'IDVY.AS',
+            } as Commodity,
+          } as Account
+        }
+      />,
+    );
+
+    const exchangeRateInput = await screen.findByPlaceholderText('IDVY.AS -> €');
+    expect(exchangeRateInput).toHaveValue(17.15);
+  });
+
+  it('autopopulates exchangeRate with toAccount being an investment', async () => {
+    jest.spyOn(Stocker.prototype, 'getPrice')
+      .mockResolvedValueOnce({ price: 17.15, currency: '' });
+
+    render(
+      <FormWrapper
+        toAccount={
+          {
+            guid: '',
+            path: '',
+            type: 'STOCK',
+            commodity: {
+              mnemonic: 'IDVY.AS',
+            } as Commodity,
+          } as Account
+        }
+        fromAccount={
+          {
+            guid: '',
+            path: '',
+            type: '',
+            commodity: {
+              mnemonic: 'EUR',
+            } as Commodity,
+          } as Account
+        }
+      />,
+    );
+
+    const exchangeRateInput = await screen.findByPlaceholderText('€ -> IDVY.AS');
+    expect(exchangeRateInput).toHaveValue();
+  });
+
+  it('autopopulates exchangeRate with both accounts being an investment', async () => {
+    jest.spyOn(Stocker.prototype, 'getPrice')
+      .mockResolvedValueOnce({ price: 17.15, currency: '' });
+
+    render(
+      <FormWrapper
+        toAccount={
+          {
+            guid: '',
+            path: '',
+            type: 'STOCK',
+            commodity: {
+              mnemonic: 'IDVY.AS',
+            } as Commodity,
+          } as Account
+        }
+        fromAccount={
+          {
+            guid: '',
+            path: '',
+            type: 'STOCK',
+            commodity: {
+              mnemonic: 'IAG.MC',
+            } as Commodity,
+          } as Account
+        }
+      />,
+    );
+
+    const exchangeRateInput = await screen.findByPlaceholderText('IAG.MC -> IDVY.AS');
+    expect(exchangeRateInput).toHaveValue(0);
   });
 });
 
@@ -378,6 +528,7 @@ function FormWrapper(
   const {
     control,
     register,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>();
@@ -388,6 +539,7 @@ function FormWrapper(
         id="id"
         index={1}
         fromAccount={fromAccount}
+        date="2023-01-01"
         split={{
           amount: 0.0,
           toAccount: toAccount || {
@@ -400,6 +552,7 @@ function FormWrapper(
           } as Account,
         }}
         control={control}
+        setValue={setValue}
         remove={mockRemove}
         register={register}
         errors={errors}

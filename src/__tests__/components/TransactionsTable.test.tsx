@@ -1,15 +1,10 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 import {
-  waitFor,
   render,
   screen,
 } from '@testing-library/react';
-import {
-  createConnection,
-  getConnection,
-} from 'typeorm';
-import type { DataSource } from 'typeorm';
+import { DataSource } from 'typeorm';
 
 import {
   Account,
@@ -26,19 +21,22 @@ jest.mock('@/hooks/useDataSource', () => ({
 }));
 
 describe('TransactionsTable', () => {
+  let datasource: DataSource;
+
   beforeEach(async () => {
-    await createConnection({
+    datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
       entities: [Account, Commodity, Split, Transaction],
       synchronize: true,
       logging: false,
     });
+    await datasource.initialize();
   });
 
   afterEach(async () => {
-    const conn = await getConnection();
-    await conn.close();
+    jest.resetAllMocks();
+    await datasource.destroy();
   });
 
   it('shows empty message', async () => {
@@ -128,9 +126,7 @@ describe('TransactionsTable', () => {
       />,
     );
 
-    await waitFor(() => {
-      screen.getByText(/random expense/i);
-    });
+    await screen.findByText(/random expense/i);
 
     expect(container).toMatchSnapshot();
   });
