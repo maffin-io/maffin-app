@@ -48,6 +48,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
     if (datasource) {
       load();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [datasource, params.guid, accounts]);
 
   if (account === null) {

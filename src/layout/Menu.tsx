@@ -8,13 +8,11 @@ import { usePathname } from 'next/navigation';
 
 const MENU_ITEMS = [
   {
-    key: 'home',
     label: 'Home',
     icon: <BiHomeAlt size="1.125em" />,
     url: '/dashboard/accounts',
   },
   {
-    key: 'investments',
     label: 'Investments',
     icon: <BiCoinStack size="1.125em" />,
     url: '/dashboard/investments',
@@ -23,7 +21,6 @@ const MENU_ITEMS = [
 
 type MenuItemProps = {
   item: {
-    key: string;
     url: string;
     target?: string;
     icon: JSX.Element;
@@ -39,7 +36,6 @@ function MenuItem({ item, className }: MenuItemProps): JSX.Element {
         href={item.url}
         target={item.target}
         className="block pt-3 pb-3"
-        data-menu-key={item.key}
       >
         <span className={`flex justify-center items-center w-20 ${className} text-slate-400 hover:text-white`}>
           {item.icon}

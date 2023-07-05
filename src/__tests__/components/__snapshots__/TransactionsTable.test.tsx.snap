@@ -1,263 +1,65 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`TransactionsTable displays splits as expected 1`] = `
+exports[`TransactionsTable renders Amount column as expected 1`] = `
+<div>
+  <span
+    class="text-green-300 flex items-center"
+  >
+    <svg
+      class="text-xs mr-1"
+      fill="currentColor"
+      height="1em"
+      stroke="currentColor"
+      stroke-width="0"
+      viewBox="0 0 448 512"
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"
+      />
+    </svg>
+    100.00 €
+  </span>
+</div>
+`;
+
+exports[`TransactionsTable renders Date column as expected 1`] = `
 <div>
   <div
-    class="relative overflow-x-auto"
+    class="group flex relative"
   >
-    <table
-      class="w-full text-sm text-left"
-    >
-      <thead
-        class="bg-gunmetal-700 text-slate-300"
-      >
-        <tr>
-          <th
-            class="px-6 py-3"
-            scope="col"
-          >
-            <div
-              class="flex"
-            >
-              Date
-              <div
-                class="flex items-center cursor-pointer"
-              >
-                <svg
-                  class="opacity-50 absolute"
-                  fill="currentColor"
-                  height="1em"
-                  stroke="currentColor"
-                  stroke-width="0"
-                  viewBox="0 0 320 512"
-                  width="1em"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M279 224H41c-21.4 0-32.1-25.9-17-41L143 64c9.4-9.4 24.6-9.4 33.9 0l119 119c15.2 15.1 4.5 41-16.9 41z"
-                  />
-                </svg>
-                <svg
-                  class="opacity-100 absolute"
-                  fill="currentColor"
-                  height="1em"
-                  stroke="currentColor"
-                  stroke-width="0"
-                  viewBox="0 0 320 512"
-                  width="1em"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41z"
-                  />
-                </svg>
-              </div>
-            </div>
-          </th>
-          <th
-            class="px-6 py-3"
-            scope="col"
-          >
-            <div
-              class="flex"
-            >
-              Description
-            </div>
-          </th>
-          <th
-            class="px-6 py-3"
-            scope="col"
-          >
-            <div
-              class="flex"
-            >
-              From/To
-            </div>
-          </th>
-          <th
-            class="px-6 py-3"
-            scope="col"
-          >
-            <div
-              class="flex"
-            >
-              Amount
-            </div>
-          </th>
-          <th
-            class="px-6 py-3"
-            scope="col"
-          >
-            <div
-              class="flex"
-            >
-              Total
-            </div>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          class="border-b border-gunmetal-700"
-        >
-          <td
-            class="px-6 py-4"
-          >
-            <div
-              class="group flex relative"
-            >
-              <span>
-                2023-01-01
-              </span>
-              <span
-                class="opacity-0 absolute rounded-md bg-black text-center z-50 -translate-x-1/2 left-1/2 mt-2 top-full text-xs p-2 transition-opacity group-hover:opacity-40"
-              >
-                tx_guid
-              </span>
-            </div>
-          </td>
-          <td
-            class="px-6 py-4"
-          >
-            random expense
-          </td>
-          <td
-            class="px-6 py-4"
-          >
-            <ul>
-              <li>
-                <a
-                  class="badge bg-red-500/20 text-red-300"
-                  href="/dashboard/accounts/account_guid_2"
-                >
-                  Expenses:expense
-                </a>
-              </li>
-            </ul>
-          </td>
-          <td
-            class="px-6 py-4"
-          >
-            <span
-              class="text-green-300 flex items-center"
-            >
-              <svg
-                class="text-xs mr-1"
-                fill="currentColor"
-                height="1em"
-                stroke="currentColor"
-                stroke-width="0"
-                viewBox="0 0 448 512"
-                width="1em"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"
-                />
-              </svg>
-              0.15 €
-            </span>
-          </td>
-          <td
-            class="px-6 py-4"
-          >
-            <span>
-              0.15 €
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div
-    class="flex text-center text-sm items-center px-2 pb-1"
-  >
-    <label
-      class="mr-1"
-    >
-      Display:
-    </label>
-    <select>
-      <option
-        value="5"
-      >
-        5
-      </option>
-      <option
-        value="10"
-      >
-        10
-      </option>
-      <option
-        value="50"
-      >
-        50
-      </option>
-    </select>
-    <span
-      class="mx-5"
-    >
-      Page
-       
-      <strong>
-        1
-         
-        of
-         
-        1
-      </strong>
-       
+    <span>
+      2023-01-01
     </span>
     <span
-      class="flex justify-start items-center"
+      class="opacity-0 absolute rounded-md bg-black text-center z-50 -translate-x-1/2 left-1/2 mt-2 top-full text-xs p-2 transition-opacity group-hover:opacity-40"
     >
-      <label
-        class="mr-1"
-      >
-        Go to page:
-      </label>
-      <input
-        class="w-1/4"
-        type="number"
-        value="1"
-      />
+      tx_guid
     </span>
-    <div
-      class="ms-auto"
-    >
-      <button
-        class="bg-gunmetal-700 rounded-full disabled:opacity-50 px-3 py-1"
-        disabled=""
-        type="button"
-      >
-        &lt;&lt;
-      </button>
-       
-      <button
-        class="bg-gunmetal-700 rounded-full disabled:opacity-50 px-3 py-1"
-        disabled=""
-        type="button"
-      >
-        &lt;
-      </button>
-       
-      <button
-        class="bg-gunmetal-700 rounded-full disabled:opacity-50 px-3 py-1"
-        disabled=""
-        type="button"
-      >
-        &gt;
-      </button>
-       
-      <button
-        class="bg-gunmetal-700 rounded-full disabled:opacity-50 px-3 py-1"
-        disabled=""
-        type="button"
-      >
-        &gt;&gt;
-      </button>
-       
-    </div>
   </div>
+</div>
+`;
+
+exports[`TransactionsTable renders FromTo column as expected 1`] = `
+<div>
+  <ul>
+    <li>
+      <a
+        class="badge bg-red-500/20 text-red-300"
+        href="/dashboard/accounts/account_guid_2"
+      >
+        Expenses:expense
+      </a>
+    </li>
+  </ul>
+</div>
+`;
+
+exports[`TransactionsTable renders Total column as expected 1`] = `
+<div>
+  <span>
+    250.00 €
+  </span>
 </div>
 `;
