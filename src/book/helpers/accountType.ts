@@ -15,3 +15,15 @@ export function isAsset(account: Account): boolean {
 
   return false;
 }
+
+export function getAllowedSubAccounts(type: string): string[] {
+  if (type === 'ROOT') {
+    return ['ASSET', 'EXPENSE', 'INCOME', 'LIABILITY'];
+  }
+
+  if (type === 'ASSET') {
+    return ['ASSET', 'BANK', 'CASH', 'EQUITY', 'STOCK', 'MUTUAL'];
+  }
+
+  return [type];
+}

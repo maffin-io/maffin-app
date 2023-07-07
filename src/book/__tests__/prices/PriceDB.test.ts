@@ -1,8 +1,5 @@
 import { DateTime } from 'luxon';
-import {
-  createConnection,
-  getConnection,
-} from 'typeorm';
+import { DataSource } from 'typeorm';
 import crypto from 'crypto';
 
 import { PriceDB } from '../../prices';
@@ -23,39 +20,42 @@ Object.defineProperty(global.self, 'crypto', {
 });
 
 describe('PriceDB', () => {
+  let datasource: DataSource;
+
   beforeEach(async () => {
-    await createConnection({
+    datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
       entities: [Price, Commodity, Account, Split, Transaction],
       synchronize: true,
       logging: false,
     });
+    await datasource.initialize();
   });
 
   afterEach(async () => {
-    const conn = await getConnection();
-    await conn.close();
+    jest.resetAllMocks();
+    await datasource.destroy();
   });
 
   describe('getRate', () => {
+    let eur: Commodity;
+    let usd: Commodity;
+
     beforeEach(async () => {
-      await Commodity.create({
-        guid: 'commodity_guid1',
+      eur = await Commodity.create({
         namespace: 'CURRENCY',
         mnemonic: 'EUR',
       }).save();
 
-      await Commodity.create({
-        guid: 'commodity_guid2',
+      usd = await Commodity.create({
         namespace: 'CURRENCY',
         mnemonic: 'USD',
       }).save();
 
       await Price.create({
-        guid: 'price1_guid',
-        fk_commodity: 'commodity_guid1',
-        fk_currency: 'commodity_guid2',
+        fk_commodity: eur,
+        fk_currency: usd,
         date: DateTime.fromISO('2023-01-01'),
         valueNum: 10,
         valueDenom: 100,
@@ -76,9 +76,8 @@ describe('PriceDB', () => {
 
     it('returns the latest by default', async () => {
       await Price.create({
-        guid: 'price2_guid',
-        fk_commodity: 'commodity_guid1',
-        fk_currency: 'commodity_guid2',
+        fk_commodity: eur,
+        fk_currency: usd,
         date: DateTime.fromISO('2023-02-01'),
         valueNum: 20,
         valueDenom: 100,
@@ -91,9 +90,8 @@ describe('PriceDB', () => {
 
     it('returns rate for specific date', async () => {
       await Price.create({
-        guid: 'price2_guid',
-        fk_commodity: 'commodity_guid1',
-        fk_currency: 'commodity_guid2',
+        fk_commodity: eur,
+        fk_currency: usd,
         date: DateTime.fromISO('2023-02-01'),
         valueNum: 20,
         valueDenom: 100,
@@ -105,9 +103,8 @@ describe('PriceDB', () => {
 
     it('returns rate for specific date when -1 day exists', async () => {
       await Price.create({
-        guid: 'price2_guid',
-        fk_commodity: 'commodity_guid1',
-        fk_currency: 'commodity_guid2',
+        fk_commodity: eur,
+        fk_currency: usd,
         date: DateTime.fromISO('2023-02-01'),
         valueNum: 20,
         valueDenom: 100,
@@ -119,9 +116,8 @@ describe('PriceDB', () => {
 
     it('returns rate for specific date when +1 day exists', async () => {
       await Price.create({
-        guid: 'price2_guid',
-        fk_commodity: 'commodity_guid1',
-        fk_currency: 'commodity_guid2',
+        fk_commodity: eur,
+        fk_currency: usd,
         date: DateTime.fromISO('2023-02-02'),
         valueNum: 20,
         valueDenom: 100,
@@ -160,13 +156,11 @@ describe('PriceDB', () => {
       });
 
       await Commodity.create({
-        guid: 'commodity_guid1',
         namespace: 'CURRENCY',
         mnemonic: 'EUR',
       }).save();
 
       await Commodity.create({
-        guid: 'commodity_guid2',
         namespace: 'CURRENCY',
         mnemonic: 'USD',
       }).save();
@@ -179,10 +173,10 @@ describe('PriceDB', () => {
         [`EUR.USD.${DateTime.now().toISODate()}`]: {
           date: expect.any(DateTime),
           fk_commodity: {
-            guid: 'commodity_guid1',
+            mnemonic: 'EUR',
           },
           fk_currency: {
-            guid: 'commodity_guid2',
+            mnemonic: 'USD',
           },
           guid: expect.any(String),
           source: 'maffin::{"price":0.9654,"changePct":-1,"changeAbs":-1,"currency":"USD"}',
@@ -192,10 +186,10 @@ describe('PriceDB', () => {
         [`USD.EUR.${DateTime.now().toISODate()}`]: {
           date: expect.any(DateTime),
           fk_commodity: {
-            guid: 'commodity_guid2',
+            mnemonic: 'USD',
           },
           fk_currency: {
-            guid: 'commodity_guid1',
+            mnemonic: 'EUR',
           },
           source: 'maffin::{"price":1.04,"changePct":-1,"changeAbs":-1,"currency":"EUR"}',
           guid: expect.any(String),
@@ -217,15 +211,15 @@ describe('PriceDB', () => {
             date: DateTime.now().startOf('day'),
             valueNum: 9654,
             valueDenom: 10000,
-            commodity: {
+            fk_commodity: {
+              guid: expect.any(String),
               cusip: null,
-              guid: 'commodity_guid1',
               mnemonic: 'EUR',
               namespace: 'CURRENCY',
             },
-            currency: {
+            fk_currency: {
+              guid: expect.any(String),
               cusip: null,
-              guid: 'commodity_guid2',
               mnemonic: 'USD',
               namespace: 'CURRENCY',
             },
@@ -236,15 +230,15 @@ describe('PriceDB', () => {
             date: DateTime.now().startOf('day'),
             valueNum: 104,
             valueDenom: 100,
-            commodity: {
+            fk_commodity: {
+              guid: expect.any(String),
               cusip: null,
-              guid: 'commodity_guid2',
               mnemonic: 'USD',
               namespace: 'CURRENCY',
             },
-            currency: {
+            fk_currency: {
+              guid: expect.any(String),
               cusip: null,
-              guid: 'commodity_guid1',
               mnemonic: 'EUR',
               namespace: 'CURRENCY',
             },
@@ -271,39 +265,62 @@ describe('PriceDB', () => {
         },
       });
 
-      await Commodity.create({
-        guid: 'commodity_googl',
+      const commodity = await Commodity.create({
         namespace: 'NASDAQ',
         mnemonic: 'GOOGL',
       }).save();
 
-      await Commodity.create({
-        guid: 'commodity_usd',
+      const usd = await Commodity.create({
         namespace: 'CURRENCY',
         mnemonic: 'USD',
       }).save();
 
-      await Account.create({
-        guid: 'googl_account',
+      const root = await Account.create({
+        name: 'Root',
+        type: 'ROOT',
+      }).save();
+
+      const parent = await Account.create({
+        name: 'Parent',
+        type: 'ASSET',
+        parent: root,
+        fk_commodity: usd,
+      }).save();
+
+      const investment = await Account.create({
         name: 'GOOGL',
         type,
-        fk_commodity: 'commodity_googl',
+        fk_commodity: commodity,
+        parent,
+      }).save();
+
+      const broker = await Account.create({
+        name: 'broker',
+        type: 'ASSET',
+        fk_commodity: usd,
+        parent,
       }).save();
 
       await Transaction.create({
-        guid: 'tx_guid_1',
-        fk_currency: 'commodity_usd',
+        description: 'description',
+        fk_currency: usd,
         date: DateTime.fromISO('2023-01-01'),
-      }).save();
-
-      await Split.create({
-        guid: 'guid_1',
-        valueNum: 10,
-        valueDenom: 100,
-        quantityNum: 200,
-        quantityDenom: 100,
-        fk_transaction: 'tx_guid_1',
-        fk_account: 'googl_account',
+        splits: [
+          {
+            valueNum: -10,
+            valueDenom: 100,
+            quantityNum: -200,
+            quantityDenom: 100,
+            fk_account: broker,
+          },
+          {
+            valueNum: 10,
+            valueDenom: 100,
+            quantityNum: 200,
+            quantityDenom: 100,
+            fk_account: investment,
+          },
+        ],
       }).save();
     });
 
@@ -314,10 +331,10 @@ describe('PriceDB', () => {
         [`GOOGL.${DateTime.now().toISODate()}`]: {
           date: expect.any(DateTime),
           fk_commodity: {
-            guid: 'commodity_googl',
+            mnemonic: 'GOOGL',
           },
           fk_currency: {
-            guid: 'commodity_usd',
+            mnemonic: 'USD',
           },
           guid: expect.any(String),
           source: 'maffin::{"price":2000,"changePct":-1,"changeAbs":-1,"currency":"USD"}',
@@ -339,14 +356,14 @@ describe('PriceDB', () => {
             date: DateTime.now().startOf('day'),
             valueNum: 2000,
             valueDenom: 1,
-            commodity: {
-              guid: 'commodity_googl',
+            fk_commodity: {
+              guid: expect.any(String),
               cusip: null,
               mnemonic: 'GOOGL',
               namespace: 'NASDAQ',
             },
-            currency: {
-              guid: 'commodity_usd',
+            fk_currency: {
+              guid: expect.any(String),
               cusip: null,
               mnemonic: 'USD',
               namespace: 'CURRENCY',
@@ -361,46 +378,40 @@ describe('PriceDB', () => {
 
   describe('getHistory', () => {
     beforeEach(async () => {
-      await Commodity.create({
-        guid: 'commodity_guid1',
+      const eur = await Commodity.create({
         namespace: 'CURRENCY',
         mnemonic: 'EUR',
       }).save();
 
-      await Commodity.create({
-        guid: 'commodity_guid2',
+      const usd = await Commodity.create({
         namespace: 'CURRENCY',
         mnemonic: 'USD',
       }).save();
 
-      await Commodity.create({
-        guid: 'commodity_guid3',
+      const sgd = await Commodity.create({
         namespace: 'CURRENCY',
         mnemonic: 'SGD',
       }).save();
 
       await Price.create({
-        guid: 'price_guid_1',
-        fk_commodity: 'commodity_guid2',
-        fk_currency: 'commodity_guid1',
+        fk_commodity: usd,
+        fk_currency: eur,
         date: DateTime.fromISO('2021-01-01'),
         valueNum: 10,
         valueDenom: 100,
       }).save();
 
       await Price.create({
-        guid: 'price_guid_2',
-        fk_commodity: 'commodity_guid2',
-        fk_currency: 'commodity_guid1',
+        fk_commodity: usd,
+        fk_currency: eur,
         date: DateTime.fromISO('2022-01-01'),
         valueNum: 20,
         valueDenom: 100,
       }).save();
 
       await Price.create({
-        guid: 'price_guid_3',
-        fk_commodity: 'commodity_guid3',
-        fk_currency: 'commodity_guid1',
+        fk_commodity: sgd,
+        fk_currency: eur,
         date: DateTime.fromISO('2023-01-01'),
         valueNum: 30,
         valueDenom: 100,
@@ -412,13 +423,16 @@ describe('PriceDB', () => {
 
       expect(prices.map).toEqual({
         'SGD.EUR.2023-01-01': expect.objectContaining({
-          guid: 'price_guid_3',
+          valueNum: 30,
+          valueDenom: 100,
         }),
         'USD.EUR.2021-01-01': expect.objectContaining({
-          guid: 'price_guid_1',
+          valueNum: 10,
+          valueDenom: 100,
         }),
         'USD.EUR.2022-01-01': expect.objectContaining({
-          guid: 'price_guid_2',
+          valueNum: 20,
+          valueDenom: 100,
         }),
       });
     });

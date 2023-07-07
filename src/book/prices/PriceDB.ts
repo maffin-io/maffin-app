@@ -112,7 +112,6 @@ async function getCurrencyQuotes(): Promise<Price[]> {
     const { amount, scale } = toAmountWithScale(priceObj.price);
 
     instances.push(Price.create({
-      guid: crypto.randomUUID().substring(0, 31),
       fk_commodity: currencies.find(currency => currency.mnemonic === from),
       fk_currency: currencies.find(currency => currency.mnemonic === to),
       date: DateTime.now().startOf('day'),
@@ -177,7 +176,6 @@ function buildPrices(
       throw new Error(`Didnt find matching currency for ${priceObj.currency}`);
     }
     instances.push(Price.create({
-      guid: crypto.randomUUID().substring(0, 31),
       fk_commodity: commodity,
       fk_currency: currency,
       date: DateTime.now().startOf('day'),

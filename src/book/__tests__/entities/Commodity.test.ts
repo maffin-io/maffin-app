@@ -1,33 +1,36 @@
-import {
-  createConnection,
-  getConnection,
-  BaseEntity,
-} from 'typeorm';
+import { DataSource, BaseEntity } from 'typeorm';
+import crypto from 'crypto';
 
 import { Commodity } from '../../entities';
 
+Object.defineProperty(global.self, 'crypto', {
+  value: {
+    randomUUID: () => crypto.randomUUID(),
+  },
+});
+
 describe('Commodity', () => {
   let instance: Commodity;
+  let datasource: DataSource;
 
   beforeEach(async () => {
-    await createConnection({
+    datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
       entities: [Commodity],
       synchronize: true,
       logging: false,
     });
+    await datasource.initialize();
   });
 
   afterEach(async () => {
-    const conn = await getConnection();
-    await conn.close();
+    await datasource.destroy();
   });
 
   describe('entity', () => {
     beforeEach(async () => {
       instance = Commodity.create({
-        guid: 'guid',
         namespace: 'namespace',
         mnemonic: 'mnemonic',
       });
@@ -44,7 +47,7 @@ describe('Commodity', () => {
 
       expect(commodities).toEqual([
         {
-          guid: 'guid',
+          guid: expect.any(String),
           cusip: null,
           mnemonic: 'mnemonic',
           namespace: 'namespace',
@@ -54,7 +57,6 @@ describe('Commodity', () => {
 
     it('calculates stockerId as expected', () => {
       instance = Commodity.create({
-        guid: 'guid',
         namespace: 'namespace',
         mnemonic: 'mnemonic',
       });

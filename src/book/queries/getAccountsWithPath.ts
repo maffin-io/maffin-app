@@ -9,10 +9,12 @@ type AccountPath = {
   commodityGuid: string,
 };
 
-export async function getAccountsWithPath(): Promise<Account[]> {
+export async function getAccountsWithPath(showRoot = false): Promise<Account[]> {
   const start = performance.now();
   const books = await Book.find();
   const rootAccount = books[0].root;
+
+  const typeFilter = !showRoot ? { type: Not('ROOT') } : {};
 
   const [accountsPaths, accounts] = await Promise.all([
     Account.query(
@@ -28,7 +30,7 @@ export async function getAccountsWithPath(): Promise<Account[]> {
       `,
       [rootAccount.guid],
     ),
-    Account.findBy({ type: Not('ROOT') }),
+    Account.findBy(typeFilter),
   ]);
 
   accounts.forEach((account) => {
@@ -36,8 +38,13 @@ export async function getAccountsWithPath(): Promise<Account[]> {
       (ap: AccountPath) => ap.guid === account.guid,
     );
 
-    account.path = accountPath.path;
+    if (showRoot && account.type === 'ROOT') {
+      account.path = 'Root';
+    } else {
+      account.path = accountPath.path;
+    }
   });
+
   const end = performance.now();
   console.log(`get accounts with paths: ${end - start}ms`);
 

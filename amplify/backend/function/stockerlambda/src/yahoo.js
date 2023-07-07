@@ -12,13 +12,12 @@ async function getLiveSummary(ticker) {
   if (ticker === 'SGDCAD=X') {
     ticker = 'SGDCAX=X';
   }
+  const url = `${HOST}/v10/finance/quoteSummary/${ticker}?modules=price`;
   try {
-    resp = await axios.get(
-      `${HOST}/v10/finance/quoteSummary/${ticker}?modules=price`,
-    );
+    resp = await axios.get(url);
   } catch (error) {
     throw new YahooError(
-      `${ticker} failed: ${error.message}`,
+      `${url} failed: ${error.message}`,
       error.response.status,
       'UNKNOWN',
     );

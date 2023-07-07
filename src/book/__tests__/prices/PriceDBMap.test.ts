@@ -1,53 +1,55 @@
 import { DateTime } from 'luxon';
-import {
-  createConnection,
-  getConnection,
-} from 'typeorm';
+import { DataSource } from 'typeorm';
+import crypto from 'crypto';
 
 import { Commodity, Price } from '../../entities';
 import PriceDBMap from '../../prices/PriceDBMap';
 
+Object.defineProperty(global.self, 'crypto', {
+  value: {
+    randomUUID: () => crypto.randomUUID(),
+  },
+});
+
 describe('PriceDBMap', () => {
+  let datasource: DataSource;
   let instance: PriceDBMap;
-  let commodityEur: Commodity;
-  let commodityUsd: Commodity;
+  let eur: Commodity;
+  let usd: Commodity;
   let price1: Price;
   let price2: Price;
 
   beforeEach(async () => {
-    await createConnection({
+    datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
       entities: [Price, Commodity],
       synchronize: true,
       logging: false,
     });
+    await datasource.initialize();
 
-    commodityEur = await Commodity.create({
-      guid: 'commodity_guid1',
+    eur = await Commodity.create({
       namespace: 'CURRENCY',
       mnemonic: 'EUR',
     }).save();
 
-    commodityUsd = await Commodity.create({
-      guid: 'commodity_guid2',
+    usd = await Commodity.create({
       namespace: 'CURRENCY',
       mnemonic: 'USD',
     }).save();
 
     price1 = Price.create({
-      guid: 'price_guid_1',
-      fk_commodity: commodityEur,
-      fk_currency: commodityUsd,
+      fk_commodity: eur,
+      fk_currency: usd,
       date: DateTime.fromISO('2023-01-01'),
       valueNum: 10,
       valueDenom: 100,
     });
 
     price2 = Price.create({
-      guid: 'price_guid_2',
-      fk_commodity: commodityUsd,
-      fk_currency: commodityEur,
+      fk_commodity: usd,
+      fk_currency: eur,
       date: DateTime.fromISO('2023-01-01'),
       valueNum: 20,
       valueDenom: 100,
@@ -55,8 +57,7 @@ describe('PriceDBMap', () => {
   });
 
   afterEach(async () => {
-    const conn = await getConnection();
-    await conn.close();
+    await datasource.destroy();
   });
 
   describe('instance', () => {
@@ -74,9 +75,8 @@ describe('PriceDBMap', () => {
     it('raises error if commodity is not loaded', () => {
       expect(() => new PriceDBMap([
         Price.create({
-          guid: 'price_guid_2',
-          fk_commodity: 'commodity_guid1',
-          fk_currency: commodityEur,
+          fk_commodity: 'foo',
+          fk_currency: eur,
           date: DateTime.fromISO('2023-01-01'),
           valueNum: 20,
           valueDenom: 100,
@@ -87,9 +87,8 @@ describe('PriceDBMap', () => {
     it('raises error if currency is not loaded', () => {
       expect(() => new PriceDBMap([
         Price.create({
-          guid: 'price_guid_2',
-          fk_commodity: commodityUsd,
-          fk_currency: 'commodity_guid1',
+          fk_commodity: usd,
+          fk_currency: 'foo',
           date: DateTime.fromISO('2023-01-01'),
           valueNum: 20,
           valueDenom: 100,
@@ -99,6 +98,10 @@ describe('PriceDBMap', () => {
   });
 
   describe('getPrice', () => {
+    beforeEach(() => {
+      instance = new PriceDBMap([price1, price2]);
+    });
+
     it('returns dummy price with value 1 if from=to', () => {
       expect(instance.getPrice('EUR', 'EUR', DateTime.now())).toMatchObject({
         valueNum: 1,
@@ -128,15 +131,13 @@ describe('PriceDBMap', () => {
   describe('getStockPrice', () => {
     beforeEach(async () => {
       const commodityStock = await Commodity.create({
-        guid: 'commodity_guid2',
-        namespace: '',
+        namespace: 'AS',
         mnemonic: 'STOCK',
       }).save();
 
       price1 = Price.create({
-        guid: 'price_guid_1',
         fk_commodity: commodityStock,
-        fk_currency: commodityUsd,
+        fk_currency: usd,
         date: DateTime.fromISO('2023-01-01'),
         valueNum: 10,
         valueDenom: 100,

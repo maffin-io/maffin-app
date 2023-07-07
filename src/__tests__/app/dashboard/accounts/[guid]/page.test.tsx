@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  act,
+  waitFor,
   render,
   screen,
 } from '@testing-library/react';
@@ -8,9 +8,22 @@ import type { DataSource } from 'typeorm';
 
 import AccountPage from '@/app/dashboard/accounts/[guid]/page';
 import { TransactionsTableProps } from '@/components/TransactionsTable';
+import { AddTransactionButtonProps } from '@/components/AddTransactionButton';
 import { Account } from '@/book/entities';
 import * as queries from '@/book/queries';
 import * as dataSourceHooks from '@/hooks/useDataSource';
+
+jest.mock('@/components/AddTransactionButton', () => {
+  function AddTransactionButton(props: AddTransactionButtonProps) {
+    return (
+      <div className="AddTransactionButton">
+        <span>{JSON.stringify(props)}</span>
+      </div>
+    );
+  }
+
+  return AddTransactionButton;
+});
 
 jest.mock('@/components/TransactionsTable', () => {
   function TransactionsTable(props: TransactionsTableProps) {
@@ -67,37 +80,23 @@ describe('AccountPage', () => {
 
   it('returns 404 when account not found', async () => {
     jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-    jest.spyOn(Account, 'findOneBy').mockResolvedValue(null);
+    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([]);
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      render(
-        <AccountPage params={{ guid: 'guid' }} />,
-      );
-    });
+    render(
+      <AccountPage params={{ guid: 'guid' }} />,
+    );
 
-    expect(mockRouterPush).toHaveBeenCalledWith('/404');
+    await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/404'));
   });
 
   it('renders as expected with account', async () => {
     jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-    jest.spyOn(Account, 'findOneBy').mockResolvedValue({
-      guid: 'accountGuid',
-      name: 'Account name',
-      path: 'account:name',
-      commodity: {
-        mnemonic: 'EUR',
-      },
-    } as Account);
 
-    let container;
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      ({ container } = render(
-        <AccountPage params={{ guid: 'guid' }} />,
-      ));
-    });
+    const { container } = render(
+      <AccountPage params={{ guid: 'guid' }} />,
+    );
 
+    await screen.findByText(/accountId/);
     expect(container).toMatchSnapshot();
   });
 });

@@ -1,18 +1,19 @@
 import * as v from 'class-validator';
 import {
-  BaseEntity,
   Column,
   Entity, JoinColumn,
   ManyToOne,
   Tree,
   TreeParent,
   TreeChildren,
-  OneToMany, PrimaryColumn,
+  OneToMany,
 } from 'typeorm';
 
 import type Commodity from './Commodity';
 import Money from '../Money';
 import type Split from './Split';
+import BaseEntity from './BaseEntity';
+import { isInvestment, getAllowedSubAccounts } from '../helpers/accountType';
 
 /**
  * CREATE TABLE accounts (
@@ -35,18 +36,12 @@ import type Split from './Split';
 export default class Account extends BaseEntity {
   static TYPES = ['ROOT', 'ASSET', 'BANK', 'CASH', 'EQUITY', 'LIABILITY', 'INCOME', 'EXPENSE', 'MUTUAL', 'STOCK'];
 
-  @PrimaryColumn({
-    type: 'varchar',
-    length: 32,
-  })
-  @v.Length(1, 32)
-    guid!: string;
-
   @Column({
     type: 'text',
     length: 2048,
   })
-  @v.MaxLength(2048)
+  @v.Matches(/[a-zA-Z.]+/)
+  @v.Length(4, 2048)
     name!: string;
 
   @Column({
@@ -55,6 +50,7 @@ export default class Account extends BaseEntity {
     length: 2048,
     name: 'account_type',
   })
+  @CheckAccountType()
   @v.IsIn(Account.TYPES)
     type!: string;
 
@@ -67,6 +63,8 @@ export default class Account extends BaseEntity {
 
   @TreeParent()
   @JoinColumn({ name: 'parent_guid' })
+  @v.IsNotEmpty({ message: 'parent is required' })
+  @v.ValidateIf(o => o.type !== 'ROOT')
   // Seems TreeParent doesn't let us create referencing the guid of the account
   // and needs the whole object...
     parent!: Account;
@@ -76,6 +74,9 @@ export default class Account extends BaseEntity {
 
   @ManyToOne('Commodity', { eager: true })
   @JoinColumn({ name: 'commodity_guid' })
+  @CheckCommodity()
+  @v.ValidateIf(o => o.type !== 'ROOT')
+  @v.IsNotEmpty({ message: 'commodity is required' })
     fk_commodity!: Commodity | string;
 
   get commodity(): Commodity {
@@ -86,7 +87,7 @@ export default class Account extends BaseEntity {
     splits!: Split[];
 
   /**
-   * Note this only works if the entity has access to splits
+   * Note this only works if the entity is loaded with splits
    */
   get total(): Money {
     if (this.type === 'ROOT') {
@@ -111,3 +112,62 @@ export default class Account extends BaseEntity {
 
 // https://github.com/typeorm/typeorm/issues/4714
 Object.defineProperty(Account, 'name', { value: 'Account' });
+
+/**
+ * Checks allowed types for parent account given the current account's type
+ */
+function CheckAccountType(validationOptions?: v.ValidationOptions) {
+  return function f(object: Account, propertyName: string) {
+    v.registerDecorator({
+      name: 'checkAccountType',
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(type: string, args: v.ValidationArguments) {
+          const account = args.object as Account;
+          if (account.parent) {
+            return getAllowedSubAccounts(account.parent.type).includes(type);
+          }
+
+          return true;
+        },
+
+        defaultMessage(args: v.ValidationArguments) {
+          const account = args.object as Account;
+          const allowedTypes = getAllowedSubAccounts(account.parent.type);
+
+          return `only ${allowedTypes} types can be selected with ${account.parent.type} account as parent`;
+        },
+      },
+    });
+  };
+}
+
+/**
+ * Checks that investment accounts commodity is not a currency
+ */
+function CheckCommodity(validationOptions?: v.ValidationOptions) {
+  return function f(object: Account, propertyName: string) {
+    v.registerDecorator({
+      name: 'checkCommodity',
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(fk_commodity: Commodity, args: v.ValidationArguments) {
+          const account = args.object as Account;
+          if (isInvestment(account)) {
+            return fk_commodity.namespace !== 'CURRENCY';
+          }
+
+          return true;
+        },
+
+        defaultMessage() {
+          return 'investment accounts cant have a currency as their commodity';
+        },
+      },
+    });
+  };
+}

@@ -6,6 +6,7 @@ import {
 } from '@testing-library/react';
 import { DataSource } from 'typeorm';
 import type { LinkProps } from 'next/link';
+import crypto from 'crypto';
 
 import {
   Account,
@@ -16,6 +17,12 @@ import {
 import Table, { TableProps } from '@/components/Table';
 import TransactionsTable from '@/components/TransactionsTable';
 import * as dataSourceHooks from '@/hooks/useDataSource';
+
+Object.defineProperty(global.self, 'crypto', {
+  value: {
+    randomUUID: () => crypto.randomUUID(),
+  },
+});
 
 jest.mock('@/hooks/useDataSource', () => ({
   __esModule: true,
@@ -46,8 +53,8 @@ describe('TransactionsTable', () => {
   let eur: Commodity;
   let root: Account;
   let account1: Account;
+  let account2: Account;
   let transaction: Transaction;
-  let split1: Split;
 
   beforeEach(async () => {
     datasource = new DataSource({
@@ -60,14 +67,13 @@ describe('TransactionsTable', () => {
     await datasource.initialize();
 
     eur = await Commodity.create({
-      guid: 'commodity_guid',
+      guid: 'eur',
       namespace: 'CURRENCY',
       mnemonic: 'EUR',
     }).save();
 
     root = await Account.create({
-      guid: 'root_account_guid',
-      name: 'Root account',
+      name: 'Root',
       type: 'ROOT',
     }).save();
 
@@ -79,7 +85,7 @@ describe('TransactionsTable', () => {
       parent: root,
     }).save();
 
-    await Account.create({
+    account2 = await Account.create({
       guid: 'account_guid_2',
       name: 'expense',
       type: 'EXPENSE',
@@ -90,28 +96,26 @@ describe('TransactionsTable', () => {
     transaction = await Transaction.create({
       guid: 'tx_guid',
       description: 'random expense',
-      fk_currency: 'commodity_guid',
+      fk_currency: eur,
       date: DateTime.fromISO('2023-01-01'),
-    }).save();
-
-    split1 = await Split.create({
-      guid: 'split1_guid',
-      valueNum: 10,
-      valueDenom: 100,
-      quantityNum: 15,
-      quantityDenom: 100,
-      fk_transaction: 'tx_guid',
-      fk_account: 'account_guid_1',
-    }).save();
-
-    await Split.create({
-      guid: 'split2_guid',
-      valueNum: -10,
-      valueDenom: 100,
-      quantityNum: -15,
-      quantityDenom: 100,
-      fk_transaction: 'tx_guid',
-      fk_account: 'account_guid_2',
+      splits: [
+        {
+          guid: 'split_guid_1',
+          valueNum: -10,
+          valueDenom: 100,
+          quantityNum: -15,
+          quantityDenom: 100,
+          fk_account: account1,
+        },
+        {
+          guid: 'split_guid_2',
+          valueNum: 10,
+          valueDenom: 100,
+          quantityNum: 15,
+          quantityDenom: 100,
+          fk_account: account2,
+        },
+      ],
     }).save();
   });
 
@@ -135,17 +139,15 @@ describe('TransactionsTable', () => {
 
     render(
       <TransactionsTable
-        accountId="account_guid_1"
+        accountId={account1.guid}
         accounts={[
           {
-            guid: 'account_guid_1',
+            ...account1,
             path: 'Assets:bank',
-            type: 'ASSET',
           } as Account,
           {
-            guid: 'account_guid_2',
+            ...account2,
             path: 'Expenses:expense',
-            type: 'EXPENSE',
           } as Account,
         ]}
       />,
@@ -186,7 +188,7 @@ describe('TransactionsTable', () => {
       ],
       data: [
         {
-          ...split1,
+          ...transaction.splits[0],
           fk_account: {
             guid: 'account_guid_1',
             name: 'bank',
@@ -195,35 +197,34 @@ describe('TransactionsTable', () => {
           },
           fk_transaction: {
             ...transaction,
-            fk_currency: eur,
             splits: [
               {
                 action: '',
                 fk_account: {
-                  guid: 'account_guid_1',
+                  guid: account1.guid,
                   name: 'bank',
                   type: 'ASSET',
                   fk_commodity: eur,
                 },
-                guid: 'split1_guid',
-                quantityDenom: 100,
-                quantityNum: 15,
-                valueDenom: 100,
-                valueNum: 10,
-              },
-              {
-                action: '',
-                fk_account: {
-                  guid: 'account_guid_2',
-                  name: 'expense',
-                  type: 'EXPENSE',
-                  fk_commodity: eur,
-                },
-                guid: 'split2_guid',
+                guid: 'split_guid_1',
                 quantityDenom: 100,
                 quantityNum: -15,
                 valueDenom: 100,
                 valueNum: -10,
+              },
+              {
+                action: '',
+                fk_account: {
+                  guid: account2.guid,
+                  name: 'expense',
+                  type: 'EXPENSE',
+                  fk_commodity: eur,
+                },
+                guid: 'split_guid_2',
+                quantityDenom: 100,
+                quantityNum: 15,
+                valueDenom: 100,
+                valueNum: 10,
               },
             ],
           },
@@ -237,17 +238,15 @@ describe('TransactionsTable', () => {
 
     render(
       <TransactionsTable
-        accountId="account_guid_1"
+        accountId={account1.guid}
         accounts={[
           {
-            guid: 'account_guid_1',
+            ...account1,
             path: 'Assets:bank',
-            type: 'ASSET',
           } as Account,
           {
-            guid: 'account_guid_2',
+            ...account2,
             path: 'Expenses:expense',
-            type: 'EXPENSE',
           } as Account,
         ]}
       />,
@@ -282,17 +281,15 @@ describe('TransactionsTable', () => {
 
     render(
       <TransactionsTable
-        accountId="account_guid_1"
+        accountId={account1.guid}
         accounts={[
           {
-            guid: 'account_guid_1',
+            ...account1,
             path: 'Assets:bank',
-            type: 'ASSET',
           } as Account,
           {
-            guid: 'account_guid_2',
+            ...account2,
             path: 'Expenses:expense',
-            type: 'EXPENSE',
           } as Account,
         ]}
       />,
@@ -315,12 +312,12 @@ describe('TransactionsTable', () => {
                 {
                   action: '',
                   account: {
-                    guid: 'account_guid_1',
+                    guid: account1.guid,
                     name: 'bank',
                     type: 'ASSET',
                     fk_commodity: eur,
                   },
-                  guid: 'split1_guid',
+                  guid: expect.any(String),
                   quantityDenom: 100,
                   quantityNum: 15,
                   valueDenom: 100,
@@ -329,12 +326,12 @@ describe('TransactionsTable', () => {
                 {
                   action: '',
                   account: {
-                    guid: 'account_guid_2',
+                    guid: account2.guid,
                     name: 'expense',
                     type: 'EXPENSE',
                     fk_commodity: eur,
                   },
-                  guid: 'split2_guid',
+                  guid: expect.any(String),
                   quantityDenom: 100,
                   quantityNum: -15,
                   valueDenom: 100,
@@ -356,17 +353,15 @@ describe('TransactionsTable', () => {
 
     render(
       <TransactionsTable
-        accountId="account_guid_1"
+        accountId={account1.guid}
         accounts={[
           {
-            guid: 'account_guid_1',
+            ...account1,
             path: 'Assets:bank',
-            type: 'ASSET',
           } as Account,
           {
-            guid: 'account_guid_2',
+            ...account2,
             path: 'Expenses:expense',
-            type: 'EXPENSE',
           } as Account,
         ]}
       />,
@@ -397,17 +392,15 @@ describe('TransactionsTable', () => {
 
     render(
       <TransactionsTable
-        accountId="account_guid_1"
+        accountId={account1.guid}
         accounts={[
           {
-            guid: 'account_guid_1',
+            ...account1,
             path: 'Assets:bank',
-            type: 'ASSET',
           } as Account,
           {
-            guid: 'account_guid_2',
+            ...account2,
             path: 'Expenses:expense',
-            type: 'EXPENSE',
           } as Account,
         ]}
       />,

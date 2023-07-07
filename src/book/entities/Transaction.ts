@@ -1,13 +1,20 @@
 import { DateTime } from 'luxon';
 import {
-  BaseEntity,
-  Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany,
-  PrimaryColumn,
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import * as v from 'class-validator';
+import { Type } from 'class-transformer';
 
+import { toFixed } from '@/helpers/number';
+import { isInvestment } from '../helpers/accountType';
 import type Commodity from './Commodity';
-import type Split from './Split';
+import Split from './Split';
+import BaseEntity from './BaseEntity';
 import { DateTimeTransformer } from './transformers';
 
 /**
@@ -25,14 +32,9 @@ import { DateTimeTransformer } from './transformers';
 
 @Entity('transactions')
 export default class Transaction extends BaseEntity {
-  @PrimaryColumn({
-    type: 'varchar',
-    length: 32,
-  })
-    guid!: string;
-
   @ManyToOne('Commodity', { eager: true })
   @JoinColumn({ name: 'currency_guid' })
+  @v.IsNotEmpty({ message: 'date is required' })
     fk_currency!: Commodity | string;
 
   get currency(): Commodity {
@@ -44,6 +46,7 @@ export default class Transaction extends BaseEntity {
     transformer: new DateTimeTransformer(),
     name: 'post_date',
   })
+  @v.IsNotEmpty({ message: 'date is required' })
     date!: DateTime;
 
   @CreateDateColumn({
@@ -51,7 +54,16 @@ export default class Transaction extends BaseEntity {
   })
     enterDate?: Date;
 
-  @OneToMany('Split', (split: Split) => split.fk_transaction)
+  @OneToMany(
+    'Split',
+    (split: Split) => split.fk_transaction,
+    { cascade: true }, // splits are useful only in a tx context
+  )
+  @CheckSplitsBalance()
+  @CheckDuplicateSplitAccounts()
+  @CheckNumSplits()
+  @v.ValidateNested()
+  @Type(() => Split)
     splits!: Split[];
 
   @Column({
@@ -59,9 +71,122 @@ export default class Transaction extends BaseEntity {
     length: 2048,
     default: '',
   })
-  @v.MaxLength(2048)
+  @v.Length(4, 2048)
     description!: string;
 }
 
 // https://github.com/typeorm/typeorm/issues/4714
 Object.defineProperty(Transaction, 'name', { value: 'Transaction' });
+
+/**
+ * Checks that the balance for the splits equals to 0
+ */
+function CheckSplitsBalance(validationOptions?: v.ValidationOptions) {
+  return function f(object: Transaction, propertyName: string) {
+    v.registerDecorator({
+      name: 'splitsBalance',
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(splits: Split[]) {
+          if (splits.length >= 2) {
+            const total = splits.reduce(
+              (acc, split) => acc + (split.value || 0),
+              0,
+            );
+
+            return total === 0;
+          }
+
+          return true;
+        },
+
+        defaultMessage(args: v.ValidationArguments) {
+          const tx = args.object as Transaction;
+          const total = tx.splits.reduce(
+            (acc, split) => acc + (split.value || 0),
+            0,
+          );
+          return `splits total must equal to 0 (now is ${toFixed(total, 2)})`;
+        },
+      },
+    });
+  };
+}
+
+/**
+ * Checks that there are no splits with repeated account
+ */
+function CheckDuplicateSplitAccounts(validationOptions?: v.ValidationOptions) {
+  return function f(object: Transaction, propertyName: string) {
+    v.registerDecorator({
+      name: 'splitsDuplicateAccounts',
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(splits: Split[]) {
+          if (splits) {
+            const set = new Set(splits.map(split => split.account?.guid));
+            return set.size === splits.length;
+          }
+
+          return true;
+        },
+
+        defaultMessage() {
+          return 'splits must have different accounts';
+        },
+      },
+    });
+  };
+}
+
+/**
+ * Checks that the number of splits is the right one
+ *
+ * Conditions are the following:
+ *
+ * - In general it must have 2 or more splits
+ * - If there's one split only and the account is an investment, it can
+ *   be a split event.
+ */
+function CheckNumSplits(validationOptions?: v.ValidationOptions) {
+  return function f(object: Transaction, propertyName: string) {
+    v.registerDecorator({
+      name: 'splitsNum',
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(splits: Split[]) {
+          if (splits && splits.length >= 2) {
+            return true;
+          }
+
+          if (
+            splits
+            && splits.length === 1
+            && isInvestment(splits[0].account)
+          ) {
+            return true;
+          }
+
+          return false;
+        },
+
+        defaultMessage(args: v.ValidationArguments) {
+          const tx = args.object as Transaction;
+          let minSplits = 2;
+
+          if (tx.splits && isInvestment(tx.splits[0].account)) {
+            minSplits = 1;
+          }
+
+          return `must add at least ${minSplits} splits`;
+        },
+      },
+    });
+  };
+}

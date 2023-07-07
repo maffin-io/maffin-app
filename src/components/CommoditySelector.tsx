@@ -1,54 +1,43 @@
 import React from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 import Select, {
   SingleValue,
   components,
 } from 'react-select';
-import { BiSearch } from 'react-icons/bi';
+import { BiMoney } from 'react-icons/bi';
 
-import { getAccountsWithPath } from '@/book/queries';
-import { Account } from '@/book/entities';
+import { Commodity } from '@/book/entities';
 import { useDataSource } from '@/hooks';
 
-export type AccountSelectorProps = {
+export type CommoditySelectorProps = {
   id?: string,
   placeholder?: string,
   onChange?: Function,
-  showRoot?: boolean,
-  isClearable?: boolean,
-  ignoreAccounts?: string[],
-  defaultValue?: Account,
+  ignoreNamespaces?: string[],
   className?: string,
 };
 
-export default function AccountSelector(
+export default function CommoditySelector(
   {
     placeholder,
     onChange,
-    ignoreAccounts,
+    ignoreNamespaces,
     id = 'accountSelector',
-    showRoot = false,
-    isClearable = true,
-    defaultValue,
     className = '',
-  }: AccountSelectorProps,
+  }: CommoditySelectorProps,
 ): JSX.Element {
   const ref = React.useRef<HTMLDivElement>();
-  useHotkeys('meta+k', () => {
-    ref.current?.focus();
-  });
   const [datasource] = useDataSource();
-  const [accounts, setAccounts] = React.useState<Account[]>([]);
+  const [commodities, setCommodities] = React.useState<Commodity[]>([]);
 
   React.useEffect(() => {
     async function load() {
       if (datasource) {
-        setAccounts(await getAccountsWithPath(showRoot));
+        setCommodities(await Commodity.find());
       }
     }
 
     load();
-  }, [datasource, showRoot]);
+  }, [datasource]);
 
   return (
     <Select
@@ -57,23 +46,24 @@ export default function AccountSelector(
       id={id}
       name={id}
       aria-label={id}
-      options={accounts.filter(account => !(ignoreAccounts || []).includes(account.type))}
-      placeholder={placeholder || 'Choose account'}
-      onChange={(newValue: SingleValue<Account> | null) => {
+      options={commodities.filter(
+        commodity => !(ignoreNamespaces || []).includes(commodity.namespace),
+      )}
+      placeholder={placeholder || 'Choose commodity'}
+      onChange={(newValue: SingleValue<Commodity> | null) => {
         if (onChange) {
           onChange(newValue);
         }
       }}
-      isClearable={isClearable}
-      defaultValue={defaultValue}
+      isClearable
       backspaceRemovesValue
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Escape') {
           ref.current?.blur();
         }
       }}
-      getOptionLabel={(option) => option.path}
-      getOptionValue={(option) => option.path}
+      getOptionLabel={(option) => option.mnemonic}
+      getOptionValue={(option) => option.mnemonic}
       openMenuOnFocus
       components={{ Control }}
       className={className}
@@ -108,7 +98,7 @@ function Control(
 ): JSX.Element {
   return (
     <components.Control {...props}>
-      <BiSearch className="absolute text-md left-[10px]" />
+      <BiMoney className="absolute text-md left-[10px]" />
       {children}
     </components.Control>
   );

@@ -1,8 +1,10 @@
 import {
-  BaseEntity, Entity, JoinColumn,
-  OneToOne, PrimaryColumn,
+  Entity,
+  JoinColumn,
+  OneToOne,
 } from 'typeorm';
 
+import BaseEntity from './BaseEntity';
 import Account from './Account';
 
 /**
@@ -16,12 +18,6 @@ import Account from './Account';
 
 @Entity('books')
 export default class Book extends BaseEntity {
-  @PrimaryColumn({
-    type: 'varchar',
-    length: 32,
-  })
-    guid!: string;
-
   @OneToOne(() => Account, { eager: true })
   @JoinColumn({ name: 'root_account_guid' })
     fk_root!: Account | string;

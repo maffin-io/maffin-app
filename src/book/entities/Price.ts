@@ -1,9 +1,7 @@
 import { DateTime } from 'luxon';
 import {
-  BaseEntity,
   Column,
   Entity,
-  PrimaryColumn,
   ManyToOne,
   JoinColumn,
   Index,
@@ -11,6 +9,7 @@ import {
 
 import type Commodity from './Commodity';
 import { DateTimeTransformer } from './transformers';
+import BaseEntity from './BaseEntity';
 import type { QuoteInfo } from '../types';
 
 /**
@@ -30,12 +29,6 @@ import type { QuoteInfo } from '../types';
 @Entity('prices')
 @Index(['fk_commodity', 'fk_currency', 'date'], { unique: true })
 export default class Price extends BaseEntity {
-  @PrimaryColumn({
-    type: 'varchar',
-    length: 32,
-  })
-    guid!: string;
-
   @ManyToOne('Commodity', { eager: true })
   @JoinColumn({ name: 'commodity_guid' })
     fk_commodity!: Commodity | string;
@@ -89,6 +82,10 @@ export default class Price extends BaseEntity {
 
   get value(): number {
     return this.valueNum / this.valueDenom;
+  }
+
+  get id(): string {
+    return `${this.date.toISODate()}.${this.commodity.mnemonic}.${this.currency.mnemonic}`;
   }
 }
 

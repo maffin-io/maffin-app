@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon';
 import { DataSource } from 'typeorm';
+import crypto from 'crypto';
 
 import {
   Account,
@@ -15,6 +16,12 @@ import { InvestmentAccount } from '../../models';
 jest.mock('../../models', () => ({
   InvestmentAccount: jest.fn(),
 }));
+
+Object.defineProperty(global.self, 'crypto', {
+  value: {
+    randomUUID: () => crypto.randomUUID(),
+  },
+});
 
 describe('getInvestments', () => {
   let datasource: DataSource;
@@ -35,7 +42,6 @@ describe('getInvestments', () => {
     await datasource.initialize();
 
     price1 = Price.create({
-      guid: 'price1',
       fk_commodity: {
         mnemonic: 'TICKER',
       },
@@ -45,7 +51,6 @@ describe('getInvestments', () => {
       date: DateTime.now(),
     });
     price2 = Price.create({
-      guid: 'price2',
       fk_commodity: {
         mnemonic: 'TICKER',
       },
@@ -74,7 +79,6 @@ describe('getInvestments', () => {
 
   it('creates investment account with expected params', async () => {
     const account = Account.create({
-      guid: 'account_guid',
       name: 'TICKER',
       type: 'STOCK',
       fk_commodity: {

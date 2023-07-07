@@ -1,7 +1,5 @@
-import {
-  createConnection,
-  getConnection,
-} from 'typeorm';
+import { DataSource } from 'typeorm';
+import crypto from 'crypto';
 
 import {
   Account,
@@ -11,89 +9,88 @@ import {
 } from '../../entities';
 import { getMainCurrency } from '../../queries';
 
+Object.defineProperty(global.self, 'crypto', {
+  value: {
+    randomUUID: () => crypto.randomUUID(),
+  },
+});
+
 describe('getMainCurrency', () => {
   let eur: Commodity;
+  let usd: Commodity;
   let rootAccount: Account;
+  let datasource: DataSource;
 
   beforeEach(async () => {
-    await createConnection({
+    datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Commodity, Account, Split, Transaction],
+      entities: [Account, Commodity, Split, Transaction],
       synchronize: true,
       logging: false,
     });
+    await datasource.initialize();
 
     eur = await Commodity.create({
-      guid: 'eur_guid',
       namespace: 'CURRENCY',
       mnemonic: 'EUR',
     }).save();
 
-    await Commodity.create({
-      guid: 'usd_guid',
+    usd = await Commodity.create({
       namespace: 'CURRENCY',
       mnemonic: 'USD',
     }).save();
 
     rootAccount = await Account.create({
-      guid: 'root_account_guid',
-      name: 'Root account',
+      name: 'Root',
       type: 'ROOT',
     }).save();
   });
 
   afterEach(async () => {
-    const conn = await getConnection();
-    await conn.close();
+    await datasource.destroy();
   });
 
   it('returns the currency with most expenses/income accounts', async () => {
     await Account.create({
-      guid: 'account_guid_1',
       name: 'TICKER',
       type: 'EXPENSE',
-      fk_commodity: 'eur_guid',
+      fk_commodity: eur,
       parent: rootAccount,
     }).save();
 
     await Account.create({
-      guid: 'account_guid_2',
       name: 'TICKER',
       type: 'INCOME',
-      fk_commodity: 'eur_guid',
+      fk_commodity: eur,
       parent: rootAccount,
     }).save();
 
     await Account.create({
-      guid: 'account_guid_3',
       name: 'TICKER',
       type: 'INCOME',
-      fk_commodity: 'usd_guid',
+      fk_commodity: usd,
       parent: rootAccount,
     }).save();
 
     await Account.create({
-      guid: 'account_guid_4',
       name: 'TICKER',
       type: 'ASSET',
-      fk_commodity: 'usd_guid',
+      fk_commodity: usd,
       parent: rootAccount,
     }).save();
 
     await Account.create({
-      guid: 'account_guid_5',
       name: 'TICKER',
       type: 'ASSET',
-      fk_commodity: 'usd_guid',
+      fk_commodity: usd,
       parent: rootAccount,
     }).save();
 
     await Account.create({
-      guid: 'account_guid_6',
       name: 'TICKER',
       type: 'ASSET',
-      fk_commodity: 'usd_guid',
+      fk_commodity: usd,
       parent: rootAccount,
     }).save();
 
