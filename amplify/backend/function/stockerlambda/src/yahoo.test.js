@@ -45,7 +45,7 @@ describe('getLiveSummary', () => {
 
     expect(mockAxiosGet).toHaveBeenNthCalledWith(
       1,
-      'https://query2.finance.yahoo.com/v10/finance/quoteSummary/ticker?modules=price',
+      'https://query2.finance.yahoo.com/v6/finance/quoteSummary/ticker?modules=price',
     );
   });
 
@@ -63,7 +63,7 @@ describe('getLiveSummary', () => {
     } catch (error) {
       expect(error instanceof yh.YahooError).toBe(true);
       expect(error.message).toEqual(
-        'https://query2.finance.yahoo.com/v10/finance/quoteSummary/ticker?modules=price failed: message'
+        'https://query2.finance.yahoo.com/v6/finance/quoteSummary/ticker?modules=price failed: message'
       );
       expect(error.status).toEqual(500);
       expect(error.code).toEqual('UNKNOWN');
@@ -168,7 +168,7 @@ describe('getLiveSummary', () => {
 
     expect(mockAxiosGet).toHaveBeenNthCalledWith(
       1,
-      'https://query2.finance.yahoo.com/v10/finance/quoteSummary/SGDCAX=X?modules=price',
+      'https://query2.finance.yahoo.com/v6/finance/quoteSummary/SGDCAX=X?modules=price',
     );
 
     expect(resp).toEqual({

@@ -12,7 +12,7 @@ async function getLiveSummary(ticker) {
   if (ticker === 'SGDCAD=X') {
     ticker = 'SGDCAX=X';
   }
-  const url = `${HOST}/v10/finance/quoteSummary/${ticker}?modules=price`;
+  const url = `${HOST}/v6/finance/quoteSummary/${ticker}?modules=price`;
   try {
     resp = await axios.get(url);
   } catch (error) {
