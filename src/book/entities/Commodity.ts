@@ -1,9 +1,10 @@
+import * as v from 'class-validator';
 import {
-  BaseEntity,
   Column,
   Entity,
-  PrimaryColumn,
 } from 'typeorm';
+
+import BaseEntity from './BaseEntity';
 
 /**
  * https://wiki.gnucash.org/wiki/SQL#Tables
@@ -23,22 +24,20 @@ import {
 
 @Entity('commodities')
 export default class Commodity extends BaseEntity {
-  @PrimaryColumn({
-    type: 'varchar',
-    length: 32,
-  })
-    guid!: string;
-
   @Column({
     type: 'text',
     length: 2048,
   })
+  @v.IsString()
+  @v.Length(2, 2048)
     namespace!: string;
 
   @Column({
     type: 'text',
     length: 2048,
   })
+  @v.IsString()
+  @v.Length(2, 2048)
     mnemonic!: string;
 
   // We use this field as a way to identify the quote
@@ -51,7 +50,9 @@ export default class Commodity extends BaseEntity {
     nullable: true,
     name: 'cusip',
   })
-    cusip!: string;
+  @v.IsOptional()
+  @v.IsString()
+    cusip?: string;
 
   get stockerId(): string {
     return this.cusip || this.mnemonic;

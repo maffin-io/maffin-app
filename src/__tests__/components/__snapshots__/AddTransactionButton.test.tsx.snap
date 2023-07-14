@@ -12,7 +12,7 @@ exports[`AddTransactionButton opens modal when clicking the button 1`] = `
     open: true
   </span>
   <span>
-    account:path transaction
+    Add transaction
   </span>
   <div
     class="TransactionForm"

@@ -62,7 +62,9 @@ describe('getLiveSummary', () => {
       await yh.getLiveSummary('ticker');
     } catch (error) {
       expect(error instanceof yh.YahooError).toBe(true);
-      expect(error.message).toEqual('ticker failed: message');
+      expect(error.message).toEqual(
+        'https://query2.finance.yahoo.com/v10/finance/quoteSummary/ticker?modules=price failed: message'
+      );
       expect(error.status).toEqual(500);
       expect(error.code).toEqual('UNKNOWN');
     }

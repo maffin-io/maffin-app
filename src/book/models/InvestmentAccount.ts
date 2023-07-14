@@ -33,7 +33,7 @@ export default class InvestmentAccount {
       DateTime.now(),
     );
     if (!price.quoteInfo) {
-      throw new Error(`No quote info found in price '${price.guid}'`);
+      throw new Error(`No quote info found in price '${price.id}'`);
     }
     this.currency = price.currency.mnemonic;
     this.setTodayQuoteInfo(price.quoteInfo);

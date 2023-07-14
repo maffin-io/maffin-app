@@ -63,31 +63,4 @@ describe('AddTransactionButton', () => {
 
     expect(screen.getByTestId('modal')).toMatchSnapshot();
   });
-
-  it.each(
-    ['INCOME', 'EXPENSE'],
-  )('disables button and shows tooltip when %s', async (type) => {
-    render(
-      <AddTransactionButton
-        account={
-          {
-            guid: 'guid',
-            type,
-            path: 'account:path',
-          } as Account
-        }
-      />,
-    );
-
-    const button = await screen.findByRole('button', { name: /add transaction/i });
-    expect(button).toBeDisabled();
-
-    fireEvent.focus(button);
-
-    await waitFor(() => {
-      screen.getByText(/add transactions from accounts/i);
-    });
-
-    expect(screen.queryByText(/add transactions from accounts/i)).toBeVisible();
-  });
 });

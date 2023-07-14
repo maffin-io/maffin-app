@@ -13,6 +13,10 @@
     @apply bg-gunmetal-800 rounded-md border-none my-3 p-2;
   }
 
+  input:disabled, select:disabled {
+    @apply opacity-50;
+  }
+
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;

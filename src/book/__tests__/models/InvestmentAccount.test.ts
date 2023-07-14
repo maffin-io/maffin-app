@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon';
 import { DataSource } from 'typeorm';
+import crypto from 'crypto';
 
 import { InvestmentAccount } from '../../models';
 import {
@@ -11,6 +12,12 @@ import {
 } from '../../entities';
 import { PriceDB, PriceDBMap } from '../../prices';
 import Money from '../../Money';
+
+Object.defineProperty(global.self, 'crypto', {
+  value: {
+    randomUUID: () => crypto.randomUUID(),
+  },
+});
 
 describe('InvestmentAccount', () => {
   let datasource: DataSource;
@@ -36,34 +43,36 @@ describe('InvestmentAccount', () => {
   describe.each(
     ['STOCK', 'MUTUAL'],
   )('instance %s', (type) => {
-    let commodityEur: Commodity;
+    let eur: Commodity;
     let commodityAccount: Commodity;
 
     beforeEach(async () => {
-      commodityEur = await Commodity.create({
-        guid: 'eur_guid',
+      eur = await Commodity.create({
         namespace: 'CURRENCY',
         mnemonic: 'EUR',
       }).save();
 
       commodityAccount = await Commodity.create({
-        guid: 'commodity_guid',
         namespace: 'NASDAQ',
         mnemonic: 'TICKER',
       }).save();
 
+      const root = await Account.create({
+        name: 'Root',
+        type: 'ROOT',
+      }).save();
+
       const investmentAccount = await Account.create({
-        guid: 'investments_guid',
         name: 'Investments',
         type: 'ASSET',
-        fk_commodity: 'eur_guid',
+        parent: root,
+        fk_commodity: eur,
       }).save();
 
       await Account.create({
-        guid: 'investment_guid',
         name: type,
         type,
-        fk_commodity: 'commodity_guid',
+        fk_commodity: commodityAccount,
         parent: investmentAccount,
       }).save();
     });
@@ -71,9 +80,8 @@ describe('InvestmentAccount', () => {
     it('initializes all values as expected', async () => {
       const priceMap = new PriceDBMap([
         Price.create({
-          guid: 'price1_guid',
           fk_commodity: commodityAccount,
-          fk_currency: commodityEur,
+          fk_currency: eur,
           date: DateTime.now(),
           source: 'maffin::{"price":2000,"changePct":-1,"changeAbs":-1,"currency":"EUR"}',
           valueNum: 10,
@@ -118,17 +126,15 @@ describe('InvestmentAccount', () => {
     });
 
     it('initializes all values as expected with difference currency in Price', async () => {
-      const commodityUsd = await Commodity.create({
-        guid: 'usd_guid',
+      const usd = await Commodity.create({
         namespace: 'CURRENCY',
         mnemonic: 'USD',
       }).save();
 
       const priceMap = new PriceDBMap([
         Price.create({
-          guid: 'price1_guid',
           fk_commodity: commodityAccount,
-          fk_currency: commodityUsd,
+          fk_currency: usd,
           date: DateTime.now(),
           source: 'maffin::{"price":2000,"changePct":-1,"changeAbs":-1,"currency":"USD"}',
           valueNum: 10,
@@ -175,9 +181,8 @@ describe('InvestmentAccount', () => {
     it('can update quoteInfo', async () => {
       const priceMap = new PriceDBMap([
         Price.create({
-          guid: 'price1_guid',
           fk_commodity: commodityAccount,
-          fk_currency: commodityEur,
+          fk_currency: eur,
           date: DateTime.now(),
           source: 'maffin::{"price":2000,"changePct":-1,"changeAbs":-1,"currency":"EUR"}',
           valueNum: 10,
@@ -223,9 +228,8 @@ describe('InvestmentAccount', () => {
     it('fails if no quoteInfo in Price', async () => {
       const priceMap = new PriceDBMap([
         Price.create({
-          guid: 'price1_guid',
           fk_commodity: commodityAccount,
-          fk_currency: commodityEur,
+          fk_currency: eur,
           date: DateTime.now(),
           valueNum: 10,
           valueDenom: 100,
@@ -239,7 +243,7 @@ describe('InvestmentAccount', () => {
       });
       expect(
         () => new InvestmentAccount(account, 'EUR', priceMap),
-      ).toThrow('No quote info found in price \'price1_guid\'');
+      ).toThrow('No quote info found in price');
     });
   });
 
@@ -248,6 +252,8 @@ describe('InvestmentAccount', () => {
     ['USD', 'EUR', 0.9856, 0.9756],
   ])('processSplits stockCurrency: %s mainCurrency: %s', (currency, mainCurrency, txExchangeRate, todayExchangeRate) => {
     let rootAccount: Account;
+    let stockAccount: Account;
+    let brokerAccount: Account;
     let stockPrice: Price;
     let mainCommodity: Commodity;
     let stockCommodity: Commodity;
@@ -257,74 +263,70 @@ describe('InvestmentAccount', () => {
 
     beforeEach(async () => {
       mainCommodity = await Commodity.create({
-        guid: 'main_commodity',
         namespace: 'CURRENCY',
         mnemonic: mainCurrency,
       }).save();
 
       stockCommodity = await Commodity.create({
-        guid: 'stock_commodity',
         namespace: 'NASDAQ',
         mnemonic: 'STOCK',
       }).save();
 
       stockCurrency = await Commodity.create({
-        guid: 'stock_currency',
         namespace: 'CURRENCY',
         mnemonic: currency,
       }).save();
 
       rootAccount = await Account.create({
-        guid: 'root_guid',
         name: 'Root',
         type: 'ROOT',
       }).save();
 
-      await Account.create({
-        guid: 'stock_guid',
-        name: 'stock',
-        type: 'STOCK',
-        fk_commodity: 'stock_commodity',
+      const investmentsAccount = await Account.create({
+        name: 'Investments',
+        type: 'ASSET',
+        fk_commodity: stockCurrency,
         parent: rootAccount,
       }).save();
 
-      await Account.create({
-        guid: 'bank_guid',
-        name: 'Broker account',
+      stockAccount = await Account.create({
+        name: 'stock',
+        type: 'STOCK',
+        fk_commodity: stockCommodity,
+        parent: investmentsAccount,
+      }).save();
+
+      brokerAccount = await Account.create({
+        name: 'Broker',
         type: 'BANK',
-        fk_commodity: 'stock_currency',
-        parent: rootAccount,
+        fk_commodity: stockCurrency,
+        parent: investmentsAccount,
       }).save();
 
       await Transaction.create({
-        guid: 'tx_guid_1',
-        fk_currency: 'stock_currency',
+        description: 'description',
+        fk_currency: stockCurrency,
         date: DateTime.fromISO('2023-01-01'),
-      }).save();
-
-      // Purchase 122.85 stocks for 1000EUR
-      await Split.create({
-        guid: 'split_guid_1',
-        valueNum: 1000,
-        valueDenom: 1,
-        quantityNum: 1228501,
-        quantityDenom: 10000,
-        fk_transaction: 'tx_guid_1',
-        fk_account: 'stock_guid',
-      }).save();
-
-      await Split.create({
-        guid: 'split_guid_2',
-        valueNum: -1000,
-        valueDenom: 1,
-        quantityNum: -1000,
-        quantityDenom: 1,
-        fk_transaction: 'tx_guid_1',
-        fk_account: 'bank_guid',
+        splits: [
+          // Purchase 122.85 stocks for 1000EUR
+          {
+            valueNum: 1000,
+            valueDenom: 1,
+            quantityNum: 1228501,
+            quantityDenom: 10000,
+            fk_account: stockAccount,
+          },
+          {
+            valueNum: -1000,
+            valueDenom: 1,
+            quantityNum: -1000,
+            quantityDenom: 1,
+            fk_account: brokerAccount,
+          },
+        ],
       }).save();
 
       currencyPrice = await Price.create({
-        guid: 'price_currency',
         fk_commodity: stockCurrency,
         fk_currency: mainCommodity,
         date: DateTime.fromISO('2023-01-01'),
@@ -334,7 +336,6 @@ describe('InvestmentAccount', () => {
       }).save();
 
       todayCurrencyPrice = await Price.create({
-        guid: 'price_currency_today',
         fk_commodity: stockCurrency,
         fk_currency: mainCommodity,
         date: DateTime.now(),
@@ -344,7 +345,6 @@ describe('InvestmentAccount', () => {
       }).save();
 
       stockPrice = await Price.create({
-        guid: 'price_stock',
         fk_commodity: stockCommodity,
         fk_currency: stockCurrency,
         date: DateTime.now(),
@@ -383,33 +383,28 @@ describe('InvestmentAccount', () => {
 
       it('accumulates multiple buys', async () => {
         await Transaction.create({
-          guid: 'tx_guid_2',
-          fk_currency: 'stock_currency',
+          description: 'description',
+          fk_currency: stockCurrency,
           date: DateTime.fromISO('2023-01-10'),
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_3',
-          valueNum: 1700,
-          valueDenom: 1,
-          quantityNum: 2457002,
-          quantityDenom: 10000,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'stock_guid',
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_4',
-          valueNum: -1700,
-          valueDenom: 1,
-          quantityNum: -1700,
-          quantityDenom: 1,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'bank_guid',
+          splits: [
+            {
+              valueNum: 1700,
+              valueDenom: 1,
+              quantityNum: 2457002,
+              quantityDenom: 10000,
+              fk_account: stockAccount,
+            },
+            {
+              valueNum: -1700,
+              valueDenom: 1,
+              quantityNum: -1700,
+              quantityDenom: 1,
+              fk_account: brokerAccount,
+            },
+          ],
         }).save();
 
         const currencyPrice2 = await Price.create({
-          guid: 'price_currency_2',
           fk_commodity: stockCurrency,
           fk_currency: mainCommodity,
           date: DateTime.fromISO('2023-01-10'),
@@ -452,29 +447,25 @@ describe('InvestmentAccount', () => {
     describe('sell', () => {
       it('deducts quantity to 0', async () => {
         await Transaction.create({
-          guid: 'tx_guid_2',
-          fk_currency: 'stock_currency',
+          description: 'description',
+          fk_currency: stockCurrency,
           date: DateTime.fromISO('2023-01-02'),
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_3',
-          valueNum: -1000,
-          valueDenom: 1,
-          quantityNum: -1228501,
-          quantityDenom: 10000,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'stock_guid',
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_4',
-          valueNum: 1000,
-          valueDenom: 1,
-          quantityNum: 1000,
-          quantityDenom: 1,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'bank_guid',
+          splits: [
+            {
+              valueNum: -1000,
+              valueDenom: 1,
+              quantityNum: -1228501,
+              quantityDenom: 10000,
+              fk_account: stockAccount,
+            },
+            {
+              valueNum: 1000,
+              valueDenom: 1,
+              quantityNum: 1000,
+              quantityDenom: 1,
+              fk_account: brokerAccount,
+            },
+          ],
         }).save();
 
         const account = await Account.findOneOrFail({
@@ -504,29 +495,26 @@ describe('InvestmentAccount', () => {
 
       it('sells with gains', async () => {
         await Transaction.create({
-          guid: 'tx_guid_2',
-          fk_currency: 'stock_currency',
+          description: 'description',
+          fk_currency: stockCurrency,
           date: DateTime.fromISO('2023-01-02'),
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_3',
-          valueNum: -2000,
-          valueDenom: 1,
-          quantityNum: -1228501,
-          quantityDenom: 10000,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'stock_guid',
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_4',
-          valueNum: 2000,
-          valueDenom: 1,
-          quantityNum: 2000,
-          quantityDenom: 1,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'bank_guid',
+          splits: [
+            {
+              guid: 'split_guid_3',
+              valueNum: -2000,
+              valueDenom: 1,
+              quantityNum: -1228501,
+              quantityDenom: 10000,
+              fk_account: stockAccount,
+            },
+            {
+              valueNum: 2000,
+              valueDenom: 1,
+              quantityNum: 2000,
+              quantityDenom: 1,
+              fk_account: brokerAccount,
+            },
+          ],
         }).save();
 
         const account = await Account.findOneOrFail({
@@ -562,29 +550,25 @@ describe('InvestmentAccount', () => {
 
       it('sells with losses', async () => {
         await Transaction.create({
-          guid: 'tx_guid_2',
-          fk_currency: 'stock_currency',
+          description: 'description',
+          fk_currency: stockCurrency,
           date: DateTime.fromISO('2023-01-02'),
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_3',
-          valueNum: -500,
-          valueDenom: 1,
-          quantityNum: -1228501,
-          quantityDenom: 10000,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'stock_guid',
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_4',
-          valueNum: 500,
-          valueDenom: 1,
-          quantityNum: 500,
-          quantityDenom: 1,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'bank_guid',
+          splits: [
+            {
+              valueNum: -500,
+              valueDenom: 1,
+              quantityNum: -1228501,
+              quantityDenom: 10000,
+              fk_account: stockAccount,
+            },
+            {
+              valueNum: 500,
+              valueDenom: 1,
+              quantityNum: 500,
+              quantityDenom: 1,
+              fk_account: brokerAccount,
+            },
+          ],
         }).save();
 
         const account = await Account.findOneOrFail({
@@ -620,29 +604,25 @@ describe('InvestmentAccount', () => {
 
       it('sells partially with gains', async () => {
         await Transaction.create({
-          guid: 'tx_guid_2',
-          fk_currency: 'stock_currency',
+          description: 'description',
+          fk_currency: stockCurrency,
           date: DateTime.fromISO('2023-01-02'),
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_3',
-          valueNum: -1000,
-          valueDenom: 1,
-          quantityNum: -6142505,
-          quantityDenom: 100000,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'stock_guid',
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_4',
-          valueNum: 1000,
-          valueDenom: 1,
-          quantityNum: 1000,
-          quantityDenom: 1,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'bank_guid',
+          splits: [
+            {
+              valueNum: -1000,
+              valueDenom: 1,
+              quantityNum: -6142505,
+              quantityDenom: 100000,
+              fk_account: stockAccount,
+            },
+            {
+              valueNum: 1000,
+              valueDenom: 1,
+              quantityNum: 1000,
+              quantityDenom: 1,
+              fk_account: brokerAccount,
+            },
+          ],
         }).save();
 
         const account = await Account.findOneOrFail({
@@ -677,29 +657,25 @@ describe('InvestmentAccount', () => {
 
       it('sells partially with losses', async () => {
         await Transaction.create({
-          guid: 'tx_guid_2',
-          fk_currency: 'stock_currency',
+          description: 'description',
+          fk_currency: stockCurrency,
           date: DateTime.fromISO('2023-01-02'),
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_3',
-          valueNum: -250,
-          valueDenom: 1,
-          quantityNum: -6142505,
-          quantityDenom: 100000,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'stock_guid',
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_4',
-          valueNum: 250,
-          valueDenom: 1,
-          quantityNum: 250,
-          quantityDenom: 1,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'bank_guid',
+          splits: [
+            {
+              valueNum: -250,
+              valueDenom: 1,
+              quantityNum: -6142505,
+              quantityDenom: 100000,
+              fk_account: stockAccount,
+            },
+            {
+              valueNum: 250,
+              valueDenom: 1,
+              quantityNum: 250,
+              quantityDenom: 1,
+              fk_account: brokerAccount,
+            },
+          ],
         }).save();
 
         const account = await Account.findOneOrFail({
@@ -739,19 +715,18 @@ describe('InvestmentAccount', () => {
     describe('split', () => {
       it('increases amount of stocks', async () => {
         await Transaction.create({
-          guid: 'tx_guid_2',
-          fk_currency: 'stock_currency',
+          description: 'description',
+          fk_currency: stockCurrency,
           date: DateTime.fromISO('2023-01-02'),
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_3',
-          valueNum: 0,
-          valueDenom: 1,
-          quantityNum: 21,
-          quantityDenom: 1,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'stock_guid',
+          splits: [
+            {
+              valueNum: 0,
+              valueDenom: 1,
+              quantityNum: 21,
+              quantityDenom: 1,
+              fk_account: stockAccount,
+            },
+          ],
         }).save();
 
         const account = await Account.findOneOrFail({
@@ -784,29 +759,25 @@ describe('InvestmentAccount', () => {
     describe('scrip', () => {
       it('increases amount of stocks', async () => {
         await Transaction.create({
-          guid: 'tx_guid_2',
-          fk_currency: 'stock_currency',
+          description: 'description',
+          fk_currency: stockCurrency,
           date: DateTime.fromISO('2023-01-02'),
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_3',
-          valueNum: 0,
-          valueDenom: 1,
-          quantityNum: 21,
-          quantityDenom: 1,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'stock_guid',
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_4',
-          valueNum: 0,
-          valueDenom: 1,
-          quantityNum: 21,
-          quantityDenom: 1,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'bank_guid',
+          splits: [
+            {
+              valueNum: 0,
+              valueDenom: 1,
+              quantityNum: 21,
+              quantityDenom: 1,
+              fk_account: stockAccount,
+            },
+            {
+              valueNum: 0,
+              valueDenom: 1,
+              quantityNum: 21,
+              quantityDenom: 1,
+              fk_account: brokerAccount,
+            },
+          ],
         }).save();
 
         const account = await Account.findOneOrFail({
@@ -837,50 +808,45 @@ describe('InvestmentAccount', () => {
     });
 
     describe('dividend', () => {
+      let incomeAccount: Account;
+      let tx: Transaction;
+
       beforeEach(async () => {
-        await Account.create({
-          guid: 'income_guid',
+        incomeAccount = await Account.create({
           name: 'Income',
           type: 'INCOME',
-          fk_commodity: 'main_commodity',
+          fk_commodity: mainCommodity,
           parent: rootAccount,
         }).save();
 
-        await Transaction.create({
-          guid: 'tx_guid_2',
-          fk_currency: 'stock_currency',
+        tx = await Transaction.create({
+          description: 'description',
+          fk_currency: stockCurrency,
           date: DateTime.fromISO('2023-01-02'),
-        }).save();
-
-        // This split is used to associate the STOCK it comes from
-        await Split.create({
-          guid: 'split_guid_3',
-          valueNum: 0,
-          valueDenom: 1,
-          quantityNum: 0,
-          quantityDenom: 1,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'stock_guid',
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_4',
-          valueNum: 89.67,
-          valueDenom: 1,
-          quantityNum: 89.67,
-          quantityDenom: 1,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'bank_guid',
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_5',
-          valueNum: -89.67,
-          valueDenom: 1,
-          quantityNum: -89.67,
-          quantityDenom: 1,
-          fk_transaction: 'tx_guid_2',
-          fk_account: 'income_guid',
+          splits: [
+            // This split is used to associate the STOCK it comes from
+            {
+              valueNum: 0,
+              valueDenom: 1,
+              quantityNum: 0,
+              quantityDenom: 1,
+              fk_account: stockAccount,
+            },
+            {
+              valueNum: 89.67,
+              valueDenom: 1,
+              quantityNum: 89.67,
+              quantityDenom: 1,
+              fk_account: brokerAccount,
+            },
+            {
+              valueNum: -89.67,
+              valueDenom: 1,
+              quantityNum: -89.67,
+              quantityDenom: 1,
+              fk_account: incomeAccount,
+            },
+          ],
         }).save();
       });
 
@@ -917,59 +883,49 @@ describe('InvestmentAccount', () => {
        * and it would complicate things if we did so this is expected
        */
       it('throws an error if dividends with different currency', async () => {
-        await Commodity.create({
-          guid: 'sgd_commodity',
+        const sgd = await Commodity.create({
           namespace: 'CURRENCY',
           mnemonic: 'SGD',
         }).save();
 
         await Transaction.create({
-          guid: 'tx_guid_3',
-          fk_currency: 'sgd_commodity',
+          description: 'description',
+          fk_currency: sgd,
           date: DateTime.fromISO('2023-01-02'),
-        }).save();
-
-        // This split is used to associate the STOCK it comes from
-        await Split.create({
-          guid: 'split_guid_6',
-          valueNum: 0,
-          valueDenom: 1,
-          quantityNum: 0,
-          quantityDenom: 1,
-          fk_transaction: 'tx_guid_3',
-          fk_account: 'stock_guid',
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_7',
-          valueNum: 89.67,
-          valueDenom: 1,
-          quantityNum: 89.67,
-          quantityDenom: 1,
-          fk_transaction: 'tx_guid_3',
-          fk_account: 'bank_guid',
-        }).save();
-
-        await Split.create({
-          guid: 'split_guid_8',
-          valueNum: -89.67,
-          valueDenom: 1,
-          quantityNum: -89.67,
-          quantityDenom: 1,
-          fk_transaction: 'tx_guid_3',
-          fk_account: 'income_guid',
+          splits: [
+            {
+              valueNum: 0,
+              valueDenom: 1,
+              quantityNum: 0,
+              quantityDenom: 1,
+              fk_account: stockAccount,
+            },
+            {
+              valueNum: 89.67,
+              valueDenom: 1,
+              quantityNum: 89.67,
+              quantityDenom: 1,
+              fk_account: brokerAccount,
+            },
+            {
+              valueNum: -89.67,
+              valueDenom: 1,
+              quantityNum: -89.67,
+              quantityDenom: 1,
+              fk_account: incomeAccount,
+            },
+          ],
         }).save();
 
         await Price.create({
-          guid: 'sgd_price',
-          fk_commodity: 'sgd_commodity',
-          fk_currency: 'main_commodity',
+          fk_commodity: sgd,
+          fk_currency: mainCommodity,
           date: DateTime.fromISO('2023-01-02'),
           valueNum: 9086,
           valueDenom: 10000,
         }).save();
 
-        const dividendCurrencyPrice = await Price.findOneByOrFail({ guid: 'sgd_price' });
+        const dividendCurrencyPrice = await Price.findOneByOrFail({ fk_commodity: sgd });
         const account = await Account.findOneOrFail({
           where: { type: 'STOCK' },
           relations: {
@@ -995,29 +951,24 @@ describe('InvestmentAccount', () => {
        * EUR but dividends are issued in USD.
        */
       it('supports dividends in different currency than account\'s currency', async () => {
-        await Commodity.create({
-          guid: 'sgd_commodity',
+        const sgd = await Commodity.create({
           namespace: 'CURRENCY',
           mnemonic: 'SGD',
         }).save();
 
-        // Override the already existing one with USD
-        await Transaction.create({
-          guid: 'tx_guid_2',
-          fk_currency: 'sgd_commodity',
-          date: DateTime.fromISO('2023-01-02'),
-        }).save();
+        // Override the already existing one with SGD
+        tx.fk_currency = sgd;
+        await tx.save();
 
         await Price.create({
-          guid: 'sgd_price',
-          fk_commodity: 'sgd_commodity',
-          fk_currency: 'main_commodity',
+          fk_commodity: sgd,
+          fk_currency: mainCommodity,
           date: DateTime.fromISO('2023-01-02'),
           valueNum: 7086,
           valueDenom: 10000,
         }).save();
 
-        const dividendCurrencyPrice = await Price.findOneByOrFail({ guid: 'sgd_price' });
+        const dividendCurrencyPrice = await Price.findOneByOrFail({ fk_commodity: sgd });
         const account = await Account.findOneOrFail({
           where: { type: 'STOCK' },
           relations: {
@@ -1045,30 +996,18 @@ describe('InvestmentAccount', () => {
 
     it('throws error on unknown split combination', async () => {
       await Transaction.create({
-        guid: 'tx_guid_2',
-        fk_currency: 'stock_currency',
+        description: 'description',
+        fk_currency: stockCommodity,
         date: DateTime.fromISO('2023-01-02'),
-      }).save();
-
-      // This split is used to associate the STOCK it comes from
-      await Split.create({
-        guid: 'split_guid_3',
-        valueNum: 0,
-        valueDenom: 1,
-        quantityNum: 0,
-        quantityDenom: 1,
-        fk_transaction: 'tx_guid_2',
-        fk_account: 'stock_guid',
-      }).save();
-
-      await Split.create({
-        guid: 'split_guid_4',
-        valueNum: 89.67,
-        valueDenom: 1,
-        quantityNum: 89.67,
-        quantityDenom: 1,
-        fk_transaction: 'tx_guid_2',
-        fk_account: 'bank_guid',
+        splits: [
+          {
+            valueNum: 10,
+            valueDenom: 1,
+            quantityNum: 10,
+            quantityDenom: 1,
+            fk_account: stockAccount,
+          },
+        ],
       }).save();
 
       const account = await Account.findOneOrFail({
@@ -1087,7 +1026,7 @@ describe('InvestmentAccount', () => {
           mainCurrency,
           new PriceDBMap([stockPrice, currencyPrice]),
         ),
-      ).toThrow('Dont know how to process stock transaction \'tx_guid_2\'');
+      ).toThrow('Dont know how to process stock transaction');
     });
   });
 });

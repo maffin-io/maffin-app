@@ -1,52 +1,54 @@
 import { DateTime } from 'luxon';
-import {
-  createConnection,
-  getConnection,
-  BaseEntity,
-} from 'typeorm';
+import { DataSource, BaseEntity } from 'typeorm';
+import crypto from 'crypto';
 
 import {
-  Account,
   Commodity,
   Price,
-  Split,
-  Transaction,
 } from '../../entities';
 
+Object.defineProperty(global.self, 'crypto', {
+  value: {
+    randomUUID: () => crypto.randomUUID(),
+  },
+});
+
 describe('Price', () => {
+  let datasource: DataSource;
+
   beforeEach(async () => {
-    await createConnection({
+    datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Price, Commodity, Account, Split, Transaction],
+      entities: [Price, Commodity],
       synchronize: true,
       logging: false,
     });
+    await datasource.initialize();
   });
 
   afterEach(async () => {
-    const conn = await getConnection();
-    await conn.close();
+    await datasource.destroy();
   });
 
   describe('Entity', () => {
+    let commodity1: Commodity;
+    let commodity2: Commodity;
+
     beforeEach(async () => {
-      await Commodity.create({
-        guid: 'commodity_guid1',
+      commodity1 = await Commodity.create({
         namespace: 'CURRENCY',
         mnemonic: 'EUR',
       }).save();
 
-      await Commodity.create({
-        guid: 'commodity_guid2',
+      commodity2 = await Commodity.create({
         namespace: 'CURRENCY',
         mnemonic: 'USD',
       }).save();
 
       await Price.create({
-        guid: 'price1_guid',
-        fk_commodity: 'commodity_guid1',
-        fk_currency: 'commodity_guid2',
+        fk_commodity: commodity1,
+        fk_currency: commodity2,
         date: DateTime.fromISO('2023-01-01'),
         valueNum: 10,
         valueDenom: 100,
@@ -61,10 +63,9 @@ describe('Price', () => {
     it('can retrieve price entry', async () => {
       const prices = await Price.find();
 
-      expect(prices[0].guid).toEqual('price1_guid');
       expect(prices[0].date.toISODate()).toEqual('2023-01-01');
-      expect(prices[0].commodity.guid).toEqual('commodity_guid1');
-      expect(prices[0].currency.guid).toEqual('commodity_guid2');
+      expect(prices[0].commodity.mnemonic).toEqual('EUR');
+      expect(prices[0].currency.mnemonic).toEqual('USD');
     });
 
     it('calculates value', async () => {
@@ -74,10 +75,9 @@ describe('Price', () => {
 
     it('returns quote info when available', async () => {
       await Price.create({
-        guid: 'price1_guid',
-        fk_commodity: 'commodity_guid1',
-        fk_currency: 'commodity_guid2',
-        date: DateTime.fromISO('2023-01-01'),
+        fk_commodity: commodity1,
+        fk_currency: commodity2,
+        date: DateTime.fromISO('2023-01-02'),
         source: `maffin::${JSON.stringify({
           changeAbs: 10.1,
           changePct: 1.1,
@@ -88,7 +88,7 @@ describe('Price', () => {
 
       const prices = await Price.find();
 
-      expect(prices[0].quoteInfo).toEqual({
+      expect(prices[1].quoteInfo).toEqual({
         changeAbs: 10.1,
         changePct: 1.1,
       });

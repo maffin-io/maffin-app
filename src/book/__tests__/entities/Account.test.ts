@@ -1,193 +1,232 @@
 import { DateTime } from 'luxon';
-import {
-  createConnection,
-  getConnection,
-  BaseEntity,
-} from 'typeorm';
+import { DataSource, BaseEntity } from 'typeorm';
+import crypto from 'crypto';
 
 import {
   Account,
   Commodity,
-  Price,
   Split,
   Transaction,
 } from '../../entities';
 
+Object.defineProperty(global.self, 'crypto', {
+  value: {
+    randomUUID: () => crypto.randomUUID(),
+  },
+});
+
 describe('Account', () => {
+  let datasource: DataSource;
+  let eur: Commodity;
+  let root: Account;
+  let account: Account;
+  let account2: Account;
+
   beforeEach(async () => {
-    await createConnection({
+    datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Commodity, Account, Split, Transaction, Price],
+      entities: [Account, Commodity, Split, Transaction],
       synchronize: true,
       logging: false,
     });
+    await datasource.initialize();
+
+    eur = await Commodity.create({
+      namespace: 'CURRENCY',
+      mnemonic: 'EUR',
+    }).save();
+
+    root = await Account.create({
+      name: 'Root',
+      type: 'ROOT',
+    }).save();
+
+    account = await Account.create({
+      name: 'name',
+      type: 'ASSET',
+      fk_commodity: eur,
+      parent: root,
+    }).save();
+
+    account2 = await Account.create({
+      name: 'Expenses',
+      type: 'EXPENSE',
+      parent: root,
+      fk_commodity: eur,
+    }).save();
   });
 
   afterEach(async () => {
-    const conn = await getConnection();
-    await conn.close();
+    await datasource.destroy();
   });
 
-  describe('TypeORM entity', () => {
-    beforeEach(async () => {
-      await Commodity.create({
-        guid: 'commodity_guid',
-        namespace: 'CURRENCY',
-        mnemonic: 'mnemonic',
-      }).save();
-
-      const root = await Account.create({
-        guid: 'root_account_guid',
-        name: 'Root account',
-        type: 'ROOT',
-        fk_commodity: 'commodity_guid',
-      }).save();
-
-      await Account.create({
-        guid: 'account_guid',
-        name: 'name',
-        type: 'ASSET',
-        fk_commodity: 'commodity_guid',
-        parent: root,
-      }).save();
-    });
-
+  describe('entity', () => {
     it('is active record', async () => {
-      const instance = await Account.findOneByOrFail({ guid: 'account_guid' });
+      const instance = await Account.findOneByOrFail({ name: 'name' });
       expect(instance).toBeInstanceOf(BaseEntity);
     });
 
     it('can retrieve account', async () => {
       const accounts = await Account.find();
 
-      expect(accounts[0].guid).toEqual('root_account_guid');
-      expect(accounts[1].guid).toEqual('account_guid');
+      expect(accounts[0].name).toEqual('Root');
+      expect(accounts[1].name).toEqual('name');
     });
 
     it('tree relations are accessible', async () => {
-      const [rootAccount, account] = await Account.find({
+      const rootAccount = await Account.findOneOrFail({
+        where: { type: 'ROOT' },
+        relations: ['parent', 'children'],
+      });
+
+      account = await Account.findOneOrFail({
+        where: { name: 'name' },
+        relations: ['parent', 'children'],
+      });
+
+      account2 = await Account.findOneOrFail({
+        where: { name: 'Expenses' },
         relations: ['parent', 'children'],
       });
 
       expect(rootAccount.children[0].guid).toEqual(account.guid);
+      expect(rootAccount.children[1].guid).toEqual(account2.guid);
       expect(account.parent.guid).toEqual(rootAccount.guid);
+      expect(account2.parent.guid).toEqual(rootAccount.guid);
     });
 
     it('loads commodity eagerly', async () => {
-      const instance = await Account.findOneByOrFail({ guid: 'account_guid' });
-      expect(instance.commodity.guid).toEqual('commodity_guid');
+      const instance = await Account.findOneByOrFail({ name: 'name' });
+      expect(instance.commodity.mnemonic).toEqual('EUR');
     });
 
-    it('loads splits and calculates total', async () => {
+    it('loads splits', async () => {
       await Transaction.create({
-        guid: 'tx_guid',
-        fk_currency: 'commodity_guid',
+        description: 'test',
+        fk_currency: eur,
         date: DateTime.fromISO('2023-01-01'),
-      }).save();
-
-      await Split.create({
-        guid: 'guid',
-        valueNum: 10,
-        valueDenom: 100,
-        quantityNum: 15,
-        quantityDenom: 100,
-        fk_transaction: 'tx_guid',
-        fk_account: 'account_guid',
+        splits: [
+          Split.create({
+            valueNum: -10,
+            valueDenom: 100,
+            quantityNum: -15,
+            quantityDenom: 100,
+            fk_account: account,
+          }),
+          Split.create({
+            valueNum: 10,
+            valueDenom: 100,
+            quantityNum: 15,
+            quantityDenom: 100,
+            fk_account: account2,
+          }),
+        ],
       }).save();
 
       const instance = await Account.findOneOrFail({
-        where: { guid: 'account_guid' },
+        where: { name: 'name' },
         relations: ['splits'],
       });
 
       expect(instance.splits).toEqual([
         {
-          guid: 'guid',
+          guid: expect.any(String),
           action: '',
-          valueNum: 10,
+          valueNum: -10,
           valueDenom: 100,
-          quantityNum: 15,
+          quantityNum: -15,
           quantityDenom: 100,
         },
       ]);
-      expect(instance.total.toString()).toEqual('0.15 mnemonic');
-    });
-
-    it('total is calculated as absolute', async () => {
-      await Transaction.create({
-        guid: 'tx_guid',
-        fk_currency: 'commodity_guid',
-        date: DateTime.fromISO('2023-01-01'),
-      }).save();
-
-      await Split.create({
-        guid: 'guid',
-        valueNum: -10,
-        valueDenom: 100,
-        quantityNum: -15,
-        quantityDenom: 100,
-        fk_transaction: 'tx_guid',
-        fk_account: 'account_guid',
-      }).save();
-
-      const instance = await Account.findOneOrFail({
-        where: { guid: 'account_guid' },
-        relations: ['splits'],
-      });
-
-      expect(instance.total.toString()).toEqual('0.15 mnemonic');
     });
   });
 
   describe('total', () => {
-    beforeEach(async () => {
-      await Commodity.create({
-        guid: 'eur_guid',
-        namespace: 'CURRENCY',
-        mnemonic: 'EUR',
-      }).save();
-    });
-
     it('sets expected total for ROOT', async () => {
-      await Account.create({
-        guid: 'account_guid',
-        name: 'account',
-        type: 'ROOT',
-      }).save();
-
-      const account = await Account.findOneByOrFail({ name: 'account' });
+      account = await Account.findOneByOrFail({ name: 'Root' });
 
       expect(account.total).toEqual(null);
     });
 
     it.each([
-      'ASSET', 'BANK', 'CASH', 'EQUITY', 'LIABILITY', 'INCOME', 'EXPENSE',
+      'ASSET', 'LIABILITY', 'INCOME',
     ])('sets expected total for %s', async (type) => {
-      await Account.create({
-        guid: 'account_guid',
+      account = await Account.create({
         name: 'account',
         type,
-        fk_commodity: 'eur_guid',
+        fk_commodity: eur,
+        parent: root,
       }).save();
 
       await Transaction.create({
-        guid: 'tx_guid',
-        fk_currency: 'eur_guid',
+        description: 'test',
+        fk_currency: eur,
         date: DateTime.fromISO('2023-01-01'),
+        splits: [
+          Split.create({
+            valueNum: 10,
+            valueDenom: 100,
+            quantityNum: 15,
+            quantityDenom: 100,
+            fk_account: account2,
+          }),
+          Split.create({
+            valueNum: -10,
+            valueDenom: 100,
+            quantityNum: -15,
+            quantityDenom: 100,
+            fk_account: account,
+          }),
+        ],
       }).save();
 
-      await Split.create({
-        guid: 'guid',
-        valueNum: 10,
-        valueDenom: 100,
-        quantityNum: 15,
-        quantityDenom: 100,
-        fk_transaction: 'tx_guid',
-        fk_account: 'account_guid',
+      account = await Account.findOneOrFail({
+        where: { name: 'account' },
+        relations: { splits: true },
+      });
+
+      expect(account.total.toString()).toEqual('0.15 EUR');
+    });
+
+    it('sets expected total for EXPENSE', async () => {
+      account = await Account.create({
+        name: 'account',
+        type: 'EXPENSE',
+        fk_commodity: eur,
+        parent: root,
       }).save();
 
-      const account = await Account.findOneOrFail({
+      account2 = await Account.create({
+        name: 'name',
+        type: 'ASSET',
+        fk_commodity: eur,
+        parent: root,
+      }).save();
+
+      await Transaction.create({
+        description: 'test',
+        fk_currency: eur,
+        date: DateTime.fromISO('2023-01-01'),
+        splits: [
+          Split.create({
+            valueNum: 10,
+            valueDenom: 100,
+            quantityNum: 15,
+            quantityDenom: 100,
+            fk_account: account,
+          }),
+          Split.create({
+            valueNum: -10,
+            valueDenom: 100,
+            quantityNum: -15,
+            quantityDenom: 100,
+            fk_account: account2,
+          }),
+        ],
+      }).save();
+
+      account = await Account.findOneOrFail({
         where: { name: 'account' },
         relations: { splits: true },
       });
@@ -198,42 +237,127 @@ describe('Account', () => {
     it.each([
       'MUTUAL', 'STOCK',
     ])('sets expected total for %s', async (type) => {
-      await Commodity.create({
-        guid: 'googl_guid',
+      const googl = await Commodity.create({
         namespace: 'NASDAQ',
         mnemonic: 'GOOGL',
       }).save();
 
-      await Account.create({
-        guid: 'account_guid',
+      const assetAccount = await Account.create({
         name: 'account',
+        type: 'ASSET',
+        fk_commodity: eur,
+        parent: root,
+      }).save();
+
+      account = await Account.create({
+        name: 'stockAccount',
         type,
-        fk_commodity: 'googl_guid',
+        fk_commodity: googl,
+        parent: assetAccount,
+      }).save();
+
+      account2 = await Account.create({
+        name: 'broker',
+        type: 'ASSET',
+        fk_commodity: eur,
+        parent: root,
       }).save();
 
       await Transaction.create({
-        guid: 'tx_guid',
-        fk_currency: 'eur_guid',
+        description: 'test',
+        fk_currency: eur,
         date: DateTime.fromISO('2023-01-01'),
+        splits: [
+          Split.create({
+            action: 'Buy',
+            valueNum: 10,
+            valueDenom: 100,
+            quantityNum: 200,
+            quantityDenom: 100,
+            fk_account: account,
+          }),
+          Split.create({
+            valueNum: -10,
+            valueDenom: 100,
+            quantityNum: -200,
+            quantityDenom: 100,
+            fk_account: account2,
+          }),
+        ],
       }).save();
 
-      await Split.create({
-        guid: 'guid',
-        action: 'Buy',
-        valueNum: 10,
-        valueDenom: 100,
-        quantityNum: 200,
-        quantityDenom: 100,
-        fk_transaction: 'tx_guid',
-        fk_account: 'account_guid',
-      }).save();
-
-      const account = await Account.findOneOrFail({
-        where: { name: 'account' },
+      account = await Account.findOneOrFail({
+        where: { name: 'stockAccount' },
         relations: ['splits', 'splits.fk_transaction'],
       });
 
       expect(account.total.toString()).toEqual('2.00 GOOGL');
+    });
+  });
+
+  describe('validation', () => {
+    it('fails if name not long enough', async () => {
+      account = Account.create({
+        name: 'a',
+        type: 'ASSET',
+        fk_commodity: eur,
+        parent: root,
+      });
+
+      await expect(account.save()).rejects.toThrow('isLength');
+    });
+
+    it('fails if type not in allowed types', async () => {
+      account = Account.create({
+        name: 'name',
+        type: 'INVALID',
+        fk_commodity: eur,
+        parent: root,
+      });
+
+      await expect(account.save()).rejects.toThrow('isIn');
+    });
+
+    it('fails if parent empty when not root', async () => {
+      account = Account.create({
+        name: 'name',
+        type: 'EXPENSE',
+        fk_commodity: eur,
+      });
+
+      await expect(account.save()).rejects.toThrow('isNotEmpty');
+    });
+
+    it('fails if commodity empty when not root', async () => {
+      account = Account.create({
+        name: 'name',
+        type: 'EXPENSE',
+        parent: root,
+      });
+
+      await expect(account.save()).rejects.toThrow('isNotEmpty');
+    });
+
+    it('fails if type not compatible with parent', async () => {
+      account = Account.create({
+        name: 'name',
+        type: 'BANK',
+        parent: root,
+        fk_commodity: eur,
+      });
+
+      await expect(account.save()).rejects.toThrow('checkAccountType');
+    });
+
+    it('fails if currency assigned to investment account', async () => {
+      account = Account.create({
+        name: 'name',
+        type: 'STOCK',
+        parent: root,
+        fk_commodity: eur,
+      });
+
+      await expect(account.save()).rejects.toThrow('checkCommodity');
     });
   });
 });

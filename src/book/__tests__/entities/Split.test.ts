@@ -1,90 +1,243 @@
 import { DateTime } from 'luxon';
-import {
-  createConnection,
-  getConnection,
-  BaseEntity,
-} from 'typeorm';
+import { DataSource } from 'typeorm';
+import crypto from 'crypto';
 
 import {
+  BaseEntity,
   Commodity,
   Transaction,
   Split,
   Account,
 } from '../../entities';
 
+Object.defineProperty(global.self, 'crypto', {
+  value: {
+    randomUUID: () => crypto.randomUUID(),
+  },
+});
+
 describe('Split', () => {
+  let datasource: DataSource;
+  let eur: Commodity;
+  let root: Account;
+  let account: Account;
+
   beforeEach(async () => {
-    await createConnection({
+    datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Account, Split, Transaction, Commodity],
+      entities: [Account, Commodity, Split, Transaction],
       synchronize: true,
       logging: false,
     });
+    await datasource.initialize();
 
-    await Commodity.create({
-      guid: 'commodity_guid',
+    eur = await Commodity.create({
       namespace: 'namespace',
       mnemonic: 'EUR',
     }).save();
 
-    await Account.create({
-      guid: 'account_guid',
+    root = await Account.create({
+      name: 'Root',
+      type: 'ROOT',
+    }).save();
+
+    account = await Account.create({
       name: 'name',
       type: 'ASSET',
-      fk_commodity: 'commodity_guid',
-    }).save();
-
-    await Transaction.create({
-      guid: 'tx_guid',
-      fk_currency: 'commodity_guid',
-      date: DateTime.fromISO('2023-01-01'),
-    }).save();
-
-    await Split.create({
-      guid: 'guid',
-      valueNum: 10,
-      valueDenom: 100,
-      action: 'whatever',
-      quantityNum: 15,
-      quantityDenom: 100,
-      fk_transaction: 'tx_guid',
-      fk_account: 'account_guid',
+      parent: root,
+      fk_commodity: eur,
     }).save();
   });
 
   afterEach(async () => {
-    const conn = await getConnection();
-    await conn.close();
+    await datasource.destroy();
   });
 
-  it('is active record', async () => {
-    const splits = await Split.find();
-    expect(splits[0]).toBeInstanceOf(BaseEntity);
-  });
-
-  it('can retrieve split', async () => {
-    const split = (await Split.find({ relations: ['fk_account', 'fk_transaction'] }))[0];
-
-    expect(split).toMatchObject({
-      guid: 'guid',
-      valueNum: 10,
-      valueDenom: 100,
-      action: 'whatever',
-      quantityNum: 15,
-      quantityDenom: 100,
+  describe('instance', () => {
+    beforeEach(async () => {
+      await Split.create({
+        valueNum: 10,
+        valueDenom: 100,
+        action: 'whatever',
+        quantityNum: 15,
+        quantityDenom: 100,
+        fk_account: account,
+      }).save();
     });
-    expect(split.account.guid).toEqual('account_guid');
-    expect(split.transaction.guid).toEqual('tx_guid');
+
+    it('is active record', async () => {
+      const splits = await Split.find();
+      expect(splits[0]).toBeInstanceOf(BaseEntity);
+    });
+
+    it('can retrieve split with relations', async () => {
+      const account2 = await Account.create({
+        name: 'Expenses',
+        type: 'EXPENSE',
+        parent: root,
+        fk_commodity: eur,
+      }).save();
+
+      await Transaction.create({
+        description: 'description',
+        fk_currency: eur,
+        date: DateTime.fromISO('2023-01-01'),
+        splits: [
+          Split.create({
+            guid: 'split_guid',
+            action: 'whatever',
+            valueNum: -10,
+            valueDenom: 100,
+            quantityNum: -15,
+            quantityDenom: 100,
+            fk_account: account,
+          }),
+          Split.create({
+            valueNum: 10,
+            valueDenom: 100,
+            quantityNum: 15,
+            quantityDenom: 100,
+            fk_account: account2,
+          }),
+        ],
+      }).save();
+
+      const split = await Split.findOneOrFail({
+        where: { guid: 'split_guid' },
+        relations: ['fk_account', 'fk_transaction'],
+      });
+
+      expect(split).toMatchObject({
+        guid: expect.any(String),
+        valueNum: -10,
+        valueDenom: 100,
+        action: 'whatever',
+        quantityNum: -15,
+        quantityDenom: 100,
+      });
+      expect(split.account.name).toEqual('name');
+      expect(split.transaction.description).toEqual('description');
+    });
+
+    it('calculates value', async () => {
+      const splits = await Split.find();
+      expect(splits[0].value).toEqual(0.1);
+    });
+
+    it('calculates quantity', async () => {
+      const splits = await Split.find();
+      expect(splits[0].quantity).toEqual(0.15);
+    });
+
+    it('can set value', async () => {
+      const splits = await Split.find();
+      const split = splits[0];
+      split.value = 1000;
+      expect(split.valueNum).toEqual(1000);
+      expect(split.valueDenom).toEqual(1);
+    });
+
+    it('can set quantity', async () => {
+      const splits = await Split.find();
+      const split = splits[0];
+      split.value = 1000;
+      expect(split.valueNum).toEqual(1000);
+      expect(split.valueDenom).toEqual(1);
+    });
   });
 
-  it('calculates value', async () => {
-    const splits = await Split.find();
-    expect(splits[0].value).toEqual(0.1);
-  });
+  describe('validation', () => {
+    let tx: Transaction;
 
-  it('calculates quantity', async () => {
-    const splits = await Split.find();
-    expect(splits[0].quantity).toEqual(0.15);
+    beforeEach(async () => {
+      tx = Transaction.create({
+        fk_currency: eur,
+        description: 'description',
+        date: DateTime.fromISO('2023-01-01'),
+      });
+    });
+
+    it('fails when empty account', async () => {
+      const split = Split.create({
+        valueNum: 10,
+        valueDenom: 100,
+        quantityNum: 15,
+        quantityDenom: 100,
+        fk_transaction: tx,
+      });
+
+      await expect(split.save()).rejects.toThrow('isNotEmpty');
+    });
+
+    it('fails when no valueNum', async () => {
+      const split = Split.create({
+        valueDenom: 100,
+        quantityNum: 15,
+        quantityDenom: 100,
+        fk_account: account,
+      });
+
+      await expect(split.save()).rejects.toThrow('isNumber');
+    });
+
+    it('fails when no valueDenom', async () => {
+      const split = Split.create({
+        valueNum: 15,
+        quantityNum: 15,
+        quantityDenom: 100,
+        fk_account: account,
+      });
+
+      await expect(split.save()).rejects.toThrow('isNumber');
+    });
+
+    it('fails when no quantityNum', async () => {
+      const split = Split.create({
+        valueNum: 15,
+        valueDenom: 100,
+        quantityDenom: 100,
+        fk_account: account,
+      });
+
+      await expect(split.save()).rejects.toThrow('isNumber');
+    });
+
+    it('fails when no quantityDenom', async () => {
+      const split = Split.create({
+        valueNum: 15,
+        valueDenom: 100,
+        quantityNum: 15,
+        fk_account: account,
+      });
+
+      await expect(split.save()).rejects.toThrow('isNumber');
+    });
+
+    it('fails when positive INCOME split', async () => {
+      account.type = 'INCOME';
+      const split = Split.create({
+        valueNum: 15,
+        valueDenom: 100,
+        quantityNum: 15,
+        quantityDenom: 100,
+        fk_account: account,
+      });
+
+      await expect(split.save()).rejects.toThrow('valueSymbol');
+    });
+
+    it('fails when negative EXPENSE split', async () => {
+      account.type = 'EXPENSE';
+      const split = Split.create({
+        valueNum: -15,
+        valueDenom: 100,
+        quantityNum: -15,
+        quantityDenom: 100,
+        fk_account: account,
+      });
+
+      await expect(split.save()).rejects.toThrow('valueSymbol');
+    });
   });
 });

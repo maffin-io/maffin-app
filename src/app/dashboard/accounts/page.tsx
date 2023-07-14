@@ -1,13 +1,11 @@
 'use client';
 
 import React from 'react';
-import { BiPlusCircle } from 'react-icons/bi';
 
 import AccountsTable from '@/components/AccountsTable';
+import AddAccountButton from '@/components/AddAccountButton';
 
 export default function AccountsPage(): JSX.Element {
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
-
   return (
     <>
       <div className="grid grid-cols-12 items-center pb-4">
@@ -15,14 +13,7 @@ export default function AccountsPage(): JSX.Element {
           Accounts
         </span>
         <div className="col-span-2 col-end-13 justify-self-end">
-          <button
-            className="btn-primary"
-            type="button"
-            onClick={() => setIsModalOpen(!isModalOpen)}
-          >
-            <BiPlusCircle className="mr-1" />
-            Add Account
-          </button>
+          <AddAccountButton />
         </div>
       </div>
       <AccountsTable />

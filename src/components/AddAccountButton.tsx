@@ -1,31 +1,21 @@
 import React from 'react';
+import Modal from '@/components/Modal';
 import { BiPlusCircle } from 'react-icons/bi';
 
-import TransactionForm from '@/components/forms/transaction/TransactionForm';
-import { Account } from '@/book/entities';
-import Modal from '@/components/Modal';
+import AccountForm from '@/components/forms/account/AccountForm';
 
-export type AddTransactionButtonProps = {
-  account: Account,
-};
-
-export default function AddTransactionButton(
-  {
-    account,
-  }: AddTransactionButtonProps,
-): JSX.Element {
+export default function AddAccountButton(): JSX.Element {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   return (
     <>
       <Modal
-        title="Add transaction"
+        title="Add account"
         open={isModalOpen}
         setOpen={setIsModalOpen}
       >
-        <TransactionForm
+        <AccountForm
           onSave={() => { setIsModalOpen(false); }}
-          account={account}
         />
       </Modal>
       <button
@@ -34,7 +24,7 @@ export default function AddTransactionButton(
         onClick={() => setIsModalOpen(!isModalOpen)}
       >
         <BiPlusCircle className="mr-1" />
-        Add Transaction
+        Add Account
       </button>
     </>
   );

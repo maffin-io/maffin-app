@@ -17,41 +17,37 @@ export type AccountPageProps = {
 
 export default function AccountPage({ params }: AccountPageProps): JSX.Element {
   const [datasource] = useDataSource();
-  const [accounts, setAccounts] = React.useState<Account[]>([]);
-  const [account, setAccount] = React.useState<Account | null>(null);
+  const [data, setData] = React.useState<{
+    account: Account | undefined,
+    accounts: Account[],
+  }>({
+    account: undefined,
+    accounts: [],
+  });
   const router = useRouter();
 
   React.useEffect(() => {
     async function load() {
-      setAccounts(await getAccountsWithPath());
-    }
+      const accounts = await getAccountsWithPath();
+      const account = accounts.find(a => a.guid === params.guid);
 
-    if (datasource) {
-      load();
-    }
-  }, [datasource]);
-
-  React.useEffect(() => {
-    async function load() {
-      const a = await Account.findOneBy({ guid: params.guid });
-      if (a === null) {
+      if (!account) {
         router.push('/404');
-      } else {
-        const accountWithPath = accounts.find(each => a.guid === each.guid);
-        if (accountWithPath) {
-          a.path = accountWithPath.path;
-        }
-        setAccount(a);
       }
+
+      setData({
+        account,
+        accounts,
+      });
     }
 
     if (datasource) {
       load();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [datasource, params.guid, accounts]);
+  }, [datasource, params.guid]);
 
-  if (account === null) {
+  if (!data.account) {
     return (
       <div>
         Loading...
@@ -63,17 +59,17 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
     <>
       <div className="grid grid-cols-12 items-center pb-4">
         <span className="col-span-10 text-xl font-medium">
-          {account.path}
+          {data.account.path}
           {' '}
           account
         </span>
         <div className="col-span-2 col-end-13 justify-self-end">
-          <AddTransactionButton account={account} />
+          <AddTransactionButton account={data.account} />
         </div>
       </div>
       <TransactionsTable
-        accountId={account.guid}
-        accounts={accounts}
+        accountId={data.account.guid}
+        accounts={data.accounts}
       />
     </>
   );

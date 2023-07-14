@@ -4,17 +4,17 @@ import {
   render,
   screen,
 } from '@testing-library/react';
+import { DateTime } from 'luxon';
 import userEvent from '@testing-library/user-event';
-import type { UseFieldArrayRemove } from 'react-hook-form';
+import { DataSource } from 'typeorm';
 import { useForm } from 'react-hook-form';
-import type { DataSource } from 'typeorm';
 
 import Stocker from '@/apis/Stocker';
+import * as dataSourceHooks from '@/hooks/useDataSource';
+import * as queries from '@/book/queries';
 import type { Account, Commodity } from '@/book/entities';
 import SplitField from '@/components/forms/transaction/SplitField';
 import type { FormValues } from '@/components/forms/transaction/types';
-import * as dataSourceHooks from '@/hooks/useDataSource';
-import * as queries from '@/book/queries';
 
 jest.mock('@/hooks/useDataSource', () => ({
   __esModule: true,
@@ -27,537 +27,215 @@ jest.mock('@/book/queries', () => ({
 }));
 
 describe('SplitField', () => {
+  let eur: Commodity;
+
   beforeEach(() => {
-    jest.spyOn(Stocker.prototype, 'getPrice').mockResolvedValue({ price: 0.0, currency: '' });
+    eur = {
+      guid: 'eur',
+      mnemonic: 'EUR',
+    } as Commodity;
+
+    jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
   });
 
   it('renders with empty data', () => {
-    const { container } = render(
-      <FormWrapper
-        fromAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'USD',
-            } as Commodity,
-          } as Account
-        }
-      />,
-    );
-
-    screen.getByText('<account>');
-    screen.queryByPlaceholderText('0.0');
-    screen.queryByText('$');
-    screen.queryByText('X');
+    const { container } = render(<FormWrapper />);
     expect(container).toMatchSnapshot();
   });
 
-  it('renders with exchange rate field when currencies are different', async () => {
-    const { container } = render(
-      <FormWrapper
-        toAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'EUR',
-            } as Commodity,
-          } as Account
-        }
-        fromAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'USD',
-            } as Commodity,
-          } as Account
-        }
-      />,
-    );
-
-    screen.getByPlaceholderText('$ -> €');
-    expect(container).toMatchSnapshot();
-  });
-
-  it('shows fromAccount currency', async () => {
-    render(
-      <FormWrapper
-        fromAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'USD',
-            } as Commodity,
-          } as Account
-        }
-      />,
-    );
-
-    screen.getByDisplayValue('$');
-  });
-
-  it('can delete split', async () => {
+  it('enables value field when date filled and account is selected', async () => {
     const user = userEvent.setup();
-    const mockRemove = jest.fn();
-    render(
-      <FormWrapper
-        fromAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'USD',
-            } as Commodity,
-          } as Account
-        }
-        mockRemove={mockRemove}
-      />,
-    );
+    render(<FormWrapper />);
 
-    await user.click(screen.getByText('X'));
+    await user.type(screen.getByTestId('date'), '2023-01-01');
 
-    expect(mockRemove).toHaveBeenCalledWith(1);
+    const [q0, q1] = screen.getAllByRole('spinbutton');
+    expect(q0).toBeEnabled();
+    expect(q1).toBeEnabled();
   });
 
-  it('shows account options when typing', async () => {
+  it('shows value field when txCurrency is different', async () => {
     const user = userEvent.setup();
     jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
     jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
       {
-        guid: '',
-        path: 'path1',
-        type: '',
+        guid: 'account_guid_3',
+        path: 'path3',
+        type: 'EXPENSE',
         commodity: {
-          mnemonic: 'USD',
-        } as Commodity,
-      } as Account,
-      {
-        guid: '',
-        path: 'path2',
-        type: '',
-        commodity: {
-          mnemonic: 'USD',
-        } as Commodity,
-      } as Account,
-    ]);
-
-    render(
-      <FormWrapper
-        fromAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'USD',
-            } as Commodity,
-          } as Account
-        }
-      />,
-    );
-
-    await waitFor(async () => {
-      const accountSelector = screen.getByLabelText('splits.1.toAccount');
-      await user.click(accountSelector);
-    });
-
-    screen.getByText('path1');
-    screen.getByText('path2');
-  });
-
-  it('shows error when account is empty', async () => {
-    const user = userEvent.setup();
-    render(
-      <FormWrapper
-        fromAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'USD',
-            } as Commodity,
-          } as Account
-        }
-      />,
-    );
-
-    await user.click(screen.getByText('Submit'));
-    screen.getByText('Account is required');
-  });
-
-  it('shows error if amount is empty', async () => {
-    const user = userEvent.setup();
-    render(
-      <FormWrapper
-        fromAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'USD',
-            } as Commodity,
-          } as Account
-        }
-      />,
-    );
-
-    const amountInput = screen.getByPlaceholderText('0.0');
-    user.clear(amountInput);
-
-    await user.click(screen.getByText('Submit'));
-    screen.getByText('Amount is required');
-  });
-
-  it.each([
-    ['INCOME', '0', 'Income amounts must be negative'],
-    ['INCOME', '100', 'Income amounts must be negative'],
-    ['EXPENSE', '0', 'Expense amounts must be positive'],
-    ['EXPENSE', '-100', 'Expense amounts must be positive'],
-  ])('shows error for account %s if amount is %s', async (type, amount, message) => {
-    const user = userEvent.setup();
-    render(
-      <FormWrapper
-        fromAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'USD',
-            } as Commodity,
-          } as Account
-        }
-        toAccount={
-          {
-            guid: '',
-            path: '',
-            type,
-            commodity: {
-              mnemonic: 'EUR',
-            } as Commodity,
-          } as Account
-        }
-      />,
-    );
-
-    const amountInput = screen.getByPlaceholderText('0.0');
-    user.clear(amountInput);
-    await user.type(amountInput, amount);
-
-    await user.click(screen.getByText('Submit'));
-    screen.getByText(message);
-  });
-
-  it('does not show error for other account type', async () => {
-    const user = userEvent.setup();
-    render(
-      <FormWrapper
-        fromAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'USD',
-            } as Commodity,
-          } as Account
-        }
-        toAccount={
-          {
-            guid: '',
-            path: '',
-            type: 'ASSET',
-            commodity: {
-              mnemonic: 'EUR',
-            } as Commodity,
-          } as Account
-        }
-      />,
-    );
-
-    const amountInput = screen.getByPlaceholderText('0.0');
-    user.clear(amountInput);
-    await user.type(amountInput, '100');
-    await user.click(screen.getByText('Submit'));
-
-    expect(screen.queryByText(/.*amounts must be negative/)).toBeNull();
-
-    user.clear(amountInput);
-    await user.type(amountInput, '-100');
-    await user.click(screen.getByText('Submit'));
-
-    expect(screen.queryByText(/.*amounts must be positive/)).toBeNull();
-  });
-
-  it('shows error if exchangeRate is empty when displayed', async () => {
-    const user = userEvent.setup();
-    render(
-      <FormWrapper
-        toAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'EUR',
-            } as Commodity,
-          } as Account
-        }
-        fromAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'USD',
-            } as Commodity,
-          } as Account
-        }
-      />,
-    );
-
-    const exchangeRateInput = await screen.findByPlaceholderText('$ -> €');
-    user.clear(exchangeRateInput);
-
-    await user.click(screen.getByText('Submit'));
-    screen.getByText('Exchange rate is required');
-  });
-
-  it('shows error if exchangeRate is negative', async () => {
-    const user = userEvent.setup();
-    render(
-      <FormWrapper
-        toAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'EUR',
-            } as Commodity,
-          } as Account
-        }
-        fromAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'USD',
-            } as Commodity,
-          } as Account
-        }
-      />,
-    );
-
-    const exchangeRateInput = await screen.findByPlaceholderText('$ -> €');
-    user.clear(exchangeRateInput);
-    await user.type(exchangeRateInput, '-0.978');
-
-    await user.click(screen.getByText('Submit'));
-    screen.getByText('Exchange rate must be positive');
-  });
-
-  it('autopopulates exchangeRate for non investments', async () => {
-    const user = userEvent.setup();
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
-      {
-        guid: '',
-        path: 'path1',
-        type: '',
-        commodity: {
+          guid: 'sgd',
           mnemonic: 'SGD',
-        } as Commodity,
+        },
       } as Account,
     ]);
-    jest.spyOn(Stocker.prototype, 'getPrice')
-      .mockResolvedValueOnce({ price: 0.987, currency: '' })
+    render(<FormWrapper />);
+
+    await user.click(screen.getByLabelText('splits.1.account'));
+    await user.click(screen.getByText('path3'));
+
+    expect(screen.getByRole('spinbutton', { name: 'splits.1.value' })).toBeVisible();
+  });
+
+  it('sets currency to account selection', async () => {
+    const user = userEvent.setup();
+    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
+    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
+      {
+        guid: 'account_guid_1',
+        path: 'path1',
+        type: 'ASSET',
+        commodity: {
+          guid: 'sgd',
+          mnemonic: 'SGD',
+        },
+      } as Account,
+    ]);
+    render(<FormWrapper />);
+
+    await user.click(screen.getByLabelText('splits.0.account'));
+    await user.click(screen.getByText('path1'));
+
+    screen.getByText('S$');
+    expect(screen.getAllByText('€')).toHaveLength(2);
+  });
+
+  it('sets value when quantity changes', async () => {
+    const user = userEvent.setup();
+    render(<FormWrapper />);
+    await user.type(screen.getByTestId('date'), '2023-01-01');
+
+    const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
+    const v0 = screen.getByRole('spinbutton', { name: 'splits.0.value', hidden: true });
+
+    expect(q0).toBeEnabled();
+    expect(v0).toBeEnabled();
+    await user.type(q0, '100');
+
+    await waitFor(() => expect(q0).toHaveValue(100));
+    await waitFor(() => expect(v0).toHaveValue(100));
+  });
+
+  it('sets value * exchangeRate when quantity changes and currency is not txCurrency', async () => {
+    const user = userEvent.setup();
+    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
+    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
+      {
+        guid: 'account_guid_1',
+        path: 'path1',
+        type: 'ASSET',
+        commodity: {
+          guid: 'sgd',
+          mnemonic: 'SGD',
+        },
+      } as Account,
+    ]);
+    const mockGetPrice = jest.spyOn(Stocker.prototype, 'getPrice')
       .mockResolvedValue({ price: 0.7, currency: '' });
+    render(<FormWrapper />);
 
-    render(
-      <FormWrapper
-        toAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'EUR',
-            } as Commodity,
-          } as Account
-        }
-        fromAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'USD',
-            } as Commodity,
-          } as Account
-        }
-      />,
-    );
+    await user.type(screen.getByTestId('date'), '2023-01-01');
 
-    const exchangeRateInput = await screen.findByPlaceholderText('$ -> €');
-    expect(exchangeRateInput).toHaveValue(0.987);
+    await user.click(screen.getByLabelText('splits.0.account'));
+    await user.click(screen.getByText('path1'));
+
+    const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
+    const v0 = screen.getByRole('spinbutton', { name: 'splits.0.value' });
+
+    expect(q0).toBeEnabled();
+    expect(v0).toBeEnabled();
+    await user.type(q0, '100');
+
+    await waitFor(() => expect(q0).toHaveValue(100));
+    await waitFor(() => expect(v0).toHaveValue(70));
+    expect(mockGetPrice).toHaveBeenCalledWith('SGDEUR=X', DateTime.fromISO('2023-01-01'));
   });
 
-  it('autopopulates exchangeRate with fromAccount being an investment', async () => {
-    jest.spyOn(Stocker.prototype, 'getPrice')
-      .mockResolvedValueOnce({ price: 17.15, currency: '' });
+  it('sets value * exchangeRate when quantity changes and currency is not txCurrency, investment', async () => {
+    const user = userEvent.setup();
+    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
+    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
+      {
+        guid: 'account_guid_1',
+        path: 'path1',
+        type: 'STOCK',
+        commodity: {
+          guid: 'googl',
+          mnemonic: 'GOOGL',
+        },
+      } as Account,
+    ]);
+    const mockGetPrice = jest.spyOn(Stocker.prototype, 'getPrice')
+      .mockResolvedValue({ price: 89.12, currency: 'USD' });
+    render(<FormWrapper />);
 
-    render(
-      <FormWrapper
-        toAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'EUR',
-            } as Commodity,
-          } as Account
-        }
-        fromAccount={
-          {
-            guid: '',
-            path: '',
-            type: 'STOCK',
-            commodity: {
-              mnemonic: 'IDVY.AS',
-            } as Commodity,
-          } as Account
-        }
-      />,
-    );
+    await user.type(screen.getByTestId('date'), '2023-01-01');
 
-    const exchangeRateInput = await screen.findByPlaceholderText('IDVY.AS -> €');
-    expect(exchangeRateInput).toHaveValue(17.15);
-  });
+    await user.click(screen.getByLabelText('splits.0.account'));
+    await user.click(screen.getByText('path1'));
 
-  it('autopopulates exchangeRate with toAccount being an investment', async () => {
-    jest.spyOn(Stocker.prototype, 'getPrice')
-      .mockResolvedValueOnce({ price: 17.15, currency: '' });
+    const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
+    const v0 = screen.getByRole('spinbutton', { name: 'splits.0.value' });
 
-    render(
-      <FormWrapper
-        toAccount={
-          {
-            guid: '',
-            path: '',
-            type: 'STOCK',
-            commodity: {
-              mnemonic: 'IDVY.AS',
-            } as Commodity,
-          } as Account
-        }
-        fromAccount={
-          {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: 'EUR',
-            } as Commodity,
-          } as Account
-        }
-      />,
-    );
+    expect(q0).toBeEnabled();
+    expect(v0).toBeEnabled();
+    await user.type(q0, '100');
 
-    const exchangeRateInput = await screen.findByPlaceholderText('€ -> IDVY.AS');
-    expect(exchangeRateInput).toHaveValue();
-  });
-
-  it('autopopulates exchangeRate with both accounts being an investment', async () => {
-    jest.spyOn(Stocker.prototype, 'getPrice')
-      .mockResolvedValueOnce({ price: 17.15, currency: '' });
-
-    render(
-      <FormWrapper
-        toAccount={
-          {
-            guid: '',
-            path: '',
-            type: 'STOCK',
-            commodity: {
-              mnemonic: 'IDVY.AS',
-            } as Commodity,
-          } as Account
-        }
-        fromAccount={
-          {
-            guid: '',
-            path: '',
-            type: 'STOCK',
-            commodity: {
-              mnemonic: 'IAG.MC',
-            } as Commodity,
-          } as Account
-        }
-      />,
-    );
-
-    const exchangeRateInput = await screen.findByPlaceholderText('IAG.MC -> IDVY.AS');
-    expect(exchangeRateInput).toHaveValue(0);
+    await waitFor(() => expect(q0).toHaveValue(100));
+    await waitFor(() => expect(v0).toHaveValue(8912));
+    expect(mockGetPrice).toHaveBeenCalledWith('GOOGL', DateTime.fromISO('2023-01-01'));
   });
 });
 
-function FormWrapper(
-  {
-    toAccount,
-    fromAccount,
-    mockRemove = jest.fn(),
-  }: {
-    toAccount?: Account,
-    fromAccount: Account,
-    mockRemove?: jest.Mock<UseFieldArrayRemove>
-  },
-): JSX.Element {
-  const {
-    control,
-    register,
-    setValue,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormValues>();
+function FormWrapper(): JSX.Element {
+  const form = useForm<FormValues>({
+    // These values reproduce the same initial state TransactionForm renders
+    defaultValues: {
+      splits: [
+        {
+          value: 0,
+          quantity: 0,
+          account: {
+            guid: 'account_guid_1',
+            path: 'path1',
+            type: 'ASSET',
+            commodity: {
+              guid: 'eur',
+              mnemonic: 'EUR',
+            } as Commodity,
+          } as Account,
+        },
+        {
+          value: 0,
+          quantity: 0,
+          account: {
+            guid: 'account_guid_2',
+            path: 'path2',
+            type: 'EXPENSE',
+            commodity: {
+              guid: 'eur',
+              mnemonic: 'EUR',
+            } as Commodity,
+          } as Account,
+        },
+      ],
+      fk_currency: {
+        guid: 'eur',
+        mnemonic: 'EUR',
+      },
+    },
+  });
 
   return (
-    <form onSubmit={handleSubmit(() => {})}>
-      <SplitField
-        id="id"
-        index={1}
-        fromAccount={fromAccount}
-        date="2023-01-01"
-        split={{
-          amount: 0.0,
-          toAccount: toAccount || {
-            guid: '',
-            path: '',
-            type: '',
-            commodity: {
-              mnemonic: '',
-            },
-          } as Account,
-        }}
-        control={control}
-        setValue={setValue}
-        remove={mockRemove}
-        register={register}
-        errors={errors}
+    <>
+      <input
+        id="dateInput"
+        data-testid="date"
+        className="block w-full m-0"
+        {...form.register('date')}
+        type="date"
       />
-      <button type="submit">Submit</button>
-    </form>
+      <SplitField index={0} form={form} />
+      <SplitField index={1} form={form} />
+    </>
   );
 }

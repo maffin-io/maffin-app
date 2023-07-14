@@ -1,13 +1,17 @@
 import * as v from 'class-validator';
 import {
-  BaseEntity,
   Column,
   Relation,
-  Entity, JoinColumn, ManyToOne, PrimaryColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
 } from 'typeorm';
 
 import type Account from './Account';
 import type Transaction from './Transaction';
+import BaseEntity from './BaseEntity';
+import { toAmountWithScale } from '../../helpers/number';
 
 /**
  * https://wiki.gnucash.org/wiki/SQL#Tables
@@ -29,13 +33,6 @@ import type Transaction from './Transaction';
 */
 @Entity('splits')
 export default class Split extends BaseEntity {
-  @PrimaryColumn({
-    type: 'varchar',
-    length: 32,
-  })
-  @v.Length(1, 32)
-    guid!: string;
-
   @ManyToOne('Transaction')
   @JoinColumn({ name: 'tx_guid' })
     fk_transaction!: Relation<Transaction> | string;
@@ -46,7 +43,9 @@ export default class Split extends BaseEntity {
 
   @ManyToOne('Account')
   @JoinColumn({ name: 'account_guid' })
-    fk_account!: Relation<Account> | string;
+  @CheckValueSymbol()
+  @v.IsNotEmpty({ message: 'account is required' })
+    fk_account!: Account;
 
   get account(): Account {
     return this.fk_account as Account;
@@ -63,24 +62,28 @@ export default class Split extends BaseEntity {
     type: 'integer',
     name: 'value_num',
   })
+  @v.IsNumber()
     valueNum!: number;
 
   @Column({
     type: 'integer',
     name: 'value_denom',
   })
+  @v.IsNumber()
     valueDenom!: number;
 
   @Column({
     type: 'integer',
     name: 'quantity_num',
   })
+  @v.IsNumber()
     quantityNum!: number;
 
   @Column({
     type: 'integer',
     name: 'quantity_denom',
   })
+  @v.IsNumber()
     quantityDenom!: number;
 
   /**
@@ -101,6 +104,12 @@ export default class Split extends BaseEntity {
     return this.valueNum / this.valueDenom;
   }
 
+  set value(n: number) {
+    const { amount, scale } = toAmountWithScale(n);
+    this.valueNum = amount;
+    this.valueDenom = parseInt('1'.padEnd(scale + 1, '0'), 10);
+  }
+
   /**
    * Returns the quantity spent in the currency of the split's account.
    * Let's say you have the following split:
@@ -119,7 +128,55 @@ export default class Split extends BaseEntity {
   get quantity(): number {
     return this.quantityNum / this.quantityDenom;
   }
+
+  set quantity(n: number) {
+    const { amount, scale } = toAmountWithScale(n);
+    this.quantityNum = amount;
+    this.quantityDenom = parseInt('1'.padEnd(scale + 1, '0'), 10);
+  }
 }
 
 // https://github.com/typeorm/typeorm/issues/4714
 Object.defineProperty(Split, 'name', { value: 'Split' });
+
+/**
+ * Checks that Income and Expense accounts have the right symbol
+ */
+function CheckValueSymbol(validationOptions?: v.ValidationOptions) {
+  return function f(object: Split, propertyName: string) {
+    v.registerDecorator({
+      name: 'valueSymbol',
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(account: Account, args: v.ValidationArguments) {
+          const split = args.object as Split;
+          if (account.type === 'INCOME') {
+            return split.value < 0;
+          }
+
+          if (account.type === 'EXPENSE') {
+            return split.value > 0;
+          }
+
+          return true;
+        },
+
+        defaultMessage(args: v.ValidationArguments) {
+          const split = args.object as Split;
+
+          if (split.account.type === 'INCOME') {
+            return 'INCOME split must be negative';
+          }
+
+          if (split.account.type === 'EXPENSE') {
+            return 'EXPENSE split must be positive';
+          }
+
+          return '';
+        },
+      },
+    });
+  };
+}

@@ -1,7 +1,5 @@
-import {
-  createConnection,
-  getConnection,
-} from 'typeorm';
+import { DataSource } from 'typeorm';
+import crypto from 'crypto';
 
 import {
   Account,
@@ -12,53 +10,56 @@ import {
 } from '../../entities';
 import { getAccountsWithPath } from '../../queries';
 
+Object.defineProperty(global.self, 'crypto', {
+  value: {
+    randomUUID: () => crypto.randomUUID(),
+  },
+});
+
 describe('getAbsolutePaths', () => {
+  let datasource: DataSource;
+
   beforeEach(async () => {
-    await createConnection({
+    datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
       entities: [Account, Book, Commodity, Split, Transaction],
       synchronize: true,
       logging: false,
     });
+    await datasource.initialize();
 
-    await Commodity.create({
-      guid: 'eur_guid',
+    const eur = await Commodity.create({
       namespace: 'CURRENCY',
       mnemonic: 'EUR',
     }).save();
 
     const root = await Account.create({
-      guid: 'root_account_guid',
-      name: 'Root account',
+      name: 'Root',
       type: 'ROOT',
     }).save();
 
     await Book.create({
-      guid: 'book_guid',
       fk_root: root,
     }).save();
 
     const parentAccount = await Account.create({
-      guid: 'parent_account_guid',
-      name: 'Parent account',
+      name: 'Parent',
       type: 'ASSET',
-      fk_commodity: 'eur_guid',
+      fk_commodity: eur,
       parent: root,
     }).save();
 
     await Account.create({
-      guid: 'child_account_guid',
-      name: 'Child account',
+      name: 'Child',
       type: 'ASSET',
-      fk_commodity: 'eur_guid',
+      fk_commodity: eur,
       parent: parentAccount,
     }).save();
   });
 
   afterEach(async () => {
-    const conn = await getConnection();
-    await conn.close();
+    await datasource.destroy();
   });
 
   it('returns absolute paths for accounts ignoring root', async () => {
@@ -68,25 +69,25 @@ describe('getAbsolutePaths', () => {
       {
         fk_commodity: {
           cusip: null,
-          guid: 'eur_guid',
+          guid: expect.any(String),
           mnemonic: 'EUR',
           namespace: 'CURRENCY',
         },
-        guid: 'parent_account_guid',
-        name: 'Parent account',
-        path: 'Parent account',
+        guid: expect.any(String),
+        name: 'Parent',
+        path: 'Parent',
         type: 'ASSET',
       },
       {
         fk_commodity: {
           cusip: null,
-          guid: 'eur_guid',
+          guid: expect.any(String),
           mnemonic: 'EUR',
           namespace: 'CURRENCY',
         },
-        guid: 'child_account_guid',
-        name: 'Child account',
-        path: 'Parent account:Child account',
+        guid: expect.any(String),
+        name: 'Child',
+        path: 'Parent:Child',
         type: 'ASSET',
       },
     ]);

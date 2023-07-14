@@ -23,6 +23,7 @@
     "incremental": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
     "plugins": [
       {
         "name": "next"

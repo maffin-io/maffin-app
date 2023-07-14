@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 import React from 'react';
 import {
+  waitFor,
   render,
   screen,
 } from '@testing-library/react';
@@ -11,7 +12,6 @@ import crypto from 'crypto';
 import Stocker from '@/apis/Stocker';
 import * as dataSourceHooks from '@/hooks/useDataSource';
 import * as queries from '@/book/queries';
-import * as transactionLib from '@/book/lib/transaction';
 import {
   Account,
   Commodity,
@@ -26,9 +26,9 @@ jest.mock('@/hooks/useDataSource', () => ({
   ...jest.requireActual('@/hooks/useDataSource'),
 }));
 
-jest.mock('@/book/lib/transaction', () => ({
+jest.mock('@/book/queries', () => ({
   __esModule: true,
-  ...jest.requireActual('@/book/lib/transaction'),
+  ...jest.requireActual('@/book/queries'),
 }));
 
 Object.defineProperty(global.self, 'crypto', {
@@ -37,15 +37,10 @@ Object.defineProperty(global.self, 'crypto', {
   },
 });
 
-jest.mock('@/book/queries', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/book/queries'),
-}));
-
 describe('TransactionForm', () => {
-  let eur: Commodity;
-  let root: Account;
   let datasource: DataSource;
+  let eur: Commodity;
+  let sgd: Commodity;
   let assetAccount: Account;
   let expenseAccount: Account;
 
@@ -65,15 +60,23 @@ describe('TransactionForm', () => {
       mnemonic: 'EUR',
     }).save();
 
-    root = await Account.create({
+    sgd = await Commodity.create({
+      guid: 'sgd_guid',
+      namespace: 'CURRENCY',
+      mnemonic: 'SGD',
+    }).save();
+
+    jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
+
+    const root = await Account.create({
       guid: 'root_account_guid',
-      name: 'Root account',
+      name: 'Root',
       type: 'ROOT',
     }).save();
 
     assetAccount = await Account.create({
       guid: 'account_guid_1',
-      name: 'bank',
+      name: 'Asset1',
       type: 'ASSET',
       fk_commodity: eur,
       parent: root,
@@ -81,24 +84,14 @@ describe('TransactionForm', () => {
 
     expenseAccount = await Account.create({
       guid: 'account_guid_2',
-      name: 'Expense',
+      name: 'Random',
       type: 'EXPENSE',
       fk_commodity: eur,
       parent: root,
     }).save();
 
-    assetAccount.path = 'Assets:bank';
-    expenseAccount.path = 'Expenses:Expense1';
-
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
-      assetAccount, expenseAccount,
-    ]);
-
-    jest.spyOn(transactionLib, 'createTransaction').mockImplementation(async () => {});
-    jest.spyOn(Stocker.prototype, 'getPrice').mockResolvedValue({
-      price: 0.987,
-      currency: 'USD',
-    });
+    assetAccount.path = 'Assets:asset1';
+    expenseAccount.path = 'Expenses:random';
   });
 
   afterEach(async () => {
@@ -114,225 +107,191 @@ describe('TransactionForm', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Date')).not.toBeNull();
-    expect(screen.getByLabelText('Description')).not.toBeNull();
-    expect(screen.getByText('Entries')).not.toBeNull();
-    expect(screen.getByText('Add split')).not.toBeNull();
-    expect(screen.getByText('Save')).not.toBeNull();
+    await waitFor(() => {
+      // wait for initial validation to appear
+      screen.queryByText('account is required');
+    });
+
+    screen.getByLabelText('Date');
+    screen.getByLabelText('Description');
+    screen.getByRole('combobox', { name: 'splits.0.account' });
+    screen.getByRole('combobox', { name: 'splits.1.account' });
+    expect(screen.getByText('Save')).toBeDisabled();
     expect(container).toMatchSnapshot();
   });
 
-  it('can add split', async () => {
+  it('creates transaction with expected params when both same currency', async () => {
     const user = userEvent.setup();
-    render(<TransactionForm
-      onSave={() => {}}
-      account={assetAccount}
-    />);
-
-    await user.click(screen.getByText('Add split'));
-    expect(screen.queryAllByRole('combobox')).toHaveLength(2);
-    expect(screen.queryAllByRole('button', { name: 'X' })).toHaveLength(2);
-    expect(screen.queryAllByRole('spinbutton')).toHaveLength(2);
-  });
-
-  it('shows error when date is empty', async () => {
-    const user = userEvent.setup();
-    render(<TransactionForm
-      onSave={() => {}}
-      account={assetAccount}
-    />);
-
-    await user.click(screen.getByText('Save'));
-    expect(screen.getByText('Date is required')).not.toBeNull();
-  });
-
-  it('shows error when description is empty', async () => {
-    const user = userEvent.setup();
-    render(<TransactionForm
-      onSave={() => {}}
-      account={assetAccount}
-    />);
-
-    await user.click(screen.getByText('Save'));
-    screen.getByText('Description is required');
-  });
-
-  it('calls createTransaction with expected data for single split', async () => {
     jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-
-    const mockSave = jest.fn();
-    const user = userEvent.setup();
-    render(<TransactionForm
-      onSave={mockSave}
-      account={assetAccount}
-    />);
-
-    await user.type(screen.getByRole('textbox', { name: /description/i }), 'My expense');
-    await user.type(screen.getByLabelText('Date'), '2023-01-01');
-
-    await userEvent.click(screen.getByLabelText('splits.0.toAccount'));
-    await user.click(screen.getByText(/expenses:expense1/i));
-
-    await user.type(screen.getByRole('spinbutton'), '100');
-
-    await user.click(screen.getByRole('button', { name: /save/i }));
-
-    expect(transactionLib.createTransaction).toHaveBeenCalledWith(
-      DateTime.fromISO('2023-01-01'),
-      'My expense',
-      {
-        action: '',
-        guid: expect.any(String),
-        fk_account: assetAccount,
-        quantityDenom: 1,
-        quantityNum: -100,
-        valueDenom: 1,
-        valueNum: -100,
-      },
-      [
-        {
-          action: '',
-          guid: expect.any(String),
-          fk_account: expenseAccount,
-          quantityDenom: 1,
-          quantityNum: 100,
-          valueDenom: 1,
-          valueNum: 100,
-        },
-      ],
-    );
-    expect(mockSave).toHaveBeenCalledTimes(1);
-  });
-
-  it('calls createTransaction with expected data for different currency', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-
-    const usd = await Commodity.create({
-      guid: 'usd_guid',
-      namespace: 'CURRENCY',
-      mnemonic: 'USD',
-    }).save();
-    assetAccount.fk_commodity = usd;
-    await assetAccount.save();
-
-    const mockSave = jest.fn();
-    const user = userEvent.setup();
-    render(<TransactionForm
-      onSave={mockSave}
-      account={assetAccount}
-    />);
-
-    await user.type(screen.getByRole('textbox', { name: /description/i }), 'My expense');
-    await user.type(screen.getByLabelText('Date'), '2023-01-01');
-
-    await userEvent.click(screen.getByLabelText('splits.0.toAccount'));
-    await user.click(screen.getByText(/expenses:expense1/i));
-
-    await user.type(screen.getByPlaceholderText('0.0'), '100');
-    await user.clear(screen.getByPlaceholderText('$ -> €'));
-    await user.type(screen.getByPlaceholderText('$ -> €'), '0.987');
-
-    await user.click(screen.getByRole('button', { name: /save/i }));
-
-    expect(transactionLib.createTransaction).toHaveBeenCalledWith(
-      DateTime.fromISO('2023-01-01'),
-      'My expense',
-      {
-        action: '',
-        guid: expect.any(String),
-        fk_account: assetAccount,
-        quantityDenom: 1,
-        quantityNum: -100,
-        valueDenom: 1,
-        valueNum: -100,
-      },
-      [
-        {
-          action: '',
-          guid: expect.any(String),
-          fk_account: expenseAccount,
-          quantityDenom: 10,
-          quantityNum: 987,
-          valueDenom: 1,
-          valueNum: 100,
-        },
-      ],
-    );
-    expect(mockSave).toHaveBeenCalledTimes(1);
-  });
-
-  it('calls createTransaction with expected data with multiple splits', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-
-    const expenseAccount2 = await Account.create({
-      guid: 'account_guid_3',
-      name: 'Expense2',
-      type: 'EXPENSE',
-      fk_commodity: eur,
-      parent: root,
-    }).save();
-    expenseAccount2.path = 'Expenses:Expense2';
-
     jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
-      assetAccount, expenseAccount, expenseAccount2,
+      assetAccount, expenseAccount,
     ]);
-
     const mockSave = jest.fn();
-    const user = userEvent.setup();
-    render(<TransactionForm
-      onSave={mockSave}
-      account={assetAccount}
-    />);
 
-    await user.type(screen.getByRole('textbox', { name: /description/i }), 'My expense');
+    render(
+      <TransactionForm
+        onSave={mockSave}
+        account={assetAccount}
+      />,
+    );
+
+    await waitFor(() => {
+      // wait for initial validation to appear
+      screen.queryByText('account is required');
+    });
+
+    const [q0, q1] = screen.getAllByRole('spinbutton');
+    expect(q0).toBeDisabled();
+    expect(q1).toBeDisabled();
+
     await user.type(screen.getByLabelText('Date'), '2023-01-01');
+    await user.type(screen.getByLabelText('Description'), 'My expense');
 
-    await user.click(screen.getByText('Add split'));
-    const amountInputs = screen.getAllByPlaceholderText('0.0');
+    await user.click(screen.getByRole('combobox', { name: 'splits.1.account' }));
+    await user.click(screen.getByText('Expenses:random'));
 
-    await userEvent.click(screen.getByLabelText('splits.0.toAccount'));
-    await user.click(screen.getByText(/expenses:expense1/i));
-    await user.type(amountInputs[0], '100');
+    expect(q0).toBeEnabled();
+    expect(q1).toBeEnabled();
+    // This happens in the UI too, we have to press - twice and dont know why
+    await user.type(q0, '--100');
+    await waitFor(() => expect(q0).toHaveValue(-100));
+    await waitFor(() => expect(q1).toHaveValue(100));
 
-    await userEvent.click(screen.getByLabelText('splits.1.toAccount'));
-    await user.click(screen.getByText(/expenses:expense2/i));
-    await user.type(amountInputs[1], '50');
+    expect(screen.getByText('Save')).not.toBeDisabled();
+    await user.click(screen.getByText('Save'));
 
-    await user.click(screen.getByRole('button', { name: /save/i }));
-
-    expect(transactionLib.createTransaction).toHaveBeenCalledWith(
-      DateTime.fromISO('2023-01-01'),
-      'My expense',
-      {
-        action: '',
-        guid: expect.any(String),
-        fk_account: assetAccount,
-        quantityDenom: 1,
-        quantityNum: -150,
-        valueDenom: 1,
-        valueNum: -150,
+    const tx = await Transaction.findOneOrFail({
+      where: { description: 'My expense' },
+      relations: {
+        splits: {
+          fk_account: true,
+        },
       },
-      [
+    });
+
+    expect(tx).toMatchObject({
+      guid: expect.any(String),
+      date: DateTime.fromISO('2023-01-01'),
+      description: 'My expense',
+      fk_currency: eur,
+      splits: [
         {
-          action: '',
           guid: expect.any(String),
-          fk_account: expenseAccount,
+          action: '',
+          fk_account: {
+            guid: 'account_guid_1',
+          },
+          quantityNum: -100,
           quantityDenom: 1,
-          quantityNum: 100,
+          valueNum: -100,
           valueDenom: 1,
-          valueNum: 100,
         },
         {
-          action: '',
           guid: expect.any(String),
-          fk_account: expenseAccount2,
+          action: '',
+          fk_account: {
+            guid: 'account_guid_2',
+          },
+          quantityNum: 100,
           quantityDenom: 1,
-          quantityNum: 50,
+          valueNum: 100,
           valueDenom: 1,
-          valueNum: 50,
         },
       ],
+    });
+    expect(mockSave).toHaveBeenCalledTimes(1);
+  });
+
+  it('creates transaction with expected params with different currency', async () => {
+    const user = userEvent.setup();
+    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
+    jest.spyOn(Stocker.prototype, 'getPrice')
+      .mockResolvedValue({ price: 0.7, currency: '' });
+    assetAccount.fk_commodity = sgd;
+    await assetAccount.save();
+    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
+      assetAccount, expenseAccount,
+    ]);
+    const mockSave = jest.fn();
+
+    render(
+      <TransactionForm
+        onSave={mockSave}
+        account={assetAccount}
+      />,
     );
+
+    await waitFor(() => {
+      // wait for initial validation to appear
+      screen.queryByText('account is required');
+    });
+
+    const [q0, q1] = screen.getAllByRole('spinbutton');
+    expect(q0).toBeDisabled();
+    expect(q1).toBeDisabled();
+
+    await user.type(screen.getByLabelText('Date'), '2023-01-01');
+    await user.type(screen.getByLabelText('Description'), 'My expense');
+
+    await user.click(screen.getByRole('combobox', { name: 'splits.1.account' }));
+    await user.click(screen.getByText('Expenses:random'));
+
+    expect(q0).toBeEnabled();
+    expect(q1).toBeEnabled();
+    // This happens in the UI too, we have to press - twice and dont know why
+    await user.type(q0, '--100');
+
+    const v0 = screen.getByRole('spinbutton', { name: 'splits.0.value' });
+    await waitFor(() => expect(v0).toHaveValue(-70));
+    await waitFor(() => expect(q0).toHaveValue(-100));
+
+    await user.type(q1, '70');
+    await waitFor(() => expect(q1).toHaveValue(70));
+    const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value', hidden: true });
+    await waitFor(() => expect(v1).toHaveValue(70));
+
+    expect(screen.getByText('Save')).not.toBeDisabled();
+    await user.click(screen.getByText('Save'));
+
+    const tx = await Transaction.findOneOrFail({
+      where: { description: 'My expense' },
+      relations: {
+        splits: {
+          fk_account: true,
+        },
+      },
+    });
+
+    expect(tx).toMatchObject({
+      guid: expect.any(String),
+      date: DateTime.fromISO('2023-01-01'),
+      description: 'My expense',
+      fk_currency: eur,
+      splits: [
+        {
+          guid: expect.any(String),
+          action: '',
+          fk_account: {
+            guid: 'account_guid_1',
+          },
+          quantityNum: -100,
+          quantityDenom: 1,
+          valueNum: -70,
+          valueDenom: 1,
+        },
+        {
+          guid: expect.any(String),
+          action: '',
+          fk_account: {
+            guid: 'account_guid_2',
+          },
+          quantityNum: 70,
+          quantityDenom: 1,
+          valueNum: 70,
+          valueDenom: 1,
+        },
+      ],
+    });
     expect(mockSave).toHaveBeenCalledTimes(1);
   });
 });

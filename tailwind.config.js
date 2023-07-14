@@ -9,7 +9,10 @@ module.exports = {
   // dynamic behavior in some cases.
   safelist: [
     // We use dynamic cols for TransactionForm when showing exchange rate
-    'col-span-6'
+    'visible',
+    {
+      pattern: /col-span-.*/,
+    },
   ],
   theme: {
     extend: {

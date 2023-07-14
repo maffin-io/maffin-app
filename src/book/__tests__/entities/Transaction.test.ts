@@ -1,84 +1,227 @@
 import { DateTime } from 'luxon';
-import {
-  createConnection,
-  getConnection,
-  BaseEntity,
-} from 'typeorm';
+import { DataSource } from 'typeorm';
+import crypto from 'crypto';
 
 import {
+  BaseEntity,
   Commodity,
   Transaction,
   Split,
   Account,
 } from '../../entities';
 
+Object.defineProperty(global.self, 'crypto', {
+  value: {
+    randomUUID: () => crypto.randomUUID(),
+  },
+});
+
 describe('Transaction', () => {
+  let datasource: DataSource;
+  let eur: Commodity;
+  let root: Account;
+  let account: Account;
+  let account2: Account;
+
   beforeEach(async () => {
-    await createConnection({
+    datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Commodity, Split, Transaction, Account],
+      entities: [Account, Commodity, Split, Transaction],
       synchronize: true,
       logging: false,
     });
+    await datasource.initialize();
 
-    await Commodity.create({
-      guid: 'currency_guid',
+    eur = await Commodity.create({
       namespace: 'namespace',
       mnemonic: 'EUR',
     }).save();
 
-    await Transaction.create({
-      guid: 'tx_guid',
-      fk_currency: 'currency_guid',
-      date: DateTime.fromISO('2023-01-01'),
+    root = await Account.create({
+      name: 'Root',
+      type: 'ROOT',
+    }).save();
+
+    account = await Account.create({
+      name: 'name',
+      type: 'ASSET',
+      parent: root,
+      fk_commodity: eur,
     }).save();
   });
 
   afterEach(async () => {
-    const conn = await getConnection();
-    await conn.close();
+    await datasource.destroy();
   });
 
-  it('is active record', async () => {
-    const instance = await Transaction.find();
-    expect(instance[0]).toBeInstanceOf(BaseEntity);
+  describe('entity', () => {
+    beforeEach(async () => {
+      account2 = await Account.create({
+        name: 'Expenses',
+        type: 'EXPENSE',
+        parent: root,
+        fk_commodity: eur,
+      }).save();
+
+      await Transaction.create({
+        description: 'description',
+        fk_currency: eur,
+        date: DateTime.fromISO('2023-01-01'),
+        splits: [
+          Split.create({
+            valueNum: -10,
+            valueDenom: 100,
+            quantityNum: -15,
+            quantityDenom: 100,
+            fk_account: account,
+          }),
+          Split.create({
+            valueNum: 10,
+            valueDenom: 100,
+            quantityNum: 15,
+            quantityDenom: 100,
+            fk_account: account2,
+          }),
+        ],
+      }).save();
+    });
+
+    it('is active record', async () => {
+      const instance = await Transaction.find();
+      expect(instance[0]).toBeInstanceOf(BaseEntity);
+    });
+
+    it('can retrieve transaction', async () => {
+      const transactions = await Transaction.find();
+      expect(transactions[0].description).toEqual('description');
+    });
+
+    it('retrieves splits', async () => {
+      const instance = await Transaction.find({
+        relations: ['splits'],
+      });
+      const txSplits = instance[0].splits;
+
+      expect(txSplits).toHaveLength(2);
+    });
   });
 
-  it('can retrieve transaction', async () => {
-    const transactions = await Transaction.find({
-      relations: ['splits'],
+  describe('validation', () => {
+    it('fails if description not long enough', async () => {
+      const tx = Transaction.create({
+        description: 'des',
+        fk_currency: eur,
+        date: DateTime.fromISO('2023-01-01'),
+      });
+
+      await expect(tx.save()).rejects.toThrow('isLength');
     });
 
-    expect(transactions[0].guid).toEqual('tx_guid');
-  });
+    it('fails if date is empty', async () => {
+      const tx = Transaction.create({
+        description: 'description',
+        fk_currency: eur,
+      });
 
-  it('retrieves splits', async () => {
-    await Account.create({
-      guid: 'account_guid',
-      name: 'name',
-      type: 'ASSET',
-      fk_commodity: 'currency_guid',
-    }).save();
-
-    const split = Split.create({
-      guid: 'split_guid',
-      valueNum: 10,
-      valueDenom: 100,
-      quantityNum: 15,
-      quantityDenom: 100,
-      fk_transaction: 'tx_guid',
-      fk_account: 'account_guid',
+      await expect(tx.save()).rejects.toThrow('isNotEmpty');
     });
 
-    await split.save();
+    it('fails if currency is empty', async () => {
+      const tx = Transaction.create({
+        description: 'description',
+        date: DateTime.fromISO('2023-01-01'),
+      });
 
-    const instance = await Transaction.find({
-      relations: ['splits'],
+      await expect(tx.save()).rejects.toThrow('isNotEmpty');
     });
-    const txSplits = instance[0].splits;
 
-    expect(txSplits).toHaveLength(1);
-    expect(txSplits[0].guid).toEqual('split_guid');
+    it('validates nested splits', async () => {
+      const split1 = new Split();
+      const split2 = new Split();
+
+      const tx = Transaction.create({
+        description: 'description',
+        fk_currency: eur,
+        date: DateTime.fromISO('2023-01-01'),
+        splits: [split1, split2],
+      });
+
+      await expect(tx.save()).rejects.toThrow();
+    });
+
+    it('fails if not enough splits', async () => {
+      const split1 = new Split();
+      split1.fk_account = account;
+
+      const tx = Transaction.create({
+        description: 'description',
+        fk_currency: eur,
+        date: DateTime.fromISO('2023-01-01'),
+        splits: [split1],
+      });
+
+      await expect(tx.save()).rejects.toThrow('splitsNum');
+    });
+
+    it('can create tx with 1 split if Investment', async () => {
+      const commodity = await Commodity.create({
+        namespace: 'NASDAQ',
+        mnemonic: 'GOOGL',
+      }).save();
+
+      const split1 = new Split();
+      split1.value = 10;
+      split1.quantity = 100;
+      split1.fk_account = await Account.create({
+        name: 'GOOGL',
+        type: 'STOCK',
+        fk_commodity: commodity,
+        parent: account,
+      }).save();
+
+      const tx = Transaction.create({
+        description: 'description',
+        fk_currency: eur,
+        date: DateTime.fromISO('2023-01-01'),
+        splits: [split1],
+      });
+
+      await expect(tx.save()).resolves.not.toThrow();
+    });
+
+    it('fails if splits value balance != 0', async () => {
+      const split1 = new Split();
+      split1.value = 100;
+      split1.fk_account = account;
+      const split2 = new Split();
+      split2.value = 200;
+      split2.fk_account = account2;
+
+      const tx = Transaction.create({
+        description: 'description',
+        fk_currency: eur,
+        date: DateTime.fromISO('2023-01-01'),
+        splits: [split1, split2],
+      });
+
+      await expect(tx.save()).rejects.toThrow('splitsBalance');
+    });
+
+    it('fails if splits have duplicated accounts', async () => {
+      const split1 = new Split();
+      split1.fk_account = account;
+      const split2 = new Split();
+      split2.fk_account = account;
+
+      const tx = Transaction.create({
+        description: 'description',
+        fk_currency: eur,
+        date: DateTime.fromISO('2023-01-01'),
+        splits: [split1, split2],
+      });
+
+      await expect(tx.save()).rejects.toThrow('splitsDuplicateAccounts');
+    });
   });
 });
