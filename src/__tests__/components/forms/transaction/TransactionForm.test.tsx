@@ -10,7 +10,6 @@ import { DataSource } from 'typeorm';
 import crypto from 'crypto';
 
 import Stocker from '@/apis/Stocker';
-import * as dataSourceHooks from '@/hooks/useDataSource';
 import * as queries from '@/book/queries';
 import {
   Account,
@@ -20,11 +19,6 @@ import {
   Transaction,
 } from '@/book/entities';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
-
-jest.mock('@/hooks/useDataSource', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/useDataSource'),
-}));
 
 jest.mock('@/book/queries', () => ({
   __esModule: true,
@@ -122,7 +116,6 @@ describe('TransactionForm', () => {
 
   it('creates transaction with expected params when both same currency', async () => {
     const user = userEvent.setup();
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
     jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
       assetAccount, expenseAccount,
     ]);
@@ -204,7 +197,6 @@ describe('TransactionForm', () => {
 
   it('creates transaction with expected params with different currency', async () => {
     const user = userEvent.setup();
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
     jest.spyOn(Stocker.prototype, 'getPrice')
       .mockResolvedValue({ price: 0.7, currency: '' });
     assetAccount.fk_commodity = sgd;

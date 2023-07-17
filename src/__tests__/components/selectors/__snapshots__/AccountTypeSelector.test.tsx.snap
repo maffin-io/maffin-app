@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AccountTypeSelector passes data as expected 1`] = `
+<div>
+  <div
+    data-testid="Selector"
+  >
+    <span>
+      {"id":"customId","labelAttribute":"type","options":[{"type":"ASSET"},{"type":"BANK"},{"type":"CASH"},{"type":"EQUITY"},{"type":"LIABILITY"},{"type":"INCOME"},{"type":"EXPENSE"},{"type":"MUTUAL"},{"type":"STOCK"}],"placeholder":"My placeholder","isClearable":false,"defaultValue":{"type":"ASSET"},"className":"class","disabled":true}
+    </span>
+  </div>
+</div>
+`;
+
+exports[`AccountTypeSelector renders as expected 1`] = `
+<div>
+  <div
+    data-testid="Selector"
+  >
+    <span>
+      {"id":"typeSelector","labelAttribute":"type","options":[{"type":"ASSET"},{"type":"BANK"},{"type":"CASH"},{"type":"EQUITY"},{"type":"LIABILITY"},{"type":"INCOME"},{"type":"EXPENSE"},{"type":"MUTUAL"},{"type":"STOCK"}],"placeholder":"Choose account type","isClearable":true,"className":"","disabled":false}
+    </span>
+  </div>
+</div>
+`;

@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AccountSelector passes data as expected 1`] = `
+<div>
+  <div
+    data-testid="Selector"
+  >
+    <span>
+      {"id":"customId","labelAttribute":"path","options":[],"placeholder":"My placeholder","isClearable":false,"defaultValue":{"path":"label1"},"className":"class"}
+    </span>
+  </div>
+</div>
+`;
+
+exports[`AccountSelector renders as expected 1`] = `
+<div>
+  <div
+    data-testid="Selector"
+  >
+    <span>
+      {"id":"accountSelector","labelAttribute":"path","options":[],"placeholder":"Choose account","isClearable":true,"className":""}
+    </span>
+  </div>
+</div>
+`;

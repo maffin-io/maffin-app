@@ -1,35 +1,37 @@
 import React from 'react';
-import Select, {
-  SingleValue,
-  components,
-} from 'react-select';
-import { BiShuffle } from 'react-icons/bi';
+import { useHotkeys } from 'react-hotkeys-hook';
+import Select, { SingleValue, components } from 'react-select';
+import { BiSearch } from 'react-icons/bi';
 
-import { Account } from '@/book/entities';
-
-export type AccountTypeSelectorProps = {
+export type SelectorProps<T> = {
+  labelAttribute: string,
+  options: T[],
   id?: string,
   placeholder?: string,
   onChange?: Function,
-  disabled?: boolean,
-  ignoreTypes?: string[],
+  isClearable?: boolean,
+  defaultValue?: T,
   className?: string,
+  disabled?: boolean,
 };
 
-export default function AccountTypeSelector(
+export default function Selector<T>(
   {
+    labelAttribute,
+    options,
     placeholder,
     onChange,
-    ignoreTypes = [],
-    id = 'accountSelector',
-    disabled = false,
+    defaultValue,
+    id = 'selector',
+    isClearable = true,
     className = '',
-  }: AccountTypeSelectorProps,
+    disabled = false,
+  }: SelectorProps<T>,
 ): JSX.Element {
   const ref = React.useRef<HTMLDivElement>();
-  const types = Account.TYPES.slice(1).filter(
-    type => !ignoreTypes.includes(type),
-  ).map(type => ({ type }));
+  useHotkeys('meta+k', () => {
+    ref.current?.focus();
+  });
 
   return (
     <Select
@@ -38,23 +40,26 @@ export default function AccountTypeSelector(
       id={id}
       name={id}
       aria-label={id}
-      options={types}
-      isDisabled={disabled}
-      placeholder={placeholder || 'Choose account type'}
-      onChange={(newValue: SingleValue<{ type: string }> | null) => {
+      options={options}
+      placeholder={placeholder || 'Choose an option'}
+      onChange={(newValue: SingleValue<T> | null) => {
         if (onChange) {
-          onChange(newValue?.type);
+          onChange(newValue);
         }
       }}
-      isClearable
+      isClearable={isClearable}
+      isDisabled={disabled}
+      defaultValue={defaultValue}
       backspaceRemovesValue
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Escape') {
           ref.current?.blur();
         }
       }}
-      getOptionLabel={(option) => option.type}
-      getOptionValue={(option) => option.type}
+      // @ts-ignore dunno how to set proper types here
+      getOptionLabel={(option: T) => option[labelAttribute]}
+      // @ts-ignore dunno how to set proper types here
+      getOptionValue={(option: T) => option[labelAttribute]}
       openMenuOnFocus
       components={{ Control }}
       className={className}
@@ -63,12 +68,7 @@ export default function AccountTypeSelector(
       }}
       classNames={{
         // We set h-9 so it's the same as other inputs
-        control: ({ isDisabled }) => {
-          if (isDisabled) {
-            return '!h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-700 !border-none';
-          }
-          return '!h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none';
-        },
+        control: () => '!h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none',
         indicatorSeparator: () => 'hidden',
         menu: () => 'text-sm !bg-gunmetal-800',
         option: (state) => {
@@ -94,7 +94,7 @@ function Control(
 ): JSX.Element {
   return (
     <components.Control {...props}>
-      <BiShuffle className="absolute text-md left-[10px]" />
+      <BiSearch className="absolute text-md left-[10px]" />
       {children}
     </components.Control>
   );

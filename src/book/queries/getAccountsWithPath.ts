@@ -9,14 +9,16 @@ type AccountPath = {
   commodityGuid: string,
 };
 
+type GetAccountsWithPathProps = {
+  showRoot?: boolean,
+  relations?: FindOptionsRelations<Account>,
+};
+
 export async function getAccountsWithPath(
   {
     showRoot = false,
-    relations,
-  }: {
-    showRoot?: boolean,
-    relations?: FindOptionsRelations<Account>,
-  },
+    relations = {},
+  }: GetAccountsWithPathProps = {},
 ): Promise<Account[]> {
   const start = performance.now();
   const books = await Book.find();

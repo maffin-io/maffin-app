@@ -16,7 +16,7 @@ export type Record = {
   subRows: Record[],
 };
 
-type AccountsTableProps = {
+export type AccountsTableProps = {
   accounts: Account[],
   todayPrices: PriceDBMap,
 };

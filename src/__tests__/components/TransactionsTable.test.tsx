@@ -198,6 +198,7 @@ describe('TransactionsTable', () => {
             name: 'bank',
             type: 'ASSET',
             fk_commodity: eur,
+            childrenIds: [],
           },
           fk_transaction: {
             ...transaction,
@@ -209,6 +210,7 @@ describe('TransactionsTable', () => {
                   name: 'bank',
                   type: 'ASSET',
                   fk_commodity: eur,
+                  childrenIds: [],
                 },
                 guid: 'split_guid_1',
                 quantityDenom: 100,
@@ -223,6 +225,7 @@ describe('TransactionsTable', () => {
                   name: 'expense',
                   type: 'EXPENSE',
                   fk_commodity: eur,
+                  childrenIds: [],
                 },
                 guid: 'split_guid_2',
                 quantityDenom: 100,

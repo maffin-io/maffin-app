@@ -12,7 +12,7 @@ exports[`AccountsTable builds subRows as expected with investment accounts 1`] =
     <span
       data-testid="data"
     >
-      [{"name":"Stocks","type":"ASSET","total":{"_raw":{"amount":1960000,"currency":{"code":"EUR","base":10,"exponent":2},"scale":4}},"subRows":[{"name":"GOOGL","type":"STOCK","total":{"_raw":{"amount":20000,"currency":{"code":"USD","base":10,"exponent":2},"scale":2}},"subRows":[]}]}]
+      [{"guid":"a1","name":"Stocks","type":"ASSET","total":{"_raw":{"amount":1960000,"currency":{"code":"EUR","base":10,"exponent":2},"scale":4}},"subRows":[{"guid":"a2","name":"GOOGL","type":"STOCK","total":{"_raw":{"amount":20000,"currency":{"code":"USD","base":10,"exponent":2},"scale":2}},"subRows":[]}]}]
     </span>
     <span>
       {"id":"total","desc":true}
@@ -33,7 +33,7 @@ exports[`AccountsTable builds subRows as expected with non investment accounts 1
     <span
       data-testid="data"
     >
-      [{"name":"Assets","type":"ASSET","total":{"_raw":{"amount":99000,"currency":{"code":"EUR","base":10,"exponent":2},"scale":2}},"subRows":[{"name":"Bank","type":"BANK","total":{"_raw":{"amount":1000,"currency":{"code":"USD","base":10,"exponent":2},"scale":0}},"subRows":[]}]}]
+      [{"guid":"a1","name":"Assets","type":"ASSET","total":{"_raw":{"amount":99000,"currency":{"code":"EUR","base":10,"exponent":2},"scale":2}},"subRows":[{"guid":"a2","name":"Bank","type":"BANK","total":{"_raw":{"amount":1000,"currency":{"code":"USD","base":10,"exponent":2},"scale":0}},"subRows":[]}]}]
     </span>
     <span>
       {"id":"total","desc":true}
@@ -42,10 +42,44 @@ exports[`AccountsTable builds subRows as expected with non investment accounts 1
 </div>
 `;
 
-exports[`AccountsTable renders empty when no dataSource 1`] = `
+exports[`AccountsTable renders empty table when no accounts 1`] = `
 <div>
-  <span>
-    Loading...
-  </span>
+  <div
+    class="Table"
+    data-testid="AccountsTable"
+  >
+    <span>
+      [{"accessorKey":"name","id":"name","header":"","enableSorting":false},{"id":"total","header":""}]
+    </span>
+    <span
+      data-testid="data"
+    >
+      []
+    </span>
+    <span>
+      {"id":"total","desc":true}
+    </span>
+  </div>
+</div>
+`;
+
+exports[`AccountsTable renders empty table when no price data 1`] = `
+<div>
+  <div
+    class="Table"
+    data-testid="AccountsTable"
+  >
+    <span>
+      [{"accessorKey":"name","id":"name","header":"","enableSorting":false},{"id":"total","header":""}]
+    </span>
+    <span
+      data-testid="data"
+    >
+      []
+    </span>
+    <span>
+      {"id":"total","desc":true}
+    </span>
+  </div>
 </div>
 `;

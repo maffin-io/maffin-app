@@ -74,6 +74,7 @@ describe('getAbsolutePaths', () => {
           namespace: 'CURRENCY',
         },
         guid: expect.any(String),
+        childrenIds: [expect.any(String)],
         name: 'Parent',
         path: 'Parent',
         type: 'ASSET',
@@ -86,10 +87,29 @@ describe('getAbsolutePaths', () => {
           namespace: 'CURRENCY',
         },
         guid: expect.any(String),
+        childrenIds: [],
         name: 'Child',
         path: 'Parent:Child',
         type: 'ASSET',
       },
     ]);
+  });
+
+  it('returns root when specified', async () => {
+    const accounts = await getAccountsWithPath({ showRoot: true });
+
+    expect(accounts).toHaveLength(3);
+    expect(accounts[0]).toMatchObject({
+      name: 'Root',
+      type: 'ROOT',
+      fk_commodity: null,
+      path: 'Root',
+    });
+  });
+
+  it('returns with loaded relations', async () => {
+    const accounts = await getAccountsWithPath({ relations: { splits: true } });
+
+    expect(accounts[0]).toHaveProperty('splits');
   });
 });

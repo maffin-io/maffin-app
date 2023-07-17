@@ -5,10 +5,10 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DataSource } from 'typeorm';
+import { SWRConfig } from 'swr';
 import crypto from 'crypto';
 
 import { getAllowedSubAccounts } from '@/book/helpers/accountType';
-import * as dataSourceHooks from '@/hooks/useDataSource';
 import * as queries from '@/book/queries';
 import {
   Account,
@@ -18,11 +18,6 @@ import {
   Transaction,
 } from '@/book/entities';
 import AccountForm from '@/components/forms/account/AccountForm';
-
-jest.mock('@/hooks/useDataSource', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/useDataSource'),
-}));
 
 jest.mock('@/book/queries', () => ({
   __esModule: true,
@@ -92,12 +87,14 @@ describe('AccountForm', () => {
 
   it('renders as expected', async () => {
     const { container } = render(
-      <AccountForm
-        onSave={() => {}}
-      />,
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountForm
+          onSave={() => {}}
+        />
+      </SWRConfig>,
     );
 
-    expect(screen.getByLabelText('Name')).not.toBeNull();
+    await screen.findByLabelText('Name');
     expect(screen.getByRole('combobox', { name: 'parentInput' })).not.toBeNull();
     expect(screen.queryByRole('combobox', { name: 'typeInput' })).toBeNull();
     expect(screen.getByRole('combobox', { name: 'commodityInput' })).not.toBeNull();
@@ -105,18 +102,22 @@ describe('AccountForm', () => {
   });
 
   it('button is disabled when form not valid', async () => {
-    render(<AccountForm
-      onSave={() => {}}
-    />);
+    render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountForm
+          onSave={() => {}}
+        />
+      </SWRConfig>,
+    );
 
-    expect(screen.getByText('Save')).toBeDisabled();
+    const button = await screen.findByText('Save');
+    expect(button).toBeDisabled();
   });
 
   /**
    * STOCK/MUTUAL accounts can't have children
    */
   it('filters stock/mutual accounts as parents', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([datasource]);
     const user = userEvent.setup();
     const commodity = await Commodity.create({
       mnemonic: 'STOCK',
@@ -146,9 +147,13 @@ describe('AccountForm', () => {
       root, assetAccount, expenseAccount, stockAccount, mutualAccount,
     ]);
 
-    render(<AccountForm
-      onSave={() => {}}
-    />);
+    render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountForm
+          onSave={() => {}}
+        />
+      </SWRConfig>,
+    );
 
     await user.click(screen.getByRole('combobox', { name: 'parentInput' }));
     screen.getByText('Assets');
@@ -158,13 +163,15 @@ describe('AccountForm', () => {
   });
 
   it('creates account with expected params', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([datasource]);
-
     const user = userEvent.setup();
     const mockSave = jest.fn();
-    render(<AccountForm
-      onSave={mockSave}
-    />);
+    render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountForm
+          onSave={mockSave}
+        />
+      </SWRConfig>,
+    );
 
     await user.type(screen.getByLabelText('Name'), 'TestAccount');
 
@@ -186,6 +193,7 @@ describe('AccountForm', () => {
       name: 'TestAccount',
       type: 'ASSET',
       fk_commodity: eur,
+      childrenIds: [],
     });
     expect(mockSave).toHaveBeenCalledTimes(1);
   });
@@ -197,8 +205,6 @@ describe('AccountForm', () => {
     ['BANK', 'Assets:Bank'],
     ['ROOT', 'Root'],
   ])('filters selection for account type with %s parent', async (parentType, parentName) => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([datasource]);
-
     const incomeAccount = await Account.create({
       guid: 'income_guid_1',
       name: 'Income',
@@ -222,9 +228,13 @@ describe('AccountForm', () => {
     ]);
 
     const user = userEvent.setup();
-    render(<AccountForm
-      onSave={() => {}}
-    />);
+    render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountForm
+          onSave={() => {}}
+        />
+      </SWRConfig>,
+    );
 
     await user.type(screen.getByLabelText('Name'), 'My account');
 

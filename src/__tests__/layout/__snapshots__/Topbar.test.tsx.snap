@@ -9,15 +9,8 @@ exports[`Topbar renders as expected 1`] = `
       class="col-span-3"
     >
       <div
-        class="AccountSelector"
-      >
-        <span>
-          globalSearch
-        </span>
-        <span>
-          Search (cmd + k)...
-        </span>
-      </div>
+        data-testid="accountSelector"
+      />
     </div>
     <div
       class="col-span-1 col-end-11 h-20 mb-0"
@@ -25,19 +18,16 @@ exports[`Topbar renders as expected 1`] = `
       <div
         class="flex h-full justify-center items-center"
       >
-        <button
-          class="btn-primary"
-          type="button"
-        >
-          ...
-        </button>
+        <div
+          data-testid="SaveButton"
+        />
       </div>
     </div>
     <div
       class="col-span-2 col-end-13 h-20"
     >
       <div
-        class="ProfileDropdown"
+        data-testid="ProfileDropdown"
       />
     </div>
   </div>
