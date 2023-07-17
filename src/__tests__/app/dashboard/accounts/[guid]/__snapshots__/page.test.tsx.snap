@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AccountPage displays loading while account is null 1`] = `
+exports[`AccountPage displays loading while accounts is empty 1`] = `
 <div>
   <div>
     Loading...
@@ -36,7 +36,7 @@ exports[`AccountPage renders as expected with account 1`] = `
     class="TransactionsTable"
   >
     <span>
-      {"accountId":"guid","accounts":[{"guid":"guid","path":"path","type":"TYPE"}]}
+      {"splits":[{"guid":"split_guid"}],"accounts":[{"guid":"guid","path":"path","type":"TYPE"}]}
     </span>
   </div>
 </div>

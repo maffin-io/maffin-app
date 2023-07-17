@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DashboardLayout renders as expected when user available 1`] = `
+exports[`DashboardLayout renders as expected when user and datasource available 1`] = `
 <div>
   <div
     class="w-full h-full overflow-hidden"
@@ -23,6 +23,14 @@ exports[`DashboardLayout renders as expected when user available 1`] = `
     <div
       class="Footer"
     />
+  </div>
+</div>
+`;
+
+exports[`DashboardLayout returns loading when datasource not available 1`] = `
+<div>
+  <div>
+    Loading...
   </div>
 </div>
 `;

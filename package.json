@@ -54,7 +54,6 @@
       "prettier",
       "airbnb",
       "airbnb-typescript",
-      "react-app",
       "react-app/jest",
       "eslint:recommended",
       "plugin:@typescript-eslint/recommended"
@@ -72,6 +71,7 @@
       "import/prefer-default-export": "off",
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/ban-types": "off",
+      "@typescript-eslint/no-use-before-define": "off",
       "new-cap": "off",
       "jsx-a11y/label-has-associated-control": "off",
       "react/jsx-props-no-spreading": "off",

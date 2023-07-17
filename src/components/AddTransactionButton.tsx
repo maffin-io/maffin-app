@@ -7,11 +7,13 @@ import Modal from '@/components/Modal';
 
 export type AddTransactionButtonProps = {
   account: Account,
+  onSave?: Function,
 };
 
 export default function AddTransactionButton(
   {
     account,
+    onSave = () => {},
   }: AddTransactionButtonProps,
 ): JSX.Element {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -24,7 +26,10 @@ export default function AddTransactionButton(
         setOpen={setIsModalOpen}
       >
         <TransactionForm
-          onSave={() => { setIsModalOpen(false); }}
+          onSave={() => {
+            onSave();
+            setIsModalOpen(false);
+          }}
           account={account}
         />
       </Modal>

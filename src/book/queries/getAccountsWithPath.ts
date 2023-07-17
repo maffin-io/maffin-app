@@ -1,4 +1,4 @@
-import { Not } from 'typeorm';
+import { FindOptionsRelations, Not } from 'typeorm';
 import { Account, Book } from '../entities';
 
 type AccountPath = {
@@ -9,7 +9,15 @@ type AccountPath = {
   commodityGuid: string,
 };
 
-export async function getAccountsWithPath(showRoot = false): Promise<Account[]> {
+export async function getAccountsWithPath(
+  {
+    showRoot = false,
+    relations,
+  }: {
+    showRoot?: boolean,
+    relations?: FindOptionsRelations<Account>,
+  },
+): Promise<Account[]> {
   const start = performance.now();
   const books = await Book.find();
   const rootAccount = books[0].root;
@@ -30,7 +38,10 @@ export async function getAccountsWithPath(showRoot = false): Promise<Account[]> 
       `,
       [rootAccount.guid],
     ),
-    Account.findBy(typeFilter),
+    Account.find({
+      where: typeFilter,
+      relations,
+    }),
   ]);
 
   accounts.forEach((account) => {

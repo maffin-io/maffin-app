@@ -1,6 +1,6 @@
 import React from 'react';
-import { render, act } from '@testing-library/react';
-import type { DataSource } from 'typeorm';
+import { render, screen } from '@testing-library/react';
+import { SWRConfig } from 'swr';
 
 import { Commodity } from '@/book/entities';
 import InvestmentsPage from '@/app/dashboard/investments/page';
@@ -11,16 +11,10 @@ import { DividendChartProps } from '@/components/equities/DividendChart';
 import Money from '@/book/Money';
 import { InvestmentAccount } from '@/book/models';
 import * as queries from '@/book/queries';
-import * as dataSourceHooks from '@/hooks/useDataSource';
 
 jest.mock('@/book/queries', () => ({
   __esModule: true,
   ...jest.requireActual('@/book/queries'),
-}));
-
-jest.mock('@/hooks/useDataSource', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/useDataSource'),
 }));
 
 jest.mock('@/components/equities/WeightsChart', () => {
@@ -76,16 +70,21 @@ jest.mock('@/components/equities/DividendChart', () => {
 });
 
 describe('InvestmentsPage', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('renders while loading data', () => {
     const { container } = render(
-      <InvestmentsPage />,
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <InvestmentsPage />
+      </SWRConfig>,
     );
 
     expect(container).toMatchSnapshot();
   });
 
   it('renders with data', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
     jest.spyOn(queries, 'getMainCurrency').mockResolvedValue({
       mnemonic: 'EUR',
       guid: 'eur',
@@ -102,19 +101,17 @@ describe('InvestmentsPage', () => {
       } as InvestmentAccount,
     ]);
 
-    let container;
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      ({ container } = render(
-        <InvestmentsPage />,
-      ));
-    });
+    const { container } = render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <InvestmentsPage />
+      </SWRConfig>,
+    );
 
+    await screen.findByText('5.00 EUR');
     expect(container).toMatchSnapshot();
   });
 
   it('renders with different mainCurrency', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
     jest.spyOn(queries, 'getMainCurrency').mockResolvedValue({
       mnemonic: 'USD',
       guid: 'usd',
@@ -131,14 +128,13 @@ describe('InvestmentsPage', () => {
       } as InvestmentAccount,
     ]);
 
-    let container;
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      ({ container } = render(
-        <InvestmentsPage />,
-      ));
-    });
+    const { container } = render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <InvestmentsPage />
+      </SWRConfig>,
+    );
 
+    await screen.findByText('5.00 USD');
     expect(container).toMatchSnapshot();
   });
 });

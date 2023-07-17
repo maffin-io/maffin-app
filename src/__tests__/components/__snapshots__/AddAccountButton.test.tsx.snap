@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AddAccountButton opens modal when clicking the button 1`] = `
+<div
+  class="Modal"
+  data-testid="modal"
+>
+  <span>
+    bound dispatchSetState
+  </span>
+  <span>
+    open: true
+  </span>
+  <span>
+    Add account
+  </span>
+  <div
+    class="AccountForm"
+  >
+    <span>
+      onSave
+    </span>
+  </div>
+</div>
+`;

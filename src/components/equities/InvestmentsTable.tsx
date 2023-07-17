@@ -167,8 +167,9 @@ const columns: ColumnDef<InvestmentAccount>[] = [
                 {' '}
                 {
                   toFixed(
-                    row.original.realizedDividends.toNumber()
-                    / row.original.cost.toNumber() * 100,
+                    (
+                      row.original.realizedDividends.toNumber() / row.original.cost.toNumber()
+                    ) * 100,
                   )
                 }
                 %

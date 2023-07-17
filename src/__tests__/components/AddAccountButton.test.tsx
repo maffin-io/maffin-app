@@ -6,9 +6,8 @@ import {
   fireEvent,
 } from '@testing-library/react';
 
-import { Account } from '@/book/entities';
-import AddTransactionButton from '@/components/AddTransactionButton';
-import type { TransactionFormProps } from '@/components/forms/transaction/TransactionForm';
+import AddAccountButton from '@/components/AddAccountButton';
+import type { AccountFormProps } from '@/components/forms/account/AccountForm';
 import type { ModalProps } from '@/components/Modal';
 
 jest.mock('@/components/Modal', () => {
@@ -26,34 +25,27 @@ jest.mock('@/components/Modal', () => {
   return Modal;
 });
 
-jest.mock('@/components/forms/transaction/TransactionForm', () => {
-  function TransactionForm(props: TransactionFormProps) {
+jest.mock('@/components/forms/account/AccountForm', () => {
+  function AccountForm(props: AccountFormProps) {
     return (
-      <div className="TransactionForm">
+      <div className="AccountForm">
         <span>{props.onSave.name}</span>
-        <span>{JSON.stringify(props.account)}</span>
       </div>
     );
   }
 
-  return TransactionForm;
+  return AccountForm;
 });
 
-describe('AddTransactionButton', () => {
+describe('AddAccountButton', () => {
   it('opens modal when clicking the button', async () => {
     render(
-      <AddTransactionButton
+      <AddAccountButton
         onSave={jest.fn()}
-        account={
-          {
-            guid: 'guid',
-            path: 'account:path',
-          } as Account
-        }
       />,
     );
 
-    const button = await screen.findByRole('button', { name: /add transaction/i });
+    const button = await screen.findByRole('button', { name: /add account/i });
     fireEvent.focus(button);
 
     fireEvent.click(button);

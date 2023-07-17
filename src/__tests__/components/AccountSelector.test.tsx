@@ -4,18 +4,12 @@ import {
   screen,
   fireEvent,
 } from '@testing-library/react';
-import type { DataSource } from 'typeorm';
 import userEvent from '@testing-library/user-event';
+import { SWRConfig } from 'swr';
 
 import { Account, Commodity } from '@/book/entities';
 import AccountSelector from '@/components/AccountSelector';
-import * as dataSourceHooks from '@/hooks/useDataSource';
 import * as queries from '@/book/queries';
-
-jest.mock('@/hooks/useDataSource', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/useDataSource'),
-}));
 
 jest.mock('@/book/queries', () => ({
   __esModule: true,
@@ -44,43 +38,58 @@ describe('AccountSelector', () => {
     ]);
   });
 
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('renders as expected', async () => {
     const { container } = render(
-      <AccountSelector
-        onChange={jest.fn()}
-      />,
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountSelector
+          onChange={jest.fn()}
+        />
+      </SWRConfig>,
     );
 
+    await screen.findByLabelText('accountSelector');
     expect(container).toMatchSnapshot();
   });
 
   it('shows default placeholder', async () => {
     render(
-      <AccountSelector
-        onChange={jest.fn()}
-      />,
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountSelector
+          onChange={jest.fn()}
+        />
+      </SWRConfig>,
     );
 
-    screen.getByText('Choose account');
+    await screen.findByText('Choose account');
   });
 
   it('shows placeholder', async () => {
     render(
-      <AccountSelector
-        placeholder="My placeholder"
-        onChange={jest.fn()}
-      />,
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountSelector
+          placeholder="My placeholder"
+          onChange={jest.fn()}
+        />
+      </SWRConfig>,
     );
 
-    screen.getByText('My placeholder');
+    await screen.findByText('My placeholder');
   });
 
   it('displays no matches when loading', async () => {
+    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([]);
+
     render(
-      <AccountSelector
-        id="testSelector"
-        onChange={jest.fn()}
-      />,
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountSelector
+          id="testSelector"
+          onChange={jest.fn()}
+        />
+      </SWRConfig>,
     );
 
     const select = screen.getByLabelText('testSelector');
@@ -90,12 +99,13 @@ describe('AccountSelector', () => {
   });
 
   it('displays accounts when datasource ready', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
     render(
-      <AccountSelector
-        id="testSelector"
-        onChange={jest.fn()}
-      />,
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountSelector
+          id="testSelector"
+          onChange={jest.fn()}
+        />
+      </SWRConfig>,
     );
 
     const select = screen.getByLabelText('testSelector');
@@ -106,12 +116,13 @@ describe('AccountSelector', () => {
   });
 
   it('displays accounts with meta+k', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
     render(
-      <AccountSelector
-        id="testSelector"
-        onChange={jest.fn()}
-      />,
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountSelector
+          id="testSelector"
+          onChange={jest.fn()}
+        />
+      </SWRConfig>,
     );
 
     const select = screen.getByLabelText('testSelector');
@@ -127,10 +138,12 @@ describe('AccountSelector', () => {
 
   it('removes focus on ESC', async () => {
     render(
-      <AccountSelector
-        id="testSelector"
-        onChange={jest.fn()}
-      />,
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountSelector
+          id="testSelector"
+          onChange={jest.fn()}
+        />
+      </SWRConfig>,
     );
 
     const select = screen.getByLabelText('testSelector');
@@ -141,12 +154,13 @@ describe('AccountSelector', () => {
   });
 
   it('backspace removes selection', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
     render(
-      <AccountSelector
-        id="testSelector"
-        onChange={jest.fn()}
-      />,
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountSelector
+          id="testSelector"
+          onChange={jest.fn()}
+        />
+      </SWRConfig>,
     );
 
     const select = screen.getByLabelText('testSelector');
@@ -160,13 +174,14 @@ describe('AccountSelector', () => {
   });
 
   it('displays filtered accounts when datasource ready', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
     render(
-      <AccountSelector
-        ignoreAccounts={['TYPE2']}
-        id="testSelector"
-        onChange={jest.fn()}
-      />,
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountSelector
+          ignoreAccounts={['TYPE2']}
+          id="testSelector"
+          onChange={jest.fn()}
+        />
+      </SWRConfig>,
     );
 
     const select = screen.getByLabelText('testSelector');
@@ -177,13 +192,14 @@ describe('AccountSelector', () => {
   });
 
   it('calls custom onChange and sets selected', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
     const mockOnChange = jest.fn();
     render(
-      <AccountSelector
-        id="testSelector"
-        onChange={mockOnChange}
-      />,
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountSelector
+          id="testSelector"
+          onChange={mockOnChange}
+        />
+      </SWRConfig>,
     );
 
     const select = screen.getByLabelText('testSelector');
@@ -199,5 +215,26 @@ describe('AccountSelector', () => {
         mnemonic: 'USD',
       },
     });
+  });
+
+  it('gets accounts once only', async () => {
+    const { rerender } = render(
+      <AccountSelector
+        ignoreAccounts={['TYPE2']}
+        id="testSelector"
+        onChange={jest.fn()}
+      />,
+    );
+
+    rerender(
+      <AccountSelector
+        ignoreAccounts={['TYPE2']}
+        id="testSelector"
+        onChange={jest.fn()}
+      />,
+    );
+
+    await screen.findByLabelText('accountSelector');
+    expect(queries.getAccountsWithPath).toHaveBeenCalledTimes(1);
   });
 });

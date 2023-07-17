@@ -16,18 +16,12 @@ import {
 } from '@/book/entities';
 import Table, { TableProps } from '@/components/Table';
 import TransactionsTable from '@/components/TransactionsTable';
-import * as dataSourceHooks from '@/hooks/useDataSource';
 
 Object.defineProperty(global.self, 'crypto', {
   value: {
     randomUUID: () => crypto.randomUUID(),
   },
 });
-
-jest.mock('@/hooks/useDataSource', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/useDataSource'),
-}));
 
 jest.mock('@/components/Table', () => jest.fn(
   (props: TableProps<Split>) => (
@@ -55,6 +49,7 @@ describe('TransactionsTable', () => {
   let account1: Account;
   let account2: Account;
   let transaction: Transaction;
+  let splits: Split[];
 
   beforeEach(async () => {
     datasource = new DataSource({
@@ -117,29 +112,38 @@ describe('TransactionsTable', () => {
         },
       ],
     }).save();
+
+    splits = await Split.find({
+      where: {
+        fk_account: {
+          guid: account1.guid,
+        },
+      },
+      relations: {
+        fk_transaction: {
+          splits: {
+            fk_account: true,
+          },
+        },
+        fk_account: true,
+      },
+      order: {
+        fk_transaction: {
+          date: 'DESC',
+        },
+        quantityNum: 'ASC',
+      },
+    });
   });
 
   afterEach(async () => {
     await datasource.destroy();
   });
 
-  it('shows empty message', async () => {
-    render(
-      <TransactionsTable
-        accountId=""
-        accounts={[]}
-      />,
-    );
-
-    await screen.findByText('Select an account to see transactions');
-  });
-
   it('creates Table with expected params', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-
     render(
       <TransactionsTable
-        accountId={account1.guid}
+        splits={splits}
         accounts={[
           {
             ...account1,
@@ -234,11 +238,9 @@ describe('TransactionsTable', () => {
   });
 
   it('renders Date column as expected', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-
     render(
       <TransactionsTable
-        accountId={account1.guid}
+        splits={splits}
         accounts={[
           {
             ...account1,
@@ -277,11 +279,9 @@ describe('TransactionsTable', () => {
   });
 
   it('renders FromTo column as expected', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-
     render(
       <TransactionsTable
-        accountId={account1.guid}
+        splits={splits}
         accounts={[
           {
             ...account1,
@@ -349,11 +349,9 @@ describe('TransactionsTable', () => {
   });
 
   it('renders Amount column as expected', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-
     render(
       <TransactionsTable
-        accountId={account1.guid}
+        splits={splits}
         accounts={[
           {
             ...account1,
@@ -388,11 +386,9 @@ describe('TransactionsTable', () => {
   });
 
   it('renders Total column as expected', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-
     render(
       <TransactionsTable
-        accountId={account1.guid}
+        splits={splits}
         accounts={[
           {
             ...account1,

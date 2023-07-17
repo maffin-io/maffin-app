@@ -5,10 +5,10 @@ import Select, {
   components,
 } from 'react-select';
 import { BiSearch } from 'react-icons/bi';
+import useSWRImmutable from 'swr/immutable';
 
-import { getAccountsWithPath } from '@/book/queries';
 import { Account } from '@/book/entities';
-import { useDataSource } from '@/hooks';
+import { getAccountsWithPath } from '@/book/queries';
 
 export type AccountSelectorProps = {
   id?: string,
@@ -37,18 +37,17 @@ export default function AccountSelector(
   useHotkeys('meta+k', () => {
     ref.current?.focus();
   });
-  const [datasource] = useDataSource();
-  const [accounts, setAccounts] = React.useState<Account[]>([]);
 
-  React.useEffect(() => {
-    async function load() {
-      if (datasource) {
-        setAccounts(await getAccountsWithPath(showRoot));
-      }
-    }
+  let { data: accounts } = useSWRImmutable(
+    '/api/accounts',
+    getAccountsWithPath,
+  );
 
-    load();
-  }, [datasource, showRoot]);
+  accounts = accounts || [];
+  accounts = accounts.filter(account => !(ignoreAccounts || []).includes(account.type));
+  if (!showRoot) {
+    accounts = accounts.filter(account => account.type !== 'ROOT');
+  }
 
   return (
     <Select
@@ -57,7 +56,7 @@ export default function AccountSelector(
       id={id}
       name={id}
       aria-label={id}
-      options={accounts.filter(account => !(ignoreAccounts || []).includes(account.type))}
+      options={accounts}
       placeholder={placeholder || 'Choose account'}
       onChange={(newValue: SingleValue<Account> | null) => {
         if (onChange) {

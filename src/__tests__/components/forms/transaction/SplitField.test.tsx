@@ -6,20 +6,14 @@ import {
 } from '@testing-library/react';
 import { DateTime } from 'luxon';
 import userEvent from '@testing-library/user-event';
-import { DataSource } from 'typeorm';
 import { useForm } from 'react-hook-form';
+import { SWRConfig } from 'swr';
 
 import Stocker from '@/apis/Stocker';
-import * as dataSourceHooks from '@/hooks/useDataSource';
 import * as queries from '@/book/queries';
 import type { Account, Commodity } from '@/book/entities';
 import SplitField from '@/components/forms/transaction/SplitField';
 import type { FormValues } from '@/components/forms/transaction/types';
-
-jest.mock('@/hooks/useDataSource', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/useDataSource'),
-}));
 
 jest.mock('@/book/queries', () => ({
   __esModule: true,
@@ -56,7 +50,6 @@ describe('SplitField', () => {
 
   it('shows value field when txCurrency is different', async () => {
     const user = userEvent.setup();
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
     jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
       {
         guid: 'account_guid_3',
@@ -78,7 +71,6 @@ describe('SplitField', () => {
 
   it('sets currency to account selection', async () => {
     const user = userEvent.setup();
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
     jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
       {
         guid: 'account_guid_1',
@@ -117,7 +109,6 @@ describe('SplitField', () => {
 
   it('sets value * exchangeRate when quantity changes and currency is not txCurrency', async () => {
     const user = userEvent.setup();
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
     jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
       {
         guid: 'account_guid_1',
@@ -152,7 +143,6 @@ describe('SplitField', () => {
 
   it('sets value * exchangeRate when quantity changes and currency is not txCurrency, investment', async () => {
     const user = userEvent.setup();
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
     jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
       {
         guid: 'account_guid_1',
@@ -234,8 +224,10 @@ function FormWrapper(): JSX.Element {
         {...form.register('date')}
         type="date"
       />
-      <SplitField index={0} form={form} />
-      <SplitField index={1} form={form} />
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <SplitField index={0} form={form} />
+        <SplitField index={1} form={form} />
+      </SWRConfig>
     </>
   );
 }

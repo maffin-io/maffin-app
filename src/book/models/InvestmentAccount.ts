@@ -105,7 +105,7 @@ export default class InvestmentAccount {
 
   get profitPct(): number {
     const n = Math.round(
-      ((this.profitAbs.toNumber() / this.cost.toNumber() * 100) + Number.EPSILON) * 100,
+      (((this.profitAbs.toNumber() / this.cost.toNumber()) * 100) + Number.EPSILON) * 100,
     ) / 100;
     return n;
   }
@@ -113,7 +113,7 @@ export default class InvestmentAccount {
   get profitPctInCurrency(): number {
     const n = Math.round(
       ((
-        this.profitAbsInCurrency.toNumber() / this.costInCurrency.toNumber() * 100
+        (this.profitAbsInCurrency.toNumber() / this.costInCurrency.toNumber()) * 100
       ) + Number.EPSILON) * 100,
     ) / 100;
     return n;

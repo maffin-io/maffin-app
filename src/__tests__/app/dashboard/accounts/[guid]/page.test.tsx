@@ -4,14 +4,13 @@ import {
   render,
   screen,
 } from '@testing-library/react';
-import type { DataSource } from 'typeorm';
+import { SWRConfig } from 'swr';
 
 import AccountPage from '@/app/dashboard/accounts/[guid]/page';
 import { TransactionsTableProps } from '@/components/TransactionsTable';
 import { AddTransactionButtonProps } from '@/components/AddTransactionButton';
-import { Account } from '@/book/entities';
+import { Account, Split } from '@/book/entities';
 import * as queries from '@/book/queries';
-import * as dataSourceHooks from '@/hooks/useDataSource';
 
 jest.mock('@/components/AddTransactionButton', () => {
   function AddTransactionButton(props: AddTransactionButtonProps) {
@@ -42,11 +41,6 @@ jest.mock('@/book/queries', () => ({
   ...jest.requireActual('@/book/queries'),
 }));
 
-jest.mock('@/hooks/useDataSource', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/useDataSource'),
-}));
-
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
@@ -55,6 +49,7 @@ const useRouter = jest.spyOn(require('next/navigation'), 'useRouter');
 
 describe('AccountPage', () => {
   let mockRouterPush: jest.Mock;
+  let mockFindSplits: jest.SpyInstance;
 
   beforeEach(() => {
     mockRouterPush = jest.fn();
@@ -68,35 +63,89 @@ describe('AccountPage', () => {
         type: 'TYPE',
       } as Account,
     ]);
+    mockFindSplits = jest.spyOn(Split, 'find').mockResolvedValue(
+      [
+        {
+          guid: 'split_guid',
+        } as Split,
+      ],
+    );
   });
 
-  it('displays loading while account is null', () => {
-    jest.spyOn(Account, 'findOneBy').mockResolvedValue(null);
-    const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
 
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+  it('displays loading while accounts is empty', async () => {
+    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([]);
+    const { container } = render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountPage params={{ guid: 'guid' }} />
+      </SWRConfig>,
+    );
+
+    await screen.findByText('Loading...');
     expect(container).toMatchSnapshot();
   });
 
   it('returns 404 when account not found', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([]);
+    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
+      { guid: 'other' } as Account,
+    ]);
 
     render(
-      <AccountPage params={{ guid: 'guid' }} />,
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountPage params={{ guid: 'guid' }} />
+      </SWRConfig>,
     );
 
     await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/404'));
   });
 
   it('renders as expected with account', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-
     const { container } = render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountPage params={{ guid: 'guid' }} />
+      </SWRConfig>,
+    );
+
+    await screen.findAllByText(/guid/);
+    expect(mockFindSplits).toHaveBeenCalledWith({
+      where: {
+        fk_account: {
+          guid: 'guid',
+        },
+      },
+      relations: {
+        fk_transaction: {
+          splits: {
+            fk_account: true,
+          },
+        },
+        fk_account: true,
+      },
+      order: {
+        fk_transaction: {
+          date: 'DESC',
+        },
+        quantityNum: 'ASC',
+      },
+    });
+    expect(container).toMatchSnapshot();
+  });
+
+  it('retrieves splits and accounts once only', async () => {
+    const { rerender } = render(
       <AccountPage params={{ guid: 'guid' }} />,
     );
 
-    await screen.findByText(/accountId/);
-    expect(container).toMatchSnapshot();
+    rerender(
+      <AccountPage params={{ guid: 'guid' }} />,
+    );
+
+    await screen.findAllByText(/guid/);
+
+    expect(queries.getAccountsWithPath).toHaveBeenCalledTimes(1);
+    expect(mockFindSplits).toHaveBeenCalledTimes(1);
   });
 });

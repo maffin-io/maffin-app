@@ -2,78 +2,54 @@
 
 import React from 'react';
 import classNames from 'classnames';
+import useSWRImmutable from 'swr/immutable';
 
-import useDataSource from '@/hooks/useDataSource';
 import WeightsChart from '@/components/equities/WeightsChart';
 import StatisticsWidget from '@/components/equities/StatisticsWidget';
 import InvestmentsTable from '@/components/equities/InvestmentsTable';
 import DividendChart from '@/components/equities/DividendChart';
 import { toFixed } from '@/helpers/number';
-import type { InvestmentAccount } from '@/book/models';
 import Money from '@/book/Money';
 import { getInvestments, getMainCurrency } from '@/book/queries';
 
 export default function InvestmentsPage(): JSX.Element {
-  const [dataSource] = useDataSource();
-  const [data, setData] = React.useState<{
-    investments: InvestmentAccount[],
-    mainCurrency: string,
-    stats: {
-      totalValue: Money,
-      totalCost: Money,
-    },
-  }>({
-    investments: [],
-    mainCurrency: 'EUR',
-    stats: {
-      totalValue: new Money(0, 'EUR'),
-      totalCost: new Money(0, 'EUR'),
-    },
-  });
-
-  const profitAbs = data.stats.totalValue.subtract(data.stats.totalCost);
-  const profitPct = profitAbs.toNumber() / data.stats.totalCost.toNumber() * 100;
-
-  const totalDividends = data.investments.reduce(
-    (total, investment) => total.add(investment.realizedDividendsInCurrency),
-    new Money(0, data.mainCurrency),
+  const { data: currency } = useSWRImmutable(
+    '/api/main_currency',
+    getMainCurrency,
   );
-  const totalRealized = data.investments.reduce(
+  const mainCurrency = currency?.mnemonic || 'EUR';
+  let { data: investments } = useSWRImmutable(
+    currency ? '/api/investments' : null,
+    () => getInvestments(mainCurrency),
+  );
+
+  investments = investments || [];
+
+  const totalValue = investments.reduce(
+    (total, investment) => total.add(investment.valueInCurrency),
+    new Money(0, mainCurrency),
+  );
+  const totalCost = investments.reduce(
+    (total, investment) => total.add(investment.costInCurrency),
+    new Money(0, mainCurrency),
+  );
+
+  const profitAbs = totalValue.subtract(totalCost);
+  const profitPct = (profitAbs.toNumber() / totalCost.toNumber()) * 100;
+
+  const totalDividends = investments.reduce(
+    (total, investment) => total.add(investment.realizedDividendsInCurrency),
+    new Money(0, mainCurrency),
+  );
+  const totalRealized = investments.reduce(
     (total, investment) => total.add(investment.realizedProfitInCurrency),
-    new Money(0, data.mainCurrency),
+    new Money(0, mainCurrency),
   );
 
   const profitAbsWithDividends = profitAbs.add(totalDividends);
-  const profitPctWithDividends = profitAbsWithDividends.toNumber()
-    / data.stats.totalCost.toNumber() * 100;
-
-  React.useEffect(() => {
-    async function load() {
-      const mainCurrency = (await getMainCurrency()).mnemonic;
-      const investments = await getInvestments(mainCurrency);
-
-      const totalValue = investments.reduce(
-        (total, investment) => total.add(investment.valueInCurrency),
-        new Money(0, mainCurrency),
-      );
-      const totalCost = investments.reduce(
-        (total, investment) => total.add(investment.costInCurrency),
-        new Money(0, mainCurrency),
-      );
-      setData({
-        investments,
-        mainCurrency,
-        stats: {
-          totalValue,
-          totalCost,
-        },
-      });
-    }
-
-    if (dataSource) {
-      load();
-    }
-  }, [dataSource]);
+  const profitPctWithDividends = (
+    profitAbsWithDividends.toNumber() / totalCost.toNumber()
+  ) * 100;
 
   return (
     <>
@@ -84,8 +60,8 @@ export default function InvestmentsPage(): JSX.Element {
       <div className="grid grid-cols-12">
         <div className="col-span-4">
           <WeightsChart
-            investments={data.investments}
-            totalValue={data.stats.totalValue}
+            investments={investments}
+            totalValue={totalValue}
           />
         </div>
 
@@ -94,9 +70,9 @@ export default function InvestmentsPage(): JSX.Element {
             <div className="col-span-4">
               <StatisticsWidget
                 title="Value/Cost"
-                stats={`${data.stats.totalValue.format()}`}
+                stats={`${totalValue.format()}`}
                 description={
-                  `${toFixed(data.stats.totalCost.toNumber()).toString()} total invested`
+                  `${toFixed(totalCost.toNumber()).toString()} total invested`
                 }
               />
             </div>
@@ -130,14 +106,14 @@ export default function InvestmentsPage(): JSX.Element {
             </div>
           </div>
           <DividendChart
-            investments={data.investments}
+            investments={investments}
           />
         </div>
       </div>
 
       <div className="py-4">
         <InvestmentsTable
-          investments={data.investments.filter(
+          investments={investments.filter(
             investment => investment.quantity.toNumber() > 0,
           )}
         />
