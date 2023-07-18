@@ -14,7 +14,7 @@ import {
   Split,
   Transaction,
 } from '@/book/entities';
-import Table, { TableProps } from '@/components/Table';
+import Table from '@/components/Table';
 import TransactionsTable from '@/components/TransactionsTable';
 
 Object.defineProperty(global.self, 'crypto', {
@@ -24,14 +24,8 @@ Object.defineProperty(global.self, 'crypto', {
 });
 
 jest.mock('@/components/Table', () => jest.fn(
-  (props: TableProps<Split>) => (
-    <div data-testid="table">
-      <span data-testid="data">{JSON.stringify(props.data)}</span>
-      <span data-testid="columns">{JSON.stringify(props.columns)}</span>
-    </div>
-  ),
+  () => <div data-testid="Table" />,
 ));
-
 const TableMock = Table as jest.MockedFunction<typeof Table>;
 
 jest.mock('next/link', () => jest.fn(
@@ -137,6 +131,7 @@ describe('TransactionsTable', () => {
   });
 
   afterEach(async () => {
+    jest.clearAllMocks();
     await datasource.destroy();
   });
 
@@ -157,7 +152,7 @@ describe('TransactionsTable', () => {
       />,
     );
 
-    await screen.findByText(/random expense/i);
+    await screen.findByTestId('Table');
 
     expect(Table).toHaveBeenLastCalledWith({
       columns: [
@@ -257,9 +252,8 @@ describe('TransactionsTable', () => {
       />,
     );
 
-    await screen.findByText(/random expense/i);
-
-    const dateCol = TableMock.mock.calls[1][0].columns[0];
+    await screen.findByTestId('Table');
+    const dateCol = TableMock.mock.calls[0][0].columns[0];
 
     expect(
       // @ts-ignore
@@ -298,12 +292,10 @@ describe('TransactionsTable', () => {
       />,
     );
 
-    await screen.findByText(/random expense/i);
-
-    const fromToCol = TableMock.mock.calls[1][0].columns[2];
+    await screen.findByTestId('Table');
+    const fromToCol = TableMock.mock.calls[0][0].columns[2];
 
     expect(fromToCol.cell).not.toBeUndefined();
-
     const { container } = render(
       // @ts-ignore
       fromToCol.cell({
@@ -368,9 +360,8 @@ describe('TransactionsTable', () => {
       />,
     );
 
-    await screen.findByText(/random expense/i);
-
-    const amountCol = TableMock.mock.calls[1][0].columns[3];
+    await screen.findByTestId('Table');
+    const amountCol = TableMock.mock.calls[0][0].columns[3];
 
     expect(amountCol.cell).not.toBeUndefined();
     const { container } = render(
@@ -405,9 +396,8 @@ describe('TransactionsTable', () => {
       />,
     );
 
-    await screen.findByText(/random expense/i);
-
-    const totalCol = TableMock.mock.calls[1][0].columns[4];
+    await screen.findByTestId('Table');
+    const totalCol = TableMock.mock.calls[0][0].columns[4];
 
     expect(totalCol.cell).not.toBeUndefined();
 

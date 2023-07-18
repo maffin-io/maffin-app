@@ -3,6 +3,9 @@ import { render, screen } from '@testing-library/react';
 import type { DataSource } from 'typeorm';
 
 import DashboardLayout from '@/app/dashboard/layout';
+import Topbar from '@/layout/Topbar';
+import LeftSidebar from '@/layout/LeftSidebar';
+import Footer from '@/layout/Footer';
 import * as userHooks from '@/hooks/useUser';
 import * as dataSourceHooks from '@/hooks/useDataSource';
 
@@ -16,39 +19,28 @@ jest.mock('@/hooks/useDataSource', () => ({
   ...jest.requireActual('@/hooks/useDataSource'),
 }));
 
-jest.mock('@/layout/LeftSidebar', () => {
-  function LeftSidebar() {
-    return (
-      <div className="LeftSidebar" />
-    );
-  }
+jest.mock('@/layout/LeftSidebar', () => jest.fn(
+  () => <div data-testid="LeftSidebar" />,
+));
 
-  return LeftSidebar;
-});
+jest.mock('@/layout/Footer', () => jest.fn(
+  () => <div data-testid="Footer" />,
+));
 
-jest.mock('@/layout/Footer', () => {
-  function Footer() {
-    return (
-      <div className="Footer" />
-    );
-  }
-
-  return Footer;
-});
-
-jest.mock('@/layout/Topbar', () => {
-  function Topbar() {
-    return (
-      <div className="Topbar" />
-    );
-  }
-
-  return Topbar;
-});
+jest.mock('@/layout/Topbar', () => jest.fn(
+  () => <div data-testid="Topbar" />,
+));
 
 describe('DashboardLayout', () => {
   beforeEach(() => {
-    jest.spyOn(userHooks, 'default').mockReturnValue({ user: undefined });
+    jest.spyOn(userHooks, 'default').mockReturnValue({
+      user: {
+        name: '',
+        email: '',
+        image: '',
+        isLoggedIn: false,
+      },
+    });
     jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
   });
 
@@ -60,25 +52,9 @@ describe('DashboardLayout', () => {
     );
 
     expect(screen.queryByTestId('child')).not.toBeInTheDocument();
-    expect(container).toMatchSnapshot();
-  });
-
-  it('returns loading when user available but not logged in', async () => {
-    jest.spyOn(userHooks, 'default').mockReturnValue({
-      user: {
-        name: '',
-        email: '',
-        image: '',
-        isLoggedIn: false,
-      },
-    });
-    const { container } = render(
-      <DashboardLayout>
-        <span data-testid="child">child</span>
-      </DashboardLayout>,
-    );
-
-    expect(screen.queryByTestId('child')).not.toBeInTheDocument();
+    expect(Topbar).toBeCalledTimes(0);
+    expect(LeftSidebar).toBeCalledTimes(0);
+    expect(Footer).toBeCalledTimes(0);
     expect(container).toMatchSnapshot();
   });
 
@@ -99,6 +75,9 @@ describe('DashboardLayout', () => {
     );
 
     expect(screen.queryByTestId('child')).not.toBeInTheDocument();
+    expect(Topbar).toBeCalledTimes(0);
+    expect(LeftSidebar).toBeCalledTimes(0);
+    expect(Footer).toBeCalledTimes(0);
     expect(container).toMatchSnapshot();
   });
 
@@ -118,8 +97,10 @@ describe('DashboardLayout', () => {
       </DashboardLayout>,
     );
 
-    const child = await screen.findByTestId('child');
-    expect(child).toBeInTheDocument();
+    await screen.findByTestId('child');
+    expect(Topbar).toHaveBeenLastCalledWith({}, {});
+    expect(LeftSidebar).toHaveBeenLastCalledWith({}, {});
+    expect(Footer).toHaveBeenLastCalledWith({}, {});
     expect(container).toMatchSnapshot();
   });
 });

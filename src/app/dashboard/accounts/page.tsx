@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
 import AccountsTable from '@/components/AccountsTable';
@@ -9,6 +10,7 @@ import { getAccountsWithPath } from '@/book/queries';
 import { PriceDB, PriceDBMap } from '@/book/prices';
 
 export default function AccountsPage(): JSX.Element {
+  const { mutate } = useSWRConfig();
   let { data: accounts } = useSWRImmutable(
     '/api/accounts/splits',
     () => getAccountsWithPath({
@@ -32,7 +34,12 @@ export default function AccountsPage(): JSX.Element {
           Accounts
         </span>
         <div className="col-span-2 col-end-13 justify-self-end">
-          <AddAccountButton />
+          <AddAccountButton
+            onSave={() => {
+              mutate('/api/accounts');
+              mutate('/api/accounts/splits');
+            }}
+          />
         </div>
       </div>
       <AccountsTable

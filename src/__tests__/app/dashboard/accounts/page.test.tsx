@@ -3,7 +3,7 @@ import {
   screen,
   render,
 } from '@testing-library/react';
-import { SWRConfig } from 'swr';
+import * as swr from 'swr';
 import crypto from 'crypto';
 
 import type { Account } from '@/book/entities';
@@ -19,6 +19,11 @@ Object.defineProperty(global.self, 'crypto', {
   },
 });
 
+jest.mock('swr', () => ({
+  __esModule: true,
+  ...jest.requireActual('swr'),
+}));
+
 jest.mock('@/book/queries', () => ({
   __esModule: true,
   ...jest.requireActual('@/book/queries'),
@@ -32,7 +37,6 @@ const AddAccountButtonMock = AddAccountButton as jest.MockedFunction<typeof AddA
 jest.mock('@/components/AccountsTable', () => jest.fn(
   () => <div data-testid="AccountsTable" />,
 ));
-const AccountsTableMock = AccountsTable as jest.MockedFunction<typeof AccountsTable>;
 
 describe('AccountsPage', () => {
   afterEach(() => {
@@ -42,14 +46,19 @@ describe('AccountsPage', () => {
   it('passes empty array to table when not ready', async () => {
     jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([]);
     const { container } = render(
-      <SWRConfig value={{ provider: () => new Map() }}>
+      <swr.SWRConfig value={{ provider: () => new Map() }}>
         <AccountsPage />
-      </SWRConfig>,
+      </swr.SWRConfig>,
     );
 
     await screen.findByTestId('AccountsTable');
-    expect(AddAccountButtonMock).toHaveBeenCalledWith({}, {});
-    expect(AccountsTableMock).toHaveBeenCalledWith(
+    expect(AddAccountButton).toHaveBeenCalledWith(
+      {
+        onSave: expect.any(Function),
+      },
+      {},
+    );
+    expect(AccountsTable).toHaveBeenCalledWith(
       {
         accounts: [],
         todayPrices: {
@@ -59,6 +68,28 @@ describe('AccountsPage', () => {
       {},
     );
     expect(container).toMatchSnapshot();
+  });
+
+  it('mutates when saving an account', async () => {
+    const mockMutate = jest.fn();
+    // @ts-ignore
+    jest.spyOn(swr, 'useSWRConfig').mockReturnValue({
+      mutate: mockMutate,
+    } as ReturnType<typeof swr.useSWRConfig>);
+    render(
+      <swr.SWRConfig value={{ provider: () => new Map() }}>
+        <AccountsPage />
+      </swr.SWRConfig>,
+    );
+
+    await screen.findByTestId('AccountsTable');
+    const { onSave } = AddAccountButtonMock.mock.calls[0][0];
+    if (onSave) {
+      onSave();
+    }
+    expect(mockMutate).toBeCalledTimes(2);
+    expect(mockMutate).toHaveBeenNthCalledWith(1, '/api/accounts');
+    expect(mockMutate).toHaveBeenNthCalledWith(2, '/api/accounts/splits');
   });
 
   it('passes data to table', async () => {
@@ -75,9 +106,9 @@ describe('AccountsPage', () => {
     ]);
 
     const { container } = render(
-      <SWRConfig value={{ provider: () => new Map() }}>
+      <swr.SWRConfig value={{ provider: () => new Map() }}>
         <AccountsPage />
-      </SWRConfig>,
+      </swr.SWRConfig>,
     );
 
     await screen.findByTestId('AccountsTable');
@@ -85,7 +116,7 @@ describe('AccountsPage', () => {
       relations: { splits: true },
       showRoot: true,
     });
-    expect(AccountsTableMock).toHaveBeenLastCalledWith(
+    expect(AccountsTable).toHaveBeenLastCalledWith(
       {
         accounts: [
           { guid: 'guid1' },
@@ -102,17 +133,17 @@ describe('AccountsPage', () => {
 
   it('calls data once', async () => {
     const { rerender } = render(
-      <SWRConfig value={{ provider: () => new Map() }}>
+      <swr.SWRConfig value={{ provider: () => new Map() }}>
         <AccountsPage />
-      </SWRConfig>,
+      </swr.SWRConfig>,
     );
 
     await screen.findByTestId('AccountsTable');
 
     rerender(
-      <SWRConfig value={{ provider: () => new Map() }}>
+      <swr.SWRConfig value={{ provider: () => new Map() }}>
         <AccountsPage />
-      </SWRConfig>,
+      </swr.SWRConfig>,
     );
 
     await screen.findByTestId('AccountsTable');

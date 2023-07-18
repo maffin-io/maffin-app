@@ -2,24 +2,10 @@
 
 exports[`AddAccountButton opens modal when clicking the button 1`] = `
 <div
-  class="Modal"
-  data-testid="modal"
+  data-testid="Modal"
 >
-  <span>
-    bound dispatchSetState
-  </span>
-  <span>
-    open: true
-  </span>
-  <span>
-    Add account
-  </span>
   <div
-    class="AccountForm"
-  >
-    <span>
-      onSave
-    </span>
-  </div>
+    data-testid="AccountForm"
+  />
 </div>
 `;

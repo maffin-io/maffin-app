@@ -6,13 +6,13 @@ exports[`DashboardLayout renders as expected when user and datasource available 
     class="w-full h-full overflow-hidden"
   >
     <div
-      class="LeftSidebar"
+      data-testid="LeftSidebar"
     />
     <div
       class="mt-20 ml-20 p-3 z-0"
     >
       <div
-        class="Topbar"
+        data-testid="Topbar"
       />
       <span
         data-testid="child"
@@ -21,7 +21,7 @@ exports[`DashboardLayout renders as expected when user and datasource available 
       </span>
     </div>
     <div
-      class="Footer"
+      data-testid="Footer"
     />
   </div>
 </div>
@@ -36,14 +36,6 @@ exports[`DashboardLayout returns loading when datasource not available 1`] = `
 `;
 
 exports[`DashboardLayout returns loading when no user available 1`] = `
-<div>
-  <div>
-    Loading...
-  </div>
-</div>
-`;
-
-exports[`DashboardLayout returns loading when user available but not logged in 1`] = `
 <div>
   <div>
     Loading...

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
 import { Split } from '@/book/entities';
@@ -16,11 +17,12 @@ export type AccountPageProps = {
 };
 
 export default function AccountPage({ params }: AccountPageProps): JSX.Element {
+  const { mutate } = useSWRConfig();
   let { data: accounts } = useSWRImmutable(
     '/api/accounts',
     getAccountsWithPath,
   );
-  const { data: splits, mutate: mutateSplits } = useSWRImmutable(
+  const { data: splits } = useSWRImmutable(
     `/api/splits/${params.guid}`,
     () => {
       const start = performance.now();
@@ -89,7 +91,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
         <div className="col-span-2 col-end-13 justify-self-end">
           <AddTransactionButton
             account={account}
-            onSave={mutateSplits}
+            onSave={() => mutate(`/api/splits/${params.guid}`)}
           />
         </div>
       </div>

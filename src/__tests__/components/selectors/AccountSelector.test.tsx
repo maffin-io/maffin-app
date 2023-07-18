@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { SWRConfig } from 'swr';
 
-import Selector, { SelectorProps } from '@/components/selectors/Selector';
+import Selector from '@/components/selectors/Selector';
 import { Account, Commodity } from '@/book/entities';
 import { AccountSelector } from '@/components/selectors';
 import * as queries from '@/book/queries';
@@ -13,14 +13,8 @@ jest.mock('@/book/queries', () => ({
 }));
 
 jest.mock('@/components/selectors/Selector', () => jest.fn(
-  (props: SelectorProps<Account>) => (
-    <div data-testid="Selector">
-      <span>{JSON.stringify(props)}</span>
-    </div>
-  ),
+  () => <div data-testid="Selector" />,
 ));
-
-const SelectorMock = Selector as jest.MockedFunction<typeof Selector>;
 
 describe('AccountSelector', () => {
   beforeEach(() => {
@@ -39,7 +33,7 @@ describe('AccountSelector', () => {
     );
 
     await screen.findByTestId('Selector');
-    expect(SelectorMock).toHaveBeenCalledWith(
+    expect(Selector).toHaveBeenCalledWith(
       {
         id: 'accountSelector',
         isClearable: true,
@@ -71,7 +65,7 @@ describe('AccountSelector', () => {
     );
 
     await screen.findByTestId('Selector');
-    expect(SelectorMock).toHaveBeenCalledWith(
+    expect(Selector).toHaveBeenCalledWith(
       {
         id: 'customId',
         isClearable: false,
@@ -115,7 +109,7 @@ describe('AccountSelector', () => {
     );
 
     await screen.findByTestId('Selector');
-    expect(SelectorMock).toHaveBeenCalledWith(
+    expect(Selector).toHaveBeenCalledWith(
       expect.objectContaining({
         options,
       }),
@@ -153,7 +147,7 @@ describe('AccountSelector', () => {
     );
 
     await screen.findByTestId('Selector');
-    expect(SelectorMock).toHaveBeenCalledWith(
+    expect(Selector).toHaveBeenCalledWith(
       expect.objectContaining({
         options: [options[0]],
       }),
@@ -189,7 +183,7 @@ describe('AccountSelector', () => {
     );
 
     await screen.findByTestId('Selector');
-    expect(SelectorMock).toHaveBeenCalledWith(
+    expect(Selector).toHaveBeenCalledWith(
       expect.objectContaining({
         options: [options[1]],
       }),
@@ -227,7 +221,7 @@ describe('AccountSelector', () => {
     );
 
     await screen.findByTestId('Selector');
-    expect(SelectorMock).toHaveBeenCalledWith(
+    expect(Selector).toHaveBeenCalledWith(
       expect.objectContaining({
         options,
       }),

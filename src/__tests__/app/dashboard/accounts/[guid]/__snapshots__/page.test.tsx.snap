@@ -24,20 +24,12 @@ exports[`AccountPage renders as expected with account 1`] = `
       class="col-span-2 col-end-13 justify-self-end"
     >
       <div
-        class="AddTransactionButton"
-      >
-        <span>
-          {"account":{"guid":"guid","path":"path","type":"TYPE"}}
-        </span>
-      </div>
+        data-testid="AddTransactionButton"
+      />
     </div>
   </div>
   <div
-    class="TransactionsTable"
-  >
-    <span>
-      {"splits":[{"guid":"split_guid"}],"accounts":[{"guid":"guid","path":"path","type":"TYPE"}]}
-    </span>
-  </div>
+    data-testid="TransactionsTable"
+  />
 </div>
 `;

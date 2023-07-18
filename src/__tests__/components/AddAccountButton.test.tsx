@@ -1,43 +1,62 @@
 import React from 'react';
 import {
-  waitFor,
   render,
   screen,
   fireEvent,
 } from '@testing-library/react';
 
 import AddAccountButton from '@/components/AddAccountButton';
-import type { AccountFormProps } from '@/components/forms/account/AccountForm';
-import type { ModalProps } from '@/components/Modal';
+import AccountForm from '@/components/forms/account/AccountForm';
+import Modal from '@/components/Modal';
 
-jest.mock('@/components/Modal', () => {
-  function Modal(props: ModalProps) {
-    return (
-      <div data-testid="modal" className="Modal">
-        <span>{props.setOpen.name}</span>
-        <span>{`open: ${props.open}`}</span>
-        <span>{props.title}</span>
-        {props.children}
-      </div>
-    );
-  }
+jest.mock('@/components/Modal', () => jest.fn(
+  (props: React.PropsWithChildren) => (
+    <div data-testid="Modal">
+      {props.children}
+    </div>
+  ),
+));
+const ModalMock = Modal as jest.MockedFunction<typeof Modal>;
 
-  return Modal;
-});
-
-jest.mock('@/components/forms/account/AccountForm', () => {
-  function AccountForm(props: AccountFormProps) {
-    return (
-      <div className="AccountForm">
-        <span>{props.onSave.name}</span>
-      </div>
-    );
-  }
-
-  return AccountForm;
-});
+jest.mock('@/components/forms/account/AccountForm', () => jest.fn(
+  () => <div data-testid="AccountForm" />,
+).mockName('AccountForm'));
+const AccountFormMock = AccountForm as jest.MockedFunction<typeof AccountForm>;
 
 describe('AddAccountButton', () => {
+  it('renders hidden modal on mount', async () => {
+    const mockOnSave = jest.fn();
+    render(
+      <AddAccountButton
+        onSave={mockOnSave}
+      />,
+    );
+    expect(Modal).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        open: false,
+        setOpen: expect.any(Function),
+        title: 'Add account',
+      }),
+      {},
+    );
+
+    const { children } = ModalMock.mock.calls[0][0];
+    // @ts-ignore
+    expect(children.type.getMockName()).toEqual('AccountForm');
+    expect(AccountForm).toHaveBeenLastCalledWith(
+      {
+        onSave: expect.any(Function),
+      },
+      {},
+    );
+    const { onSave } = AccountFormMock.mock.calls[0][0];
+    expect(mockOnSave).toBeCalledTimes(0);
+    if (onSave) {
+      onSave();
+    }
+    expect(mockOnSave).toBeCalledWith();
+  });
+
   it('opens modal when clicking the button', async () => {
     render(
       <AddAccountButton
@@ -46,13 +65,9 @@ describe('AddAccountButton', () => {
     );
 
     const button = await screen.findByRole('button', { name: /add account/i });
-    fireEvent.focus(button);
-
     fireEvent.click(button);
-    await waitFor(() => {
-      screen.getByTestId('modal');
-    });
 
-    expect(screen.getByTestId('modal')).toMatchSnapshot();
+    const modal = await screen.findByTestId('Modal');
+    expect(modal).toMatchSnapshot();
   });
 });

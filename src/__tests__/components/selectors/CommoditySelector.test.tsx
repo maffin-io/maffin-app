@@ -2,19 +2,13 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { SWRConfig } from 'swr';
 
-import Selector, { SelectorProps } from '@/components/selectors/Selector';
+import Selector from '@/components/selectors/Selector';
 import { Commodity } from '@/book/entities';
 import { CommoditySelector } from '@/components/selectors';
 
 jest.mock('@/components/selectors/Selector', () => jest.fn(
-  (props: SelectorProps<Commodity>) => (
-    <div data-testid="Selector">
-      <span>{JSON.stringify(props)}</span>
-    </div>
-  ),
+  () => <div data-testid="Selector" />,
 ));
-
-const SelectorMock = Selector as jest.MockedFunction<typeof Selector>;
 
 describe('CommoditySelector', () => {
   beforeEach(() => {
@@ -33,7 +27,7 @@ describe('CommoditySelector', () => {
     );
 
     await screen.findByTestId('Selector');
-    expect(SelectorMock).toHaveBeenCalledWith(
+    expect(Selector).toHaveBeenCalledWith(
       {
         id: 'commoditySelector',
         isClearable: true,
@@ -65,7 +59,7 @@ describe('CommoditySelector', () => {
     );
 
     await screen.findByTestId('Selector');
-    expect(SelectorMock).toHaveBeenCalledWith(
+    expect(Selector).toHaveBeenCalledWith(
       {
         id: 'customId',
         isClearable: false,
@@ -105,7 +99,7 @@ describe('CommoditySelector', () => {
     );
 
     await screen.findByTestId('Selector');
-    expect(SelectorMock).toHaveBeenCalledWith(
+    expect(Selector).toHaveBeenCalledWith(
       expect.objectContaining({
         options,
       }),
@@ -139,7 +133,7 @@ describe('CommoditySelector', () => {
     );
 
     await screen.findByTestId('Selector');
-    expect(SelectorMock).toHaveBeenCalledWith(
+    expect(Selector).toHaveBeenCalledWith(
       expect.objectContaining({
         options: [options[2]],
       }),

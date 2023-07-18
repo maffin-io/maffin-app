@@ -93,7 +93,7 @@ export default function InvestmentsPage(): JSX.Element {
 
             <div className="col-span-4">
               <StatisticsWidget
-                statsTextClass={classNames('mdi', {
+                statsTextClass={classNames({
                   'text-green-500': totalRealized.add(totalDividends).toNumber() >= 0,
                   'text-red-400': totalRealized.add(totalDividends).toNumber() < 0,
                 })}

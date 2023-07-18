@@ -2,17 +2,12 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { SWRConfig } from 'swr';
 
-import Selector, { SelectorProps } from '@/components/selectors/Selector';
+import Selector from '@/components/selectors/Selector';
 import { AccountTypeSelector } from '@/components/selectors';
 
 jest.mock('@/components/selectors/Selector', () => jest.fn(
-  (props: SelectorProps<{ type: string }>) => (
-    <div data-testid="Selector">
-      <span>{JSON.stringify(props)}</span>
-    </div>
-  ),
+  () => <div data-testid="Selector" />,
 ));
-
 const SelectorMock = Selector as jest.MockedFunction<typeof Selector>;
 
 describe('AccountTypeSelector', () => {
@@ -28,7 +23,7 @@ describe('AccountTypeSelector', () => {
     );
 
     await screen.findByTestId('Selector');
-    expect(SelectorMock).toHaveBeenCalledWith(
+    expect(Selector).toHaveBeenCalledWith(
       {
         id: 'typeSelector',
         isClearable: true,
@@ -72,7 +67,7 @@ describe('AccountTypeSelector', () => {
     );
 
     await screen.findByTestId('Selector');
-    expect(SelectorMock).toHaveBeenCalledWith(
+    expect(Selector).toHaveBeenCalledWith(
       {
         id: 'customId',
         isClearable: false,
@@ -114,7 +109,7 @@ describe('AccountTypeSelector', () => {
     );
 
     await screen.findByTestId('Selector');
-    expect(SelectorMock).toHaveBeenCalledWith(
+    expect(Selector).toHaveBeenCalledWith(
       expect.objectContaining({
         options: [
           { type: 'CASH' },

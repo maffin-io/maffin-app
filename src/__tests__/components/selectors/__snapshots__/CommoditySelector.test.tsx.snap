@@ -4,11 +4,7 @@ exports[`CommoditySelector passes data as expected 1`] = `
 <div>
   <div
     data-testid="Selector"
-  >
-    <span>
-      {"id":"customId","labelAttribute":"mnemonic","options":[],"placeholder":"My placeholder","isClearable":false,"defaultValue":{"mnemonic":"EUR"},"className":"class"}
-    </span>
-  </div>
+  />
 </div>
 `;
 
@@ -16,10 +12,6 @@ exports[`CommoditySelector renders as expected 1`] = `
 <div>
   <div
     data-testid="Selector"
-  >
-    <span>
-      {"id":"commoditySelector","labelAttribute":"mnemonic","options":[],"placeholder":"Choose commodity","isClearable":true,"className":""}
-    </span>
-  </div>
+  />
 </div>
 `;

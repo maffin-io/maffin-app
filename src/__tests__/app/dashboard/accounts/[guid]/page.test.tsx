@@ -4,37 +4,29 @@ import {
   render,
   screen,
 } from '@testing-library/react';
-import { SWRConfig } from 'swr';
+import * as swr from 'swr';
 
 import AccountPage from '@/app/dashboard/accounts/[guid]/page';
-import { TransactionsTableProps } from '@/components/TransactionsTable';
-import { AddTransactionButtonProps } from '@/components/AddTransactionButton';
+import TransactionsTable from '@/components/TransactionsTable';
+import AddTransactionButton from '@/components/AddTransactionButton';
 import { Account, Split } from '@/book/entities';
 import * as queries from '@/book/queries';
 
-jest.mock('@/components/AddTransactionButton', () => {
-  function AddTransactionButton(props: AddTransactionButtonProps) {
-    return (
-      <div className="AddTransactionButton">
-        <span>{JSON.stringify(props)}</span>
-      </div>
-    );
-  }
+jest.mock('swr', () => ({
+  __esModule: true,
+  ...jest.requireActual('swr'),
+}));
 
-  return AddTransactionButton;
-});
+jest.mock('@/components/AddTransactionButton', () => jest.fn(
+  () => <div data-testid="AddTransactionButton" />,
+));
+const AddTransactionButtonMock = AddTransactionButton as jest.MockedFunction<
+  typeof AddTransactionButton
+>;
 
-jest.mock('@/components/TransactionsTable', () => {
-  function TransactionsTable(props: TransactionsTableProps) {
-    return (
-      <div className="TransactionsTable">
-        <span>{JSON.stringify(props)}</span>
-      </div>
-    );
-  }
-
-  return TransactionsTable;
-});
+jest.mock('@/components/TransactionsTable', () => jest.fn(
+  () => <div data-testid="TransactionsTable" />,
+));
 
 jest.mock('@/book/queries', () => ({
   __esModule: true,
@@ -73,18 +65,20 @@ describe('AccountPage', () => {
   });
 
   afterEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   it('displays loading while accounts is empty', async () => {
     jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([]);
     const { container } = render(
-      <SWRConfig value={{ provider: () => new Map() }}>
+      <swr.SWRConfig value={{ provider: () => new Map() }}>
         <AccountPage params={{ guid: 'guid' }} />
-      </SWRConfig>,
+      </swr.SWRConfig>,
     );
 
     await screen.findByText('Loading...');
+    expect(AddTransactionButton).toHaveBeenCalledTimes(0);
+    expect(TransactionsTable).toHaveBeenCalledTimes(0);
     expect(container).toMatchSnapshot();
   });
 
@@ -94,22 +88,50 @@ describe('AccountPage', () => {
     ]);
 
     render(
-      <SWRConfig value={{ provider: () => new Map() }}>
+      <swr.SWRConfig value={{ provider: () => new Map() }}>
         <AccountPage params={{ guid: 'guid' }} />
-      </SWRConfig>,
+      </swr.SWRConfig>,
     );
 
     await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/404'));
+    expect(AddTransactionButton).toHaveBeenCalledTimes(0);
+    expect(TransactionsTable).toHaveBeenCalledTimes(0);
+  });
+
+  it('mutates when saving a transaction', async () => {
+    const mockMutate = jest.fn();
+    // @ts-ignore
+    jest.spyOn(swr, 'useSWRConfig').mockReturnValue({
+      mutate: mockMutate,
+    } as ReturnType<typeof swr.useSWRConfig>);
+    render(
+      <swr.SWRConfig value={{ provider: () => new Map() }}>
+        <AccountPage params={{ guid: 'guid' }} />
+      </swr.SWRConfig>,
+    );
+
+    await screen.findByTestId('TransactionsTable');
+    const { onSave } = AddTransactionButtonMock.mock.calls[0][0];
+    if (onSave) {
+      onSave();
+    }
+    expect(mockMutate).toBeCalledTimes(1);
+    expect(mockMutate).toHaveBeenNthCalledWith(1, '/api/splits/guid');
   });
 
   it('renders as expected with account', async () => {
+    const mockMutate = jest.fn();
+    // @ts-ignore
+    jest.spyOn(swr, 'useSWRConfig').mockReturnValue({
+      mutate: mockMutate,
+    } as ReturnType<typeof swr.useSWRConfig>);
     const { container } = render(
-      <SWRConfig value={{ provider: () => new Map() }}>
+      <swr.SWRConfig value={{ provider: () => new Map() }}>
         <AccountPage params={{ guid: 'guid' }} />
-      </SWRConfig>,
+      </swr.SWRConfig>,
     );
 
-    await screen.findAllByText(/guid/);
+    await screen.findByTestId('TransactionsTable');
     expect(mockFindSplits).toHaveBeenCalledWith({
       where: {
         fk_account: {
@@ -131,6 +153,32 @@ describe('AccountPage', () => {
         quantityNum: 'ASC',
       },
     });
+    expect(AddTransactionButton).toHaveBeenLastCalledWith(
+      {
+        account: {
+          guid: 'guid',
+          path: 'path',
+          type: 'TYPE',
+        },
+        onSave: expect.any(Function),
+      },
+      {},
+    );
+    expect(TransactionsTable).toHaveBeenLastCalledWith(
+      {
+        accounts: [
+          {
+            guid: 'guid',
+            path: 'path',
+            type: 'TYPE',
+          },
+        ],
+        splits: [
+          { guid: 'split_guid' },
+        ],
+      },
+      {},
+    );
     expect(container).toMatchSnapshot();
   });
 
@@ -143,8 +191,7 @@ describe('AccountPage', () => {
       <AccountPage params={{ guid: 'guid' }} />,
     );
 
-    await screen.findAllByText(/guid/);
-
+    await screen.findByTestId('TransactionsTable');
     expect(queries.getAccountsWithPath).toHaveBeenCalledTimes(1);
     expect(mockFindSplits).toHaveBeenCalledTimes(1);
   });
