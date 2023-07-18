@@ -14,9 +14,8 @@ import {
   Split,
   Transaction,
 } from '@/book/entities';
-import Table, { TableProps } from '@/components/Table';
+import Table from '@/components/Table';
 import TransactionsTable from '@/components/TransactionsTable';
-import * as dataSourceHooks from '@/hooks/useDataSource';
 
 Object.defineProperty(global.self, 'crypto', {
   value: {
@@ -24,20 +23,9 @@ Object.defineProperty(global.self, 'crypto', {
   },
 });
 
-jest.mock('@/hooks/useDataSource', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/useDataSource'),
-}));
-
 jest.mock('@/components/Table', () => jest.fn(
-  (props: TableProps<Split>) => (
-    <div data-testid="table">
-      <span data-testid="data">{JSON.stringify(props.data)}</span>
-      <span data-testid="columns">{JSON.stringify(props.columns)}</span>
-    </div>
-  ),
+  () => <div data-testid="Table" />,
 ));
-
 const TableMock = Table as jest.MockedFunction<typeof Table>;
 
 jest.mock('next/link', () => jest.fn(
@@ -55,6 +43,7 @@ describe('TransactionsTable', () => {
   let account1: Account;
   let account2: Account;
   let transaction: Transaction;
+  let splits: Split[];
 
   beforeEach(async () => {
     datasource = new DataSource({
@@ -117,29 +106,39 @@ describe('TransactionsTable', () => {
         },
       ],
     }).save();
+
+    splits = await Split.find({
+      where: {
+        fk_account: {
+          guid: account1.guid,
+        },
+      },
+      relations: {
+        fk_transaction: {
+          splits: {
+            fk_account: true,
+          },
+        },
+        fk_account: true,
+      },
+      order: {
+        fk_transaction: {
+          date: 'DESC',
+        },
+        quantityNum: 'ASC',
+      },
+    });
   });
 
   afterEach(async () => {
+    jest.clearAllMocks();
     await datasource.destroy();
   });
 
-  it('shows empty message', async () => {
-    render(
-      <TransactionsTable
-        accountId=""
-        accounts={[]}
-      />,
-    );
-
-    await screen.findByText('Select an account to see transactions');
-  });
-
   it('creates Table with expected params', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-
     render(
       <TransactionsTable
-        accountId={account1.guid}
+        splits={splits}
         accounts={[
           {
             ...account1,
@@ -153,7 +152,7 @@ describe('TransactionsTable', () => {
       />,
     );
 
-    await screen.findByText(/random expense/i);
+    await screen.findByTestId('Table');
 
     expect(Table).toHaveBeenLastCalledWith({
       columns: [
@@ -194,6 +193,7 @@ describe('TransactionsTable', () => {
             name: 'bank',
             type: 'ASSET',
             fk_commodity: eur,
+            childrenIds: [],
           },
           fk_transaction: {
             ...transaction,
@@ -205,6 +205,7 @@ describe('TransactionsTable', () => {
                   name: 'bank',
                   type: 'ASSET',
                   fk_commodity: eur,
+                  childrenIds: [],
                 },
                 guid: 'split_guid_1',
                 quantityDenom: 100,
@@ -219,6 +220,7 @@ describe('TransactionsTable', () => {
                   name: 'expense',
                   type: 'EXPENSE',
                   fk_commodity: eur,
+                  childrenIds: [],
                 },
                 guid: 'split_guid_2',
                 quantityDenom: 100,
@@ -234,11 +236,9 @@ describe('TransactionsTable', () => {
   });
 
   it('renders Date column as expected', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-
     render(
       <TransactionsTable
-        accountId={account1.guid}
+        splits={splits}
         accounts={[
           {
             ...account1,
@@ -252,9 +252,8 @@ describe('TransactionsTable', () => {
       />,
     );
 
-    await screen.findByText(/random expense/i);
-
-    const dateCol = TableMock.mock.calls[1][0].columns[0];
+    await screen.findByTestId('Table');
+    const dateCol = TableMock.mock.calls[0][0].columns[0];
 
     expect(
       // @ts-ignore
@@ -277,11 +276,9 @@ describe('TransactionsTable', () => {
   });
 
   it('renders FromTo column as expected', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-
     render(
       <TransactionsTable
-        accountId={account1.guid}
+        splits={splits}
         accounts={[
           {
             ...account1,
@@ -295,12 +292,10 @@ describe('TransactionsTable', () => {
       />,
     );
 
-    await screen.findByText(/random expense/i);
-
-    const fromToCol = TableMock.mock.calls[1][0].columns[2];
+    await screen.findByTestId('Table');
+    const fromToCol = TableMock.mock.calls[0][0].columns[2];
 
     expect(fromToCol.cell).not.toBeUndefined();
-
     const { container } = render(
       // @ts-ignore
       fromToCol.cell({
@@ -349,11 +344,9 @@ describe('TransactionsTable', () => {
   });
 
   it('renders Amount column as expected', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-
     render(
       <TransactionsTable
-        accountId={account1.guid}
+        splits={splits}
         accounts={[
           {
             ...account1,
@@ -367,9 +360,8 @@ describe('TransactionsTable', () => {
       />,
     );
 
-    await screen.findByText(/random expense/i);
-
-    const amountCol = TableMock.mock.calls[1][0].columns[3];
+    await screen.findByTestId('Table');
+    const amountCol = TableMock.mock.calls[0][0].columns[3];
 
     expect(amountCol.cell).not.toBeUndefined();
     const { container } = render(
@@ -388,11 +380,9 @@ describe('TransactionsTable', () => {
   });
 
   it('renders Total column as expected', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-
     render(
       <TransactionsTable
-        accountId={account1.guid}
+        splits={splits}
         accounts={[
           {
             ...account1,
@@ -406,9 +396,8 @@ describe('TransactionsTable', () => {
       />,
     );
 
-    await screen.findByText(/random expense/i);
-
-    const totalCol = TableMock.mock.calls[1][0].columns[4];
+    await screen.findByTestId('Table');
+    const totalCol = TableMock.mock.calls[0][0].columns[4];
 
     expect(totalCol.cell).not.toBeUndefined();
 

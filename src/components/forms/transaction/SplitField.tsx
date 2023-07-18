@@ -8,7 +8,7 @@ import { isInvestment } from '@/book/helpers/accountType';
 import { getMainCurrency } from '@/book/queries';
 import Stocker from '@/apis/Stocker';
 import { toFixed } from '@/helpers/number';
-import AccountSelector from '@/components/AccountSelector';
+import { AccountSelector } from '@/components/selectors';
 import { currencyToSymbol } from '@/helpers/currency';
 import type { Account, Commodity } from '@/book/entities';
 import type { FormValues } from './types';

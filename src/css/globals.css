@@ -37,7 +37,7 @@
   }
 
   button.link {
-    @apply text-cyan-700 hover:text-cyan-600;
+    @apply text-left text-cyan-700 hover:text-cyan-600;
   }
 
   .invalid-feedback {

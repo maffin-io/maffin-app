@@ -65,6 +65,12 @@ describe('PriceDBMap', () => {
       instance = new PriceDBMap([price1, price2]);
     });
 
+    it('returns empty', () => {
+      expect(instance.isEmpty).toBe(false);
+      instance = new PriceDBMap();
+      expect(instance.isEmpty).toBe(true);
+    });
+
     it('creates map as expected', () => {
       expect(instance.map).toEqual({
         'EUR.USD.2023-01-01': price1,

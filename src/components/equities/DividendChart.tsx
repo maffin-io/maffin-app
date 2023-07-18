@@ -193,11 +193,11 @@ const OPTIONS_YEARLY = {
     foreColor: '#94A3B8',
     events: {
       // @ts-ignore
-      dataPointSelection: (e, chart, opts) => {
+      dataPointSelection: (e, chart) => {
         updateMonthlyChart(chart, 'barMonthly');
       },
       // @ts-ignore
-      mounted: (chart, opts) => {
+      mounted: (chart) => {
         const seriesIndex = 0;
         if (chart.w.globals.selectedDataPoints.length === 0) {
           // Display the last year by default

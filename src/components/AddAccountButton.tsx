@@ -4,7 +4,15 @@ import { BiPlusCircle } from 'react-icons/bi';
 
 import AccountForm from '@/components/forms/account/AccountForm';
 
-export default function AddAccountButton(): JSX.Element {
+export type AddAccountButtonProps = {
+  onSave?: Function,
+};
+
+export default function AddAccountButton(
+  {
+    onSave = () => {},
+  }: AddAccountButtonProps,
+): JSX.Element {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   return (
@@ -15,7 +23,10 @@ export default function AddAccountButton(): JSX.Element {
         setOpen={setIsModalOpen}
       >
         <AccountForm
-          onSave={() => { setIsModalOpen(false); }}
+          onSave={() => {
+            onSave();
+            setIsModalOpen(false);
+          }}
         />
       </Modal>
       <button

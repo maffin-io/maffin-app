@@ -3,9 +3,11 @@ import { useForm, Controller } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 
 import { Account, Commodity } from '@/book/entities';
-import AccountSelector from '@/components/AccountSelector';
-import CommoditySelector from '@/components/CommoditySelector';
-import AccountTypeSelector from '@/components/AccountTypeSelector';
+import {
+  AccountSelector,
+  CommoditySelector,
+  AccountTypeSelector,
+} from '@/components/selectors';
 import { getAllowedSubAccounts } from '@/book/helpers/accountType';
 
 const resolver = classValidatorResolver(Account, { validator: { stopAtFirstError: true } });

@@ -41,17 +41,17 @@ export default function ProfileDropdown(): JSX.Element {
       </button>
       <ul className="absolute w-40 hidden bg-gunmetal-700 rounded-b-sm py-1 group-hover:block">
         <li className="px-3 py-2 text-sm hover:bg-gunmetal-800">
-          <Link
+          <button
             id="menu-item-0"
+            type="button"
             role="menuitem"
             tabIndex={-1}
-            href="#"
-            className="inline-block w-full whitespace-nowrap"
+            className="link inline-block w-full whitespace-nowrap"
             onClick={() => fileImportInput.current !== null && fileImportInput.current.click()}
           >
             <BiImport className="inline-block align-middle mr-1" />
             <span className="inline-block align-middle">Import</span>
-          </Link>
+          </button>
           <input
             type="file"
             ref={fileImportInput}

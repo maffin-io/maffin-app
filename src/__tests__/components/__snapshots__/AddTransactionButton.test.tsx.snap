@@ -2,27 +2,10 @@
 
 exports[`AddTransactionButton opens modal when clicking the button 1`] = `
 <div
-  class="Modal"
-  data-testid="modal"
+  data-testid="Modal"
 >
-  <span>
-    bound dispatchSetState
-  </span>
-  <span>
-    open: true
-  </span>
-  <span>
-    Add transaction
-  </span>
   <div
-    class="TransactionForm"
-  >
-    <span>
-      onSave
-    </span>
-    <span>
-      {"guid":"guid","path":"account:path"}
-    </span>
-  </div>
+    data-testid="TransactionForm"
+  />
 </div>
 `;

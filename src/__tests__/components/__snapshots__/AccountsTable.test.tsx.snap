@@ -1,51 +1,27 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AccountsTable builds subRows as expected with investment accounts 1`] = `
+exports[`AccountsTable creates empty Table with expected params 1`] = `
 <div>
   <div
-    class="Table"
-    data-testid="AccountsTable"
-  >
-    <span>
-      [{"accessorKey":"name","id":"name","header":"","enableSorting":false},{"id":"total","header":""}]
-    </span>
-    <span
-      data-testid="data"
-    >
-      [{"name":"Stocks","type":"ASSET","total":{"_raw":{"amount":1960000,"currency":{"code":"EUR","base":10,"exponent":2},"scale":4}},"subRows":[{"name":"GOOGL","type":"STOCK","total":{"_raw":{"amount":20000,"currency":{"code":"USD","base":10,"exponent":2},"scale":2}},"subRows":[]}]}]
-    </span>
-    <span>
-      {"id":"total","desc":true}
-    </span>
-  </div>
+    data-testid="Table"
+  />
 </div>
 `;
 
-exports[`AccountsTable builds subRows as expected with non investment accounts 1`] = `
+exports[`AccountsTable renders Name column as expected 1`] = `
 <div>
-  <div
-    class="Table"
-    data-testid="AccountsTable"
+  <a
+    href="/dashboard/accounts/a1"
   >
-    <span>
-      [{"accessorKey":"name","id":"name","header":"","enableSorting":false},{"id":"total","header":""}]
-    </span>
-    <span
-      data-testid="data"
-    >
-      [{"name":"Assets","type":"ASSET","total":{"_raw":{"amount":99000,"currency":{"code":"EUR","base":10,"exponent":2},"scale":2}},"subRows":[{"name":"Bank","type":"BANK","total":{"_raw":{"amount":1000,"currency":{"code":"USD","base":10,"exponent":2},"scale":0}},"subRows":[]}]}]
-    </span>
-    <span>
-      {"id":"total","desc":true}
-    </span>
-  </div>
+    Assets
+  </a>
 </div>
 `;
 
-exports[`AccountsTable renders empty when no dataSource 1`] = `
+exports[`AccountsTable renders Total column as expected 1`] = `
 <div>
   <span>
-    Loading...
+    10.00 €
   </span>
 </div>
 `;

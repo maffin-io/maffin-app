@@ -121,7 +121,7 @@ export default function WeightsChart({
         fontSize: '12px',
       },
       // @ts-ignore
-      formatter: (text: string, op: any) => `${text}: ${data[text].today}`,
+      formatter: (text: string) => `${text}: ${data[text].today}`,
       offsetY: -4,
     },
     plotOptions: {

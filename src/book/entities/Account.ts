@@ -3,6 +3,7 @@ import {
   Column,
   Entity, JoinColumn,
   ManyToOne,
+  RelationId,
   Tree,
   TreeParent,
   TreeChildren,
@@ -71,6 +72,9 @@ export default class Account extends BaseEntity {
 
   @TreeChildren()
     children!: Account[];
+
+  @RelationId((account: Account) => account.children) // you need to specify target relation
+    childrenIds: string[];
 
   @ManyToOne('Commodity', { eager: true })
   @JoinColumn({ name: 'commodity_guid' })

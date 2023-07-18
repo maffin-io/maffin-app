@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AccountSelector passes data as expected 1`] = `
+<div>
+  <div
+    data-testid="Selector"
+  />
+</div>
+`;
+
+exports[`AccountSelector renders as expected 1`] = `
+<div>
+  <div
+    data-testid="Selector"
+  />
+</div>
+`;

@@ -6,7 +6,6 @@ import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 
 import Table from '@/components/Table';
 import Tooltip from '@/components/Tooltip';
-import useDataSource from '@/hooks/useDataSource';
 import Money from '@/book/Money';
 import {
   Account,
@@ -14,57 +13,14 @@ import {
 } from '@/book/entities';
 
 export type TransactionsTableProps = {
-  accountId: string,
+  splits: Split[],
   accounts: Account[],
 };
 
 export default function TransactionsTable({
-  accountId,
+  splits,
   accounts,
 }: TransactionsTableProps): JSX.Element {
-  const [datasource] = useDataSource();
-  const [splits, setSplits] = React.useState<Split[]>([]);
-
-  React.useEffect(() => {
-    async function load() {
-      const newSplits = await Split.find({
-        where: {
-          fk_account: {
-            guid: accountId,
-          },
-        },
-        relations: {
-          fk_transaction: {
-            splits: {
-              fk_account: true,
-            },
-          },
-          fk_account: true,
-        },
-        order: {
-          fk_transaction: {
-            date: 'DESC',
-          },
-          // This is so debit is always before credit
-          // so we avoid negative amounts when display
-          // partial totals
-          quantityNum: 'ASC',
-        },
-      });
-      setSplits(newSplits);
-    }
-
-    if (datasource && accountId) {
-      load();
-    }
-  }, [datasource, accountId]);
-
-  if (!accountId) {
-    return (
-      <span>Select an account to see transactions</span>
-    );
-  }
-
   columns[2].cell = FromToAccountPartial(accounts);
 
   return (

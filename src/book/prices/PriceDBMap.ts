@@ -5,7 +5,7 @@ import { Price } from '../entities';
 export default class PriceDBMap {
   readonly map: { [pair: string]: Price } = {};
 
-  constructor(instances: Price[]) {
+  constructor(instances: Price[] = []) {
     instances.forEach(instance => {
       if (!instance.commodity.mnemonic || !instance.currency.mnemonic) {
         throw new Error('To create PriceDBMap currency and commodity need to be loaded');
@@ -71,5 +71,9 @@ export default class PriceDBMap {
     }
 
     throw new Error(`Price ${from}.${when.toISODate()} not found`);
+  }
+
+  get isEmpty(): boolean {
+    return Object.keys(this.map).length === 0;
   }
 }

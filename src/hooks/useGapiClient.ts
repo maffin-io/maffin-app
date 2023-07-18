@@ -43,7 +43,7 @@ export default function useGapiClient() {
  */
 async function loadGapiClient(callback: React.Dispatch<React.SetStateAction<boolean>>) {
   if (!window.gapi.client) {
-    await new Promise((res, rej) => {
+    await new Promise((res) => {
       if (window.gapi) {
         window.gapi.load('client', res);
       }

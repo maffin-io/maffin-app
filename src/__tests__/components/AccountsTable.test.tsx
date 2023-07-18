@@ -1,195 +1,330 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import type { DataSource, BaseEntity } from 'typeorm';
 
 import AccountsTable, { Record } from '@/components/AccountsTable';
-import type { TableProps } from '@/components/Table';
-import { PriceDB, PriceDBMap } from '@/book/prices';
-import { Book, Account } from '@/book/entities';
+import Table from '@/components/Table';
+import { PriceDBMap } from '@/book/prices';
+import { Account } from '@/book/entities';
 import Money from '@/book/Money';
-import * as dataSourceHooks from '@/hooks/useDataSource';
 
-jest.mock('@/hooks/useDataSource', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/useDataSource'),
-}));
-
-jest.mock('@/components/Table', () => {
-  function Table({ columns, data, initialSort }: TableProps<Record>) {
-    return (
-      <div data-testid="AccountsTable" className="Table">
-        <span>{JSON.stringify(columns)}</span>
-        <span data-testid="data">{JSON.stringify(data)}</span>
-        <span>{JSON.stringify(initialSort)}</span>
-      </div>
-    );
-  }
-
-  return Table;
-});
+jest.mock('@/components/Table', () => jest.fn(
+  () => <div data-testid="Table" />,
+));
+const TableMock = Table as jest.MockedFunction<typeof Table>;
 
 describe('AccountsTable', () => {
-  let mockGetTodayQuotes: jest.SpyInstance;
-
-  beforeEach(() => {
-    mockGetTodayQuotes = jest.spyOn(PriceDB, 'getTodayQuotes').mockResolvedValue({
-      getPrice: (from, to, date) => ({
-        guid: 'price_guid',
-        value: 0.98,
-      }),
-    } as PriceDBMap);
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([null]);
-    jest.spyOn(Book, 'find').mockResolvedValue([
-      {
-        // @ts-ignore
-        root: {
-          name: 'Root',
-          currency: Promise.resolve(null),
-          total: null,
-          type: 'ROOT',
-        } as Account,
-      },
-    ]);
-  });
-
   afterEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
-  it('renders empty when no dataSource', () => {
-    const { container } = render(<AccountsTable />);
+  it('creates empty Table with expected params', async () => {
+    const { container } = render(
+      <AccountsTable
+        accounts={[{} as Account]}
+        todayPrices={new PriceDBMap()}
+      />,
+    );
 
-    expect(container).toMatchSnapshot();
-  });
-
-  it('renders message when no accounts', async () => {
-    // @ts-ignore
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{
-      manager: {
-        getTreeRepository: (e: BaseEntity) => ({
-          findDescendantsTree: async () => ({
-            name: 'Root',
-            currency: null,
-            total: null,
-            type: 'ROOT',
-            children: [],
-          }),
-        }),
+    await screen.findByTestId('Table');
+    expect(Table).toHaveBeenLastCalledWith(
+      {
+        columns: [
+          {
+            header: '',
+            id: 'name',
+            enableSorting: false,
+            accessorKey: 'name',
+            cell: expect.any(Function),
+          },
+          {
+            header: '',
+            id: 'total',
+            accessorFn: expect.any(Function),
+            cell: expect.any(Function),
+          },
+        ],
+        data: [],
+        initialSort: {
+          desc: true,
+          id: 'total',
+        },
+        showHeader: false,
+        showPagination: false,
       },
-    } as DataSource]);
-    render(<AccountsTable />);
-
-    await screen.findByText('Add accounts to start seeing some data!');
+      {},
+    );
+    expect(container).toMatchSnapshot();
   });
 
   it('builds subRows as expected with non investment accounts', async () => {
-    // @ts-ignore
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{
-      manager: {
-        getTreeRepository: (e: BaseEntity) => ({
-          findDescendantsTree: async () => ({
-            name: 'Root',
-            currency: null,
-            total: null,
-            type: 'ROOT',
-            children: [
+    const accounts = [
+      {
+        guid: 'root',
+        name: 'Root',
+        type: 'ROOT',
+        childrenIds: ['a1'],
+      } as Account,
+      {
+        guid: 'a1',
+        name: 'Assets',
+        total: new Money(10, 'EUR'),
+        commodity: {
+          mnemonic: 'EUR',
+        },
+        type: 'ASSET',
+        childrenIds: ['a2'],
+      } as Account,
+      {
+        guid: 'a2',
+        name: 'Bank',
+        total: new Money(1000, 'USD'),
+        commodity: {
+          mnemonic: 'USD',
+        },
+        type: 'BANK',
+        childrenIds: [] as string[],
+      } as Account,
+    ];
+
+    render(
+      <AccountsTable
+        accounts={accounts}
+        todayPrices={{
+          getPrice: (from, to, date) => ({
+            guid: `${from}.${to}.${date}`,
+            value: 0.98,
+          }),
+        } as PriceDBMap}
+      />,
+    );
+
+    await screen.findByTestId('Table');
+    expect(Table).toBeCalledTimes(1);
+    expect(Table).toHaveBeenLastCalledWith(
+      {
+        columns: [
+          {
+            header: '',
+            id: 'name',
+            enableSorting: false,
+            accessorKey: 'name',
+            cell: expect.any(Function),
+          },
+          {
+            header: '',
+            id: 'total',
+            accessorFn: expect.any(Function),
+            cell: expect.any(Function),
+          },
+        ],
+        data: [
+          {
+            guid: 'a1',
+            name: 'Assets',
+            type: 'ASSET',
+            total: expect.any(Money),
+            subRows: [
               {
-                name: 'Assets',
-                total: new Money(10, 'EUR'),
-                currency: {
-                  mnemonic: 'EUR',
-                },
-                commodity: {
-                  mnemonic: 'EUR',
-                },
-                type: 'ASSET',
-                children: [
-                  {
-                    name: 'Bank',
-                    total: new Money(1000, 'USD'),
-                    currency: {
-                      mnemonic: 'USD',
-                    },
-                    commodity: {
-                      mnemonic: 'USD',
-                    },
-                    type: 'BANK',
-                    children: [],
-                  },
-                ],
+                guid: 'a2',
+                name: 'Bank',
+                type: 'BANK',
+                total: expect.any(Money),
+                subRows: [],
               },
             ],
-          }),
-        }),
+          },
+        ],
+        initialSort: {
+          desc: true,
+          id: 'total',
+        },
+        showHeader: false,
+        showPagination: false,
       },
-    } as DataSource]);
+      {},
+    );
 
-    const { container } = render(<AccountsTable />);
-    await screen.findByTestId('data');
-
-    expect(container).toMatchSnapshot();
-    expect(mockGetTodayQuotes).toBeCalledTimes(1);
+    const data = TableMock.mock.calls[0][0].data as Record[];
+    expect(data[0].subRows[0].total.toString()).toEqual('1000.00 USD');
+    expect(data[0].total.toString()).toEqual('990.00 EUR'); // 1000 USD * 0.98 + 10 EUR
   });
 
   it('builds subRows as expected with investment accounts', async () => {
-    mockGetTodayQuotes = jest.spyOn(PriceDB, 'getTodayQuotes').mockResolvedValue({
-      getPrice: (from, to, date) => ({
-        guid: 'price_guid',
-        value: 0.98,
-      }),
-      getStockPrice: (from, date) => ({
-        guid: 'stock_price_guid',
-        value: 100,
-        currency: {
-          mnemonic: 'USD',
+    const accounts = [
+      {
+        guid: 'root',
+        name: 'Root',
+        type: 'ROOT',
+        childrenIds: ['a1'],
+      } as Account,
+      {
+        guid: 'a1',
+        name: 'Stocks',
+        total: new Money(0, 'EUR'),
+        commodity: {
+          mnemonic: 'EUR',
         },
-      }),
-    } as PriceDBMap);
-    // @ts-ignore
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{
-      manager: {
-        getTreeRepository: (e: BaseEntity) => ({
-          findDescendantsTree: async () => ({
-            name: 'Root',
-            currency: null,
-            total: null,
-            type: 'ROOT',
-            children: [
+        type: 'ASSET',
+        childrenIds: ['a2'],
+      } as Account,
+      {
+        guid: 'a2',
+        name: 'GOOGL',
+        total: new Money(2, 'GOOGL'),
+        commodity: {
+          mnemonic: 'GOOGL',
+        },
+        type: 'STOCK',
+        childrenIds: [] as string[],
+      } as Account,
+    ];
+
+    render(
+      <AccountsTable
+        accounts={accounts}
+        todayPrices={{
+          getPrice: (from, to, date) => ({
+            guid: `${from}.${to}.${date}`,
+            value: 0.98,
+          }),
+          getStockPrice: (from, date) => ({
+            guid: `${from}.${date}`,
+            value: 100,
+            currency: {
+              mnemonic: 'USD',
+            },
+          }),
+        } as PriceDBMap}
+      />,
+    );
+
+    await screen.findByTestId('Table');
+    expect(Table).toBeCalledTimes(1);
+    expect(Table).toHaveBeenLastCalledWith(
+      {
+        columns: [
+          {
+            header: '',
+            id: 'name',
+            enableSorting: false,
+            accessorKey: 'name',
+            cell: expect.any(Function),
+          },
+          {
+            header: '',
+            id: 'total',
+            accessorFn: expect.any(Function),
+            cell: expect.any(Function),
+          },
+        ],
+        data: [
+          {
+            guid: 'a1',
+            name: 'Stocks',
+            type: 'ASSET',
+            total: expect.any(Money),
+            subRows: [
               {
-                name: 'Stocks',
-                total: new Money(0, 'EUR'),
-                currency: {
-                  mnemonic: 'EUR',
-                },
-                commodity: {
-                  mnemonic: 'EUR',
-                },
-                type: 'ASSET',
-                children: [
-                  {
-                    name: 'GOOGL',
-                    total: new Money(2, 'GOOGL'),
-                    currency: {
-                      mnemonic: 'USD',
-                    },
-                    commodity: {
-                      mnemonic: 'GOOGL',
-                    },
-                    type: 'STOCK',
-                    children: [],
-                  },
-                ],
+                guid: 'a2',
+                name: 'GOOGL',
+                type: 'STOCK',
+                total: expect.any(Money),
+                subRows: [],
               },
             ],
-          }),
-        }),
+          },
+        ],
+        initialSort: {
+          desc: true,
+          id: 'total',
+        },
+        showHeader: false,
+        showPagination: false,
       },
-    } as DataSource]);
+      {},
+    );
 
-    const { container } = render(<AccountsTable />);
-    await screen.findByTestId('data');
+    const data = TableMock.mock.calls[0][0].data as Record[];
+    expect(data[0].subRows[0].total.toString()).toEqual('200.00 USD'); // 2 GOOGL * 100 USD
+    expect(data[0].total.toString()).toEqual('196.00 EUR'); // 200 USD * 0.98
+  });
 
+  it('renders Name column as expected', async () => {
+    const account = {
+      guid: 'a1',
+      name: 'Assets',
+      total: new Money(10, 'EUR'),
+      commodity: {
+        mnemonic: 'EUR',
+      },
+      type: 'ASSET',
+      childrenIds: [] as string[],
+    } as Account;
+
+    render(
+      <AccountsTable
+        accounts={[account]}
+        todayPrices={new PriceDBMap()}
+      />,
+    );
+
+    await screen.findByTestId('Table');
+    expect(Table).toBeCalledTimes(1);
+    const nameCol = TableMock.mock.calls[0][0].columns[0];
+
+    expect(nameCol.cell).not.toBeUndefined();
+    const { container } = render(
+      // @ts-ignore
+      nameCol.cell({
+        row: {
+          original: account,
+        },
+      }),
+    );
+
+    await screen.findByText('Assets');
     expect(container).toMatchSnapshot();
-    expect(mockGetTodayQuotes).toBeCalledTimes(1);
+  });
+
+  it('renders Total column as expected', async () => {
+    const account = {
+      guid: 'a1',
+      name: 'Assets',
+      total: new Money(10, 'EUR'),
+      commodity: {
+        mnemonic: 'EUR',
+      },
+      type: 'ASSET',
+      childrenIds: [] as string[],
+    } as Account;
+
+    render(
+      <AccountsTable
+        accounts={[account]}
+        todayPrices={new PriceDBMap()}
+      />,
+    );
+
+    await screen.findByTestId('Table');
+    expect(Table).toBeCalledTimes(1);
+    const totalCol = TableMock.mock.calls[0][0].columns[1];
+
+    expect(
+      // @ts-ignore
+      totalCol.accessorFn({ total: new Money(10, 'EUR') }),
+    ).toEqual(10);
+
+    expect(totalCol.cell).not.toBeUndefined();
+    const { container } = render(
+      // @ts-ignore
+      totalCol.cell({
+        row: {
+          original: account,
+        },
+      }),
+    );
+
+    await screen.findByText('10.00 €');
+    expect(container).toMatchSnapshot();
   });
 });

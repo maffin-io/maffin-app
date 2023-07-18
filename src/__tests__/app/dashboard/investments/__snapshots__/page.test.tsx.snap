@@ -14,16 +14,8 @@ exports[`InvestmentsPage renders while loading data 1`] = `
       class="col-span-4"
     >
       <div
-        class="WeightsChart"
-        data-investments=""
-      >
-        <span>
-          []
-        </span>
-        <span>
-          0.00 EUR
-        </span>
-      </div>
+        data-testid="WeightsChart"
+      />
     </div>
     <div
       class="col-span-8"
@@ -35,82 +27,35 @@ exports[`InvestmentsPage renders while loading data 1`] = `
           class="col-span-4"
         >
           <div
-            class="StatisticsWidget"
-          >
-            <span>
-              0 total invested
-            </span>
-            <span>
-              Value/Cost
-            </span>
-            <span>
-              0.00 €
-            </span>
-            <span>
-              0 total invested
-            </span>
-          </div>
+            data-testid="StatisticsWidget"
+          />
         </div>
         <div
           class="col-span-4"
         >
           <div
-            class="StatisticsWidget"
-          >
-            <span>
-              0 (NaN%) with dividends
-            </span>
-            <span>
-              Unrealized Profit
-            </span>
-            <span>
-              0.00 € (NaN%)
-            </span>
-            <span>
-              0 (NaN%) with dividends
-            </span>
-          </div>
+            data-testid="StatisticsWidget"
+          />
         </div>
         <div
           class="col-span-4"
         >
           <div
-            class="StatisticsWidget"
-          >
-            <span>
-              0.00 € from dividends
-            </span>
-            <span>
-              Realized
-            </span>
-            <span>
-              0.00 €
-            </span>
-            <span>
-              0.00 € from dividends
-            </span>
-          </div>
+            data-testid="StatisticsWidget"
+          />
         </div>
       </div>
       <div
-        class="DividendChart"
-      >
-        <span>
-          []
-        </span>
-      </div>
+        data-testid="DividendChart"
+      />
     </div>
   </div>
   <div
     class="py-4"
   >
     <div
-      class="InvestmentsTable"
-    >
-      <span>
-        []
-      </span>
-    </div>
+      data-testid="InvestmentsTable"
+    />
   </div>
 </div>
 `;
@@ -129,16 +74,8 @@ exports[`InvestmentsPage renders with data 1`] = `
       class="col-span-4"
     >
       <div
-        class="WeightsChart"
-        data-investments=""
-      >
-        <span>
-          [{"account":{"name":"Investment"},"quantity":{"_raw":{"amount":10,"currency":{"code":"TICKER","base":10,"exponent":2},"scale":0}},"valueInCurrency":{"_raw":{"amount":5,"currency":{"code":"EUR","base":10,"exponent":2},"scale":0}},"costInCurrency":{"_raw":{"amount":4,"currency":{"code":"EUR","base":10,"exponent":2},"scale":0}},"realizedProfitInCurrency":{"_raw":{"amount":10,"currency":{"code":"EUR","base":10,"exponent":2},"scale":0}},"realizedDividendsInCurrency":{"_raw":{"amount":5,"currency":{"code":"EUR","base":10,"exponent":2},"scale":0}}}]
-        </span>
-        <span>
-          5.00 EUR
-        </span>
-      </div>
+        data-testid="WeightsChart"
+      />
     </div>
     <div
       class="col-span-8"
@@ -150,82 +87,35 @@ exports[`InvestmentsPage renders with data 1`] = `
           class="col-span-4"
         >
           <div
-            class="StatisticsWidget"
-          >
-            <span>
-              4 total invested
-            </span>
-            <span>
-              Value/Cost
-            </span>
-            <span>
-              5.00 €
-            </span>
-            <span>
-              4 total invested
-            </span>
-          </div>
+            data-testid="StatisticsWidget"
+          />
         </div>
         <div
           class="col-span-4"
         >
           <div
-            class="StatisticsWidget"
-          >
-            <span>
-              6 (150%) with dividends
-            </span>
-            <span>
-              Unrealized Profit
-            </span>
-            <span>
-              1.00 € (25%)
-            </span>
-            <span>
-              6 (150%) with dividends
-            </span>
-          </div>
+            data-testid="StatisticsWidget"
+          />
         </div>
         <div
           class="col-span-4"
         >
           <div
-            class="StatisticsWidget"
-          >
-            <span>
-              5.00 € from dividends
-            </span>
-            <span>
-              Realized
-            </span>
-            <span>
-              15.00 €
-            </span>
-            <span>
-              5.00 € from dividends
-            </span>
-          </div>
+            data-testid="StatisticsWidget"
+          />
         </div>
       </div>
       <div
-        class="DividendChart"
-      >
-        <span>
-          [{"account":{"name":"Investment"},"quantity":{"_raw":{"amount":10,"currency":{"code":"TICKER","base":10,"exponent":2},"scale":0}},"valueInCurrency":{"_raw":{"amount":5,"currency":{"code":"EUR","base":10,"exponent":2},"scale":0}},"costInCurrency":{"_raw":{"amount":4,"currency":{"code":"EUR","base":10,"exponent":2},"scale":0}},"realizedProfitInCurrency":{"_raw":{"amount":10,"currency":{"code":"EUR","base":10,"exponent":2},"scale":0}},"realizedDividendsInCurrency":{"_raw":{"amount":5,"currency":{"code":"EUR","base":10,"exponent":2},"scale":0}}}]
-        </span>
-      </div>
+        data-testid="DividendChart"
+      />
     </div>
   </div>
   <div
     class="py-4"
   >
     <div
-      class="InvestmentsTable"
-    >
-      <span>
-        [{"account":{"name":"Investment"},"quantity":{"_raw":{"amount":10,"currency":{"code":"TICKER","base":10,"exponent":2},"scale":0}},"valueInCurrency":{"_raw":{"amount":5,"currency":{"code":"EUR","base":10,"exponent":2},"scale":0}},"costInCurrency":{"_raw":{"amount":4,"currency":{"code":"EUR","base":10,"exponent":2},"scale":0}},"realizedProfitInCurrency":{"_raw":{"amount":10,"currency":{"code":"EUR","base":10,"exponent":2},"scale":0}},"realizedDividendsInCurrency":{"_raw":{"amount":5,"currency":{"code":"EUR","base":10,"exponent":2},"scale":0}}}]
-      </span>
-    </div>
+      data-testid="InvestmentsTable"
+    />
   </div>
 </div>
 `;
@@ -244,16 +134,8 @@ exports[`InvestmentsPage renders with different mainCurrency 1`] = `
       class="col-span-4"
     >
       <div
-        class="WeightsChart"
-        data-investments=""
-      >
-        <span>
-          [{"account":{"name":"Investment"},"quantity":{"_raw":{"amount":10,"currency":{"code":"TICKER","base":10,"exponent":2},"scale":0}},"valueInCurrency":{"_raw":{"amount":5,"currency":{"code":"USD","base":10,"exponent":2},"scale":0}},"costInCurrency":{"_raw":{"amount":4,"currency":{"code":"USD","base":10,"exponent":2},"scale":0}},"realizedProfitInCurrency":{"_raw":{"amount":10,"currency":{"code":"USD","base":10,"exponent":2},"scale":0}},"realizedDividendsInCurrency":{"_raw":{"amount":5,"currency":{"code":"USD","base":10,"exponent":2},"scale":0}}}]
-        </span>
-        <span>
-          5.00 USD
-        </span>
-      </div>
+        data-testid="WeightsChart"
+      />
     </div>
     <div
       class="col-span-8"
@@ -265,82 +147,35 @@ exports[`InvestmentsPage renders with different mainCurrency 1`] = `
           class="col-span-4"
         >
           <div
-            class="StatisticsWidget"
-          >
-            <span>
-              4 total invested
-            </span>
-            <span>
-              Value/Cost
-            </span>
-            <span>
-              5.00 $
-            </span>
-            <span>
-              4 total invested
-            </span>
-          </div>
+            data-testid="StatisticsWidget"
+          />
         </div>
         <div
           class="col-span-4"
         >
           <div
-            class="StatisticsWidget"
-          >
-            <span>
-              6 (150%) with dividends
-            </span>
-            <span>
-              Unrealized Profit
-            </span>
-            <span>
-              1.00 $ (25%)
-            </span>
-            <span>
-              6 (150%) with dividends
-            </span>
-          </div>
+            data-testid="StatisticsWidget"
+          />
         </div>
         <div
           class="col-span-4"
         >
           <div
-            class="StatisticsWidget"
-          >
-            <span>
-              5.00 $ from dividends
-            </span>
-            <span>
-              Realized
-            </span>
-            <span>
-              15.00 $
-            </span>
-            <span>
-              5.00 $ from dividends
-            </span>
-          </div>
+            data-testid="StatisticsWidget"
+          />
         </div>
       </div>
       <div
-        class="DividendChart"
-      >
-        <span>
-          [{"account":{"name":"Investment"},"quantity":{"_raw":{"amount":10,"currency":{"code":"TICKER","base":10,"exponent":2},"scale":0}},"valueInCurrency":{"_raw":{"amount":5,"currency":{"code":"USD","base":10,"exponent":2},"scale":0}},"costInCurrency":{"_raw":{"amount":4,"currency":{"code":"USD","base":10,"exponent":2},"scale":0}},"realizedProfitInCurrency":{"_raw":{"amount":10,"currency":{"code":"USD","base":10,"exponent":2},"scale":0}},"realizedDividendsInCurrency":{"_raw":{"amount":5,"currency":{"code":"USD","base":10,"exponent":2},"scale":0}}}]
-        </span>
-      </div>
+        data-testid="DividendChart"
+      />
     </div>
   </div>
   <div
     class="py-4"
   >
     <div
-      class="InvestmentsTable"
-    >
-      <span>
-        [{"account":{"name":"Investment"},"quantity":{"_raw":{"amount":10,"currency":{"code":"TICKER","base":10,"exponent":2},"scale":0}},"valueInCurrency":{"_raw":{"amount":5,"currency":{"code":"USD","base":10,"exponent":2},"scale":0}},"costInCurrency":{"_raw":{"amount":4,"currency":{"code":"USD","base":10,"exponent":2},"scale":0}},"realizedProfitInCurrency":{"_raw":{"amount":10,"currency":{"code":"USD","base":10,"exponent":2},"scale":0}},"realizedDividendsInCurrency":{"_raw":{"amount":5,"currency":{"code":"USD","base":10,"exponent":2},"scale":0}}}]
-      </span>
-    </div>
+      data-testid="InvestmentsTable"
+    />
   </div>
 </div>
 `;

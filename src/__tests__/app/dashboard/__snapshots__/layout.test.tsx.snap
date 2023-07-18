@@ -1,18 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DashboardLayout renders as expected when user available 1`] = `
+exports[`DashboardLayout renders as expected when user and datasource available 1`] = `
 <div>
   <div
     class="w-full h-full overflow-hidden"
   >
     <div
-      class="LeftSidebar"
+      data-testid="LeftSidebar"
     />
     <div
       class="mt-20 ml-20 p-3 z-0"
     >
       <div
-        class="Topbar"
+        data-testid="Topbar"
       />
       <span
         data-testid="child"
@@ -21,13 +21,13 @@ exports[`DashboardLayout renders as expected when user available 1`] = `
       </span>
     </div>
     <div
-      class="Footer"
+      data-testid="Footer"
     />
   </div>
 </div>
 `;
 
-exports[`DashboardLayout returns loading when no user available 1`] = `
+exports[`DashboardLayout returns loading when datasource not available 1`] = `
 <div>
   <div>
     Loading...
@@ -35,7 +35,7 @@ exports[`DashboardLayout returns loading when no user available 1`] = `
 </div>
 `;
 
-exports[`DashboardLayout returns loading when user available but not logged in 1`] = `
+exports[`DashboardLayout returns loading when no user available 1`] = `
 <div>
   <div>
     Loading...
