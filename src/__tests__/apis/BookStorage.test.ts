@@ -1,3 +1,5 @@
+import pako from 'pako';
+
 import BookStorage from '@/apis/BookStorage';
 
 describe('GoogleDrive', () => {
@@ -8,7 +10,7 @@ describe('GoogleDrive', () => {
   let mockFetch: jest.SpyInstance;
 
   beforeEach(() => {
-    rawBook = new Uint8Array([22, 33]);
+    rawBook = pako.deflate('rawBook');
     mockDriveClient = {
       files: {
         // @ts-ignore
@@ -94,7 +96,7 @@ describe('GoogleDrive', () => {
       expect(mockDriveClient.files.list).toHaveBeenNthCalledWith(
         1,
         {
-          q: 'name=\'book1.sqlite\' and trashed = false and \'parentFolderId\' in parents',
+          q: 'name=\'book1.sqlite.gz\' and trashed = false and \'parentFolderId\' in parents',
         },
       );
     });
@@ -164,7 +166,7 @@ describe('GoogleDrive', () => {
         {
           fields: 'id',
           resource: {
-            name: 'book1.sqlite',
+            name: 'book1.sqlite.gz',
             mimeType: 'application/vnd.sqlite3',
             parents: ['createdResourceId'],
           },
@@ -229,7 +231,7 @@ describe('GoogleDrive', () => {
     beforeEach(() => {
       mockFetch = jest.spyOn(global, 'fetch').mockImplementation(
         jest.fn(() => Promise.resolve({
-          arrayBuffer: () => Promise.resolve(rawBook),
+          arrayBuffer: () => Promise.resolve(rawBook.buffer),
         })) as jest.Mock,
       );
       jest.spyOn(client, 'initStorage');
@@ -240,7 +242,7 @@ describe('GoogleDrive', () => {
       expect(client.initStorage).toHaveBeenCalledTimes(1);
     });
 
-    it('returns rawBook from downloaded file', async () => {
+    it('returns decompressed data from downloaded file', async () => {
       client.parentFolderId = 'parentFolderId';
       client.bookFileId = 'bookFileId';
       const content = await client.get();
@@ -256,7 +258,8 @@ describe('GoogleDrive', () => {
           method: 'GET',
         },
       );
-      expect(content).toEqual(rawBook);
+      console.log(content);
+      expect(content).toEqual(pako.inflate(rawBook));
     });
   });
 
@@ -289,8 +292,9 @@ describe('GoogleDrive', () => {
       );
 
       const blob = mockFetch.mock.calls[0][1]!.body as Blob;
-      const blobData = await fileToArrayBuffer(blob);
-      expect(new Uint8Array(blobData as ArrayBuffer)).toEqual(rawBook);
+      const resultBlobData = await fileToArrayBuffer(blob);
+      const expectedBlobData = await fileToArrayBuffer(blob);
+      expect(resultBlobData).toEqual(expectedBlobData);
     });
   });
 });
