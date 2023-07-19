@@ -1,5 +1,6 @@
 import initSqlJs from 'sql.js';
 import { DataSource } from 'typeorm';
+import { useSWRConfig } from 'swr';
 
 import {
   Account,
@@ -41,6 +42,7 @@ export async function initDB(database: Uint8Array): Promise<DataSource> {
   return datasource;
 }
 
+// TODO: Need to mutate the accounts SWR key so Root is shown!
 async function createEmptyBook() {
   const rootAccount = Account.create({
     guid: 'rootAccount',

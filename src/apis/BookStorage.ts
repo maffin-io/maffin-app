@@ -1,3 +1,5 @@
+import pako from 'pako';
+
 export default class BookStorage {
   gapiClient: typeof gapi.client;
   driveClient: typeof gapi.client.drive;
@@ -20,7 +22,7 @@ export default class BookStorage {
   /**
    * Initializes Gooogle Drive storage by:
    * - Creating a folder called 'maffin.io' if it doesn't exist
-   * - Creating an empty file called 'book1.sqlite' within if it doesn't exist.
+   * - Creating an empty file called 'book1.sqlite.gz' within if it doesn't exist.
    */
   async initStorage(): Promise<void> {
     this.parentFolderId = await this.findParentFolderId();
@@ -43,7 +45,7 @@ export default class BookStorage {
       const response = await this.driveClient.files.create({
         fields: 'id',
         resource: {
-          name: 'book1.sqlite',
+          name: 'book1.sqlite.gz',
           mimeType: 'application/vnd.sqlite3',
           parents: [this.parentFolderId],
         },
@@ -66,6 +68,7 @@ export default class BookStorage {
       await this.initStorage();
     }
 
+    const start = performance.now();
     const response = await fetch(
       `https://www.googleapis.com/drive/v3/files/${this.bookFileId}?alt=media`,
       {
@@ -78,7 +81,10 @@ export default class BookStorage {
     );
     const binaryContent = await response.arrayBuffer();
 
-    return new Uint8Array(binaryContent);
+    const data = pako.inflate(binaryContent) || new Uint8Array();
+    const end = performance.now();
+    console.log(`get book: ${end - start}`);
+    return data;
   }
 
   /**
@@ -92,6 +98,7 @@ export default class BookStorage {
    * @param rawBook - The RawBook to be uploaded
    */
   async save(rawBook: Uint8Array): Promise<void> {
+    const start = performance.now();
     if (!this.initialised) {
       await this.initStorage();
     }
@@ -104,9 +111,11 @@ export default class BookStorage {
           Authorization: `Bearer ${this.gapiClient.getToken().access_token}`,
           'Content-Type': 'application/vnd.sqlite3',
         }),
-        body: new Blob([rawBook], { type: 'application/vnd.sqlite3' }),
+        body: new Blob([pako.deflate(rawBook)], { type: 'application/vnd.sqlite3' }),
       },
     );
+    const end = performance.now();
+    console.log(`save book: ${end - start}`);
   }
 
   /**
@@ -137,7 +146,7 @@ export default class BookStorage {
     }
 
     const response = await this.driveClient.files.list({
-      q: `name='${book}.sqlite' and trashed = false and '${this.parentFolderId}' in parents`,
+      q: `name='${book}.sqlite.gz' and trashed = false and '${this.parentFolderId}' in parents`,
     });
     if (response.result.files!.length > 0 && response.result.files![0].id !== undefined) {
       return response.result.files![0].id;

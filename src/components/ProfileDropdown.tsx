@@ -80,6 +80,7 @@ async function importBook(
   event: React.ChangeEvent<HTMLInputElement>,
   bookStorage: BookStorage | null,
 ) {
+  // TODO: Need to mutate the accounts SWR key so Root is shown!
   if (event.target.files !== null && event.target.files[0] !== null) {
     const fileReader = new FileReader();
     fileReader.onload = async (loadEvent) => {
