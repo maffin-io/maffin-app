@@ -1,5 +1,5 @@
 import React from 'react';
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import { useRouter } from 'next/navigation';
 
 import useGapiClient from '@/hooks/useGapiClient';
@@ -19,34 +19,45 @@ const emptyUser = {
 };
 
 async function getUser(): Promise<User> {
-  const res = await window.gapi.client.people.people.get({
-    resourceName: 'people/me',
-    personFields: 'names,emailAddresses,photos',
-  });
+  try {
+    const res = await window.gapi.client.people.people.get({
+      resourceName: 'people/me',
+      personFields: 'names,emailAddresses,photos',
+    });
 
-  return {
-    name: res.result.names?.[0].displayName as string,
-    email: res.result.emailAddresses?.[0].value as string,
-    image: res.result.photos?.[0].url as string,
-    isLoggedIn: true,
-  };
+    return {
+      name: res.result.names?.[0].displayName as string,
+      email: res.result.emailAddresses?.[0].value as string,
+      image: res.result.photos?.[0].url as string,
+      isLoggedIn: true,
+    };
+  } catch {
+    localStorage.setItem('accessToken', '');
+    return emptyUser;
+  }
 }
 
-export default function useUser(): { user: User } {
+export default function useUser(): { user: User, mutate: Function } {
   const router = useRouter();
   const [isGapiLoaded] = useGapiClient();
-  const { data: user, error } = useSWR<User>(isGapiLoaded ? '/api/user' : null, getUser);
+  const { data: user, mutate, isLoading } = useSWRImmutable<User>(
+    isGapiLoaded ? '/api/user' : null,
+    getUser,
+    {
+      refreshInterval: 100000,
+    },
+  );
 
   React.useEffect(() => {
-    if (error) {
+    if (!isLoading && user && !user.isLoggedIn) {
       router.push('/user/login');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isGapiLoaded, user, error]);
+  }, [isGapiLoaded, user]);
 
   if (!user) {
-    return { user: emptyUser };
+    return { user: emptyUser, mutate };
   }
 
-  return { user };
+  return { user, mutate };
 }

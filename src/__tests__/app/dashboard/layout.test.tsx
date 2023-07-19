@@ -40,6 +40,7 @@ describe('DashboardLayout', () => {
         image: '',
         isLoggedIn: false,
       },
+      mutate: jest.fn(),
     });
     jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
   });
@@ -67,6 +68,7 @@ describe('DashboardLayout', () => {
         image: 'image',
         isLoggedIn: true,
       },
+      mutate: jest.fn(),
     });
     const { container } = render(
       <DashboardLayout>
@@ -89,6 +91,7 @@ describe('DashboardLayout', () => {
         image: 'image',
         isLoggedIn: true,
       },
+      mutate: jest.fn(),
     });
 
     const { container } = render(

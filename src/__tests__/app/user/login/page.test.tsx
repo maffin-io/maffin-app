@@ -2,6 +2,12 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 import LoginPage from '@/app/user/login/page';
+import * as userHooks from '@/hooks/useUser';
+
+jest.mock('@/hooks/useUser', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/useUser'),
+}));
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
@@ -14,6 +20,7 @@ describe('LoginPage', () => {
   let mockInitTokenClient: jest.Mock;
   let mockStorageSetItem: jest.SpyInstance;
   let mockRouterPush: jest.Mock;
+  let mockMutate: jest.Mock;
 
   beforeEach(() => {
     requestAccessToken = jest.fn();
@@ -33,6 +40,16 @@ describe('LoginPage', () => {
     useRouter.mockImplementation(() => ({
       push: mockRouterPush,
     }));
+    mockMutate = jest.fn();
+    jest.spyOn(userHooks, 'default').mockReturnValue({
+      user: {
+        name: '',
+        email: '',
+        image: '',
+        isLoggedIn: false,
+      },
+      mutate: mockMutate,
+    });
   });
 
   it('shows loading... when not finished', () => {
@@ -54,7 +71,7 @@ describe('LoginPage', () => {
     expect(requestAccessToken).toBeCalledTimes(1);
   });
 
-  it('callback saves access token to storage and navigates to accounts page', async () => {
+  it('callback saves access token to storage, purges swr and navigates to accounts page', async () => {
     render(<LoginPage />);
 
     const { callback } = mockInitTokenClient.mock.calls[0][0];
@@ -66,5 +83,7 @@ describe('LoginPage', () => {
       'ACCESS_TOKEN',
     );
     expect(mockRouterPush).toHaveBeenCalledWith('/dashboard/accounts');
+    expect(mockMutate).toBeCalledTimes(1);
+    expect(mockMutate).toHaveBeenCalledWith();
   });
 });

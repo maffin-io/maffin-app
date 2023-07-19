@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import useUser from '@/hooks/useUser';
 
 export default function LoginPage(): JSX.Element {
   const router = useRouter();
@@ -9,6 +10,7 @@ export default function LoginPage(): JSX.Element {
     tokenClient,
     setTokenClient,
   ] = React.useState<google.accounts.oauth2.TokenClient | null>(null);
+  const { mutate } = useUser();
 
   React.useEffect(() => {
     setTokenClient(window.google.accounts?.oauth2.initTokenClient({
@@ -16,6 +18,7 @@ export default function LoginPage(): JSX.Element {
       scope: 'email profile https://www.googleapis.com/auth/drive.file',
       callback: async (tokenResponse) => {
         localStorage.setItem('accessToken', tokenResponse.access_token);
+        mutate();
         router.push('/dashboard/accounts');
       },
     }));
