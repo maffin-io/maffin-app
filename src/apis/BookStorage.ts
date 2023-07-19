@@ -15,10 +15,6 @@ export default class BookStorage {
     this.bookFileId = '';
   }
 
-  get initialised(): boolean {
-    return (this.parentFolderId !== '' && this.bookFileId !== '');
-  }
-
   /**
    * Initializes Gooogle Drive storage by:
    * - Creating a folder called 'maffin.io' if it doesn't exist
@@ -64,10 +60,6 @@ export default class BookStorage {
    * and returns it as a string instead.
    */
   async get(): Promise<Uint8Array> {
-    if (!this.initialised) {
-      await this.initStorage();
-    }
-
     const start = performance.now();
     const response = await fetch(
       `https://www.googleapis.com/drive/v3/files/${this.bookFileId}?alt=media`,
@@ -83,7 +75,7 @@ export default class BookStorage {
 
     const data = pako.inflate(binaryContent) || new Uint8Array();
     const end = performance.now();
-    console.log(`get book: ${end - start}`);
+    console.log(`get book: ${end - start}ms`);
     return data;
   }
 
@@ -99,10 +91,6 @@ export default class BookStorage {
    */
   async save(rawBook: Uint8Array): Promise<void> {
     const start = performance.now();
-    if (!this.initialised) {
-      await this.initStorage();
-    }
-
     await fetch(
       `https://www.googleapis.com/upload/drive/v3/files/${this.bookFileId}`,
       {

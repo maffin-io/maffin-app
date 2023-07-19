@@ -237,11 +237,6 @@ describe('GoogleDrive', () => {
       jest.spyOn(client, 'initStorage');
     });
 
-    it('inits storage when no parentFolderId', async () => {
-      await client.get();
-      expect(client.initStorage).toHaveBeenCalledTimes(1);
-    });
-
     it('returns decompressed data from downloaded file', async () => {
       client.parentFolderId = 'parentFolderId';
       client.bookFileId = 'bookFileId';
@@ -266,11 +261,6 @@ describe('GoogleDrive', () => {
   describe('save', () => {
     beforeEach(() => {
       jest.spyOn(client, 'initStorage');
-    });
-
-    it('inits storage when no parentFolderId', async () => {
-      await client.save(rawBook);
-      expect(client.initStorage).toHaveBeenCalledTimes(1);
     });
 
     it('saves book as expected', async () => {

@@ -1,47 +1,79 @@
 import React from 'react';
 import { DataSource } from 'typeorm';
+import initSqlJs from 'sql.js';
 
 import useBookStorage from '@/hooks/useBookStorage';
-import { initDB } from '@/book/datasource';
+import {
+  Account,
+  Book,
+  Commodity,
+  Price,
+  Split,
+  Transaction,
+} from '@/book/entities';
 
-// Not sure if this is the best way to cache the storage...
-// need to research
-let DATASOURCE: DataSource | null = null;
+const DATASOURCE: DataSource = new DataSource({
+  type: 'sqljs',
+  synchronize: true,
+  logging: false,
+  entities: [Account, Book, Commodity, Price, Split, Transaction],
+});
 
 export default function useDataSource(): [DataSource | null] {
   const [bookStorage] = useBookStorage();
-  const [, setDataSource] = React.useState<DataSource | null>(DATASOURCE);
-  const isInitializing = React.useRef(false);
+  const [isLoaded, setIsLoaded] = React.useState(false);
 
   React.useEffect(() => {
     async function load() {
-      if (bookStorage && DATASOURCE == null && !isInitializing.current) {
-        isInitializing.current = true;
-        let start;
-        let end;
+      let rawBook: Uint8Array;
+      if (bookStorage && !DATASOURCE.isInitialized) {
+        ([, rawBook] = await Promise.all([
+          initSqlJs({ locateFile: file => `https://sql.js.org/dist/${file}` }),
+          bookStorage.get(),
+        ]));
 
-        start = performance.now();
-        const rawBook = await bookStorage.get();
-        end = performance.now();
+        // Due to async nature, this value can change between this and the previous statement
+        // as it's a shared global
+        if (!DATASOURCE.isInitialized) {
+          const start = performance.now();
+          await DATASOURCE.initialize();
 
-        start = performance.now();
-        // We re-check here to avoid race conditions because of
-        // downloading book data takes time. Without this
-        // we have some reference errors where a component may
-        // use one instance another the difference instance which
-        // causes synchronization issues.
-        if (DATASOURCE === null) {
-          DATASOURCE = await initDB(rawBook);
-          end = performance.now();
-          console.log(`init dataSource: ${end - start}ms`);
+          if (rawBook.length) {
+            await DATASOURCE.sqljsManager.loadDatabase(rawBook);
+          } else {
+            await createEmptyBook();
+          }
+          const end = performance.now();
+          console.log(`init datasource: ${end - start}ms`);
+          setIsLoaded(true);
         }
-        setDataSource(DATASOURCE);
-        isInitializing.current = false;
       }
     }
 
     load();
   }, [bookStorage]);
 
+  if (!isLoaded && !DATASOURCE.isInitialized) {
+    return [null];
+  }
+
   return [DATASOURCE];
+}
+
+// TODO: Need to mutate the accounts SWR key so Root is shown!
+async function createEmptyBook() {
+  const rootAccount = Account.create({
+    guid: 'rootAccount',
+    name: 'Root',
+    type: 'ROOT',
+  });
+  await Account.upsert(rootAccount, ['guid']);
+
+  await Book.upsert(
+    {
+      guid: 'maffinBook',
+      fk_root: rootAccount.guid,
+    },
+    ['guid'],
+  );
 }
