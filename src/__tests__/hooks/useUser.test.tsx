@@ -1,9 +1,15 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { SWRConfig } from 'swr';
+import { SWRConfig, SWRResponse } from 'swr';
+import * as swrImmutable from 'swr/immutable';
 
 import useUser from '@/hooks/useUser';
 import * as gapiHooks from '@/hooks/useGapiClient';
+
+jest.mock('swr/immutable', () => ({
+  __esModule: true,
+  ...jest.requireActual('swr/immutable'),
+}));
 
 jest.mock('@/hooks/useGapiClient', () => ({
   __esModule: true,
@@ -61,7 +67,8 @@ describe('useUser', () => {
     });
   });
 
-  it('returns empty user and redirects if not logged in', async () => {
+  it('returns empty user, redirects and sets empty token if not logged in', async () => {
+    const mockStorageSetItem = jest.spyOn(Storage.prototype, 'setItem');
     jest.spyOn(gapiHooks, 'default').mockReturnValue([true]);
     const error = new Error('whatever');
     mockPeopleGet.mockRejectedValue({
@@ -78,6 +85,41 @@ describe('useUser', () => {
     await waitFor(() => {
       expect(mockRouterPush).toHaveBeenCalled();
     });
+    expect(mockStorageSetItem).toHaveBeenCalledWith('accessToken', '');
+    expect(JSON.parse((await screen.findByTestId('user')).innerHTML)).toEqual({
+      name: '',
+      email: '',
+      image: '',
+      isLoggedIn: false,
+    });
+  });
+
+  it('returns empty user if still loading and doesnt redirect', async () => {
+    jest.spyOn(gapiHooks, 'default').mockReturnValue([true]);
+    mockPeopleGet.mockResolvedValue({
+      result: {
+        names: [{ displayName: 'name' }],
+        emailAddresses: [{ value: 'email' }],
+        photos: [{ url: 'image' }],
+      },
+    });
+    jest.spyOn(swrImmutable, 'default').mockReturnValue({
+      data: {
+        name: '',
+        email: '',
+        image: '',
+        isLoggedIn: false,
+      },
+      mutate: () => {},
+      isLoading: true,
+    } as SWRResponse);
+    render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <TestComponent />
+      </SWRConfig>,
+    );
+
+    expect(mockRouterPush).not.toHaveBeenCalled();
     expect(JSON.parse((await screen.findByTestId('user')).innerHTML)).toEqual({
       name: '',
       email: '',
