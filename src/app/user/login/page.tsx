@@ -22,6 +22,10 @@ export default function LoginPage(): JSX.Element {
         router.push('/dashboard/accounts');
       },
     }));
+
+    router.prefetch('/dashboard/investments');
+    router.prefetch('/dashboard/accounts');
+    router.prefetch('/dashboard/accounts/guid');
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

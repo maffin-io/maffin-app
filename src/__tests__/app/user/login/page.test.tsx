@@ -20,6 +20,7 @@ describe('LoginPage', () => {
   let mockInitTokenClient: jest.Mock;
   let mockStorageSetItem: jest.SpyInstance;
   let mockRouterPush: jest.Mock;
+  let mockRouterPrefetch: jest.Mock;
   let mockMutate: jest.Mock;
 
   beforeEach(() => {
@@ -37,8 +38,10 @@ describe('LoginPage', () => {
     };
     mockStorageSetItem = jest.spyOn(Storage.prototype, 'setItem');
     mockRouterPush = jest.fn();
+    mockRouterPrefetch = jest.fn();
     useRouter.mockImplementation(() => ({
       push: mockRouterPush,
+      prefetch: mockRouterPrefetch,
     }));
     mockMutate = jest.fn();
     jest.spyOn(userHooks, 'default').mockReturnValue({
@@ -69,6 +72,14 @@ describe('LoginPage', () => {
     expect(requestAccessToken).toBeCalledTimes(0);
     screen.getByText('Sign In').click();
     expect(requestAccessToken).toBeCalledTimes(1);
+  });
+
+  it('prefetches dashboard pages', async () => {
+    render(<LoginPage />);
+
+    expect(mockRouterPrefetch).toHaveBeenCalledWith('/dashboard/accounts');
+    expect(mockRouterPrefetch).toHaveBeenCalledWith('/dashboard/accounts/guid');
+    expect(mockRouterPrefetch).toHaveBeenCalledWith('/dashboard/investments');
   });
 
   it('callback saves access token to storage, purges swr and navigates to accounts page', async () => {

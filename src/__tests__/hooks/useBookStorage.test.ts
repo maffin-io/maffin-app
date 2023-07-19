@@ -16,6 +16,10 @@ describe('useBookStorage', () => {
     jest.spyOn(gapiHooks, 'default').mockReturnValue([false]);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('returns null if gapi not loaded', () => {
     const { result } = renderHook(() => useBookStorage());
 
@@ -36,5 +40,20 @@ describe('useBookStorage', () => {
     await waitFor(() => {
       expect(result.current).toEqual([expect.any(BookStorage)]);
     });
+  });
+
+  it('inits storage', async () => {
+    window.gapi = {
+      client: {} as typeof gapi.client,
+    } as typeof gapi;
+    jest.spyOn(gapiHooks, 'default').mockReturnValue([true]);
+
+    const { result, rerender } = renderHook(() => useBookStorage());
+    rerender();
+
+    await waitFor(() => {
+      expect(result.current).toEqual([expect.any(BookStorage)]);
+    });
+    expect(BookStorage.prototype.initStorage).toBeCalledTimes(1);
   });
 });
