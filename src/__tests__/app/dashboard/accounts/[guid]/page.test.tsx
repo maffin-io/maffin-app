@@ -8,7 +8,7 @@ import * as swr from 'swr';
 
 import AccountPage from '@/app/dashboard/accounts/[guid]/page';
 import TransactionsTable from '@/components/TransactionsTable';
-import AddTransactionButton from '@/components/AddTransactionButton';
+import AddTransactionButton from '@/components/buttons/AddTransactionButton';
 import { Account, Split } from '@/book/entities';
 import * as queries from '@/book/queries';
 
@@ -17,7 +17,7 @@ jest.mock('swr', () => ({
   ...jest.requireActual('swr'),
 }));
 
-jest.mock('@/components/AddTransactionButton', () => jest.fn(
+jest.mock('@/components/buttons/AddTransactionButton', () => jest.fn(
   () => <div data-testid="AddTransactionButton" />,
 ));
 const AddTransactionButtonMock = AddTransactionButton as jest.MockedFunction<
@@ -44,6 +44,7 @@ describe('AccountPage', () => {
   let mockFindSplits: jest.SpyInstance;
 
   beforeEach(() => {
+    jest.spyOn(swr, 'mutate');
     mockRouterPush = jest.fn();
     useRouter.mockImplementation(() => ({
       push: mockRouterPush,
@@ -99,11 +100,6 @@ describe('AccountPage', () => {
   });
 
   it('mutates when saving a transaction', async () => {
-    const mockMutate = jest.fn();
-    // @ts-ignore
-    jest.spyOn(swr, 'useSWRConfig').mockReturnValue({
-      mutate: mockMutate,
-    } as ReturnType<typeof swr.useSWRConfig>);
     render(
       <swr.SWRConfig value={{ provider: () => new Map() }}>
         <AccountPage params={{ guid: 'guid' }} />
@@ -115,16 +111,11 @@ describe('AccountPage', () => {
     if (onSave) {
       onSave();
     }
-    expect(mockMutate).toBeCalledTimes(1);
-    expect(mockMutate).toHaveBeenNthCalledWith(1, '/api/splits/guid');
+    expect(swr.mutate).toBeCalledTimes(1);
+    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/guid');
   });
 
   it('renders as expected with account', async () => {
-    const mockMutate = jest.fn();
-    // @ts-ignore
-    jest.spyOn(swr, 'useSWRConfig').mockReturnValue({
-      mutate: mockMutate,
-    } as ReturnType<typeof swr.useSWRConfig>);
     const { container } = render(
       <swr.SWRConfig value={{ provider: () => new Map() }}>
         <AccountPage params={{ guid: 'guid' }} />

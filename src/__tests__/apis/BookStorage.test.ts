@@ -253,7 +253,6 @@ describe('GoogleDrive', () => {
           method: 'GET',
         },
       );
-      console.log(content);
       expect(content).toEqual(pako.inflate(rawBook));
     });
   });
@@ -281,7 +280,7 @@ describe('GoogleDrive', () => {
         },
       );
 
-      const blob = mockFetch.mock.calls[0][1]!.body as Blob;
+      const blob = mockFetch.mock.calls[0][1].body as Blob;
       const resultBlobData = await fileToArrayBuffer(blob);
       const expectedBlobData = await fileToArrayBuffer(blob);
       expect(resultBlobData).toEqual(expectedBlobData);

@@ -22,7 +22,7 @@ export default function useGapiClient() {
       script.id = 'maffin-gapi';
       script.src = 'https://apis.google.com/js/api.js';
       script.async = true;
-      script.onload = () => loadGapiClient(setIsLoaded);
+      script.onload = async () => loadGapiClient(setIsLoaded);
 
       document.body.appendChild(script);
 

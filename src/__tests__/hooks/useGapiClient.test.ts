@@ -77,14 +77,15 @@ describe('useGapiClient', () => {
     // eslint-disable-next-line testing-library/no-node-access
     const script = document.getElementById('maffin-gapi');
     expect(script).not.toBeNull();
-    expect(script!.onload).not.toBeNull();
+    expect(script?.onload).not.toBeNull();
     window.gapi = {
       load: mockGapiLoad as typeof window.gapi.load,
     } as typeof gapi;
 
-    await act(() => {
-      // @ts-ignore
-      script.onload();
+    await act(async () => {
+      if (script?.onload) {
+        await script.onload({} as Event);
+      }
     });
 
     expect(result.current).toEqual([true]);

@@ -37,10 +37,10 @@ async function getUser(): Promise<User> {
   }
 }
 
-export default function useUser(): { user: User, mutate: Function } {
+export default function useUser(): { user: User } {
   const router = useRouter();
   const [isGapiLoaded] = useGapiClient();
-  const { data: user, mutate, isLoading } = useSWRImmutable<User>(
+  const { data: user, isLoading } = useSWRImmutable<User>(
     isGapiLoaded ? '/api/user' : null,
     getUser,
     {
@@ -56,8 +56,8 @@ export default function useUser(): { user: User, mutate: Function } {
   }, [isGapiLoaded, user]);
 
   if (!user) {
-    return { user: emptyUser, mutate };
+    return { user: emptyUser };
   }
 
-  return { user, mutate };
+  return { user };
 }

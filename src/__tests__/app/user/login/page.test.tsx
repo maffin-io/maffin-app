@@ -1,13 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import * as swr from 'swr';
 
 import LoginPage from '@/app/user/login/page';
-import * as userHooks from '@/hooks/useUser';
 
-jest.mock('@/hooks/useUser', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/useUser'),
-}));
+jest.mock('swr');
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
@@ -21,7 +18,6 @@ describe('LoginPage', () => {
   let mockStorageSetItem: jest.SpyInstance;
   let mockRouterPush: jest.Mock;
   let mockRouterPrefetch: jest.Mock;
-  let mockMutate: jest.Mock;
 
   beforeEach(() => {
     requestAccessToken = jest.fn();
@@ -43,16 +39,6 @@ describe('LoginPage', () => {
       push: mockRouterPush,
       prefetch: mockRouterPrefetch,
     }));
-    mockMutate = jest.fn();
-    jest.spyOn(userHooks, 'default').mockReturnValue({
-      user: {
-        name: '',
-        email: '',
-        image: '',
-        isLoggedIn: false,
-      },
-      mutate: mockMutate,
-    });
   });
 
   it('shows loading... when not finished', () => {
@@ -94,7 +80,7 @@ describe('LoginPage', () => {
       'ACCESS_TOKEN',
     );
     expect(mockRouterPush).toHaveBeenCalledWith('/dashboard/accounts');
-    expect(mockMutate).toBeCalledTimes(1);
-    expect(mockMutate).toHaveBeenCalledWith();
+    expect(swr.mutate).toBeCalledTimes(1);
+    expect(swr.mutate).toBeCalledWith('/api/user');
   });
 });

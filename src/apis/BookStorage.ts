@@ -116,11 +116,8 @@ export default class BookStorage {
     const response = await this.driveClient.files.list({
       q: `mimeType = 'application/vnd.google-apps.folder' and name='${app}' and trashed = false`,
     });
-    if (response.result.files!.length > 0 && response.result.files![0].id !== undefined) {
-      return response.result.files![0].id;
-    }
 
-    return '';
+    return response.result.files?.[0]?.id || '';
   }
 
   /**
@@ -136,10 +133,7 @@ export default class BookStorage {
     const response = await this.driveClient.files.list({
       q: `name='${book}.sqlite.gz' and trashed = false and '${this.parentFolderId}' in parents`,
     });
-    if (response.result.files!.length > 0 && response.result.files![0].id !== undefined) {
-      return response.result.files![0].id;
-    }
 
-    return '';
+    return response.result.files?.[0]?.id || '';
   }
 }

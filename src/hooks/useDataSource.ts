@@ -12,7 +12,7 @@ import {
   Transaction,
 } from '@/book/entities';
 
-const DATASOURCE: DataSource = new DataSource({
+export const DATASOURCE: DataSource = new DataSource({
   type: 'sqljs',
   synchronize: true,
   logging: false,

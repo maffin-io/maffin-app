@@ -32,7 +32,7 @@ export default function AccountTypeSelector(
   ).map(type => ({ type }));
 
   return (
-    <Selector
+    <Selector<{ type: string }>
       id={id}
       labelAttribute="type"
       options={types}
