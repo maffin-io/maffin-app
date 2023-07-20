@@ -7,7 +7,7 @@ import {
 import type { DataSource } from 'typeorm';
 
 import type BookStorage from '@/apis/BookStorage';
-import SaveButton from '@/components/SaveButton';
+import SaveButton from '@/components/buttons/SaveButton';
 import * as dataSourceHooks from '@/hooks/useDataSource';
 import * as storageHooks from '@/hooks/useBookStorage';
 

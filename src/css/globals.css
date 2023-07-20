@@ -13,7 +13,7 @@
     @apply bg-gunmetal-800 rounded-md border-none my-3 p-2;
   }
 
-  input:disabled, select:disabled {
+  input:disabled, select:disabled, button:disabled {
     @apply opacity-50;
   }
 
@@ -37,6 +37,10 @@
   }
 
   button.link {
+    @apply text-left text-cyan-700;
+  }
+
+  button.link:not:disabled {
     @apply text-left text-cyan-700 hover:text-cyan-600;
   }
 

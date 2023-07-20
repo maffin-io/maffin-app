@@ -15,7 +15,7 @@ export type SelectorProps<T> = {
   disabled?: boolean,
 };
 
-export default function Selector<T>(
+export default function Selector<T extends object = {}>(
   {
     labelAttribute,
     options,

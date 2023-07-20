@@ -1,11 +1,11 @@
 import React from 'react';
 import { Table } from '@tanstack/react-table';
 
-type PaginationProps = {
-  table: Table<any>,
+type PaginationProps<T> = {
+  table: Table<T>,
 };
 
-export default function Pagination({ table }: PaginationProps): JSX.Element {
+export default function Pagination<T>({ table }: PaginationProps<T>): JSX.Element {
   const { pagination } = table.getState();
   return (
     <div className="flex text-center text-sm items-center px-2 pb-1">

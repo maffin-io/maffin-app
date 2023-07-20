@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 
 import Topbar from '@/layout/Topbar';
 import { AccountSelector } from '@/components/selectors';
-import SaveButton from '@/components/SaveButton';
+import SaveButton from '@/components/buttons/SaveButton';
 import ProfileDropdown from '@/components/ProfileDropdown';
 
 jest.mock('next/navigation', () => ({
@@ -17,7 +17,7 @@ jest.mock('@/components/ProfileDropdown', () => jest.fn(
 ));
 const ProfileDropdownMock = ProfileDropdown as jest.MockedFunction<typeof ProfileDropdown>;
 
-jest.mock('@/components/SaveButton', () => jest.fn(
+jest.mock('@/components/buttons/SaveButton', () => jest.fn(
   () => <div data-testid="SaveButton" />,
 ));
 const SaveButtonMock = SaveButton as jest.MockedFunction<typeof SaveButton>;

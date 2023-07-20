@@ -40,7 +40,6 @@ describe('DashboardLayout', () => {
         image: '',
         isLoggedIn: false,
       },
-      mutate: jest.fn(),
     });
     jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
   });

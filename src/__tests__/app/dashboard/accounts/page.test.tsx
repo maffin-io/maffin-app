@@ -9,7 +9,7 @@ import crypto from 'crypto';
 import type { Account } from '@/book/entities';
 import AccountsPage from '@/app/dashboard/accounts/page';
 import AccountsTable from '@/components/AccountsTable';
-import AddAccountButton from '@/components/AddAccountButton';
+import AddAccountButton from '@/components/buttons/AddAccountButton';
 import { PriceDB, PriceDBMap } from '@/book/prices';
 import * as queries from '@/book/queries';
 
@@ -29,7 +29,7 @@ jest.mock('@/book/queries', () => ({
   ...jest.requireActual('@/book/queries'),
 }));
 
-jest.mock('@/components/AddAccountButton', () => jest.fn(
+jest.mock('@/components/buttons/AddAccountButton', () => jest.fn(
   () => <div data-testid="AddAccountButton" />,
 ));
 const AddAccountButtonMock = AddAccountButton as jest.MockedFunction<typeof AddAccountButton>;
@@ -71,11 +71,7 @@ describe('AccountsPage', () => {
   });
 
   it('mutates when saving an account', async () => {
-    const mockMutate = jest.fn();
-    // @ts-ignore
-    jest.spyOn(swr, 'useSWRConfig').mockReturnValue({
-      mutate: mockMutate,
-    } as ReturnType<typeof swr.useSWRConfig>);
+    jest.spyOn(swr, 'mutate');
     render(
       <swr.SWRConfig value={{ provider: () => new Map() }}>
         <AccountsPage />
@@ -87,9 +83,9 @@ describe('AccountsPage', () => {
     if (onSave) {
       onSave();
     }
-    expect(mockMutate).toBeCalledTimes(2);
-    expect(mockMutate).toHaveBeenNthCalledWith(1, '/api/accounts');
-    expect(mockMutate).toHaveBeenNthCalledWith(2, '/api/accounts/splits');
+    expect(swr.mutate).toBeCalledTimes(2);
+    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/accounts');
+    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/accounts/splits');
   });
 
   it('passes data to table', async () => {

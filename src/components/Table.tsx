@@ -126,7 +126,7 @@ export default function Table<T extends object = {}>(
 
       {
         showPagination
-        && <Pagination table={table} />
+        && <Pagination<T> table={table} />
       }
     </>
   );

@@ -2,12 +2,12 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { useSWRConfig } from 'swr';
+import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
 import { Split } from '@/book/entities';
 import TransactionsTable from '@/components/TransactionsTable';
-import AddTransactionButton from '@/components/AddTransactionButton';
+import AddTransactionButton from '@/components/buttons/AddTransactionButton';
 import { getAccountsWithPath } from '@/book/queries';
 
 export type AccountPageProps = {
@@ -17,7 +17,6 @@ export type AccountPageProps = {
 };
 
 export default function AccountPage({ params }: AccountPageProps): JSX.Element {
-  const { mutate } = useSWRConfig();
   let { data: accounts } = useSWRImmutable(
     '/api/accounts',
     getAccountsWithPath,

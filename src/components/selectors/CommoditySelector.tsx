@@ -36,7 +36,7 @@ export default function CommoditySelector(
   );
 
   return (
-    <Selector
+    <Selector<Commodity>
       id={id}
       labelAttribute="mnemonic"
       options={commodities}

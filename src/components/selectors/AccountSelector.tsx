@@ -40,7 +40,7 @@ export default function AccountSelector(
   }
 
   return (
-    <Selector
+    <Selector<Account>
       id={id}
       labelAttribute="path"
       options={accounts}

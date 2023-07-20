@@ -5,8 +5,9 @@ import {
   fireEvent,
 } from '@testing-library/react';
 
-import AddAccountButton from '@/components/AddAccountButton';
-import AccountForm from '@/components/forms/account/AccountForm';
+import { Account } from '@/book/entities';
+import AddTransactionButton from '@/components/buttons/AddTransactionButton';
+import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import Modal from '@/components/Modal';
 
 jest.mock('@/components/Modal', () => jest.fn(
@@ -18,38 +19,48 @@ jest.mock('@/components/Modal', () => jest.fn(
 ));
 const ModalMock = Modal as jest.MockedFunction<typeof Modal>;
 
-jest.mock('@/components/forms/account/AccountForm', () => jest.fn(
-  () => <div data-testid="AccountForm" />,
-).mockName('AccountForm'));
-const AccountFormMock = AccountForm as jest.MockedFunction<typeof AccountForm>;
+jest.mock('@/components/forms/transaction/TransactionForm', () => jest.fn(
+  () => <div data-testid="TransactionForm" />,
+).mockName('TransactionForm'));
+const TransactionFormMock = TransactionForm as jest.MockedFunction<typeof TransactionForm>;
 
-describe('AddAccountButton', () => {
+describe('AddTransactionButton', () => {
   it('renders hidden modal on mount', async () => {
     const mockOnSave = jest.fn();
     render(
-      <AddAccountButton
+      <AddTransactionButton
         onSave={mockOnSave}
+        account={
+          {
+            guid: 'guid',
+            path: 'account:path',
+          } as Account
+        }
       />,
     );
     expect(Modal).toHaveBeenLastCalledWith(
       expect.objectContaining({
         open: false,
         setOpen: expect.any(Function),
-        title: 'Add account',
+        title: 'Add transaction',
       }),
       {},
     );
 
     const { children } = ModalMock.mock.calls[0][0];
     // @ts-ignore
-    expect(children.type.getMockName()).toEqual('AccountForm');
-    expect(AccountForm).toHaveBeenLastCalledWith(
+    expect(children.type.getMockName()).toEqual('TransactionForm');
+    expect(TransactionForm).toHaveBeenLastCalledWith(
       {
+        account: {
+          guid: 'guid',
+          path: 'account:path',
+        },
         onSave: expect.any(Function),
       },
       {},
     );
-    const { onSave } = AccountFormMock.mock.calls[0][0];
+    const { onSave } = TransactionFormMock.mock.calls[0][0];
     expect(mockOnSave).toBeCalledTimes(0);
     if (onSave) {
       onSave();
@@ -59,12 +70,18 @@ describe('AddAccountButton', () => {
 
   it('opens modal when clicking the button', async () => {
     render(
-      <AddAccountButton
+      <AddTransactionButton
         onSave={jest.fn()}
+        account={
+          {
+            guid: 'guid',
+            path: 'account:path',
+          } as Account
+        }
       />,
     );
 
-    const button = await screen.findByRole('button', { name: /add account/i });
+    const button = await screen.findByRole('button', { name: /add transaction/i });
     fireEvent.click(button);
 
     const modal = await screen.findByTestId('Modal');
