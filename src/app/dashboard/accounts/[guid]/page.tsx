@@ -9,6 +9,7 @@ import { Split } from '@/book/entities';
 import TransactionsTable from '@/components/TransactionsTable';
 import AddTransactionButton from '@/components/buttons/AddTransactionButton';
 import { getAccountsWithPath } from '@/book/queries';
+import { useDataSource } from '@/hooks';
 
 export type AccountPageProps = {
   params: {
@@ -17,6 +18,7 @@ export type AccountPageProps = {
 };
 
 export default function AccountPage({ params }: AccountPageProps): JSX.Element {
+  const { save } = useDataSource();
   let { data: accounts } = useSWRImmutable(
     '/api/accounts',
     getAccountsWithPath,
@@ -90,7 +92,10 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
         <div className="col-span-2 col-end-13 justify-self-end">
           <AddTransactionButton
             account={account}
-            onSave={() => mutate(`/api/splits/${params.guid}`)}
+            onSave={() => {
+              save();
+              mutate(`/api/splits/${params.guid}`);
+            }}
           />
         </div>
       </div>

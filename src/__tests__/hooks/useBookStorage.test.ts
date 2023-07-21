@@ -23,7 +23,7 @@ describe('useBookStorage', () => {
   it('returns null if gapi not loaded', () => {
     const { result } = renderHook(() => useBookStorage());
 
-    expect(result.current).toEqual([null]);
+    expect(result.current).toEqual({ storage: null });
   });
 
   it('returns storage if gapi is loaded', async () => {
@@ -38,7 +38,7 @@ describe('useBookStorage', () => {
     rerender();
 
     await waitFor(() => {
-      expect(result.current).toEqual([expect.any(BookStorage)]);
+      expect(result.current).toEqual({ storage: expect.any(BookStorage) });
     });
   });
 
@@ -52,7 +52,7 @@ describe('useBookStorage', () => {
     rerender();
 
     await waitFor(() => {
-      expect(result.current).toEqual([expect.any(BookStorage)]);
+      expect(result.current).toEqual({ storage: expect.any(BookStorage) });
     });
     expect(BookStorage.prototype.initStorage).toBeCalledTimes(1);
   });

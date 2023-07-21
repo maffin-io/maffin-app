@@ -1,15 +1,16 @@
 import React from 'react';
 import {
+  act,
   render,
   screen,
   fireEvent,
+  waitFor,
 } from '@testing-library/react';
-import type { DataSource } from 'typeorm';
+import { SWRConfig, mutate } from 'swr';
 
-import type BookStorage from '@/apis/BookStorage';
 import SaveButton from '@/components/buttons/SaveButton';
+import type { UseDataSourceReturn } from '@/hooks';
 import * as dataSourceHooks from '@/hooks/useDataSource';
-import * as storageHooks from '@/hooks/useBookStorage';
 
 jest.mock('@/hooks/useDataSource', () => ({
   __esModule: true,
@@ -22,56 +23,66 @@ jest.mock('@/hooks/useBookStorage', () => ({
 }));
 
 describe('SaveButton', () => {
-  it('loads while unavailable datasource', () => {
-    const { container } = render(<SaveButton />);
-    expect(container).toMatchSnapshot();
-  });
-
-  it('loads while unavailable bookstorage', () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-
-    const { container } = render(<SaveButton />);
-    expect(container).toMatchSnapshot();
-  });
-
-  it('shows Save text when ready', () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
-    jest.spyOn(storageHooks, 'default').mockReturnValue([{} as BookStorage]);
-
-    const { container } = render(<SaveButton />);
-
-    expect(container).toMatchSnapshot();
-  });
-
-  it('exports and saves book', () => {
-    const mockExportDatabase = jest.fn().mockReturnValue(
-      new Uint8Array([1, 2]),
-    ) as typeof DataSource.prototype.sqljsManager.exportDatabase;
+  it('loads while unavailable datasource', async () => {
     jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
-      [
-        {
-          sqljsManager: {
-            exportDatabase: mockExportDatabase,
-          },
-        } as DataSource,
-      ],
+      { isLoaded: false } as UseDataSourceReturn,
     );
-    const mockSave = jest.fn() as typeof BookStorage.prototype.save;
-    jest.spyOn(storageHooks, 'default').mockReturnValue(
-      [
-        {
-          save: mockSave,
-        } as BookStorage,
-      ],
+    const { container } = render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <SaveButton />
+      </SWRConfig>,
     );
 
-    render(<SaveButton />);
+    await screen.findByText('...');
+    expect(container).toMatchSnapshot();
+  });
+
+  it('renders as expected when datasource ready and not saving', async () => {
+    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
+      { isLoaded: true } as UseDataSourceReturn,
+    );
+    const { container } = render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <SaveButton />
+      </SWRConfig>,
+    );
+
+    await screen.findByText('Save');
+    expect(container).toMatchSnapshot();
+  });
+
+  it('renders as expected when datasource ready and saving', async () => {
+    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
+      { isLoaded: true } as UseDataSourceReturn,
+    );
+    const { container } = render(<SaveButton />);
+
+    act(() => {
+      mutate('/state/save', true, { revalidate: false });
+    });
+
+    expect(screen.getByRole('button')).toBeDisabled();
+    expect(container).toMatchSnapshot();
+  });
+
+  it('calls datasource save on click', async () => {
+    const mockSave = jest.fn();
+    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
+      {
+        isLoaded: true,
+        save: mockSave as Function,
+      } as UseDataSourceReturn,
+    );
+    render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <SaveButton />
+      </SWRConfig>,
+    );
 
     const button = screen.getByText('Save');
 
     fireEvent.click(button);
 
-    expect(mockExportDatabase).toHaveBeenCalledWith();
-    expect(mockSave).toHaveBeenCalledWith(new Uint8Array([1, 2]));
+    await waitFor(() => expect(mockSave).toBeCalledTimes(1));
   });
 });

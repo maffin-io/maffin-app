@@ -12,6 +12,8 @@ import AccountsTable from '@/components/AccountsTable';
 import AddAccountButton from '@/components/buttons/AddAccountButton';
 import { PriceDB, PriceDBMap } from '@/book/prices';
 import * as queries from '@/book/queries';
+import * as dataSourceHooks from '@/hooks/useDataSource';
+import type { UseDataSourceReturn } from '@/hooks';
 
 Object.defineProperty(global.self, 'crypto', {
   value: {
@@ -22,6 +24,11 @@ Object.defineProperty(global.self, 'crypto', {
 jest.mock('swr', () => ({
   __esModule: true,
   ...jest.requireActual('swr'),
+}));
+
+jest.mock('@/hooks/useDataSource', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/useDataSource'),
 }));
 
 jest.mock('@/book/queries', () => ({
@@ -70,7 +77,11 @@ describe('AccountsPage', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('mutates when saving an account', async () => {
+  it('mutates and saves when creating an account', async () => {
+    const mockSave = jest.fn();
+    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
+      { save: mockSave as Function } as UseDataSourceReturn,
+    );
     jest.spyOn(swr, 'mutate');
     render(
       <swr.SWRConfig value={{ provider: () => new Map() }}>
@@ -86,6 +97,7 @@ describe('AccountsPage', () => {
     expect(swr.mutate).toBeCalledTimes(2);
     expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/accounts');
     expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/accounts/splits');
+    expect(mockSave).toBeCalledTimes(1);
   });
 
   it('passes data to table', async () => {

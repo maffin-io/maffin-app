@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import type { DataSource } from 'typeorm';
 
+import type { UseDataSourceReturn } from '@/hooks';
 import DashboardLayout from '@/app/dashboard/layout';
 import Topbar from '@/layout/Topbar';
 import LeftSidebar from '@/layout/LeftSidebar';
@@ -41,7 +41,9 @@ describe('DashboardLayout', () => {
         isLoggedIn: false,
       },
     });
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([{} as DataSource]);
+    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
+      { isLoaded: true } as UseDataSourceReturn,
+    );
   });
 
   it('returns loading when no user available', async () => {
@@ -59,7 +61,9 @@ describe('DashboardLayout', () => {
   });
 
   it('returns loading when datasource not available', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue([null]);
+    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
+      { isLoaded: false } as UseDataSourceReturn,
+    );
     jest.spyOn(userHooks, 'default').mockReturnValue({
       user: {
         name: 'name',
@@ -67,7 +71,6 @@ describe('DashboardLayout', () => {
         image: 'image',
         isLoggedIn: true,
       },
-      mutate: jest.fn(),
     });
     const { container } = render(
       <DashboardLayout>
@@ -90,7 +93,6 @@ describe('DashboardLayout', () => {
         image: 'image',
         isLoggedIn: true,
       },
-      mutate: jest.fn(),
     });
 
     const { container } = render(
