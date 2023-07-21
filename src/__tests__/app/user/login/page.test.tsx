@@ -81,6 +81,6 @@ describe('LoginPage', () => {
     );
     expect(mockRouterPush).toHaveBeenCalledWith('/dashboard/accounts');
     expect(swr.mutate).toBeCalledTimes(1);
-    expect(swr.mutate).toBeCalledWith('/api/user');
+    expect(swr.mutate).toBeCalledWith('/api/user', null, { revalidate: true });
   });
 });

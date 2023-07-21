@@ -17,7 +17,7 @@ export default function LoginPage(): JSX.Element {
       scope: 'email profile https://www.googleapis.com/auth/drive.file',
       callback: async (tokenResponse) => {
         localStorage.setItem('accessToken', tokenResponse.access_token);
-        mutate('/api/user');
+        mutate('/api/user', null, { revalidate: true });
         router.push('/dashboard/accounts');
       },
     }));
