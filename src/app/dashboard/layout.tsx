@@ -2,8 +2,8 @@
 
 import React from 'react';
 
+import { useDataSource } from '@/hooks';
 import useUser from '@/hooks/useUser';
-import useDataSource from '@/hooks/useDataSource';
 import Footer from '@/layout/Footer';
 import LeftSidebar from '@/layout/LeftSidebar';
 import Topbar from '@/layout/Topbar';
@@ -12,9 +12,9 @@ export default function DashboardLayout({
   children,
 }: React.PropsWithChildren): JSX.Element {
   const { user } = useUser();
-  const [datasource] = useDataSource();
+  const { isLoaded } = useDataSource();
 
-  if (!user || !datasource || user.isLoggedIn === false) {
+  if (!user || !isLoaded || user.isLoggedIn === false) {
     return <div>Loading...</div>;
   }
 

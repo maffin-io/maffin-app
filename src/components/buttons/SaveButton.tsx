@@ -1,13 +1,17 @@
 import React from 'react';
-import { BiCloudUpload } from 'react-icons/bi';
+import { BiCloudUpload, BiLoader } from 'react-icons/bi';
+import useSWRImmutable from 'swr/immutable';
 
-import { useBookStorage, useDataSource } from '@/hooks';
+import { useDataSource } from '@/hooks';
 
 export default function SaveButton(): JSX.Element {
-  const [bookStorage] = useBookStorage();
-  const [datasource] = useDataSource();
+  const { data: isSaving } = useSWRImmutable(
+    '/state/save',
+    () => false,
+  );
+  const { isLoaded, save } = useDataSource();
 
-  if (bookStorage === null || datasource === null) {
+  if (!isLoaded) {
     return (
       <button
         type="button"
@@ -22,13 +26,27 @@ export default function SaveButton(): JSX.Element {
     <button
       type="button"
       className="btn-primary"
+      disabled={isSaving}
       onClick={async () => {
-        const rawBook = datasource?.sqljsManager.exportDatabase();
-        await bookStorage?.save(rawBook);
+        await save();
       }}
     >
-      <BiCloudUpload className="mr-1" />
-      Save
+      {
+        (
+          isSaving
+          && (
+          <>
+            <BiLoader className="mr-1 animate-spin" />
+            <span>Saving...</span>
+          </>
+          )
+        ) || (
+          <>
+            <BiCloudUpload className="mr-1" />
+            <span>Save</span>
+          </>
+        )
+      }
     </button>
   );
 }

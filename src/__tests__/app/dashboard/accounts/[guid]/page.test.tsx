@@ -11,10 +11,17 @@ import TransactionsTable from '@/components/TransactionsTable';
 import AddTransactionButton from '@/components/buttons/AddTransactionButton';
 import { Account, Split } from '@/book/entities';
 import * as queries from '@/book/queries';
+import * as dataSourceHooks from '@/hooks/useDataSource';
+import type { UseDataSourceReturn } from '@/hooks';
 
 jest.mock('swr', () => ({
   __esModule: true,
   ...jest.requireActual('swr'),
+}));
+
+jest.mock('@/hooks/useDataSource', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/useDataSource'),
 }));
 
 jest.mock('@/components/buttons/AddTransactionButton', () => jest.fn(
@@ -99,7 +106,12 @@ describe('AccountPage', () => {
     expect(TransactionsTable).toHaveBeenCalledTimes(0);
   });
 
-  it('mutates when saving a transaction', async () => {
+  it('mutates and saves when saving a transaction', async () => {
+    const mockSave = jest.fn();
+    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
+      { save: mockSave as Function } as UseDataSourceReturn,
+    );
+
     render(
       <swr.SWRConfig value={{ provider: () => new Map() }}>
         <AccountPage params={{ guid: 'guid' }} />
@@ -113,6 +125,7 @@ describe('AccountPage', () => {
     }
     expect(swr.mutate).toBeCalledTimes(1);
     expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/guid');
+    expect(mockSave).toBeCalledTimes(1);
   });
 
   it('renders as expected with account', async () => {

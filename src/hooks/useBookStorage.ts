@@ -2,7 +2,11 @@ import React from 'react';
 import useGapiClient from '@/hooks/useGapiClient';
 import BookStorage from '@/apis/BookStorage';
 
-export default function useBookStorage(): [BookStorage | null] {
+type UseBookStorageReturn = {
+  storage: BookStorage | null,
+};
+
+export default function useBookStorage(): UseBookStorageReturn {
   const [isGapiLoaded] = useGapiClient();
   const [storage, setStorage] = React.useState<BookStorage | null>(null);
 
@@ -18,5 +22,5 @@ export default function useBookStorage(): [BookStorage | null] {
     }
   }, [isGapiLoaded]);
 
-  return [storage || null];
+  return { storage };
 }

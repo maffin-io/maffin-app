@@ -1,8 +1,10 @@
 import React from 'react';
 import { DataSource } from 'typeorm';
 import initSqlJs from 'sql.js';
+import { mutate } from 'swr';
 
 import useBookStorage from '@/hooks/useBookStorage';
+import type BookStorage from '@/apis/BookStorage';
 import {
   Account,
   Book,
@@ -12,24 +14,31 @@ import {
   Transaction,
 } from '@/book/entities';
 
-export const DATASOURCE: DataSource = new DataSource({
+export type UseDataSourceReturn = {
+  datasource: DataSource | null,
+  save: () => Promise<void>,
+  importBook: (rawBook: Uint8Array) => Promise<void>,
+  isLoaded: boolean,
+};
+
+const DATASOURCE: DataSource = new DataSource({
   type: 'sqljs',
   synchronize: true,
   logging: false,
   entities: [Account, Book, Commodity, Price, Split, Transaction],
 });
 
-export default function useDataSource(): [DataSource | null] {
-  const [bookStorage] = useBookStorage();
-  const [isLoaded, setIsLoaded] = React.useState(false);
+export default function useDataSource(): UseDataSourceReturn {
+  const { storage } = useBookStorage();
+  const [isLoaded, setIsLoaded] = React.useState(DATASOURCE.isInitialized);
 
   React.useEffect(() => {
     async function load() {
       let rawBook: Uint8Array;
-      if (bookStorage && !DATASOURCE.isInitialized) {
+      if (storage && !DATASOURCE.isInitialized) {
         ([, rawBook] = await Promise.all([
           initSqlJs({ locateFile: file => `https://sql.js.org/dist/${file}` }),
-          bookStorage.get(),
+          storage.get(),
         ]));
 
         // Due to async nature, this value can change between this and the previous statement
@@ -45,19 +54,52 @@ export default function useDataSource(): [DataSource | null] {
           }
           const end = performance.now();
           console.log(`init datasource: ${end - start}ms`);
-          setIsLoaded(true);
         }
+        setIsLoaded(true);
       }
     }
 
     load();
-  }, [bookStorage]);
+  }, [storage]);
 
-  if (!isLoaded && !DATASOURCE.isInitialized) {
-    return [null];
+  if (!isLoaded) {
+    return {
+      datasource: DATASOURCE,
+      save: async () => {},
+      importBook: async () => {},
+      isLoaded: false,
+    };
   }
 
-  return [DATASOURCE];
+  async function save() {
+    mutate('/state/save', true, { revalidate: false });
+    const rawBook = DATASOURCE.sqljsManager.exportDatabase();
+    await (storage as BookStorage).save(rawBook);
+    mutate('/state/save', false, { revalidate: false });
+  }
+
+  async function importBook(rawData: Uint8Array) {
+    const tempDataSource = new DataSource({
+      type: 'sqljs',
+      synchronize: true,
+      database: rawData,
+      logging: false,
+      entities: [Account, Book, Commodity, Price, Split, Transaction],
+    });
+    await tempDataSource.initialize();
+    const rawBook = tempDataSource.sqljsManager.exportDatabase();
+
+    await DATASOURCE.sqljsManager.loadDatabase(rawBook);
+    mutate((key: string) => key.startsWith('/api'));
+    await save();
+  }
+
+  return {
+    datasource: DATASOURCE,
+    save,
+    importBook,
+    isLoaded,
+  };
 }
 
 // TODO: Need to mutate the accounts SWR key so Root is shown!

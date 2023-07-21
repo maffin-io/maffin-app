@@ -3,6 +3,7 @@
 import React from 'react';
 import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
+import { useDataSource } from '@/hooks';
 
 import AccountsTable from '@/components/AccountsTable';
 import AddAccountButton from '@/components/buttons/AddAccountButton';
@@ -10,6 +11,7 @@ import { getAccountsWithPath } from '@/book/queries';
 import { PriceDB, PriceDBMap } from '@/book/prices';
 
 export default function AccountsPage(): JSX.Element {
+  const { save } = useDataSource();
   let { data: accounts } = useSWRImmutable(
     '/api/accounts/splits',
     () => getAccountsWithPath({
@@ -35,6 +37,7 @@ export default function AccountsPage(): JSX.Element {
         <div className="col-span-2 col-end-13 justify-self-end">
           <AddAccountButton
             onSave={() => {
+              save();
               mutate('/api/accounts');
               mutate('/api/accounts/splits');
             }}

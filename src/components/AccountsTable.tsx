@@ -31,10 +31,7 @@ export default function AccountsTable(
 
   const root = accounts.find(a => a.type === 'ROOT');
   if (root && !todayPrices.isEmpty) {
-    const start = performance.now();
     rows = buildNestedRows(root, accounts, todayPrices).subRows;
-    const end = performance.now();
-    console.log(`build nested rows: ${end - start}ms`);
   }
 
   return (
