@@ -7,7 +7,6 @@ import {
   render,
   screen,
 } from '@testing-library/react';
-import crypto from 'crypto';
 
 import {
   Account,
@@ -17,12 +16,6 @@ import {
 } from '@/book/entities';
 import SplitsField from '@/components/forms/transaction/SplitsField';
 import type { FormValues } from '@/components/forms/transaction/types';
-
-Object.defineProperty(global.self, 'crypto', {
-  value: {
-    randomUUID: () => crypto.randomUUID(),
-  },
-});
 
 describe('SplitsField', () => {
   let datasource: DataSource;

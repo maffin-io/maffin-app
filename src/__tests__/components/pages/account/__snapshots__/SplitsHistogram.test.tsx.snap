@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SplitsHistogram creates Chart with expected params 1`] = `
+<div>
+  <div
+    class="bg-gunmetal-700 rounded-sm mb-6 p-4"
+  >
+    <div
+      data-testid="Chart"
+    />
+  </div>
+</div>
+`;

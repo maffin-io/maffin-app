@@ -1,4 +1,5 @@
 import React from 'react';
+import { DateTime } from 'luxon';
 import {
   waitFor,
   render,
@@ -6,9 +7,12 @@ import {
 } from '@testing-library/react';
 import * as swr from 'swr';
 
+import Money from '@/book/Money';
 import AccountPage from '@/app/dashboard/accounts/[guid]/page';
 import TransactionsTable from '@/components/TransactionsTable';
 import AddTransactionButton from '@/components/buttons/AddTransactionButton';
+import SplitsHistogram from '@/components/pages/account/SplitsHistogram';
+import TotalLineChart from '@/components/pages/account/TotalLineChart';
 import { Account, Split } from '@/book/entities';
 import * as queries from '@/book/queries';
 import * as dataSourceHooks from '@/hooks/useDataSource';
@@ -33,6 +37,14 @@ const AddTransactionButtonMock = AddTransactionButton as jest.MockedFunction<
 
 jest.mock('@/components/TransactionsTable', () => jest.fn(
   () => <div data-testid="TransactionsTable" />,
+));
+
+jest.mock('@/components/pages/account/SplitsHistogram', () => jest.fn(
+  () => <div data-testid="SplitsHistogram" />,
+));
+
+jest.mock('@/components/pages/account/TotalLineChart', () => jest.fn(
+  () => <div data-testid="TotalLineChart" />,
 ));
 
 jest.mock('@/book/queries', () => ({
@@ -61,12 +73,23 @@ describe('AccountPage', () => {
         guid: 'guid',
         path: 'path',
         type: 'TYPE',
+        commodity: {
+          mnemonic: 'EUR',
+        },
+        get total() { return new Money(100, 'EUR'); },
       } as Account,
     ]);
     mockFindSplits = jest.spyOn(Split, 'find').mockResolvedValue(
       [
         {
           guid: 'split_guid',
+          transaction: {
+            date: DateTime.fromISO('2023-01-01'),
+          },
+          account: {
+            type: 'TYPE',
+          },
+          quantity: 100,
         } as Split,
       ],
     );
@@ -163,6 +186,11 @@ describe('AccountPage', () => {
           guid: 'guid',
           path: 'path',
           type: 'TYPE',
+          splits: [],
+          commodity: {
+            mnemonic: 'EUR',
+          },
+          total: expect.any(Money),
         },
         onSave: expect.any(Function),
       },
@@ -175,10 +203,58 @@ describe('AccountPage', () => {
             guid: 'guid',
             path: 'path',
             type: 'TYPE',
+            splits: [],
+            commodity: {
+              mnemonic: 'EUR',
+            },
+            total: expect.any(Money),
           },
         ],
         splits: [
-          { guid: 'split_guid' },
+          {
+            guid: 'split_guid',
+            transaction: {
+              date: DateTime.fromISO('2023-01-01'),
+            },
+            account: {
+              type: 'TYPE',
+            },
+            quantity: 100,
+          },
+        ],
+      },
+      {},
+    );
+    expect(SplitsHistogram).toHaveBeenLastCalledWith(
+      {
+        splits: [
+          {
+            guid: 'split_guid',
+            transaction: {
+              date: DateTime.fromISO('2023-01-01'),
+            },
+            account: {
+              type: 'TYPE',
+            },
+            quantity: 100,
+          },
+        ],
+      },
+      {},
+    );
+    expect(TotalLineChart).toHaveBeenLastCalledWith(
+      {
+        splits: [
+          {
+            guid: 'split_guid',
+            transaction: {
+              date: DateTime.fromISO('2023-01-01'),
+            },
+            account: {
+              type: 'TYPE',
+            },
+            quantity: 100,
+          },
         ],
       },
       {},

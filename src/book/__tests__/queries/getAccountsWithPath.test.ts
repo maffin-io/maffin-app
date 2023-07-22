@@ -1,5 +1,4 @@
 import { DataSource } from 'typeorm';
-import crypto from 'crypto';
 
 import {
   Account,
@@ -9,12 +8,6 @@ import {
   Transaction,
 } from '../../entities';
 import { getAccountsWithPath } from '../../queries';
-
-Object.defineProperty(global.self, 'crypto', {
-  value: {
-    randomUUID: () => crypto.randomUUID(),
-  },
-});
 
 describe('getAbsolutePaths', () => {
   let datasource: DataSource;

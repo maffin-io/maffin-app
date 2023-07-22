@@ -1,6 +1,5 @@
 import { DateTime } from 'luxon';
 import { DataSource } from 'typeorm';
-import crypto from 'crypto';
 
 import {
   BaseEntity,
@@ -9,12 +8,6 @@ import {
   Split,
   Account,
 } from '../../entities';
-
-Object.defineProperty(global.self, 'crypto', {
-  value: {
-    randomUUID: () => crypto.randomUUID(),
-  },
-});
 
 describe('Transaction', () => {
   let datasource: DataSource;

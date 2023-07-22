@@ -6,7 +6,6 @@ import {
 import userEvent from '@testing-library/user-event';
 import { DataSource } from 'typeorm';
 import { SWRConfig } from 'swr';
-import crypto from 'crypto';
 
 import { getAllowedSubAccounts } from '@/book/helpers/accountType';
 import * as queries from '@/book/queries';
@@ -23,12 +22,6 @@ jest.mock('@/book/queries', () => ({
   __esModule: true,
   ...jest.requireActual('@/book/queries'),
 }));
-
-Object.defineProperty(global.self, 'crypto', {
-  value: {
-    randomUUID: () => crypto.randomUUID(),
-  },
-});
 
 describe('AccountForm', () => {
   let datasource: DataSource;

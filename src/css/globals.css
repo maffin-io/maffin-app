@@ -33,7 +33,7 @@
   }
 
   .badge {
-    @apply bg-slate-500/20 text-slate-300 inline-block my-1 px-1 py-1 text-xs text-center rounded-md hover:text-slate-300
+    @apply bg-slate-500/20 text-slate-300 inline-block my-1 px-1 py-1 text-xs text-center rounded-md
   }
 
   button.link {

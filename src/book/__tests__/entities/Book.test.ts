@@ -1,5 +1,4 @@
 import { DataSource, BaseEntity } from 'typeorm';
-import crypto from 'crypto';
 
 import {
   Book,
@@ -8,12 +7,6 @@ import {
   Split,
   Account,
 } from '../../entities';
-
-Object.defineProperty(global.self, 'crypto', {
-  value: {
-    randomUUID: () => crypto.randomUUID(),
-  },
-});
 
 describe('Book', () => {
   let instance: Book;

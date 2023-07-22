@@ -1,6 +1,5 @@
 import { DateTime } from 'luxon';
 import { DataSource } from 'typeorm';
-import crypto from 'crypto';
 
 import { PriceDB } from '../../prices';
 import {
@@ -12,12 +11,6 @@ import {
 } from '../../entities';
 import Stocker from '../../../apis/Stocker';
 import { toFixed } from '../../../helpers/number';
-
-Object.defineProperty(global.self, 'crypto', {
-  value: {
-    randomUUID: () => crypto.randomUUID(),
-  },
-});
 
 describe('PriceDB', () => {
   let datasource: DataSource;

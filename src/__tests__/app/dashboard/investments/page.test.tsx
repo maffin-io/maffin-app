@@ -57,6 +57,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       1,
       {
+        className: 'mx-6',
         title: 'Value/Cost',
         stats: '0.00 €',
         description: '0 total invested',
@@ -66,6 +67,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       2,
       {
+        className: 'mx-6',
         title: 'Unrealized Profit',
         stats: '0.00 € (NaN%)',
         description: '0 (NaN%) with dividends',
@@ -76,6 +78,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       3,
       {
+        className: 'mx-6',
         title: 'Realized',
         stats: '0.00 €',
         description: '0.00 € from dividends',
@@ -134,6 +137,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       7,
       {
+        className: 'mx-6',
         title: 'Value/Cost',
         stats: '5.00 €',
         description: '4 total invested',
@@ -143,6 +147,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       8,
       {
+        className: 'mx-6',
         title: 'Unrealized Profit',
         stats: '1.00 € (25%)',
         description: '6 (150%) with dividends',
@@ -153,6 +158,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       9,
       {
+        className: 'mx-6',
         title: 'Realized',
         stats: '15.00 €',
         description: '5.00 € from dividends',
@@ -211,6 +217,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       7,
       {
+        className: 'mx-6',
         title: 'Value/Cost',
         stats: '5.00 $',
         description: '4 total invested',
@@ -220,6 +227,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       8,
       {
+        className: 'mx-6',
         title: 'Unrealized Profit',
         stats: '1.00 $ (25%)',
         description: '6 (150%) with dividends',
@@ -230,6 +238,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       9,
       {
+        className: 'mx-6',
         title: 'Realized',
         stats: '15.00 $',
         description: '5.00 $ from dividends',
