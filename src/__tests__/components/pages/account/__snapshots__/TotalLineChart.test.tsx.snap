@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TotalLineChart creates Chart with expected params 1`] = `
+<div>
+  <div
+    class="bg-gunmetal-700 rounded-sm my-6 mr-6"
+  >
+    <div
+      data-testid="Chart"
+    />
+  </div>
+</div>
+`;

@@ -14,17 +14,89 @@ exports[`AccountPage renders as expected with account 1`] = `
     class="grid grid-cols-12 items-center pb-4"
   >
     <span
-      class="col-span-10 text-xl font-medium"
+      class="col-span-10"
     >
-      path
-       
-      account
+      <span
+        class="text-xl font-medium badge"
+      >
+        path
+         
+        account
+      </span>
     </span>
     <div
       class="col-span-2 col-end-13 justify-self-end"
     >
       <div
         data-testid="AddTransactionButton"
+      />
+    </div>
+  </div>
+  <div
+    class="grid grid-cols-12"
+  >
+    <div
+      class="col-span-6"
+    >
+      <div
+        class="grid grid-cols-12"
+      >
+        <div
+          class="col-span-6"
+        >
+          <div
+            class="mr-6 bg-gunmetal-700 rounded-sm p-6"
+          >
+            <p>
+              You have a total of
+            </p>
+            <p
+              class=" text-2xl font-semibold my-3"
+            >
+              100.00 €
+            </p>
+            <span
+              class="text-sm"
+            >
+              with an average of 100.00 € per month
+            </span>
+          </div>
+        </div>
+        <div
+          class="col-span-6"
+        >
+          <div
+            class="mr-6 bg-gunmetal-700 rounded-sm p-6"
+          >
+            <p>
+              This year there's been a change of
+            </p>
+            <p
+              class=" text-2xl font-semibold my-3"
+            >
+              100.00 €
+            </p>
+            <span
+              class="text-sm"
+            >
+              for this account
+            </span>
+          </div>
+        </div>
+        <div
+          class="col-span-12"
+        >
+          <div
+            data-testid="TotalLineChart"
+          />
+        </div>
+      </div>
+    </div>
+    <div
+      class="col-span-6"
+    >
+      <div
+        data-testid="SplitsHistogram"
       />
     </div>
   </div>

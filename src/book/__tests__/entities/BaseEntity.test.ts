@@ -1,14 +1,7 @@
-import crypto from 'crypto';
 import * as v from 'class-validator';
 import { BaseEntity as BE } from 'typeorm';
 
 import { BaseEntity } from '../../entities';
-
-Object.defineProperty(global.self, 'crypto', {
-  value: {
-    randomUUID: () => crypto.randomUUID(),
-  },
-});
 
 describe('BaseEntity', () => {
   let instance: BaseEntity;

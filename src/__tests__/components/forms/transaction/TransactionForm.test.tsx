@@ -7,7 +7,6 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DataSource } from 'typeorm';
-import crypto from 'crypto';
 
 import Stocker from '@/apis/Stocker';
 import * as queries from '@/book/queries';
@@ -24,12 +23,6 @@ jest.mock('@/book/queries', () => ({
   __esModule: true,
   ...jest.requireActual('@/book/queries'),
 }));
-
-Object.defineProperty(global.self, 'crypto', {
-  value: {
-    randomUUID: () => crypto.randomUUID(),
-  },
-});
 
 describe('TransactionForm', () => {
   let datasource: DataSource;

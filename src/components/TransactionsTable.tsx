@@ -130,7 +130,7 @@ function FromToAccountPartial(
             <li key={split.guid}>
               <Link
                 href={`/dashboard/accounts/${split.account.guid}`}
-                className={classNames('badge', {
+                className={classNames('badge hover:text-slate-300', {
                   'bg-green-500/20 text-green-300': split.account.type === 'INCOME',
                   'bg-red-500/20 text-red-300': split.account.type === 'EXPENSE',
                   'bg-cyan-500/20 text-cyan-300': ['ASSET', 'BANK'].includes(split.account.type),

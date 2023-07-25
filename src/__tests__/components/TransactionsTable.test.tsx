@@ -6,7 +6,6 @@ import {
 } from '@testing-library/react';
 import { DataSource } from 'typeorm';
 import type { LinkProps } from 'next/link';
-import crypto from 'crypto';
 
 import {
   Account,
@@ -16,12 +15,6 @@ import {
 } from '@/book/entities';
 import Table from '@/components/Table';
 import TransactionsTable from '@/components/TransactionsTable';
-
-Object.defineProperty(global.self, 'crypto', {
-  value: {
-    randomUUID: () => crypto.randomUUID(),
-  },
-});
 
 jest.mock('@/components/Table', () => jest.fn(
   () => <div data-testid="Table" />,

@@ -1,6 +1,5 @@
 import { DateTime } from 'luxon';
 import { DataSource } from 'typeorm';
-import crypto from 'crypto';
 
 import {
   Account,
@@ -16,12 +15,6 @@ import { InvestmentAccount } from '../../models';
 jest.mock('../../models', () => ({
   InvestmentAccount: jest.fn(),
 }));
-
-Object.defineProperty(global.self, 'crypto', {
-  value: {
-    randomUUID: () => crypto.randomUUID(),
-  },
-});
 
 describe('getInvestments', () => {
   let datasource: DataSource;

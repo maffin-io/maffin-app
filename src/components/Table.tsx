@@ -54,7 +54,7 @@ export default function Table<T extends object = {}>(
 
   return (
     <>
-      <div className="relative overflow-x-auto">
+      <div className="relative overflow-hidden">
         <table className="w-full text-sm text-left">
           {
             showHeader

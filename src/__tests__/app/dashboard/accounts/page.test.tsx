@@ -4,7 +4,6 @@ import {
   render,
 } from '@testing-library/react';
 import * as swr from 'swr';
-import crypto from 'crypto';
 
 import type { Account } from '@/book/entities';
 import AccountsPage from '@/app/dashboard/accounts/page';
@@ -14,12 +13,6 @@ import { PriceDB, PriceDBMap } from '@/book/prices';
 import * as queries from '@/book/queries';
 import * as dataSourceHooks from '@/hooks/useDataSource';
 import type { UseDataSourceReturn } from '@/hooks';
-
-Object.defineProperty(global.self, 'crypto', {
-  value: {
-    randomUUID: () => crypto.randomUUID(),
-  },
-});
 
 jest.mock('swr', () => ({
   __esModule: true,

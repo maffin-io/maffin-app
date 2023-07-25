@@ -1,13 +1,6 @@
 import { DataSource, BaseEntity } from 'typeorm';
-import crypto from 'crypto';
 
 import { Commodity } from '../../entities';
-
-Object.defineProperty(global.self, 'crypto', {
-  value: {
-    randomUUID: () => crypto.randomUUID(),
-  },
-});
 
 describe('Commodity', () => {
   let instance: Commodity;

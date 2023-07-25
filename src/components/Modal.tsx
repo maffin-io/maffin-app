@@ -10,9 +10,13 @@ export type ModalProps = {
 export default function Modal({
   open, setOpen, title, children,
 }: ModalProps): JSX.Element {
+  if (!open) {
+    return <span />;
+  }
+
   return (
     <div
-      className={`fixed ${open ? 'visible' : 'hidden'} inset-0 bg-white bg-opacity-30 overflow-y-auto h-full w-full z-50`}
+      className="fixed inset-0 bg-white bg-opacity-30 overflow-y-auto h-full w-full z-50"
       id="my-modal"
     >
       <div
