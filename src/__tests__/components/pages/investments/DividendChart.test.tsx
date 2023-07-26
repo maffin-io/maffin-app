@@ -240,4 +240,79 @@ describe('DividendChart', () => {
       },
     );
   });
+
+  it('recalculates monthly with dividend on same ticker/month', () => {
+    render(
+      <DividendChart
+        investments={
+          [
+            {
+              mainCurrency: 'EUR',
+              account: {
+                name: 'Account1',
+              },
+              dividends: [
+                {
+                  when: DateTime.fromISO('2023-01-01', { zone: 'utc' }),
+                  amountInCurrency: new Money(100, 'EUR'),
+                },
+                {
+                  when: DateTime.fromISO('2023-01-20', { zone: 'utc' }),
+                  amountInCurrency: new Money(130, 'EUR'),
+                },
+              ],
+            } as InvestmentAccount,
+          ]
+        }
+      />,
+    );
+
+    const dataPointSelection = ChartMock.mock.calls[0][0].events?.dataPointSelection as Function;
+
+    const mockChart = {
+      w: {
+        globals: {
+          selectedDataPoints: [[0]],
+        },
+        config: {
+          series: [
+            {
+              name: 'dividends',
+              data: [
+                {
+                  dividends: {
+                    Jan: [
+                      {
+                        amount: 100,
+                        ticker: 'Account1',
+                      },
+                      {
+                        amount: 130,
+                        ticker: 'Account1',
+                      },
+                    ],
+                  },
+                  x: '2023',
+                  y: 230,
+                },
+              ],
+            },
+          ],
+        },
+      },
+    };
+    dataPointSelection(jest.fn(), mockChart);
+    expect(mockChartExec).toBeCalledWith(
+      'barMonthly',
+      'updateOptions',
+      {
+        series: [
+          {
+            data: [230, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            name: 'Account1',
+          },
+        ],
+      },
+    );
+  });
 });
