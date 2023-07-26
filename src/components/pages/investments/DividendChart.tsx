@@ -175,7 +175,7 @@ function buildMonthlySeries(
         if (!(dividend.ticker in tickerSeries)) {
           tickerSeries[dividend.ticker] = new Array(12).fill(0);
         }
-        tickerSeries[dividend.ticker][Number(monthNumber)] = dividend.amount;
+        tickerSeries[dividend.ticker][Number(monthNumber)] += dividend.amount;
       });
     }
   });
