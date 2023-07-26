@@ -22,7 +22,7 @@ describe('SplitsHistogram', () => {
     expect(Chart).toBeCalledWith(
       {
         series: [],
-        title: 'Total per month',
+        title: 'Movements per month',
         type: 'bar',
         unit: '',
         xCategories: [
@@ -189,7 +189,7 @@ describe('SplitsHistogram', () => {
             name: '2023',
           },
         ],
-        title: 'Total per month',
+        title: 'Movements per month',
         type: 'bar',
         unit: '€',
         xCategories: [

@@ -10,10 +10,12 @@ import SplitField from './SplitField';
 
 export type SplitsFieldProps = {
   form: UseFormReturn<FormValues>,
+  disabled?: boolean,
 };
 
 export default function SplitsField({
   form,
+  disabled = false,
 }: SplitsFieldProps): JSX.Element {
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -64,6 +66,7 @@ export default function SplitsField({
               <SplitField
                 index={index}
                 form={form}
+                disabled={disabled}
               />
             </div>
             {(
@@ -85,18 +88,23 @@ export default function SplitsField({
         ))
       }
       <p className="invalid-feedback">{form.formState.errors.splits?.message}</p>
-      <button
-        className="link m-3"
-        type="button"
-        onClick={() => (
-          append(Split.create({
-            value: 0,
-            quantity: 0,
-          }))
-        )}
-      >
-        Add split
-      </button>
+      {
+        !disabled
+        && (
+          <button
+            className="link m-3"
+            type="button"
+            onClick={() => (
+              append(Split.create({
+                value: 0,
+                quantity: 0,
+              }))
+            )}
+          >
+            Add split
+          </button>
+        )
+      }
     </>
   );
 }

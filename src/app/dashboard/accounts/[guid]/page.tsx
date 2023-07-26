@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
@@ -13,9 +12,8 @@ import TotalLineChart from '@/components/pages/account/TotalLineChart';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import { Split } from '@/book/entities';
 import TransactionsTable from '@/components/TransactionsTable';
-import AddTransactionButton from '@/components/buttons/AddTransactionButton';
+import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import { getAccountsWithPath } from '@/book/queries';
-import { useDataSource } from '@/hooks';
 
 export type AccountPageProps = {
   params: {
@@ -24,7 +22,6 @@ export type AccountPageProps = {
 };
 
 export default function AccountPage({ params }: AccountPageProps): JSX.Element {
-  const { save } = useDataSource();
   let { data: accounts } = useSWRImmutable(
     '/api/accounts',
     getAccountsWithPath,
@@ -124,6 +121,15 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
     return true;
   });
 
+  const split1 = new Split();
+  split1.value = 0;
+  split1.quantity = 0;
+  split1.fk_account = account;
+
+  const split2 = new Split();
+  split2.value = 0;
+  split2.quantity = 0;
+
   return (
     <>
       <div className="grid grid-cols-12 items-center pb-4">
@@ -143,12 +149,15 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
           </span>
         </span>
         <div className="col-span-2 col-end-13 justify-self-end">
-          <AddTransactionButton
-            account={account}
-            onSave={() => {
-              save();
-              mutate(`/api/splits/${params.guid}`);
-            }}
+          <TransactionFormButton
+            defaultValues={
+              {
+                date: DateTime.now().toISODate() as string,
+                description: '',
+                splits: [split1, split2],
+                fk_currency: account.commodity,
+              }
+            }
           />
         </div>
       </div>

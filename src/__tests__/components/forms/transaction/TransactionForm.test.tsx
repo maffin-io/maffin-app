@@ -86,24 +86,36 @@ describe('TransactionForm', () => {
     await datasource.destroy();
   });
 
-  it('renders as expected', async () => {
+  it.each([
+    'add', 'update', 'delete',
+  ])('renders as expected with action %s', async (action) => {
     const { container } = render(
       <TransactionForm
         onSave={() => {}}
-        account={assetAccount}
+        action={action as 'add' | 'update' | 'delete'}
+        defaultValues={
+          {
+            date: DateTime.now().toISODate() as string,
+            description: '',
+            splits: [
+              Split.create({
+                value: 0,
+                quantity: 0,
+                fk_account: assetAccount,
+              }),
+              Split.create({
+                value: 0,
+                quantity: 0,
+              }),
+            ],
+            fk_currency: assetAccount.commodity,
+          }
+        }
       />,
     );
 
-    await waitFor(() => {
-      // wait for initial validation to appear
-      screen.queryByText('account is required');
-    });
-
     screen.getByLabelText('Date');
     screen.getByLabelText('Description');
-    screen.getByRole('combobox', { name: 'splits.0.account' });
-    screen.getByRole('combobox', { name: 'splits.1.account' });
-    expect(screen.getByText('Save')).toBeDisabled();
     expect(container).toMatchSnapshot();
   });
 
@@ -117,14 +129,26 @@ describe('TransactionForm', () => {
     render(
       <TransactionForm
         onSave={mockSave}
-        account={assetAccount}
+        defaultValues={
+          {
+            date: '',
+            description: '',
+            splits: [
+              Split.create({
+                value: 0,
+                quantity: 0,
+                fk_account: assetAccount,
+              }),
+              Split.create({
+                value: 0,
+                quantity: 0,
+              }),
+            ],
+            fk_currency: assetAccount.commodity,
+          }
+        }
       />,
     );
-
-    await waitFor(() => {
-      // wait for initial validation to appear
-      screen.queryByText('account is required');
-    });
 
     const [q0, q1] = screen.getAllByRole('spinbutton');
     expect(q0).toBeDisabled();
@@ -185,6 +209,7 @@ describe('TransactionForm', () => {
         },
       ],
     });
+    expect(tx.guid.length).toEqual(31);
     expect(mockSave).toHaveBeenCalledTimes(1);
   });
 
@@ -202,14 +227,26 @@ describe('TransactionForm', () => {
     render(
       <TransactionForm
         onSave={mockSave}
-        account={assetAccount}
+        defaultValues={
+          {
+            date: '',
+            description: '',
+            splits: [
+              Split.create({
+                value: 0,
+                quantity: 0,
+                fk_account: assetAccount,
+              }),
+              Split.create({
+                value: 0,
+                quantity: 0,
+              }),
+            ],
+            fk_currency: assetAccount.commodity,
+          }
+        }
       />,
     );
-
-    await waitFor(() => {
-      // wait for initial validation to appear
-      screen.queryByText('account is required');
-    });
 
     const [q0, q1] = screen.getAllByRole('spinbutton');
     expect(q0).toBeDisabled();
@@ -277,6 +314,163 @@ describe('TransactionForm', () => {
         },
       ],
     });
+    expect(tx.guid.length).toEqual(31);
     expect(mockSave).toHaveBeenCalledTimes(1);
+  });
+
+  it('updates transaction', async () => {
+    const user = userEvent.setup();
+    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
+      assetAccount, expenseAccount,
+    ]);
+    const mockSave = jest.fn();
+
+    const { rerender } = render(
+      <TransactionForm
+        action="add"
+        onSave={mockSave}
+        defaultValues={
+          {
+            guid: 'tx_guid',
+            date: DateTime.fromISO('2023-01-01').toISODate() as string,
+            description: 'description',
+            splits: [
+              Split.create({
+                valueNum: -100,
+                valueDenom: 1,
+                quantityNum: -100,
+                quantityDenom: 1,
+                fk_account: assetAccount,
+              }),
+              Split.create({
+                valueNum: 100,
+                valueDenom: 1,
+                quantityNum: 100,
+                quantityDenom: 1,
+                fk_account: expenseAccount,
+              }),
+            ],
+            fk_currency: assetAccount.commodity,
+          }
+        }
+      />,
+    );
+
+    expect(screen.getByText('Save')).toBeEnabled();
+    await user.click(screen.getByText('Save'));
+
+    const tx = await Transaction.findOneOrFail({
+      where: { description: 'description' },
+      relations: {
+        splits: {
+          fk_transaction: {
+            splits: {
+              fk_account: true,
+            },
+          },
+          fk_account: true,
+        },
+      },
+    });
+
+    rerender(
+      <TransactionForm
+        action="update"
+        onSave={mockSave}
+        defaultValues={
+          {
+            ...tx,
+            date: tx.date.toISODate() as string,
+            fk_currency: tx.currency as Commodity,
+          }
+        }
+      />,
+    );
+
+    await user.clear(screen.getByLabelText('Description'));
+    await user.type(screen.getByLabelText('Description'), 'New description');
+
+    await user.click(screen.getByText('Update'));
+
+    const txs = await Transaction.find();
+    expect(txs).toHaveLength(1);
+    expect(txs[0].description).toEqual('New description');
+  });
+
+  it('deletes transaction and splits', async () => {
+    const user = userEvent.setup();
+    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
+      assetAccount, expenseAccount,
+    ]);
+    const mockSave = jest.fn();
+
+    const { rerender } = render(
+      <TransactionForm
+        action="add"
+        onSave={mockSave}
+        defaultValues={
+          {
+            guid: 'tx_guid',
+            date: DateTime.fromISO('2023-01-01').toISODate() as string,
+            description: 'description',
+            splits: [
+              Split.create({
+                valueNum: -100,
+                valueDenom: 1,
+                quantityNum: -100,
+                quantityDenom: 1,
+                fk_account: assetAccount,
+              }),
+              Split.create({
+                valueNum: 100,
+                valueDenom: 1,
+                quantityNum: 100,
+                quantityDenom: 1,
+                fk_account: expenseAccount,
+              }),
+            ],
+            fk_currency: assetAccount.commodity,
+          }
+        }
+      />,
+    );
+
+    expect(screen.getByText('Save')).toBeEnabled();
+    await user.click(screen.getByText('Save'));
+
+    const tx = await Transaction.findOneOrFail({
+      where: { description: 'description' },
+      relations: {
+        splits: {
+          fk_transaction: {
+            splits: {
+              fk_account: true,
+            },
+          },
+          fk_account: true,
+        },
+      },
+    });
+
+    rerender(
+      <TransactionForm
+        action="delete"
+        onSave={mockSave}
+        defaultValues={
+          {
+            ...tx,
+            date: tx.date.toISODate() as string,
+            fk_currency: tx.currency as Commodity,
+          }
+        }
+      />,
+    );
+
+    await user.click(screen.getByText('Delete'));
+
+    const txs = await Transaction.find();
+    expect(txs).toHaveLength(0);
+    const splits = await Split.find();
+    expect(splits).toHaveLength(0);
   });
 });

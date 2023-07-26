@@ -46,6 +46,7 @@ export default function Selector<T extends object = {}>(
         if (onChange) {
           onChange(newValue);
         }
+        ref.current?.blur();
       }}
       isClearable={isClearable}
       isDisabled={disabled}
@@ -68,7 +69,14 @@ export default function Selector<T extends object = {}>(
       }}
       classNames={{
         // We set h-9 so it's the same as other inputs
-        control: () => '!h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none',
+        control: (state) => {
+          const styles = '!h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none';
+          if (state.isDisabled) {
+            // For some reason putting focus:bg-gunmetal-700 doesnt work
+            return `opacity-50 ${styles}`;
+          }
+          return styles;
+        },
         indicatorSeparator: () => 'hidden',
         menu: () => 'text-sm !bg-gunmetal-800',
         option: (state) => {
