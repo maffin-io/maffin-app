@@ -3,12 +3,15 @@ import { ColumnDef, CellContext, Row } from '@tanstack/react-table';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
+import { BiEdit, BiXCircle } from 'react-icons/bi';
 
+import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import Table from '@/components/Table';
 import Tooltip from '@/components/Tooltip';
 import Money from '@/book/Money';
 import {
   Account,
+  Commodity,
   Split,
 } from '@/book/entities';
 
@@ -111,6 +114,40 @@ const columns: ColumnDef<Split>[] = [
         </span>
       );
     },
+  },
+  {
+    header: 'Actions',
+    enableSorting: false,
+    cell: ({ row }) => (
+      <>
+        <TransactionFormButton
+          action="update"
+          defaultValues={
+            {
+              ...row.original.transaction,
+              date: row.original.transaction.date.toISODate() as string,
+              fk_currency: row.original.transaction.currency as Commodity,
+            }
+          }
+          className="link"
+        >
+          <BiEdit className="flex" />
+        </TransactionFormButton>
+        <TransactionFormButton
+          action="delete"
+          defaultValues={
+            {
+              ...row.original.transaction,
+              date: row.original.transaction.date.toISODate() as string,
+              fk_currency: row.original.transaction.currency as Commodity,
+            }
+          }
+          className="link"
+        >
+          <BiXCircle className="flex" />
+        </TransactionFormButton>
+      </>
+    ),
   },
 ];
 

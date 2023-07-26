@@ -28,7 +28,7 @@ exports[`AccountPage renders as expected with account 1`] = `
       class="col-span-2 col-end-13 justify-self-end"
     >
       <div
-        data-testid="AddTransactionButton"
+        data-testid="TransactionFormButton"
       />
     </div>
   </div>

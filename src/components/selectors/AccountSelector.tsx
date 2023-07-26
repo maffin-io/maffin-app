@@ -12,6 +12,7 @@ export type AccountSelectorProps = {
   id?: string,
   showRoot?: boolean,
   isClearable?: boolean,
+  disabled?: boolean,
   className?: string,
   onChange?: Function,
 };
@@ -24,6 +25,7 @@ export default function AccountSelector(
     id = 'accountSelector',
     showRoot = false,
     isClearable = true,
+    disabled = false,
     className = '',
     onChange = () => {},
   }: AccountSelectorProps,
@@ -39,6 +41,13 @@ export default function AccountSelector(
     accounts = accounts.filter(account => account.type !== 'ROOT');
   }
 
+  // We do this because received account may not have 'path' attribute.
+  // This way we ensure it's always there.
+  let account: Account | undefined = defaultValue;
+  if (defaultValue) {
+    account = accounts.find(a => defaultValue.guid === a.guid);
+  }
+
   return (
     <Selector<Account>
       id={id}
@@ -47,7 +56,8 @@ export default function AccountSelector(
       onChange={onChange}
       placeholder={placeholder || 'Choose account'}
       isClearable={isClearable}
-      defaultValue={defaultValue}
+      disabled={disabled}
+      defaultValue={account}
       className={className}
     />
   );

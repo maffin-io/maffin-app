@@ -1,6 +1,7 @@
 import type { Commodity, Split } from '@/book/entities';
 
 export type FormValues = {
+  guid?: string,
   date: string,
   description: string,
   splits: Split[],

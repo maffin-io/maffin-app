@@ -16,18 +16,20 @@ import type { FormValues } from './types';
 export type SplitFieldProps = {
   index: number;
   form: UseFormReturn<FormValues>,
+  disabled?: boolean,
 };
 
 export default function SplitField({
   index,
   form,
+  disabled = false,
 }: SplitFieldProps): JSX.Element {
   const splits = form.watch('splits');
   const account = form.watch(`splits.${index}.fk_account`) as Account;
   const date = form.watch('date');
   const txCurrency = form.watch('fk_currency');
 
-  const disableValueInputs = !date || !splits.every(split => !!split.account);
+  const disableValueInputs = !date || !splits.every(split => !!split.account) || disabled;
   const showValueField = account && account.commodity.guid !== txCurrency?.guid;
 
   async function onQuantityChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -60,6 +62,7 @@ export default function SplitField({
               <AccountSelector
                 id={`splits.${index}.account`}
                 isClearable={false}
+                disabled={disabled}
                 placeholder="<account>"
                 onChange={async (newValue: Account) => {
                   field.onChange(newValue);

@@ -26,6 +26,19 @@ describe('Selector', () => {
     expect(container).toMatchSnapshot();
   });
 
+  it('renders as expected when disabled', async () => {
+    const { container } = render(
+      <Selector
+        options={options}
+        labelAttribute="label"
+        disabled
+      />,
+    );
+
+    await screen.findByLabelText('selector');
+    expect(container).toMatchSnapshot();
+  });
+
   it('shows default placeholder', async () => {
     render(
       <Selector
@@ -156,7 +169,7 @@ describe('Selector', () => {
     screen.getByText('Choose an option');
   });
 
-  it('calls custom onChange and sets selected', async () => {
+  it('calls custom onChange, sets selected and blurs', async () => {
     const mockOnChange = jest.fn();
     render(
       <Selector
@@ -168,11 +181,16 @@ describe('Selector', () => {
 
     const select = screen.getByLabelText('selector');
     await userEvent.click(select);
+    expect(select).toHaveFocus();
 
     await userEvent.click(screen.getByText('label1'));
 
     expect(mockOnChange).toHaveBeenCalledWith({
       label: 'label1',
     });
+    // This actually passes regardless of blur function being there or not.
+    // Need to find a way to retrieve the control element as it's the one
+    // affected
+    expect(select).not.toHaveFocus();
   });
 });

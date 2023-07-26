@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`TransactionForm renders as expected 1`] = `
+exports[`TransactionForm renders as expected with action add 1`] = `
 <div>
   <form>
     <fieldset
@@ -97,9 +97,10 @@ exports[`TransactionForm renders as expected 1`] = `
                     class=" css-1fdsijx-ValueContainer"
                   >
                     <div
-                      class="!text-inherit css-1dimb5e-singleValue"
+                      class=" css-1jqq78o-placeholder"
+                      id="react-select-2-placeholder"
                     >
-                      Assets:asset1
+                      &lt;account&gt;
                     </div>
                     <div
                       class="!text-inherit css-qbdosj-Input"
@@ -107,6 +108,7 @@ exports[`TransactionForm renders as expected 1`] = `
                     >
                       <input
                         aria-autocomplete="list"
+                        aria-describedby="react-select-2-placeholder"
                         aria-expanded="false"
                         aria-haspopup="true"
                         aria-label="splits.0.account"
@@ -152,7 +154,7 @@ exports[`TransactionForm renders as expected 1`] = `
                 <input
                   name="splits.0.account"
                   type="hidden"
-                  value="Assets:asset1"
+                  value=""
                 />
               </div>
               <p
@@ -381,6 +383,11 @@ exports[`TransactionForm renders as expected 1`] = `
     </fieldset>
     <input
       hidden=""
+      name="guid"
+      type="text"
+    />
+    <input
+      hidden=""
       name="fk_currency"
       type="number"
     />
@@ -389,10 +396,807 @@ exports[`TransactionForm renders as expected 1`] = `
     >
       <button
         class="btn-primary"
-        disabled=""
         type="submit"
       >
         Save
+      </button>
+    </div>
+  </form>
+</div>
+`;
+
+exports[`TransactionForm renders as expected with action delete 1`] = `
+<div>
+  <form>
+    <fieldset
+      class="text-sm my-5"
+    >
+      <label
+        class="inline-block mb-2"
+        for="dateInput"
+      >
+        Date
+      </label>
+      <input
+        class="block w-full m-0"
+        disabled=""
+        id="dateInput"
+        name="date"
+        type="date"
+      />
+      <p
+        class="invalid-feedback"
+      />
+    </fieldset>
+    <fieldset
+      class="text-sm my-5"
+    >
+      <label
+        class="inline-block mb-2"
+        for="descriptionInput"
+      >
+        Description
+      </label>
+      <input
+        class="block w-full m-0"
+        disabled=""
+        id="descriptionInput"
+        name="description"
+        placeholder="Enter description"
+        type="text"
+      />
+      <p
+        class="invalid-feedback"
+      />
+    </fieldset>
+    <fieldset
+      class="text-sm my-5"
+    >
+      <label
+        class="inline-block mb-2"
+      >
+        Splits
+      </label>
+      <fieldset
+        class="grid grid-cols-12"
+      >
+        <div
+          class="col-span-11"
+        >
+          <fieldset
+            class="grid grid-cols-12"
+          >
+            <div
+              class="col-span-9"
+            >
+              <div
+                class=" css-3iigni-container"
+                id="splits.0.account"
+              >
+                <span
+                  class="css-1f43avz-a11yText-A11yText"
+                  id="react-select-6-live-region"
+                />
+                <span
+                  aria-atomic="false"
+                  aria-live="polite"
+                  aria-relevant="additions text"
+                  class="css-1f43avz-a11yText-A11yText"
+                />
+                <div
+                  class="opacity-50 !h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none css-16xfy0z-control"
+                >
+                  <svg
+                    class="absolute text-md left-[10px]"
+                    fill="currentColor"
+                    height="1em"
+                    stroke="currentColor"
+                    stroke-width="0"
+                    viewBox="0 0 24 24"
+                    width="1em"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"
+                    />
+                  </svg>
+                  <div
+                    class=" css-1fdsijx-ValueContainer"
+                  >
+                    <div
+                      class=" css-1jqq78o-placeholder"
+                      id="react-select-6-placeholder"
+                    >
+                      &lt;account&gt;
+                    </div>
+                    <div
+                      class="!text-inherit css-1h01tm3-Input"
+                      data-value=""
+                    >
+                      <input
+                        aria-autocomplete="list"
+                        aria-describedby="react-select-6-placeholder"
+                        aria-expanded="false"
+                        aria-haspopup="true"
+                        aria-label="splits.0.account"
+                        autocapitalize="none"
+                        autocomplete="off"
+                        autocorrect="off"
+                        class=""
+                        disabled=""
+                        id="react-select-6-input"
+                        role="combobox"
+                        spellcheck="false"
+                        style="opacity: 1; width: 100%; grid-area: 1 / 2; min-width: 2px; border: 0px; margin: 0px; outline: 0; padding: 0px;"
+                        tabindex="0"
+                        type="text"
+                        value=""
+                      />
+                    </div>
+                  </div>
+                  <div
+                    class=" css-1hb7zxy-IndicatorsContainer"
+                  >
+                    <span
+                      class="hidden css-894a34-indicatorSeparator"
+                    />
+                    <div
+                      aria-hidden="true"
+                      class=" css-1xc3v61-indicatorContainer"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="css-tj5bde-Svg"
+                        focusable="false"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        width="20"
+                      >
+                        <path
+                          d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p
+                class="invalid-feedback"
+              />
+            </div>
+            <div
+              class="col-span-3"
+            >
+              <span
+                class="absolute px-1 py-2"
+              >
+                €
+              </span>
+              <input
+                aria-label="splits.0.quantity"
+                class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
+                disabled=""
+                name="splits.0.quantity"
+                placeholder="0"
+                step="0.001"
+                type="number"
+              />
+            </div>
+            <div
+              class="col-span-2"
+              hidden=""
+            >
+              <span
+                class="absolute px-1 py-2"
+              >
+                €
+              </span>
+              <input
+                aria-label="splits.0.value"
+                class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
+                disabled=""
+                name="splits.0.value"
+                placeholder="0"
+                step="0.001"
+                type="number"
+              />
+            </div>
+          </fieldset>
+        </div>
+      </fieldset>
+      <fieldset
+        class="grid grid-cols-12"
+      >
+        <div
+          class="col-span-12 py-3 text-lg font-thin justify-self-center"
+        >
+          <div
+            class="p-2 rounded-full"
+          >
+            <svg
+              fill="currentColor"
+              height="1em"
+              stroke="currentColor"
+              stroke-width="0"
+              viewBox="0 0 384 512"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"
+              />
+            </svg>
+          </div>
+        </div>
+        <div
+          class="col-span-11"
+        >
+          <fieldset
+            class="grid grid-cols-12"
+          >
+            <div
+              class="col-span-9"
+            >
+              <div
+                class=" css-3iigni-container"
+                id="splits.1.account"
+              >
+                <span
+                  class="css-1f43avz-a11yText-A11yText"
+                  id="react-select-7-live-region"
+                />
+                <span
+                  aria-atomic="false"
+                  aria-live="polite"
+                  aria-relevant="additions text"
+                  class="css-1f43avz-a11yText-A11yText"
+                />
+                <div
+                  class="opacity-50 !h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none css-16xfy0z-control"
+                >
+                  <svg
+                    class="absolute text-md left-[10px]"
+                    fill="currentColor"
+                    height="1em"
+                    stroke="currentColor"
+                    stroke-width="0"
+                    viewBox="0 0 24 24"
+                    width="1em"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"
+                    />
+                  </svg>
+                  <div
+                    class=" css-1fdsijx-ValueContainer"
+                  >
+                    <div
+                      class=" css-1jqq78o-placeholder"
+                      id="react-select-7-placeholder"
+                    >
+                      &lt;account&gt;
+                    </div>
+                    <div
+                      class="!text-inherit css-1h01tm3-Input"
+                      data-value=""
+                    >
+                      <input
+                        aria-autocomplete="list"
+                        aria-describedby="react-select-7-placeholder"
+                        aria-expanded="false"
+                        aria-haspopup="true"
+                        aria-label="splits.1.account"
+                        autocapitalize="none"
+                        autocomplete="off"
+                        autocorrect="off"
+                        class=""
+                        disabled=""
+                        id="react-select-7-input"
+                        role="combobox"
+                        spellcheck="false"
+                        style="opacity: 1; width: 100%; grid-area: 1 / 2; min-width: 2px; border: 0px; margin: 0px; outline: 0; padding: 0px;"
+                        tabindex="0"
+                        type="text"
+                        value=""
+                      />
+                    </div>
+                  </div>
+                  <div
+                    class=" css-1hb7zxy-IndicatorsContainer"
+                  >
+                    <span
+                      class="hidden css-894a34-indicatorSeparator"
+                    />
+                    <div
+                      aria-hidden="true"
+                      class=" css-1xc3v61-indicatorContainer"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="css-tj5bde-Svg"
+                        focusable="false"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        width="20"
+                      >
+                        <path
+                          d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p
+                class="invalid-feedback"
+              />
+            </div>
+            <div
+              class="col-span-3"
+            >
+              <span
+                class="absolute px-1 py-2"
+              />
+              <input
+                aria-label="splits.1.quantity"
+                class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
+                disabled=""
+                name="splits.1.quantity"
+                placeholder="0"
+                step="0.001"
+                type="number"
+              />
+            </div>
+            <div
+              class="col-span-2"
+              hidden=""
+            >
+              <span
+                class="absolute px-1 py-2"
+              >
+                €
+              </span>
+              <input
+                aria-label="splits.1.value"
+                class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
+                disabled=""
+                name="splits.1.value"
+                placeholder="0"
+                step="0.001"
+                type="number"
+              />
+            </div>
+          </fieldset>
+        </div>
+      </fieldset>
+      <p
+        class="invalid-feedback"
+      />
+    </fieldset>
+    <input
+      hidden=""
+      name="guid"
+      type="text"
+    />
+    <input
+      hidden=""
+      name="fk_currency"
+      type="number"
+    />
+    <div
+      class="flex w-full gap-2 items-center justify-center"
+    >
+      <button
+        class="btn-danger"
+        type="submit"
+      >
+        Delete
+      </button>
+    </div>
+  </form>
+</div>
+`;
+
+exports[`TransactionForm renders as expected with action update 1`] = `
+<div>
+  <form>
+    <fieldset
+      class="text-sm my-5"
+    >
+      <label
+        class="inline-block mb-2"
+        for="dateInput"
+      >
+        Date
+      </label>
+      <input
+        class="block w-full m-0"
+        id="dateInput"
+        name="date"
+        type="date"
+      />
+      <p
+        class="invalid-feedback"
+      />
+    </fieldset>
+    <fieldset
+      class="text-sm my-5"
+    >
+      <label
+        class="inline-block mb-2"
+        for="descriptionInput"
+      >
+        Description
+      </label>
+      <input
+        class="block w-full m-0"
+        id="descriptionInput"
+        name="description"
+        placeholder="Enter description"
+        type="text"
+      />
+      <p
+        class="invalid-feedback"
+      />
+    </fieldset>
+    <fieldset
+      class="text-sm my-5"
+    >
+      <label
+        class="inline-block mb-2"
+      >
+        Splits
+      </label>
+      <fieldset
+        class="grid grid-cols-12"
+      >
+        <div
+          class="col-span-11"
+        >
+          <fieldset
+            class="grid grid-cols-12"
+          >
+            <div
+              class="col-span-9"
+            >
+              <div
+                class=" css-b62m3t-container"
+                id="splits.0.account"
+              >
+                <span
+                  class="css-1f43avz-a11yText-A11yText"
+                  id="react-select-4-live-region"
+                />
+                <span
+                  aria-atomic="false"
+                  aria-live="polite"
+                  aria-relevant="additions text"
+                  class="css-1f43avz-a11yText-A11yText"
+                />
+                <div
+                  class="!h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none css-13cymwt-control"
+                >
+                  <svg
+                    class="absolute text-md left-[10px]"
+                    fill="currentColor"
+                    height="1em"
+                    stroke="currentColor"
+                    stroke-width="0"
+                    viewBox="0 0 24 24"
+                    width="1em"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"
+                    />
+                  </svg>
+                  <div
+                    class=" css-1fdsijx-ValueContainer"
+                  >
+                    <div
+                      class=" css-1jqq78o-placeholder"
+                      id="react-select-4-placeholder"
+                    >
+                      &lt;account&gt;
+                    </div>
+                    <div
+                      class="!text-inherit css-qbdosj-Input"
+                      data-value=""
+                    >
+                      <input
+                        aria-autocomplete="list"
+                        aria-describedby="react-select-4-placeholder"
+                        aria-expanded="false"
+                        aria-haspopup="true"
+                        aria-label="splits.0.account"
+                        autocapitalize="none"
+                        autocomplete="off"
+                        autocorrect="off"
+                        class=""
+                        id="react-select-4-input"
+                        role="combobox"
+                        spellcheck="false"
+                        style="opacity: 1; width: 100%; grid-area: 1 / 2; min-width: 2px; border: 0px; margin: 0px; outline: 0; padding: 0px;"
+                        tabindex="0"
+                        type="text"
+                        value=""
+                      />
+                    </div>
+                  </div>
+                  <div
+                    class=" css-1hb7zxy-IndicatorsContainer"
+                  >
+                    <span
+                      class="hidden css-1u9des2-indicatorSeparator"
+                    />
+                    <div
+                      aria-hidden="true"
+                      class=" css-1xc3v61-indicatorContainer"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="css-tj5bde-Svg"
+                        focusable="false"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        width="20"
+                      >
+                        <path
+                          d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <input
+                  name="splits.0.account"
+                  type="hidden"
+                  value=""
+                />
+              </div>
+              <p
+                class="invalid-feedback"
+              />
+            </div>
+            <div
+              class="col-span-3"
+            >
+              <span
+                class="absolute px-1 py-2"
+              >
+                €
+              </span>
+              <input
+                aria-label="splits.0.quantity"
+                class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
+                disabled=""
+                name="splits.0.quantity"
+                placeholder="0"
+                step="0.001"
+                type="number"
+              />
+            </div>
+            <div
+              class="col-span-2"
+              hidden=""
+            >
+              <span
+                class="absolute px-1 py-2"
+              >
+                €
+              </span>
+              <input
+                aria-label="splits.0.value"
+                class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
+                disabled=""
+                name="splits.0.value"
+                placeholder="0"
+                step="0.001"
+                type="number"
+              />
+            </div>
+          </fieldset>
+        </div>
+      </fieldset>
+      <fieldset
+        class="grid grid-cols-12"
+      >
+        <div
+          class="col-span-12 py-3 text-lg font-thin justify-self-center"
+        >
+          <div
+            class="p-2 rounded-full"
+          >
+            <svg
+              fill="currentColor"
+              height="1em"
+              stroke="currentColor"
+              stroke-width="0"
+              viewBox="0 0 384 512"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"
+              />
+            </svg>
+          </div>
+        </div>
+        <div
+          class="col-span-11"
+        >
+          <fieldset
+            class="grid grid-cols-12"
+          >
+            <div
+              class="col-span-9"
+            >
+              <div
+                class=" css-b62m3t-container"
+                id="splits.1.account"
+              >
+                <span
+                  class="css-1f43avz-a11yText-A11yText"
+                  id="react-select-5-live-region"
+                />
+                <span
+                  aria-atomic="false"
+                  aria-live="polite"
+                  aria-relevant="additions text"
+                  class="css-1f43avz-a11yText-A11yText"
+                />
+                <div
+                  class="!h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none css-13cymwt-control"
+                >
+                  <svg
+                    class="absolute text-md left-[10px]"
+                    fill="currentColor"
+                    height="1em"
+                    stroke="currentColor"
+                    stroke-width="0"
+                    viewBox="0 0 24 24"
+                    width="1em"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"
+                    />
+                  </svg>
+                  <div
+                    class=" css-1fdsijx-ValueContainer"
+                  >
+                    <div
+                      class=" css-1jqq78o-placeholder"
+                      id="react-select-5-placeholder"
+                    >
+                      &lt;account&gt;
+                    </div>
+                    <div
+                      class="!text-inherit css-qbdosj-Input"
+                      data-value=""
+                    >
+                      <input
+                        aria-autocomplete="list"
+                        aria-describedby="react-select-5-placeholder"
+                        aria-expanded="false"
+                        aria-haspopup="true"
+                        aria-label="splits.1.account"
+                        autocapitalize="none"
+                        autocomplete="off"
+                        autocorrect="off"
+                        class=""
+                        id="react-select-5-input"
+                        role="combobox"
+                        spellcheck="false"
+                        style="opacity: 1; width: 100%; grid-area: 1 / 2; min-width: 2px; border: 0px; margin: 0px; outline: 0; padding: 0px;"
+                        tabindex="0"
+                        type="text"
+                        value=""
+                      />
+                    </div>
+                  </div>
+                  <div
+                    class=" css-1hb7zxy-IndicatorsContainer"
+                  >
+                    <span
+                      class="hidden css-1u9des2-indicatorSeparator"
+                    />
+                    <div
+                      aria-hidden="true"
+                      class=" css-1xc3v61-indicatorContainer"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="css-tj5bde-Svg"
+                        focusable="false"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        width="20"
+                      >
+                        <path
+                          d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <input
+                  name="splits.1.account"
+                  type="hidden"
+                  value=""
+                />
+              </div>
+              <p
+                class="invalid-feedback"
+              />
+            </div>
+            <div
+              class="col-span-3"
+            >
+              <span
+                class="absolute px-1 py-2"
+              />
+              <input
+                aria-label="splits.1.quantity"
+                class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
+                disabled=""
+                name="splits.1.quantity"
+                placeholder="0"
+                step="0.001"
+                type="number"
+              />
+            </div>
+            <div
+              class="col-span-2"
+              hidden=""
+            >
+              <span
+                class="absolute px-1 py-2"
+              >
+                €
+              </span>
+              <input
+                aria-label="splits.1.value"
+                class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
+                disabled=""
+                name="splits.1.value"
+                placeholder="0"
+                step="0.001"
+                type="number"
+              />
+            </div>
+          </fieldset>
+        </div>
+      </fieldset>
+      <p
+        class="invalid-feedback"
+      />
+      <button
+        class="link m-3"
+        type="button"
+      >
+        Add split
+      </button>
+    </fieldset>
+    <input
+      hidden=""
+      name="guid"
+      type="text"
+    />
+    <input
+      hidden=""
+      name="fk_currency"
+      type="number"
+    />
+    <div
+      class="flex w-full gap-2 items-center justify-center"
+    >
+      <button
+        class="btn-warn"
+        type="submit"
+      >
+        Update
       </button>
     </div>
   </form>

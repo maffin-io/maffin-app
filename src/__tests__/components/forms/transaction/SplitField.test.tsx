@@ -37,6 +37,14 @@ describe('SplitField', () => {
     expect(container).toMatchSnapshot();
   });
 
+  it('renders disabled', () => {
+    render(<FormWrapper disabled />);
+
+    expect(screen.getByLabelText('splits.1.account')).toBeDisabled();
+    expect(screen.getByRole('spinbutton', { name: 'splits.0.quantity' })).toBeDisabled();
+    expect(screen.getByRole('spinbutton', { name: 'splits.0.value', hidden: true })).toBeDisabled();
+  });
+
   it('enables value field when date filled and account is selected', async () => {
     const user = userEvent.setup();
     render(<FormWrapper />);
@@ -176,7 +184,7 @@ describe('SplitField', () => {
   });
 });
 
-function FormWrapper(): JSX.Element {
+function FormWrapper({ disabled = false }: { disabled?: boolean }): JSX.Element {
   const form = useForm<FormValues>({
     // These values reproduce the same initial state TransactionForm renders
     defaultValues: {
@@ -225,8 +233,8 @@ function FormWrapper(): JSX.Element {
         type="date"
       />
       <SWRConfig value={{ provider: () => new Map() }}>
-        <SplitField index={0} form={form} />
-        <SplitField index={1} form={form} />
+        <SplitField index={0} form={form} disabled={disabled} />
+        <SplitField index={1} form={form} disabled={disabled} />
       </SWRConfig>
     </>
   );

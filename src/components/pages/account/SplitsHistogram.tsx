@@ -69,7 +69,7 @@ export default function SplitsHistogram({
       <Chart
         type="bar"
         series={series}
-        title="Total per month"
+        title="Movements per month"
         xCategories={Object.values(MONTHS)}
         unit={currencyToSymbol(splits[0]?.account.commodity.mnemonic || '')}
         plotOptions={

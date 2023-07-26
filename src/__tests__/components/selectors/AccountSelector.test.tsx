@@ -37,6 +37,7 @@ describe('AccountSelector', () => {
       {
         id: 'accountSelector',
         isClearable: true,
+        disabled: false,
         defaultValue: undefined,
         className: '',
         labelAttribute: 'path',
@@ -50,6 +51,12 @@ describe('AccountSelector', () => {
   });
 
   it('passes data as expected', async () => {
+    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
+      {
+        guid: 'guid',
+        path: 'label1',
+      } as Account,
+    ]);
     const mockOnSave = jest.fn();
     const { container } = render(
       <SWRConfig value={{ provider: () => new Map() }}>
@@ -58,7 +65,7 @@ describe('AccountSelector', () => {
           placeholder="My placeholder"
           isClearable={false}
           className="class"
-          defaultValue={{ path: 'label1' } as Account}
+          defaultValue={{ guid: 'guid' } as Account}
           onChange={mockOnSave}
         />
       </SWRConfig>,
@@ -69,10 +76,11 @@ describe('AccountSelector', () => {
       {
         id: 'customId',
         isClearable: false,
-        defaultValue: { path: 'label1' },
+        disabled: false,
+        defaultValue: { guid: 'guid', path: 'label1' },
         className: 'class',
         labelAttribute: 'path',
-        options: [],
+        options: [{ guid: 'guid', path: 'label1' }],
         placeholder: 'My placeholder',
         onChange: mockOnSave,
       },

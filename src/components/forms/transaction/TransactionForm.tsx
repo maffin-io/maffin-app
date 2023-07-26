@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 
 import {
-  Account,
   Split,
   Transaction,
 } from '@/book/entities';
@@ -14,38 +13,44 @@ import type { FormValues } from './types';
 const resolver = classValidatorResolver(Transaction, { validator: { stopAtFirstError: true } });
 
 export type TransactionFormProps = {
+  action?: 'add' | 'update' | 'delete',
   onSave: Function,
-  account: Account,
+  defaultValues?: FormValues,
 };
 
-export default function TransactionForm({ onSave, account }: TransactionFormProps): JSX.Element {
+export default function TransactionForm({
+  action = 'add',
+  onSave,
+  defaultValues,
+}: TransactionFormProps): JSX.Element {
   const form = useForm<FormValues>({
-    defaultValues: {
-      splits: [
-        Split.create({
-          value: 0,
-          quantity: 0,
-          fk_account: account,
-        }),
-        Split.create({
-          value: 0,
-          quantity: 0,
-        }),
-      ],
-      fk_currency: account.commodity,
-    },
+    defaultValues,
     mode: 'onChange',
     resolver,
   });
 
   const { errors } = form.formState;
 
+  let disabled = false;
+  let submitButtonText = 'Save';
+  let submitButtonClass = 'btn-primary';
+  if (action === 'update') {
+    submitButtonText = 'Update';
+    submitButtonClass = 'btn-warn';
+  }
+  if (action === 'delete') {
+    disabled = true;
+    submitButtonText = 'Delete';
+    submitButtonClass = 'btn-danger';
+  }
+
   return (
-    <form onSubmit={form.handleSubmit((data) => onSubmit(data, onSave))}>
+    <form onSubmit={form.handleSubmit((data) => onSubmit(data, action, onSave))}>
       <fieldset className="text-sm my-5">
         <label htmlFor="dateInput" className="inline-block mb-2">Date</label>
         <input
           id="dateInput"
+          disabled={disabled}
           className="block w-full m-0"
           {...form.register('date')}
           type="date"
@@ -57,6 +62,7 @@ export default function TransactionForm({ onSave, account }: TransactionFormProp
         <label htmlFor="descriptionInput" className="inline-block mb-2">Description</label>
         <input
           id="descriptionInput"
+          disabled={disabled}
           className="block w-full m-0"
           {...form.register('description')}
           type="text"
@@ -68,9 +74,18 @@ export default function TransactionForm({ onSave, account }: TransactionFormProp
       <fieldset className="text-sm my-5">
         <label className="inline-block mb-2">Splits</label>
         <SplitsField
+          disabled={disabled}
           form={form}
         />
       </fieldset>
+
+      <input
+        {...form.register(
+          'guid',
+        )}
+        hidden
+        type="text"
+      />
 
       <input
         {...form.register(
@@ -81,18 +96,31 @@ export default function TransactionForm({ onSave, account }: TransactionFormProp
       />
 
       <div className="flex w-full gap-2 items-center justify-center">
-        <button className="btn-primary" type="submit" disabled={!form.formState.isValid}>
-          Save
+        <button className={submitButtonClass} type="submit" disabled={Object.keys(errors).length > 0}>
+          {submitButtonText}
         </button>
       </div>
     </form>
   );
 }
 
-async function onSubmit(data: FormValues, onSave: Function) {
-  await Transaction.create({
+async function onSubmit(data: FormValues, action: 'add' | 'update' | 'delete', onSave: Function) {
+  const transaction = Transaction.create({
     ...data,
+    guid: data.guid || undefined,
     date: DateTime.fromISO(data.date),
-  }).save();
+  });
+
+  if (action === 'add' || action === 'update') {
+    await transaction.save();
+  }
+
+  if (action === 'delete') {
+    // Not using cascade here because seems it has problems with
+    // old data. Deleting splits manually for now
+    await Split.remove(transaction.splits);
+    await transaction.remove();
+  }
+
   onSave();
 }

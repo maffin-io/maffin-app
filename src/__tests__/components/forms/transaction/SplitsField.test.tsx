@@ -45,6 +45,13 @@ describe('SplitsField', () => {
     expect(container).toMatchSnapshot();
   });
 
+  it('renders renders as expected when disabled', async () => {
+    render(<FormWrapper disabled />);
+
+    expect(await screen.findByLabelText('splits.0.account')).toBeDisabled();
+    expect(screen.queryByText('Add split')).toBeNull();
+  });
+
   it('can remove for N > 2 split fields', async () => {
     const user = userEvent.setup();
     render(<FormWrapper />);
@@ -82,7 +89,7 @@ describe('SplitsField', () => {
   });
 });
 
-function FormWrapper(): JSX.Element {
+function FormWrapper({ disabled = false }: { disabled?: boolean }): JSX.Element {
   const form = useForm<FormValues>({
     defaultValues: {
       splits: [
@@ -129,7 +136,7 @@ function FormWrapper(): JSX.Element {
         {...form.register('date')}
         type="date"
       />
-      <SplitsField form={form} />
+      <SplitsField form={form} disabled={disabled} />
     </form>
   );
 }

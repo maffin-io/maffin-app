@@ -6,6 +6,7 @@ import {
 } from '@testing-library/react';
 import { DataSource } from 'typeorm';
 import type { LinkProps } from 'next/link';
+import { BiEdit, BiXCircle } from 'react-icons/bi';
 
 import {
   Account,
@@ -15,17 +16,26 @@ import {
 } from '@/book/entities';
 import Table from '@/components/Table';
 import TransactionsTable from '@/components/TransactionsTable';
-
-jest.mock('@/components/Table', () => jest.fn(
-  () => <div data-testid="Table" />,
-));
-const TableMock = Table as jest.MockedFunction<typeof Table>;
+import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 
 jest.mock('next/link', () => jest.fn(
   (
     props: LinkProps & { children?: React.ReactNode } & React.HTMLAttributes<HTMLAnchorElement>,
   ) => (
     <a className={props.className} href={props.href.toString()}>{props.children}</a>
+  ),
+));
+
+jest.mock('@/components/Table', () => jest.fn(
+  () => <div data-testid="Table" />,
+));
+const TableMock = Table as jest.MockedFunction<typeof Table>;
+
+jest.mock('@/components/buttons/TransactionFormButton', () => jest.fn(
+  (props: React.PropsWithChildren) => (
+    <div data-testid="TransactionFormButton">
+      {props.children}
+    </div>
   ),
 ));
 
@@ -174,6 +184,11 @@ describe('TransactionsTable', () => {
         },
         {
           header: 'Total',
+          enableSorting: false,
+          cell: expect.any(Function),
+        },
+        {
+          header: 'Actions',
           enableSorting: false,
           cell: expect.any(Function),
         },
@@ -416,6 +431,74 @@ describe('TransactionsTable', () => {
           getCoreRowModel: () => ({ rows: [row1, row2] }),
         },
       }),
+    );
+
+    expect(container).toMatchSnapshot();
+  });
+
+  it('renders Actions column as expected', async () => {
+    render(
+      <TransactionsTable
+        splits={splits}
+        accounts={[
+          {
+            ...account1,
+            path: 'Assets:bank',
+          } as Account,
+          {
+            ...account2,
+            path: 'Expenses:expense',
+          } as Account,
+        ]}
+      />,
+    );
+
+    await screen.findByTestId('Table');
+    const actionsCol = TableMock.mock.calls[0][0].columns[5];
+
+    expect(actionsCol.cell).not.toBeUndefined();
+
+    const { container } = render(
+      // @ts-ignore
+      actionsCol.cell({
+        row: {
+          original: {
+            quantity: 100,
+            account: account1,
+            transaction,
+          },
+        },
+      }),
+    );
+
+    expect(TransactionFormButton).toBeCalledTimes(2);
+    expect(TransactionFormButton).toHaveBeenNthCalledWith(
+      1,
+      {
+        action: 'update',
+        className: 'link',
+        children: <BiEdit className="flex" />,
+        defaultValues: {
+          ...transaction,
+          date: transaction.date.toISODate(),
+          fk_currency: transaction.currency as Commodity,
+        },
+      },
+      {},
+    );
+    expect(TransactionFormButton).toHaveBeenNthCalledWith(
+      2,
+      {
+        action: 'delete',
+        className: 'link',
+        children: <BiXCircle className="flex" />,
+        defaultValues: {
+          ...transaction,
+          date: transaction.date.toISODate(),
+          fk_currency: transaction.currency as Commodity,
+        },
+      },
+      {},
     );
 
     expect(container).toMatchSnapshot();
