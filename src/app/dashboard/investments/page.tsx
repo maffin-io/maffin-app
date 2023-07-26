@@ -4,10 +4,10 @@ import React from 'react';
 import classNames from 'classnames';
 import useSWRImmutable from 'swr/immutable';
 
-import WeightsChart from '@/components/equities/WeightsChart';
-import StatisticsWidget from '@/components/equities/StatisticsWidget';
-import InvestmentsTable from '@/components/equities/InvestmentsTable';
-import DividendChart from '@/components/equities/DividendChart';
+import WeightsChart from '@/components/pages/investments/WeightsChart';
+import StatisticsWidget from '@/components/StatisticsWidget';
+import InvestmentsTable from '@/components/pages/investments/InvestmentsTable';
+import DividendChart from '@/components/pages/investments/DividendChart';
 import { toFixed } from '@/helpers/number';
 import Money from '@/book/Money';
 import { getInvestments, getMainCurrency } from '@/book/queries';

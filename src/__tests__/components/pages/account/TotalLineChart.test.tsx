@@ -9,7 +9,6 @@ import TotalLineChart from '@/components/pages/account/TotalLineChart';
 jest.mock('@/components/charts/Chart', () => jest.fn(
   () => <div data-testid="Chart" />,
 ));
-const ChartMock = Chart as jest.MockedFunction<typeof Chart>;
 
 describe('TotalLineChart', () => {
   afterEach(() => {
@@ -19,7 +18,7 @@ describe('TotalLineChart', () => {
   it('creates Chart with expected params', () => {
     const { container } = render(<TotalLineChart splits={[]} />);
 
-    expect(ChartMock).toBeCalledWith(
+    expect(Chart).toBeCalledWith(
       {
         height: 255,
         series: [{ data: [] }],
@@ -68,7 +67,7 @@ describe('TotalLineChart', () => {
       />,
     );
 
-    expect(ChartMock).toBeCalledWith(
+    expect(Chart).toBeCalledWith(
       {
         height: 255,
         series: [
