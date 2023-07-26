@@ -4,10 +4,10 @@ import { SWRConfig } from 'swr';
 
 import { Commodity } from '@/book/entities';
 import InvestmentsPage from '@/app/dashboard/investments/page';
-import WeightsChart from '@/components/equities/WeightsChart';
-import StatisticsWidget from '@/components/equities/StatisticsWidget';
-import InvestmentsTable from '@/components/equities/InvestmentsTable';
-import DividendChart from '@/components/equities/DividendChart';
+import WeightsChart from '@/components/pages/investments/WeightsChart';
+import StatisticsWidget from '@/components/StatisticsWidget';
+import InvestmentsTable from '@/components/pages/investments/InvestmentsTable';
+import DividendChart from '@/components/pages/investments/DividendChart';
 import Money from '@/book/Money';
 import { InvestmentAccount } from '@/book/models';
 import * as queries from '@/book/queries';
@@ -17,20 +17,20 @@ jest.mock('@/book/queries', () => ({
   ...jest.requireActual('@/book/queries'),
 }));
 
-jest.mock('@/components/equities/WeightsChart', () => jest.fn(
+jest.mock('@/components/pages/investments/WeightsChart', () => jest.fn(
   () => <div data-testid="WeightsChart" />,
 ));
 const WeightsChartMock = WeightsChart as jest.MockedFunction<typeof WeightsChart>;
 
-jest.mock('@/components/equities/StatisticsWidget', () => jest.fn(
+jest.mock('@/components/StatisticsWidget', () => jest.fn(
   () => <div data-testid="StatisticsWidget" />,
 ));
 
-jest.mock('@/components/equities/DividendChart', () => jest.fn(
+jest.mock('@/components/pages/investments/DividendChart', () => jest.fn(
   () => <div data-testid="DividendChart" />,
 ));
 
-jest.mock('@/components/equities/InvestmentsTable', () => jest.fn(
+jest.mock('@/components/pages/investments/InvestmentsTable', () => jest.fn(
   () => <div data-testid="InvestmentsTable" />,
 ));
 

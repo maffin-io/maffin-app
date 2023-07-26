@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 
-import StatisticsWidget from '@/components/equities/StatisticsWidget';
+import StatisticsWidget from '@/components/StatisticsWidget';
 
 describe('StatisticsWidget', () => {
   it('renders as expected', () => {

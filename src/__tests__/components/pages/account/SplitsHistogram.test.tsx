@@ -19,16 +19,24 @@ describe('SplitsHistogram', () => {
   it('creates Chart with expected params', () => {
     const { container } = render(<SplitsHistogram splits={[]} />);
 
-    expect(ChartMock).toBeCalledWith(
+    expect(Chart).toBeCalledWith(
       {
         series: [],
-        hideSeries: [],
         title: 'Total per month',
         type: 'bar',
         unit: '',
         xCategories: [
           'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
         ],
+        events: {
+          mounted: expect.any(Function),
+        },
+        plotOptions: {
+          bar: {
+            columnWidth: '55%',
+            horizontal: false,
+          },
+        },
       },
       {},
     );
@@ -71,9 +79,8 @@ describe('SplitsHistogram', () => {
       />,
     );
 
-    expect(ChartMock).toBeCalledWith(
+    expect(Chart).toBeCalledWith(
       {
-        hideSeries: ['2022'],
         series: [
           {
             data: [
@@ -188,8 +195,58 @@ describe('SplitsHistogram', () => {
         xCategories: [
           'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
         ],
+        events: {
+          mounted: expect.any(Function),
+        },
+        plotOptions: {
+          bar: {
+            columnWidth: '55%',
+            horizontal: false,
+          },
+        },
       },
       {},
     );
+  });
+
+  it('hides all series except last', () => {
+    render(
+      <SplitsHistogram
+        splits={[
+          {
+            account: {
+              type: 'ASSET',
+              commodity: {
+                mnemonic: 'EUR',
+              },
+            },
+            transaction: {
+              date: DateTime.fromISO('2023-01-02', { zone: 'utc' }),
+            },
+            quantity: 100,
+          } as Split,
+          {
+            account: {
+              // This is not very accurate as type is always the same but
+              // this way we test INCOME behavior in this same test
+              type: 'INCOME',
+              commodity: {
+                mnemonic: 'EUR',
+              },
+            },
+            transaction: {
+              date: DateTime.fromISO('2022-01-01', { zone: 'utc' }),
+            },
+            quantity: -200,
+          } as Split,
+        ]}
+      />,
+    );
+
+    const mountedEvent = ChartMock.mock.calls[0][0].events?.mounted as Function;
+    const mockHideSeries = jest.fn();
+    mountedEvent({ hideSeries: mockHideSeries });
+    expect(mockHideSeries).toBeCalledTimes(1);
+    expect(mockHideSeries).toBeCalledWith('2022');
   });
 });

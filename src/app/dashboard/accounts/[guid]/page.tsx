@@ -10,7 +10,7 @@ import { DateTime } from 'luxon';
 import Money from '@/book/Money';
 import SplitsHistogram from '@/components/pages/account/SplitsHistogram';
 import TotalLineChart from '@/components/pages/account/TotalLineChart';
-import StatisticsWidget from '@/components/equities/StatisticsWidget';
+import StatisticsWidget from '@/components/StatisticsWidget';
 import { Split } from '@/book/entities';
 import TransactionsTable from '@/components/TransactionsTable';
 import AddTransactionButton from '@/components/buttons/AddTransactionButton';

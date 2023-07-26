@@ -7,16 +7,24 @@ import { ApexOptions } from 'apexcharts';
 import { toFixed } from '@/helpers/number';
 
 export type ChartProps = {
-  type: 'line' | 'bar' | 'pie' | 'donut',
+  type: 'line' | 'bar' | 'pie' | 'donut' | 'treemap',
   series?: ApexOptions['series'],
   labels?: string[],
+  id?: string,
   title?: string,
   showLegend?: boolean,
   xCategories?: string[],
-  hideSeries?: string[],
   unit?: string,
+  stacked?: boolean,
   height?: number,
   xAxisType?: 'datetime' | 'category' | 'numeric' | undefined,
+  yFormatter?: (val: number, opts?: any) => string,
+  events?: {
+    mounted?(chart: any, options?: any): void
+    dataPointSelection?(e: any, chart?: any, options?: any): void
+  },
+  dataLabels?: ApexOptions['dataLabels'],
+  plotOptions?: ApexOptions['plotOptions'],
 };
 
 // apexcharts import references window so we need this
@@ -33,20 +41,31 @@ const ApexChart = dynamic(
 
 export default function Chart({
   type,
-  title = '',
+  title,
+  id,
+  yFormatter,
   series = [],
   labels = [],
   showLegend = true,
+  stacked = false,
   xCategories = [],
-  hideSeries = [],
   unit = '',
   height = 400,
   xAxisType = undefined,
+  dataLabels = {
+    enabled: false,
+  },
+  plotOptions = {},
+  events = {},
 }: ChartProps): JSX.Element {
   if (!series?.length) {
     return (
       <span>Loading...</span>
     );
+  }
+
+  if (!yFormatter) {
+    yFormatter = (val: number) => `${toFixed(val)}${unit}`;
   }
 
   let options = OPTIONS;
@@ -55,18 +74,15 @@ export default function Chart({
     labels,
     chart: {
       ...options.chart,
-      id: title,
-      events: {
-        mounted: (chart) => hideSeries.forEach(name => {
-          try {
-            chart.hideSeries(name);
-          } catch {
-            // this fails sometimes for some reason but still renders
-            // as expected. Adding the catch to protect against that.
-          }
-        }),
+      id,
+      sparkline: {
+        enabled: type === 'treemap',
       },
+      stacked,
+      events,
     },
+    dataLabels,
+    plotOptions,
     legend: {
       show: showLegend,
     },
@@ -81,13 +97,13 @@ export default function Chart({
     },
     yaxis: {
       labels: {
-        formatter: (val: number) => `${toFixed(val)} ${unit}`,
+        formatter: (type !== 'treemap' && !plotOptions.bar?.horizontal) ? yFormatter : undefined,
       },
     },
     tooltip: {
       ...options.tooltip,
       y: {
-        formatter: (val: number) => `${toFixed(val)} ${unit}`,
+        formatter: yFormatter,
       },
     },
     stroke: {
@@ -103,7 +119,6 @@ export default function Chart({
       options={options}
       series={series}
       type={type}
-      className="apex-charts"
       // https://stackoverflow.com/questions/75103994
       width="100%"
       height={height}
@@ -116,7 +131,6 @@ const OPTIONS: ApexOptions = {
     borderColor: '#777f85',
   },
   chart: {
-    id: 'line',
     width: '100%',
     foreColor: '#94A3B8',
     toolbar: {
@@ -137,15 +151,6 @@ const OPTIONS: ApexOptions = {
       show: false,
     },
   },
-  plotOptions: {
-    bar: {
-      horizontal: false,
-      columnWidth: '55%',
-    },
-  },
-  dataLabels: {
-    enabled: false,
-  },
   tooltip: {
     fillSeriesColor: true,
     x: {
@@ -155,5 +160,14 @@ const OPTIONS: ApexOptions = {
     intersect: true,
     inverseOrder: true,
     shared: false,
+  },
+  states: {
+    active: {
+      allowMultipleDataPointsSelection: false,
+      filter: {
+        type: 'lighten',
+        value: 0.5,
+      },
+    },
   },
 };

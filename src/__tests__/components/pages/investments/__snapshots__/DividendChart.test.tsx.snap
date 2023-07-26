@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DividendChart renders as expected with data 1`] = `
+<div>
+  <div
+    class="bg-gunmetal-700 rounded-sm m-6 p-4"
+  >
+    <span
+      class="text-lg"
+    >
+      
+          Dividends in
+          €
+        
+    </span>
+    <div
+      class="grid grid-cols-12"
+    >
+      <div
+        class="col-span-4"
+      >
+        <div
+          class="text-slate-300"
+          id="chart-year"
+        >
+          <div
+            data-testid="Chart"
+          />
+        </div>
+      </div>
+      <div
+        class="col-span-8"
+      >
+        <div
+          id="chart-monthly"
+        >
+          <div
+            data-testid="Chart"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

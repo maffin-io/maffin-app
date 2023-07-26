@@ -71,8 +71,27 @@ export default function SplitsHistogram({
         series={series}
         title="Total per month"
         xCategories={Object.values(MONTHS)}
-        hideSeries={hiddenSeries}
         unit={currencyToSymbol(splits[0]?.account.commodity.mnemonic || '')}
+        plotOptions={
+          {
+            bar: {
+              horizontal: false,
+              columnWidth: '55%',
+            },
+          }
+        }
+        events={
+          {
+            mounted: (chart) => hiddenSeries.forEach(name => {
+              try {
+                chart.hideSeries(name);
+              } catch {
+                // this fails sometimes for some reason but still renders
+                // as expected. Adding the catch to protect against that.
+              }
+            }),
+          }
+        }
       />
     </div>
   );

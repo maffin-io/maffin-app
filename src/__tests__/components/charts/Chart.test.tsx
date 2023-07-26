@@ -30,25 +30,32 @@ describe('Chart', () => {
   it('creates chart with expected parameters', () => {
     render(<Chart series={[1]} type="bar" />);
 
+    // @ts-ignore
+    const options = ApexChartMock.mock.calls[0][0].options as ApexOptions;
+    // @ts-ignore
+    expect(options?.yaxis?.labels.formatter(1)).toEqual('1');
+    // @ts-ignore
+    expect(options?.tooltip?.y?.formatter(1)).toEqual('1');
     expect(ApexChartMock).toHaveBeenCalledWith(
       {
-        className: 'apex-charts',
         height: 400,
         options: {
           chart: {
             foreColor: '#94A3B8',
-            id: '',
+            id: undefined,
             toolbar: {
               show: false,
             },
+            stacked: false,
             width: '100%',
             zoom: {
               autoScaleYaxis: true,
               enabled: true,
               type: 'x',
             },
-            events: {
-              mounted: expect.any(Function),
+            events: {},
+            sparkline: {
+              enabled: false,
             },
           },
           dataLabels: {
@@ -61,10 +68,14 @@ describe('Chart', () => {
           legend: {
             show: true,
           },
-          plotOptions: {
-            bar: {
-              columnWidth: '55%',
-              horizontal: false,
+          plotOptions: {},
+          states: {
+            active: {
+              allowMultipleDataPointsSelection: false,
+              filter: {
+                type: 'lighten',
+                value: 0.5,
+              },
             },
           },
           stroke: {
@@ -74,7 +85,7 @@ describe('Chart', () => {
           },
           title: {
             align: 'left',
-            text: '',
+            text: undefined,
           },
           tooltip: {
             fillSeriesColor: true,
@@ -110,26 +121,9 @@ describe('Chart', () => {
     );
   });
 
-  it('hides series on mount', () => {
-    render(<Chart hideSeries={['a', 'b']} series={[1]} type="bar" />);
-
-    // @ts-ignore
-    const options = ApexChartMock.mock.calls[0][0].options as ApexOptions;
-
-    const mockHideSeries = jest.fn();
-    const mockChart = {
-      hideSeries: mockHideSeries,
-    };
-
-    // @ts-ignore
-    options.chart.events.mounted(mockChart);
-
-    expect(mockHideSeries).toBeCalledTimes(2);
-    expect(mockHideSeries).toHaveBeenNthCalledWith(1, 'a');
-    expect(mockHideSeries).toHaveBeenNthCalledWith(2, 'b');
-  });
-
   it('sets optional params', () => {
+    const mockYFormatter = jest.fn();
+    const mockMounted = jest.fn();
     render(
       <Chart
         series={[1]}
@@ -138,23 +132,65 @@ describe('Chart', () => {
         xCategories={['a', 'b']}
         xAxisType="datetime"
         type="bar"
+        stacked
         unit="unit"
         height={200}
+        dataLabels={
+          { enabled: true }
+        }
+        plotOptions={
+          {
+            area: {
+              fillTo: 'origin',
+            },
+          }
+        }
+        events={
+          {
+            mounted: mockMounted,
+          }
+        }
+        yFormatter={mockYFormatter}
       />,
     );
 
-    // @ts-ignore
-    const options = ApexChartMock.mock.calls[0][0].options as ApexOptions;
-
-    expect(options?.title?.text).toEqual('title');
-    expect(options?.legend?.show).toEqual(false);
-    expect(options?.xaxis?.categories).toEqual(['a', 'b']);
-    // @ts-ignore
-    expect(options?.yaxis?.labels.formatter(1)).toEqual('1 unit');
-    // @ts-ignore
-    expect(options?.tooltip?.y?.formatter(1)).toEqual('1 unit');
-
-    // @ts-ignore
-    expect(ApexChartMock.mock.calls[0][0].height).toEqual(200);
+    expect(ApexChartMock.mock.calls[0][0]).toMatchObject({
+      options: {
+        chart: {
+          events: {
+            mounted: mockMounted,
+          },
+          stacked: true,
+        },
+        title: {
+          text: 'title',
+        },
+        legend: {
+          show: false,
+        },
+        xaxis: {
+          categories: ['a', 'b'],
+        },
+        yaxis: {
+          labels: {
+            formatter: mockYFormatter,
+          },
+        },
+        tooltip: {
+          y: {
+            formatter: mockYFormatter,
+          },
+        },
+        dataLabels: {
+          enabled: true,
+        },
+        plotOptions: {
+          area: {
+            fillTo: 'origin',
+          },
+        },
+      },
+      height: 200,
+    });
   });
 });
