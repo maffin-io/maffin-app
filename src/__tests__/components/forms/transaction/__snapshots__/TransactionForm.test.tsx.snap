@@ -174,7 +174,6 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                 class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
                 disabled=""
                 name="splits.0.quantity"
-                placeholder="0"
                 step="0.001"
                 type="number"
               />
@@ -193,7 +192,6 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                 class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
                 disabled=""
                 name="splits.0.value"
-                placeholder="0"
                 step="0.001"
                 type="number"
               />
@@ -344,7 +342,6 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                 class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
                 disabled=""
                 name="splits.1.quantity"
-                placeholder="0"
                 step="0.001"
                 type="number"
               />
@@ -363,7 +360,6 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                 class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
                 disabled=""
                 name="splits.1.value"
-                placeholder="0"
                 step="0.001"
                 type="number"
               />
@@ -577,7 +573,6 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                 class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
                 disabled=""
                 name="splits.0.quantity"
-                placeholder="0"
                 step="0.001"
                 type="number"
               />
@@ -596,7 +591,6 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                 class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
                 disabled=""
                 name="splits.0.value"
-                placeholder="0"
                 step="0.001"
                 type="number"
               />
@@ -743,7 +737,6 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                 class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
                 disabled=""
                 name="splits.1.quantity"
-                placeholder="0"
                 step="0.001"
                 type="number"
               />
@@ -762,7 +755,6 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                 class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
                 disabled=""
                 name="splits.1.value"
-                placeholder="0"
                 step="0.001"
                 type="number"
               />
@@ -972,7 +964,6 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                 class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
                 disabled=""
                 name="splits.0.quantity"
-                placeholder="0"
                 step="0.001"
                 type="number"
               />
@@ -991,7 +982,6 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                 class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
                 disabled=""
                 name="splits.0.value"
-                placeholder="0"
                 step="0.001"
                 type="number"
               />
@@ -1142,7 +1132,6 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                 class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
                 disabled=""
                 name="splits.1.quantity"
-                placeholder="0"
                 step="0.001"
                 type="number"
               />
@@ -1161,7 +1150,6 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                 class="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
                 disabled=""
                 name="splits.1.value"
-                placeholder="0"
                 step="0.001"
                 type="number"
               />
