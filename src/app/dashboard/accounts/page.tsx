@@ -32,7 +32,7 @@ export default function AccountsPage(): JSX.Element {
     <>
       <div className="grid grid-cols-12 items-center pb-4">
         <span className="col-span-10 text-xl font-medium">
-          Accounts
+          Dashboard
         </span>
         <div className="col-span-2 col-end-13 justify-self-end">
           <AddAccountButton
@@ -44,10 +44,14 @@ export default function AccountsPage(): JSX.Element {
           />
         </div>
       </div>
-      <AccountsTable
-        accounts={accounts}
-        todayPrices={todayPrices}
-      />
+      <div className="grid grid-cols-12 items-center pb-4">
+        <div className="col-span-3">
+          <AccountsTable
+            accounts={accounts}
+            todayPrices={todayPrices}
+          />
+        </div>
+      </div>
     </>
   );
 }
