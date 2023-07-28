@@ -201,6 +201,32 @@ describe('Transaction', () => {
       await expect(tx.save()).rejects.toThrow('splitsBalance');
     });
 
+    it('doesnt fail when floating point error', async () => {
+      const split1 = new Split();
+      split1.value = -86.56;
+      split1.fk_account = account;
+      const split2 = new Split();
+      split2.value = 55;
+      split2.fk_account = account2;
+      const split3 = new Split();
+      split3.value = 31.56;
+      split3.fk_account = Account.create({
+        name: 'Expenses2',
+        type: 'EXPENSE',
+        parent: root,
+        fk_commodity: eur,
+      });
+
+      const tx = Transaction.create({
+        description: 'description',
+        fk_currency: eur,
+        date: DateTime.fromISO('2023-01-01'),
+        splits: [split1, split2, split3],
+      });
+
+      await expect(tx.save()).rejects.not.toThrow('splitsBalance');
+    });
+
     it('fails if splits have duplicated accounts', async () => {
       const split1 = new Split();
       split1.fk_account = account;
