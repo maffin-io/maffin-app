@@ -7,6 +7,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DataSource } from 'typeorm';
+import * as swr from 'swr';
 
 import Stocker from '@/apis/Stocker';
 import * as queries from '@/book/queries';
@@ -18,6 +19,12 @@ import {
   Transaction,
 } from '@/book/entities';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
+
+jest.mock('swr', () => ({
+  __esModule: true,
+  ...jest.requireActual('swr'),
+  mutate: jest.fn(),
+}));
 
 jest.mock('@/book/queries', () => ({
   __esModule: true,
@@ -119,7 +126,7 @@ describe('TransactionForm', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('creates transaction with expected params when both same currency', async () => {
+  it('creates transaction, mutates and saves with expected params when both same currency', async () => {
     const user = userEvent.setup();
     jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
       assetAccount, expenseAccount,
@@ -211,6 +218,9 @@ describe('TransactionForm', () => {
     });
     expect(tx.guid.length).toEqual(31);
     expect(mockSave).toHaveBeenCalledTimes(1);
+    expect(swr.mutate).toBeCalledTimes(2);
+    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/account_guid_1');
+    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/splits/account_guid_2');
   });
 
   it('creates transaction with expected params with different currency', async () => {
@@ -316,6 +326,67 @@ describe('TransactionForm', () => {
     });
     expect(tx.guid.length).toEqual(31);
     expect(mockSave).toHaveBeenCalledTimes(1);
+  });
+
+  it('refreshes investments key when account is investment', async () => {
+    const user = userEvent.setup();
+    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
+      assetAccount, expenseAccount,
+    ]);
+    const mockSave = jest.fn();
+
+    const stockCommodity = await Commodity.create({
+      guid: 'stock_guid',
+      namespace: 'NASDAW',
+      mnemonic: 'STOCK',
+    }).save();
+
+    const stockAccount = await Account.create({
+      guid: 'stock_account',
+      name: 'Stock',
+      type: 'STOCK',
+      fk_commodity: stockCommodity,
+      parent: assetAccount,
+    }).save();
+
+    render(
+      <TransactionForm
+        action="add"
+        onSave={mockSave}
+        defaultValues={
+          {
+            guid: 'tx_guid',
+            date: DateTime.fromISO('2023-01-01').toISODate() as string,
+            description: 'description',
+            splits: [
+              Split.create({
+                valueNum: -100,
+                valueDenom: 1,
+                quantityNum: -100,
+                quantityDenom: 1,
+                fk_account: assetAccount,
+              }),
+              Split.create({
+                valueNum: 100,
+                valueDenom: 1,
+                quantityNum: 100,
+                quantityDenom: 1,
+                fk_account: stockAccount,
+              }),
+            ],
+            fk_currency: assetAccount.commodity,
+          }
+        }
+      />,
+    );
+
+    expect(screen.getByText('Save')).toBeEnabled();
+    await user.click(screen.getByText('Save'));
+
+    expect(swr.mutate).toBeCalledTimes(3);
+    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/account_guid_1');
+    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/investments');
+    expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/splits/stock_account');
   });
 
   it('updates transaction', async () => {

@@ -44,7 +44,6 @@ export default function TransactionFormButton(
           action={action}
           onSave={() => {
             save();
-            (defaultValues?.splits || []).forEach(split => mutate(`/api/splits/${split.account.guid}`));
             setIsModalOpen(false);
           }}
           defaultValues={defaultValues}

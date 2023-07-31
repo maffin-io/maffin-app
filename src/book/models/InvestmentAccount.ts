@@ -280,18 +280,30 @@ export default class InvestmentAccount {
    */
   _dividend(split: Split): void {
     split.transaction.splits.forEach(otherSplit => {
-      if (split.guid !== otherSplit.guid && otherSplit.quantity > 0) {
+      if (
+        split.guid !== otherSplit.guid
+        && this.currency === otherSplit.account.commodity.mnemonic
+        && otherSplit.quantity > 0
+      ) {
         const value = new Money(
-          otherSplit.value,
-          split.transaction.currency.mnemonic,
+          otherSplit.quantity,
+          this.currency,
         );
 
-        const mainCurrencyPrice = this._priceDBMap.getPrice(
-          split.transaction.currency.mnemonic,
-          this.mainCurrency,
-          split.transaction.date,
-        );
-        const valueInCurrency = value.convert(this.mainCurrency, mainCurrencyPrice.value);
+        let valueInCurrency: Money;
+        if (split.transaction.currency.mnemonic === this.mainCurrency) {
+          valueInCurrency = new Money(otherSplit.value, this.mainCurrency);
+        } else {
+          const mainCurrencyPrice = this._priceDBMap.getPrice(
+            split.transaction.currency.mnemonic,
+            this.mainCurrency,
+            split.transaction.date,
+          );
+          valueInCurrency = new Money(
+            otherSplit.value * mainCurrencyPrice.value,
+            this.mainCurrency,
+          );
+        }
 
         this.dividends.push({
           when: split.transaction.date,

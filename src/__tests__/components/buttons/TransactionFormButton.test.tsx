@@ -5,7 +5,6 @@ import {
   screen,
   fireEvent,
 } from '@testing-library/react';
-import * as swr from 'swr';
 
 import type { Commodity, Split } from '@/book/entities';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
@@ -13,8 +12,6 @@ import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import Modal from '@/components/Modal';
 import type { UseDataSourceReturn } from '@/hooks';
 import * as dataSourceHooks from '@/hooks/useDataSource';
-
-jest.mock('swr');
 
 jest.mock('@/components/Modal', () => jest.fn(
   (props: React.PropsWithChildren) => (
@@ -133,9 +130,6 @@ describe('TransactionFormButton', () => {
 
     const { onSave } = TransactionFormMock.mock.calls[0][0];
     act(() => onSave());
-    expect(swr.mutate).toBeCalledTimes(2);
-    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/1');
-    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/splits/2');
     expect(mockSave).toBeCalledTimes(1);
 
     expect(Modal).toHaveBeenLastCalledWith(

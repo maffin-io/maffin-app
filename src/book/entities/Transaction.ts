@@ -96,7 +96,8 @@ function CheckSplitsBalance(validationOptions?: v.ValidationOptions) {
               0,
             );
 
-            return total === 0;
+            // Correct for floating point errors
+            return toFixed(total, 4) === 0;
           }
 
           return true;

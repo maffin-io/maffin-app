@@ -33,9 +33,9 @@ export default function SplitField({
   const showValueField = account && account.commodity.guid !== txCurrency?.guid;
 
   async function onQuantityChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const q = e.target.value;
+    const q = Number(e.target.value);
     let rate = 1;
-    if (showValueField) {
+    if (showValueField && q !== 0) {
       rate = await getExchangeRate(
         account,
         txCurrency,
@@ -90,7 +90,7 @@ export default function SplitField({
         <span
           className="absolute px-1 py-2"
         >
-          {currencyToSymbol(account?.commodity?.mnemonic || '')}
+          {currencyToSymbol(account?.commodity?.mnemonic || '').slice(0, 3)}
         </span>
         <input
           {...form.register(
@@ -102,7 +102,6 @@ export default function SplitField({
           aria-label={`splits.${index}.quantity`}
           disabled={disableValueInputs}
           className="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
-          placeholder="0"
           type="number"
           step="0.001"
           onChange={(e) => {
@@ -134,7 +133,6 @@ export default function SplitField({
           aria-label={`splits.${index}.value`}
           disabled={disableValueInputs}
           className="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
-          placeholder="0"
           type="number"
           step="0.001"
         />
