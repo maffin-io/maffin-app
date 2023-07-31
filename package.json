@@ -115,7 +115,7 @@
     "@types/gapi.auth2": "^0.0.57",
     "@types/gapi.client.drive": "^3.0.15",
     "@types/gapi.client.people": "^1.0.5",
-    "@types/google.accounts": "^0.0.7",
+    "@types/google.accounts": "^0.0.8",
     "@types/jest": "^29.5.3",
     "@types/lodash.debounce": "^4.0.7",
     "@types/luxon": "^3.3.1",
