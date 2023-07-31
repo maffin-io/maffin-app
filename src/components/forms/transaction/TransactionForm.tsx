@@ -2,11 +2,13 @@ import React from 'react';
 import { DateTime } from 'luxon';
 import { useForm } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
+import { mutate } from 'swr';
 
 import {
   Split,
   Transaction,
 } from '@/book/entities';
+import { isInvestment } from '@/book/helpers/accountType';
 import SplitsField from './SplitsField';
 import type { FormValues } from './types';
 
@@ -122,5 +124,11 @@ async function onSubmit(data: FormValues, action: 'add' | 'update' | 'delete', o
     await transaction.remove();
   }
 
+  transaction.splits.forEach(split => {
+    if (isInvestment(split.account)) {
+      mutate('/api/investments');
+    }
+    mutate(`/api/splits/${split.account.guid}`);
+  });
   onSave();
 }

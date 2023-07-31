@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 import { DataSource } from 'typeorm';
 
+import { toFixed } from '@/helpers/number';
 import { InvestmentAccount } from '../../models';
 import {
   Account,
@@ -849,7 +850,9 @@ describe('InvestmentAccount', () => {
           relations: {
             splits: {
               fk_transaction: {
-                splits: true,
+                splits: {
+                  fk_account: true,
+                },
               },
             },
           },
@@ -875,7 +878,7 @@ describe('InvestmentAccount', () => {
        * I haven't seen a use case where dividends are earned in different currencies
        * and it would complicate things if we did so this is expected
        */
-      it('throws an error if dividends with different currency', async () => {
+      it('supports dividends with different currency as long as split with correct commodity', async () => {
         const sgd = await Commodity.create({
           namespace: 'CURRENCY',
           mnemonic: 'SGD',
@@ -894,16 +897,16 @@ describe('InvestmentAccount', () => {
               fk_account: stockAccount,
             },
             {
-              valueNum: 89.67,
+              valueNum: 176.12,
               valueDenom: 1,
-              quantityNum: 89.67,
+              quantityNum: 120,
               quantityDenom: 1,
               fk_account: brokerAccount,
             },
             {
-              valueNum: -89.67,
+              valueNum: -176.12,
               valueDenom: 1,
-              quantityNum: -89.67,
+              quantityNum: -176.12,
               quantityDenom: 1,
               fk_account: incomeAccount,
             },
@@ -914,8 +917,8 @@ describe('InvestmentAccount', () => {
           fk_commodity: sgd,
           fk_currency: mainCommodity,
           date: DateTime.fromISO('2023-01-02'),
-          valueNum: 9086,
-          valueDenom: 10000,
+          valueNum: 68138,
+          valueDenom: 100000,
         }).save();
 
         const dividendCurrencyPrice = await Price.findOneByOrFail({ fk_commodity: sgd });
@@ -924,7 +927,9 @@ describe('InvestmentAccount', () => {
           relations: {
             splits: {
               fk_transaction: {
-                splits: true,
+                splits: {
+                  fk_account: true,
+                },
               },
             },
           },
@@ -935,13 +940,34 @@ describe('InvestmentAccount', () => {
           new PriceDBMap([stockPrice, currencyPrice, dividendCurrencyPrice]),
         );
 
-        expect(() => instance.realizedDividends).toThrow();
+        expect(instance.realizedDividends.toString()).toEqual(`209.67 ${currency}`);
+        expect(instance.realizedDividendsInCurrency.format()).toEqual(
+          new Money(
+            (
+              (
+                toFixed(instance.dividends[0].amount.toNumber() * currencyPrice.value)
+              ) + (
+                instance.dividends[1].amount.toNumber()
+              )
+            ),
+            mainCurrency,
+          ).format(),
+        );
+
+        expect(instance.dividends[0].amount.toString()).toEqual(`89.67 ${currency}`);
+        expect(instance.dividends[0].amountInCurrency.format()).toEqual(
+          new Money(89.67 * currencyPrice.value, mainCurrency).format(),
+        );
+
+        expect(instance.dividends[1].amount.toString()).toEqual(`120.00 ${currency}`);
+        expect(instance.dividends[1].amountInCurrency.toString()).toEqual(`120.00 ${mainCurrency}`);
       });
 
       /**
        * There's case though for specific stocks trading in X currency
        * giving dividends in another currency. Check VHYL which trades in
-       * EUR but dividends are issued in USD.
+       * EUR but dividends are issued in USD. Regardless, we store the dividend
+       * in the currency of the account
        */
       it('supports dividends in different currency than account\'s currency', async () => {
         const sgd = await Commodity.create({
@@ -967,7 +993,9 @@ describe('InvestmentAccount', () => {
           relations: {
             splits: {
               fk_transaction: {
-                splits: true,
+                splits: {
+                  fk_account: true,
+                },
               },
             },
           },
@@ -978,11 +1006,11 @@ describe('InvestmentAccount', () => {
           new PriceDBMap([stockPrice, currencyPrice, dividendCurrencyPrice]),
         );
 
-        expect(instance.realizedDividends.toString()).toEqual('89.67 SGD');
+        expect(instance.realizedDividends.toString()).toEqual(`89.67 ${currency}`);
         const expected = new Money(89.67 * dividendCurrencyPrice.value, mainCurrency);
         expect(instance.realizedDividendsInCurrency.toString()).toEqual(expected.toString());
 
-        expect(instance.dividends[0].amount.toString()).toEqual('89.67 SGD');
+        expect(instance.dividends[0].amount.toString()).toEqual(`89.67 ${currency}`);
         expect(instance.dividends[0].amountInCurrency.toString()).toEqual(expected.toString());
       });
     });
