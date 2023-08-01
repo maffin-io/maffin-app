@@ -7,6 +7,7 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   getPaginationRowModel,
+  getExpandedRowModel,
   ColumnSort,
 } from '@tanstack/react-table';
 import classNames from 'classnames';
@@ -21,6 +22,8 @@ export type TableProps<T extends object> = {
   pageSize?: number,
   showHeader?: boolean,
   showPagination?: boolean,
+  tdClassName?: string,
+  getSubRows?: (originalRow: T, index: number) => T[] | undefined,
 };
 
 export default function Table<T extends object = {}>(
@@ -31,6 +34,8 @@ export default function Table<T extends object = {}>(
     pageSize = 10,
     showHeader = true,
     showPagination = true,
+    tdClassName = 'px-6 py-4',
+    getSubRows,
   }: TableProps<T>,
 ): JSX.Element {
   const tableConfig: TableOptions<T> = {
@@ -38,6 +43,9 @@ export default function Table<T extends object = {}>(
     data,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    enableExpanding: true,
+    getSubRows,
     initialState: {
       pagination: {
         pageSize,
@@ -114,7 +122,7 @@ export default function Table<T extends object = {}>(
             {table.getRowModel().rows.map(row => (
               <tr key={row.id} className="border-b border-gunmetal-700">
                 {row.getVisibleCells().map(cell => (
-                  <td key={cell.id} className="px-6 py-4">
+                  <td key={cell.id} className={tdClassName}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}

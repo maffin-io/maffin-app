@@ -65,34 +65,32 @@ export default function SplitsHistogram({
   hiddenSeries.pop();
 
   return (
-    <div className="bg-gunmetal-700 rounded-sm mb-6 p-4">
-      <Chart
-        type="bar"
-        series={series}
-        title="Movements per month"
-        xCategories={Object.values(MONTHS)}
-        unit={currencyToSymbol(splits[0]?.account.commodity.mnemonic || '')}
-        plotOptions={
-          {
-            bar: {
-              horizontal: false,
-              columnWidth: '55%',
-            },
-          }
+    <Chart
+      type="bar"
+      series={series}
+      title="Movements per month"
+      xCategories={Object.values(MONTHS)}
+      unit={currencyToSymbol(splits[0]?.account.commodity.mnemonic || '')}
+      plotOptions={
+        {
+          bar: {
+            horizontal: false,
+            columnWidth: '55%',
+          },
         }
-        events={
-          {
-            mounted: (chart) => hiddenSeries.forEach(name => {
-              try {
-                chart.hideSeries(name);
-              } catch {
-                // this fails sometimes for some reason but still renders
-                // as expected. Adding the catch to protect against that.
-              }
-            }),
-          }
+      }
+      events={
+        {
+          mounted: (chart) => hiddenSeries.forEach(name => {
+            try {
+              chart.hideSeries(name);
+            } catch {
+              // this fails sometimes for some reason but still renders
+              // as expected. Adding the catch to protect against that.
+            }
+          }),
         }
-      />
-    </div>
+      }
+    />
   );
 }

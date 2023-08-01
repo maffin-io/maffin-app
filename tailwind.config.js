@@ -2,8 +2,10 @@ import defaultTheme from 'tailwindcss/defaultTheme';
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  // darkMode: 'class',
   content: [
     './src/**/*.{js,ts,jsx,tsx,mdx}',
+    './node_modules/react-tailwindcss-datepicker/dist/index.esm.js',
   ],
   // Tailwind optimises which classes are brought in. This breaks
   // dynamic behavior in some cases.
@@ -12,6 +14,10 @@ module.exports = {
     'visible',
     {
       pattern: /col-span-.*/,
+    },
+    // padding is added dynamically to expandable tables
+    {
+      pattern: /pl-.*/,
     },
   ],
   theme: {

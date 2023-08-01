@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon';
+import { DateTime, Interval } from 'luxon';
 import { DataSource, BaseEntity } from 'typeorm';
 
 import {
@@ -135,11 +135,11 @@ describe('Account', () => {
     });
   });
 
-  describe('total', () => {
-    it('sets expected total for ROOT', async () => {
+  describe('getTotal', () => {
+    it('sets expected getTotal for ROOT', async () => {
       account = await Account.findOneByOrFail({ name: 'Root' });
 
-      expect(account.total).toEqual(null);
+      expect(account.getTotal()).toEqual(null);
     });
 
     it.each([
@@ -179,7 +179,7 @@ describe('Account', () => {
         relations: { splits: true },
       });
 
-      expect(account.total.toString()).toEqual('0.15 EUR');
+      expect(account.getTotal().toString()).toEqual('0.15 EUR');
     });
 
     it('sets expected total for EXPENSE', async () => {
@@ -224,7 +224,7 @@ describe('Account', () => {
         relations: { splits: true },
       });
 
-      expect(account.total.toString()).toEqual('0.15 EUR');
+      expect(account.getTotal().toString()).toEqual('0.15 EUR');
     });
 
     it.each([
@@ -284,7 +284,79 @@ describe('Account', () => {
         relations: ['splits', 'splits.fk_transaction'],
       });
 
-      expect(account.total.toString()).toEqual('2.00 GOOGL');
+      expect(account.getTotal().toString()).toEqual('2.00 GOOGL');
+    });
+
+    it('filters according to interval', async () => {
+      account = await Account.create({
+        name: 'account',
+        type: 'EXPENSE',
+        fk_commodity: eur,
+        parent: root,
+      }).save();
+
+      account2 = await Account.create({
+        name: 'name',
+        type: 'ASSET',
+        fk_commodity: eur,
+        parent: root,
+      }).save();
+
+      await Transaction.create({
+        description: 'test',
+        fk_currency: eur,
+        date: DateTime.fromISO('2023-01-01'),
+        splits: [
+          Split.create({
+            valueNum: 10,
+            valueDenom: 100,
+            quantityNum: 15,
+            quantityDenom: 100,
+            fk_account: account,
+          }),
+          Split.create({
+            valueNum: -10,
+            valueDenom: 100,
+            quantityNum: -15,
+            quantityDenom: 100,
+            fk_account: account2,
+          }),
+        ],
+      }).save();
+
+      await Transaction.create({
+        description: 'test',
+        fk_currency: eur,
+        date: DateTime.fromISO('2023-01-03'),
+        splits: [
+          Split.create({
+            valueNum: 10,
+            valueDenom: 100,
+            quantityNum: 20,
+            quantityDenom: 100,
+            fk_account: account,
+          }),
+          Split.create({
+            valueNum: -10,
+            valueDenom: 100,
+            quantityNum: -20,
+            quantityDenom: 100,
+            fk_account: account2,
+          }),
+        ],
+      }).save();
+
+      account = await Account.findOneOrFail({
+        where: { name: 'account' },
+        relations: { splits: { fk_transaction: true } },
+      });
+
+      expect(account.getTotal(
+        Interval.fromDateTimes(
+          DateTime.fromISO('2022-01-02'),
+          DateTime.fromISO('2023-01-03'),
+        ),
+      ).toString()).toEqual('0.15 EUR');
     });
   });
 

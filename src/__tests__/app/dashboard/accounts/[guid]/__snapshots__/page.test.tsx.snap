@@ -69,7 +69,7 @@ exports[`AccountPage renders as expected with account 1`] = `
             class="mr-6 bg-gunmetal-700 rounded-sm p-6"
           >
             <p>
-              This year there's been a change of
+              This year you have
             </p>
             <p
               class=" text-2xl font-semibold my-3"
@@ -79,12 +79,12 @@ exports[`AccountPage renders as expected with account 1`] = `
             <span
               class="text-sm"
             >
-              for this account
+              in this account
             </span>
           </div>
         </div>
         <div
-          class="col-span-12"
+          class="col-span-12 bg-gunmetal-700 rounded-sm my-6 mr-6"
         >
           <div
             data-testid="TotalLineChart"
@@ -93,7 +93,7 @@ exports[`AccountPage renders as expected with account 1`] = `
       </div>
     </div>
     <div
-      class="col-span-6"
+      class="col-span-6 bg-gunmetal-700 rounded-sm mb-6 p-4"
     >
       <div
         data-testid="SplitsHistogram"

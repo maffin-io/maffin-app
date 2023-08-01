@@ -8,13 +8,103 @@ exports[`AccountsTable creates empty Table with expected params 1`] = `
 </div>
 `;
 
-exports[`AccountsTable renders Name column as expected 1`] = `
+exports[`AccountsTable renders Name column as expected when expandable and expanded 1`] = `
 <div>
-  <a
-    href="/dashboard/accounts/a1"
+  <div
+    class="flex pl-NaN"
   >
-    Assets
-  </a>
+    <button
+      type="button"
+    >
+      <svg
+        class="mr-1 text-xs opacity-20"
+        fill="currentColor"
+        height="1em"
+        stroke="currentColor"
+        stroke-width="0"
+        viewBox="0 0 24 24"
+        width="1em"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M11.178 19.569a.998.998 0 0 0 1.644 0l9-13A.999.999 0 0 0 21 5H3a1.002 1.002 0 0 0-.822 1.569l9 13z"
+        />
+      </svg>
+    </button>
+    <a
+      class="badge hover:text-slate-300 bg-cyan-500/20 text-cyan-300"
+      href="/dashboard/accounts/assets"
+    >
+      Assets
+    </a>
+  </div>
+</div>
+`;
+
+exports[`AccountsTable renders Name column as expected when expandable and not expandded 1`] = `
+<div>
+  <div
+    class="flex pl-NaN"
+  >
+    <button
+      type="button"
+    >
+      <svg
+        class="mr-1 text-xs opacity-20"
+        fill="currentColor"
+        height="1em"
+        stroke="currentColor"
+        stroke-width="0"
+        viewBox="0 0 24 24"
+        width="1em"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5.536 21.886a1.004 1.004 0 0 0 1.033-.064l13-9a1 1 0 0 0 0-1.644l-13-9A1 1 0 0 0 5 3v18a1 1 0 0 0 .536.886z"
+        />
+      </svg>
+    </button>
+    <a
+      class="badge hover:text-slate-300 bg-cyan-500/20 text-cyan-300"
+      href="/dashboard/accounts/assets"
+    >
+      Assets
+    </a>
+  </div>
+</div>
+`;
+
+exports[`AccountsTable renders Name column as expected when not expandable 1`] = `
+<div>
+  <div
+    class="flex pl-NaN"
+  >
+    <button
+      class="cursor-default"
+      type="button"
+    >
+      <svg
+        class="mr-1 text-xs opacity-20"
+        fill="currentColor"
+        height="1em"
+        stroke="currentColor"
+        stroke-width="0"
+        viewBox="0 0 24 24"
+        width="1em"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M12 2C6.486 2 2 6.486 2 12c.001 5.515 4.487 10.001 10 10.001 5.514 0 10-4.486 10.001-10.001 0-5.514-4.486-10-10.001-10zm0 18.001c-4.41 0-7.999-3.589-8-8.001 0-4.411 3.589-8 8-8 4.412 0 8.001 3.589 8.001 8-.001 4.412-3.59 8.001-8.001 8.001z"
+        />
+      </svg>
+    </button>
+    <a
+      class="badge hover:text-slate-300 bg-cyan-500/20 text-cyan-300"
+      href="/dashboard/accounts/assets"
+    >
+      Assets
+    </a>
+  </div>
 </div>
 `;
 

@@ -40,6 +40,7 @@ describe('useUser', () => {
     } as typeof window.gapi;
 
     jest.spyOn(gapiHooks, 'default').mockReturnValue([false]);
+    jest.spyOn(swrImmutable, 'default');
 
     mockRouterPush = jest.fn();
     useRouter.mockImplementation(() => ({
@@ -48,6 +49,7 @@ describe('useUser', () => {
   });
 
   afterEach(() => {
+    jest.clearAllMocks();
     jest.resetAllMocks();
   });
 
@@ -65,6 +67,14 @@ describe('useUser', () => {
       image: '',
       isLoggedIn: false,
     });
+    expect(swrImmutable.default).toBeCalledWith(
+      null,
+      expect.any(Function),
+      {
+        refreshInterval: 100000,
+        revalidateOnMount: true, // Once the user logs in, we need to revalidate
+      },
+    );
   });
 
   it('returns empty user, redirects and sets empty token if not logged in', async () => {
@@ -92,6 +102,14 @@ describe('useUser', () => {
       image: '',
       isLoggedIn: false,
     });
+    expect(swrImmutable.default).toBeCalledWith(
+      '/api/user',
+      expect.any(Function),
+      {
+        refreshInterval: 100000,
+        revalidateOnMount: true, // Once the user logs in, we need to revalidate
+      },
+    );
   });
 
   it('returns empty user if still loading and doesnt redirect', async () => {

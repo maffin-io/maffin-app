@@ -85,7 +85,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
     );
   }
   account.splits = splits;
-  const { total } = account;
+  const total = account.getTotal();
   const average = new Money(total.toNumber() / (splits.length && (splits[0].transaction.date.diff(
     splits[splits.length - 1].transaction.date,
     ['months', 'days'],
@@ -122,13 +122,9 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
   });
 
   const split1 = new Split();
-  split1.value = 0;
-  split1.quantity = 0;
   split1.fk_account = account;
 
   const split2 = new Split();
-  split2.value = 0;
-  split2.quantity = 0;
 
   return (
     <>
@@ -176,17 +172,17 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
             <div className="col-span-6">
               <StatisticsWidget
                 className="mr-6"
-                title="This year there's been a change of"
+                title={`This year you ${totalKeyword}`}
                 stats={new Money(totalThisYear, account.commodity.mnemonic).format()}
-                description="for this account"
+                description="in this account"
               />
             </div>
-            <div className="col-span-12">
+            <div className="col-span-12 bg-gunmetal-700 rounded-sm my-6 mr-6">
               <TotalLineChart splits={splits} />
             </div>
           </div>
         </div>
-        <div className="col-span-6">
+        <div className="col-span-6 bg-gunmetal-700 rounded-sm mb-6 p-4">
           <SplitsHistogram splits={splits.filter(split => split.quantity !== 0)} />
         </div>
       </div>

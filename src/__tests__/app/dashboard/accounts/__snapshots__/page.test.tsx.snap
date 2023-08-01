@@ -1,49 +1,112 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AccountsPage passes data to table 1`] = `
+exports[`AccountsPage generates tree as expected, no investments 1`] = `
 <div>
   <div
-    class="grid grid-cols-12 items-center pb-4"
+    class="flex items-center pb-4"
   >
     <span
-      class="col-span-10 text-xl font-medium"
+      class="text-xl font-medium"
     >
-      Accounts
+      Your finances
     </span>
-    <div
-      class="col-span-2 col-end-13 justify-self-end"
+    <span
+      class="ml-auto mr-3"
     >
+      <div
+        data-testid="DateRangeInput"
+      />
+    </span>
+    <div>
       <div
         data-testid="AddAccountButton"
       />
     </div>
   </div>
   <div
-    data-testid="AccountsTable"
-  />
+    class="grid grid-cols-12 items-top pb-4"
+  >
+    <div
+      class="col-span-3 p-4 mr-4 rounded-sm bg-gunmetal-700"
+    >
+      <div
+        data-testid="AccountsTable"
+      />
+    </div>
+  </div>
 </div>
 `;
 
-exports[`AccountsPage passes empty array to table when not ready 1`] = `
+exports[`AccountsPage generates tree as expected, with investments 1`] = `
 <div>
   <div
-    class="grid grid-cols-12 items-center pb-4"
+    class="flex items-center pb-4"
   >
     <span
-      class="col-span-10 text-xl font-medium"
+      class="text-xl font-medium"
     >
-      Accounts
+      Your finances
     </span>
-    <div
-      class="col-span-2 col-end-13 justify-self-end"
+    <span
+      class="ml-auto mr-3"
     >
+      <div
+        data-testid="DateRangeInput"
+      />
+    </span>
+    <div>
       <div
         data-testid="AddAccountButton"
       />
     </div>
   </div>
   <div
-    data-testid="AccountsTable"
-  />
+    class="grid grid-cols-12 items-top pb-4"
+  >
+    <div
+      class="col-span-3 p-4 mr-4 rounded-sm bg-gunmetal-700"
+    >
+      <div
+        data-testid="AccountsTable"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`AccountsPage passes empty data to components when loading when not ready 1`] = `
+<div>
+  <div
+    class="flex items-center pb-4"
+  >
+    <span
+      class="text-xl font-medium"
+    >
+      Your finances
+    </span>
+    <span
+      class="ml-auto mr-3"
+    >
+      <div
+        data-testid="DateRangeInput"
+      />
+    </span>
+    <div>
+      <div
+        data-testid="AddAccountButton"
+      />
+    </div>
+  </div>
+  <div
+    class="grid grid-cols-12 items-top pb-4"
+  >
+    <div
+      class="col-span-3 p-4 mr-4 rounded-sm bg-gunmetal-700"
+    >
+      <div
+        data-testid="AccountsTable"
+      />
+    </div>
+  </div>
 </div>
 `;

@@ -129,7 +129,6 @@ export default function Chart({
 const OPTIONS: ApexOptions = {
   grid: {
     borderColor: '#777f85',
-    strokeDashArray: 5,
   },
   chart: {
     width: '100%',

@@ -45,6 +45,7 @@ export default function useUser(): { user: User } {
     getUser,
     {
       refreshInterval: 100000,
+      revalidateOnMount: true,
     },
   );
 

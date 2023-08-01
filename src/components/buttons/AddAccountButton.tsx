@@ -2,17 +2,11 @@ import React from 'react';
 import Modal from '@/components/Modal';
 import { BiPlusCircle } from 'react-icons/bi';
 
+import { useDataSource } from '@/hooks';
 import AccountForm from '@/components/forms/account/AccountForm';
 
-export type AddAccountButtonProps = {
-  onSave?: Function,
-};
-
-export default function AddAccountButton(
-  {
-    onSave = () => {},
-  }: AddAccountButtonProps,
-): JSX.Element {
+export default function AddAccountButton(): JSX.Element {
+  const { save } = useDataSource();
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   return (
@@ -24,7 +18,7 @@ export default function AddAccountButton(
       >
         <AccountForm
           onSave={() => {
-            onSave();
+            save();
             setIsModalOpen(false);
           }}
         />

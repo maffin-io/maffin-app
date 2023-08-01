@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
+import { mutate } from 'swr';
 
 import { Account, Commodity } from '@/book/entities';
 import {
@@ -125,5 +126,6 @@ export default function AccountForm({ onSave }: AccountFormProps): JSX.Element {
 
 async function onSubmit(data: FormValues, onSave: Function) {
   await Account.create({ ...data }).save();
+  mutate((key: string) => key.startsWith('/api/accounts'));
   onSave();
 }
