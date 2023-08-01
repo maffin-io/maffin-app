@@ -22,6 +22,14 @@
     -webkit-appearance: none;
     margin: 0;
   }
+
+  button.link {
+    @apply text-left text-cyan-700;
+  }
+
+  button.link:not:disabled {
+    @apply text-left text-cyan-700 hover:text-cyan-600;
+  }
 }
 
 @tailwind components;
@@ -42,14 +50,6 @@
 
   .badge {
     @apply bg-slate-500/20 text-slate-300 inline-block my-1 px-1 py-1 text-xs text-center rounded-md
-  }
-
-  button.link {
-    @apply text-left text-cyan-700;
-  }
-
-  button.link:not:disabled {
-    @apply text-left text-cyan-700 hover:text-cyan-600;
   }
 
   .invalid-feedback {

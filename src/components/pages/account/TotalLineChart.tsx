@@ -29,14 +29,12 @@ export default function TotalLineChart({
   });
 
   return (
-    <div className="bg-gunmetal-700 rounded-sm my-6 mr-6">
-      <Chart
-        type="line"
-        series={series}
-        unit={currencyToSymbol(splits[0]?.account.commodity.mnemonic || '')}
-        height={255}
-        xAxisType="datetime"
-      />
-    </div>
+    <Chart
+      type="line"
+      series={series}
+      unit={currencyToSymbol(splits[0]?.account.commodity.mnemonic || '')}
+      height={255}
+      xAxisType="datetime"
+    />
   );
 }

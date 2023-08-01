@@ -1,64 +1,80 @@
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { DateTime } from 'luxon';
 import Link from 'next/link';
+import { BiCircle, BiSolidRightArrow, BiSolidDownArrow } from 'react-icons/bi';
+import classNames from 'classnames';
 
-import { Account } from '@/book/entities';
-import Money from '@/book/Money';
-import type { PriceDBMap } from '@/book/prices';
 import Table from '@/components/Table';
-
-export type Record = {
-  guid: string,
-  name: string,
-  type: string,
-  total: Money,
-  subRows: Record[],
-};
+import type { AccountsTree } from '@/types/accounts';
 
 export type AccountsTableProps = {
-  accounts: Account[],
-  todayPrices: PriceDBMap,
+  tree: AccountsTree,
 };
 
 export default function AccountsTable(
   {
-    accounts,
-    todayPrices,
+    tree,
   }: AccountsTableProps,
 ): JSX.Element {
-  let rows: Record[] = [];
-
-  const root = accounts.find(a => a.type === 'ROOT');
-  if (root && !todayPrices.isEmpty) {
-    rows = buildNestedRows(root, accounts, todayPrices).subRows;
-  }
-
   return (
-    <Table<Record>
+    <Table<AccountsTree>
       columns={columns}
-      data={rows}
+      data={tree.children}
       initialSort={{ id: 'total', desc: true }}
       showHeader={false}
       showPagination={false}
+      tdClassName="p-2"
+      getSubRows={row => row.children}
     />
   );
 }
 
-const columns: ColumnDef<Record>[] = [
+const columns: ColumnDef<AccountsTree>[] = [
   {
     accessorKey: 'name',
     id: 'name',
-    header: '',
     enableSorting: false,
+    header: '',
     cell: ({ row }) => (
-      <Link href={`/dashboard/accounts/${row.original.guid}`}>
-        {row.original.name}
-      </Link>
+      <div
+        className={`flex pl-${row.depth * 4}`}
+      >
+        {row.getCanExpand() ? (
+          <button
+            type="button"
+            onClick={() => row.toggleExpanded()}
+          >
+            {(
+              row.getIsExpanded()
+                ? <BiSolidDownArrow className="mr-1 text-xs opacity-20" />
+                : <BiSolidRightArrow className="mr-1 text-xs opacity-20" />
+            )}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="cursor-default"
+          >
+            <BiCircle className="mr-1 text-xs opacity-20" />
+          </button>
+        )}
+        <Link
+          className={classNames('badge hover:text-slate-300', {
+            'bg-green-500/20 text-green-300': row.original.account.type === 'INCOME',
+            'bg-red-500/20 text-red-300': row.original.account.type === 'EXPENSE',
+            'bg-cyan-500/20 text-cyan-300': ['ASSET', 'BANK'].includes(row.original.account.type),
+            'bg-orange-500/20 text-orange-300': row.original.account.type === 'LIABILITY',
+            'bg-violet-500/20 text-violet-300': ['STOCK', 'MUTUAL'].includes(row.original.account.type),
+          })}
+          href={`/dashboard/accounts/${row.original.account.guid}`}
+        >
+          {row.original.account.name}
+        </Link>
+      </div>
     ),
   },
   {
-    accessorFn: (row: Record) => row.total.toNumber(),
+    accessorFn: (row: AccountsTree) => row.total.toNumber(),
     id: 'total',
     header: '',
     cell: ({ row }) => (
@@ -68,60 +84,3 @@ const columns: ColumnDef<Record>[] = [
     ),
   },
 ];
-
-/**
- * This function recursively goes through all the accounts so it can build the tree
- * of accounts containing total and subrows so they can be rendered in react table.
- *
- * Note that it interacts with PriceDB so prices can be aggregated to the parent's
- * total in order to display total amounts of assets, income, etc.
- */
-function buildNestedRows(
-  current: Account,
-  accounts: Account[],
-  todayQuotes: PriceDBMap,
-): Record {
-  const { childrenIds } = current;
-  let { total } = current;
-  let subRows: Record[] = [];
-
-  if (current.type === 'ROOT') {
-    subRows = childrenIds.map(childId => {
-      const child = accounts.find(a => a.guid === childId) as Account;
-      const childRecord = buildNestedRows(child, accounts, todayQuotes);
-      return childRecord;
-    });
-  } else {
-    const commodity = current.commodity.mnemonic;
-    if (['STOCK', 'MUTUAL'].includes(current.type)) {
-      const price = todayQuotes.getStockPrice(
-        current.commodity.mnemonic,
-        DateTime.now(),
-      );
-      total = total.convert(price.currency.mnemonic, price.value);
-    }
-    subRows = childrenIds.map(childId => {
-      const child = accounts.find(a => a.guid === childId) as Account;
-      const childRecord = buildNestedRows(child, accounts, todayQuotes);
-      let childTotal = childRecord.total;
-      if (childTotal.currency !== commodity) {
-        const price = todayQuotes.getPrice(
-          childTotal.currency,
-          commodity,
-          DateTime.now(),
-        );
-        childTotal = childTotal.convert(commodity, price.value);
-      }
-      total = total.add(childTotal);
-      return childRecord;
-    });
-  }
-
-  return {
-    guid: current.guid,
-    name: current.name,
-    type: current.type,
-    total,
-    subRows,
-  };
-}

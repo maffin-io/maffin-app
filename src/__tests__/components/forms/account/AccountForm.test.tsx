@@ -6,6 +6,7 @@ import {
 import userEvent from '@testing-library/user-event';
 import { DataSource } from 'typeorm';
 import { SWRConfig } from 'swr';
+import * as swr from 'swr';
 
 import { getAllowedSubAccounts } from '@/book/helpers/accountType';
 import * as queries from '@/book/queries';
@@ -17,6 +18,12 @@ import {
   Transaction,
 } from '@/book/entities';
 import AccountForm from '@/components/forms/account/AccountForm';
+
+jest.mock('swr', () => ({
+  __esModule: true,
+  ...jest.requireActual('swr'),
+  mutate: jest.fn(),
+}));
 
 jest.mock('@/book/queries', () => ({
   __esModule: true,
@@ -155,7 +162,7 @@ describe('AccountForm', () => {
     expect(screen.queryByText('Mutual')).toBeNull();
   });
 
-  it('creates account with expected params', async () => {
+  it('creates account with expected params, mutates and saves', async () => {
     const user = userEvent.setup();
     const mockSave = jest.fn();
     render(
@@ -189,6 +196,9 @@ describe('AccountForm', () => {
       childrenIds: [],
     });
     expect(mockSave).toHaveBeenCalledTimes(1);
+    expect(swr.mutate).toBeCalledTimes(1);
+    expect((swr.mutate as jest.Mock).mock.calls[0][0]('/api/accounts')).toBe(true);
+    expect((swr.mutate as jest.Mock).mock.calls[0][0]('/api/splits')).toBe(false);
   });
 
   it.each([

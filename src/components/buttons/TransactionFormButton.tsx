@@ -1,6 +1,5 @@
 import React from 'react';
 import { BiPlusCircle } from 'react-icons/bi';
-import { mutate } from 'swr';
 
 import { useDataSource } from '@/hooks';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';

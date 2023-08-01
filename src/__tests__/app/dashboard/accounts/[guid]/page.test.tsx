@@ -66,7 +66,7 @@ describe('AccountPage', () => {
         commodity: {
           mnemonic: 'EUR',
         },
-        get total() { return new Money(100, 'EUR'); },
+        getTotal: () => new Money(100, 'EUR'),
       } as Account,
     ]);
     mockFindSplits = jest.spyOn(Split, 'find').mockResolvedValue(
@@ -166,22 +166,14 @@ describe('AccountPage', () => {
                 guid: 'guid',
                 path: 'path',
                 splits: [],
-                total: expect.any(Money),
+                getTotal: expect.any(Function),
                 type: 'TYPE',
               },
               guid: expect.any(String),
-              quantityNum: 0,
-              quantityDenom: 1,
-              valueNum: 0,
-              valueDenom: 1,
             },
             {
               action: '',
               guid: expect.any(String),
-              quantityNum: 0,
-              quantityDenom: 1,
-              valueNum: 0,
-              valueDenom: 1,
             },
           ],
         },
@@ -199,7 +191,7 @@ describe('AccountPage', () => {
             commodity: {
               mnemonic: 'EUR',
             },
-            total: expect.any(Money),
+            getTotal: expect.any(Function),
           },
         ],
         splits: [

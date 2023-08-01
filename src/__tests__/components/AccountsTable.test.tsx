@@ -1,9 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-import AccountsTable, { Record } from '@/components/AccountsTable';
+import AccountsTable from '@/components/AccountsTable';
 import Table from '@/components/Table';
-import { PriceDBMap } from '@/book/prices';
 import { Account } from '@/book/entities';
 import Money from '@/book/Money';
 
@@ -20,8 +19,13 @@ describe('AccountsTable', () => {
   it('creates empty Table with expected params', async () => {
     const { container } = render(
       <AccountsTable
-        accounts={[{} as Account]}
-        todayPrices={new PriceDBMap()}
+        tree={
+          {
+            account: {},
+            total: new Money(0, 'EUR'),
+            children: [],
+          }
+        }
       />,
     );
 
@@ -50,153 +54,42 @@ describe('AccountsTable', () => {
         },
         showHeader: false,
         showPagination: false,
+        tdClassName: 'p-2',
+        getSubRows: expect.any(Function),
       },
       {},
     );
     expect(container).toMatchSnapshot();
   });
 
-  it('builds subRows as expected with non investment accounts', async () => {
-    const accounts = [
-      {
+  it('creates table with expected params', async () => {
+    const tree = {
+      account: {
         guid: 'root',
         name: 'Root',
         type: 'ROOT',
         childrenIds: ['a1'],
       } as Account,
-      {
-        guid: 'a1',
-        name: 'Assets',
-        total: new Money(10, 'EUR'),
-        commodity: {
-          mnemonic: 'EUR',
-        },
-        type: 'ASSET',
-        childrenIds: ['a2'],
-      } as Account,
-      {
-        guid: 'a2',
-        name: 'Bank',
-        total: new Money(1000, 'USD'),
-        commodity: {
-          mnemonic: 'USD',
-        },
-        type: 'BANK',
-        childrenIds: [] as string[],
-      } as Account,
-    ];
-
-    render(
-      <AccountsTable
-        accounts={accounts}
-        todayPrices={{
-          getPrice: (from, to, date) => ({
-            guid: `${from}.${to}.${date}`,
-            value: 0.98,
-          }),
-        } as PriceDBMap}
-      />,
-    );
-
-    await screen.findByTestId('Table');
-    expect(Table).toBeCalledTimes(1);
-    expect(Table).toHaveBeenLastCalledWith(
-      {
-        columns: [
-          {
-            header: '',
-            id: 'name',
-            enableSorting: false,
-            accessorKey: 'name',
-            cell: expect.any(Function),
-          },
-          {
-            header: '',
-            id: 'total',
-            accessorFn: expect.any(Function),
-            cell: expect.any(Function),
-          },
-        ],
-        data: [
-          {
+      total: new Money(100, 'EUR'),
+      children: [
+        {
+          account: {
             guid: 'a1',
             name: 'Assets',
-            type: 'ASSET',
-            total: expect.any(Money),
-            subRows: [
-              {
-                guid: 'a2',
-                name: 'Bank',
-                type: 'BANK',
-                total: expect.any(Money),
-                subRows: [],
-              },
-            ],
-          },
-        ],
-        initialSort: {
-          desc: true,
-          id: 'total',
-        },
-        showHeader: false,
-        showPagination: false,
-      },
-      {},
-    );
-
-    const data = TableMock.mock.calls[0][0].data as Record[];
-    expect(data[0].subRows[0].total.toString()).toEqual('1000.00 USD');
-    expect(data[0].total.toString()).toEqual('990.00 EUR'); // 1000 USD * 0.98 + 10 EUR
-  });
-
-  it('builds subRows as expected with investment accounts', async () => {
-    const accounts = [
-      {
-        guid: 'root',
-        name: 'Root',
-        type: 'ROOT',
-        childrenIds: ['a1'],
-      } as Account,
-      {
-        guid: 'a1',
-        name: 'Stocks',
-        total: new Money(0, 'EUR'),
-        commodity: {
-          mnemonic: 'EUR',
-        },
-        type: 'ASSET',
-        childrenIds: ['a2'],
-      } as Account,
-      {
-        guid: 'a2',
-        name: 'GOOGL',
-        total: new Money(2, 'GOOGL'),
-        commodity: {
-          mnemonic: 'GOOGL',
-        },
-        type: 'STOCK',
-        childrenIds: [] as string[],
-      } as Account,
-    ];
-
-    render(
-      <AccountsTable
-        accounts={accounts}
-        todayPrices={{
-          getPrice: (from, to, date) => ({
-            guid: `${from}.${to}.${date}`,
-            value: 0.98,
-          }),
-          getStockPrice: (from, date) => ({
-            guid: `${from}.${date}`,
-            value: 100,
-            currency: {
-              mnemonic: 'USD',
+            getTotal: () => new Money(10, 'EUR'),
+            commodity: {
+              mnemonic: 'EUR',
             },
-          }),
-        } as PriceDBMap}
-      />,
-    );
+            type: 'ASSET',
+            childrenIds: [] as string[],
+          } as Account,
+          total: new Money(70, 'EUR'),
+          children: [],
+        },
+      ],
+    };
+
+    render(<AccountsTable tree={tree} />);
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -217,56 +110,34 @@ describe('AccountsTable', () => {
             cell: expect.any(Function),
           },
         ],
-        data: [
-          {
-            guid: 'a1',
-            name: 'Stocks',
-            type: 'ASSET',
-            total: expect.any(Money),
-            subRows: [
-              {
-                guid: 'a2',
-                name: 'GOOGL',
-                type: 'STOCK',
-                total: expect.any(Money),
-                subRows: [],
-              },
-            ],
-          },
-        ],
+        // eslint-disable-next-line testing-library/no-node-access
+        data: tree.children,
         initialSort: {
           desc: true,
           id: 'total',
         },
         showHeader: false,
         showPagination: false,
+        tdClassName: 'p-2',
+        getSubRows: expect.any(Function),
       },
       {},
     );
-
-    const data = TableMock.mock.calls[0][0].data as Record[];
-    expect(data[0].subRows[0].total.toString()).toEqual('200.00 USD'); // 2 GOOGL * 100 USD
-    expect(data[0].total.toString()).toEqual('196.00 EUR'); // 200 USD * 0.98
   });
 
-  it('renders Name column as expected', async () => {
-    const account = {
-      guid: 'a1',
-      name: 'Assets',
-      total: new Money(10, 'EUR'),
-      commodity: {
-        mnemonic: 'EUR',
-      },
-      type: 'ASSET',
-      childrenIds: [] as string[],
-    } as Account;
+  it('renders Name column as expected when expandable and not expandded', async () => {
+    const tree = {
+      account: {
+        guid: 'assets',
+        name: 'Assets',
+        type: 'ASSET',
+        childrenIds: ['a1'],
+      } as Account,
+      total: new Money(100, 'EUR'),
+      children: [],
+    };
 
-    render(
-      <AccountsTable
-        accounts={[account]}
-        todayPrices={new PriceDBMap()}
-      />,
-    );
+    render(<AccountsTable tree={tree} />);
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -277,7 +148,76 @@ describe('AccountsTable', () => {
       // @ts-ignore
       nameCol.cell({
         row: {
-          original: account,
+          original: tree,
+          getCanExpand: () => true,
+          getIsExpanded: () => false,
+        },
+      }),
+    );
+
+    await screen.findByText('Assets');
+    expect(container).toMatchSnapshot();
+  });
+
+  it('renders Name column as expected when expandable and expanded', async () => {
+    const tree = {
+      account: {
+        guid: 'assets',
+        name: 'Assets',
+        type: 'ASSET',
+        childrenIds: ['a1'],
+      } as Account,
+      total: new Money(100, 'EUR'),
+      children: [],
+    };
+
+    render(<AccountsTable tree={tree} />);
+
+    await screen.findByTestId('Table');
+    expect(Table).toBeCalledTimes(1);
+    const nameCol = TableMock.mock.calls[0][0].columns[0];
+
+    expect(nameCol.cell).not.toBeUndefined();
+    const { container } = render(
+      // @ts-ignore
+      nameCol.cell({
+        row: {
+          original: tree,
+          getCanExpand: () => true,
+          getIsExpanded: () => true,
+        },
+      }),
+    );
+
+    await screen.findByText('Assets');
+    expect(container).toMatchSnapshot();
+  });
+
+  it('renders Name column as expected when not expandable', async () => {
+    const tree = {
+      account: {
+        guid: 'assets',
+        name: 'Assets',
+        type: 'ASSET',
+        childrenIds: ['a1'],
+      } as Account,
+      total: new Money(100, 'EUR'),
+      children: [],
+    };
+
+    render(<AccountsTable tree={tree} />);
+
+    await screen.findByTestId('Table');
+    expect(Table).toBeCalledTimes(1);
+    const nameCol = TableMock.mock.calls[0][0].columns[0];
+
+    expect(nameCol.cell).not.toBeUndefined();
+    const { container } = render(
+      // @ts-ignore
+      nameCol.cell({
+        row: {
+          original: tree,
+          getCanExpand: () => false,
         },
       }),
     );
@@ -287,23 +227,18 @@ describe('AccountsTable', () => {
   });
 
   it('renders Total column as expected', async () => {
-    const account = {
-      guid: 'a1',
-      name: 'Assets',
+    const tree = {
+      account: {
+        guid: 'assets',
+        name: 'Assets',
+        type: 'ASSET',
+        childrenIds: ['a1'],
+      } as Account,
       total: new Money(10, 'EUR'),
-      commodity: {
-        mnemonic: 'EUR',
-      },
-      type: 'ASSET',
-      childrenIds: [] as string[],
-    } as Account;
+      children: [],
+    };
 
-    render(
-      <AccountsTable
-        accounts={[account]}
-        todayPrices={new PriceDBMap()}
-      />,
-    );
+    render(<AccountsTable tree={tree} />);
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -319,7 +254,7 @@ describe('AccountsTable', () => {
       // @ts-ignore
       totalCol.cell({
         row: {
-          original: account,
+          original: tree,
         },
       }),
     );
