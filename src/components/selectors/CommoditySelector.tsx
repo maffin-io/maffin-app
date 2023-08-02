@@ -1,6 +1,7 @@
 import React from 'react';
-import useSWRImmutable from 'swr/immutable';
+import type { SWRResponse } from 'swr';
 
+import { useApi } from '@/hooks';
 import { Commodity } from '@/book/entities';
 import Selector from '@/components/selectors/Selector';
 
@@ -25,11 +26,7 @@ export default function CommoditySelector(
     onChange = () => {},
   }: CommoditySelectorProps,
 ): JSX.Element {
-  let { data: commodities } = useSWRImmutable(
-    '/api/commodities',
-    () => Commodity.find(),
-  );
-
+  let { data: commodities } = useApi('/api/commodities') as SWRResponse<Commodity[]>;
   commodities = commodities || [];
   commodities = commodities.filter(
     commodity => !(ignoreNamespaces).includes(commodity.namespace),

@@ -7,17 +7,23 @@ import {
 import { DateTime } from 'luxon';
 import userEvent from '@testing-library/user-event';
 import { useForm } from 'react-hook-form';
-import { SWRConfig } from 'swr';
+import type { SWRResponse } from 'swr';
 
 import Stocker from '@/apis/Stocker';
-import * as queries from '@/book/queries';
 import type { Account, Commodity } from '@/book/entities';
 import SplitField from '@/components/forms/transaction/SplitField';
 import type { FormValues } from '@/components/forms/transaction/types';
+import * as queries from '@/book/queries';
+import * as apiHook from '@/hooks/useApi';
 
 jest.mock('@/book/queries', () => ({
   __esModule: true,
   ...jest.requireActual('@/book/queries'),
+}));
+
+jest.mock('@/hooks/useApi', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/useApi'),
 }));
 
 describe('SplitField', () => {
@@ -30,6 +36,8 @@ describe('SplitField', () => {
     } as Commodity;
 
     jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
+    jest.spyOn(apiHook, 'default')
+      .mockReturnValue({ data: undefined } as SWRResponse);
   });
 
   it('renders with empty data', () => {
@@ -58,17 +66,22 @@ describe('SplitField', () => {
 
   it('shows value field when txCurrency is different', async () => {
     const user = userEvent.setup();
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
+    jest.spyOn(apiHook, 'default').mockReturnValue(
       {
-        guid: 'account_guid_3',
-        path: 'path3',
-        type: 'EXPENSE',
-        commodity: {
-          guid: 'sgd',
-          mnemonic: 'SGD',
-        },
-      } as Account,
-    ]);
+        data: [
+          {
+            guid: 'account_guid_3',
+            path: 'path3',
+            type: 'EXPENSE',
+            commodity: {
+              guid: 'sgd',
+              mnemonic: 'SGD',
+            },
+          } as Account,
+        ],
+      } as SWRResponse,
+    );
+
     render(<FormWrapper />);
 
     await user.click(screen.getByLabelText('splits.1.account'));
@@ -79,17 +92,22 @@ describe('SplitField', () => {
 
   it('sets currency to account selection', async () => {
     const user = userEvent.setup();
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
+    jest.spyOn(apiHook, 'default').mockReturnValue(
       {
-        guid: 'account_guid_1',
-        path: 'path1',
-        type: 'ASSET',
-        commodity: {
-          guid: 'sgd',
-          mnemonic: 'SGD',
-        },
-      } as Account,
-    ]);
+        data: [
+          {
+            guid: 'account_guid_1',
+            path: 'path1',
+            type: 'ASSET',
+            commodity: {
+              guid: 'sgd',
+              mnemonic: 'SGD',
+            },
+          } as Account,
+        ],
+      } as SWRResponse,
+    );
+
     render(<FormWrapper />);
 
     await user.click(screen.getByLabelText('splits.0.account'));
@@ -117,19 +135,24 @@ describe('SplitField', () => {
 
   it('sets value * exchangeRate when quantity changes and currency is not txCurrency', async () => {
     const user = userEvent.setup();
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
+    jest.spyOn(apiHook, 'default').mockReturnValue(
       {
-        guid: 'account_guid_1',
-        path: 'path1',
-        type: 'ASSET',
-        commodity: {
-          guid: 'sgd',
-          mnemonic: 'SGD',
-        },
-      } as Account,
-    ]);
+        data: [
+          {
+            guid: 'account_guid_1',
+            path: 'path1',
+            type: 'ASSET',
+            commodity: {
+              guid: 'sgd',
+              mnemonic: 'SGD',
+            },
+          } as Account,
+        ],
+      } as SWRResponse,
+    );
     const mockGetPrice = jest.spyOn(Stocker.prototype, 'getPrice')
       .mockResolvedValue({ price: 0.7, currency: '' });
+
     render(<FormWrapper />);
 
     await user.type(screen.getByTestId('date'), '2023-01-01');
@@ -151,17 +174,21 @@ describe('SplitField', () => {
 
   it('sets value * exchangeRate when quantity changes and currency is not txCurrency, investment', async () => {
     const user = userEvent.setup();
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
+    jest.spyOn(apiHook, 'default').mockReturnValue(
       {
-        guid: 'account_guid_1',
-        path: 'path1',
-        type: 'STOCK',
-        commodity: {
-          guid: 'googl',
-          mnemonic: 'GOOGL',
-        },
-      } as Account,
-    ]);
+        data: [
+          {
+            guid: 'account_guid_1',
+            path: 'path1',
+            type: 'STOCK',
+            commodity: {
+              guid: 'googl',
+              mnemonic: 'GOOGL',
+            },
+          } as Account,
+        ],
+      } as SWRResponse,
+    );
     const mockGetPrice = jest.spyOn(Stocker.prototype, 'getPrice')
       .mockResolvedValue({ price: 89.12, currency: 'USD' });
     render(<FormWrapper />);
@@ -232,10 +259,8 @@ function FormWrapper({ disabled = false }: { disabled?: boolean }): JSX.Element 
         {...form.register('date')}
         type="date"
       />
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <SplitField index={0} form={form} disabled={disabled} />
-        <SplitField index={1} form={form} disabled={disabled} />
-      </SWRConfig>
+      <SplitField index={0} form={form} disabled={disabled} />
+      <SplitField index={1} form={form} disabled={disabled} />
     </>
   );
 }

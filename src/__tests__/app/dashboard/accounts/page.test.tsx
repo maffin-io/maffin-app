@@ -3,8 +3,8 @@ import {
   screen,
   render,
 } from '@testing-library/react';
-import * as swr from 'swr';
 import { DateTime, Interval } from 'luxon';
+import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
 import type { Account } from '@/book/entities';
@@ -12,17 +12,12 @@ import AccountsPage from '@/app/dashboard/accounts/page';
 import AccountsTable from '@/components/AccountsTable';
 import AddAccountButton from '@/components/buttons/AddAccountButton';
 import DateRangeInput from '@/components/DateRangeInput';
-import { PriceDB, PriceDBMap } from '@/book/prices';
-import * as queries from '@/book/queries';
+import { PriceDBMap } from '@/book/prices';
+import * as apiHook from '@/hooks/useApi';
 
-jest.mock('@/hooks/useDataSource', () => ({
+jest.mock('@/hooks/useApi', () => ({
   __esModule: true,
-  ...jest.requireActual('@/hooks/useDataSource'),
-}));
-
-jest.mock('@/book/queries', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/book/queries'),
+  ...jest.requireActual('@/hooks/useApi'),
 }));
 
 jest.mock('@/components/buttons/AddAccountButton', () => jest.fn(
@@ -39,8 +34,8 @@ jest.mock('@/components/DateRangeInput', () => jest.fn(
 
 describe('AccountsPage', () => {
   beforeEach(() => {
-    jest.spyOn(queries, 'getEarliestDate').mockResolvedValue(DateTime.fromISO('2022-01-01'));
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02'));
+    jest.spyOn(apiHook, 'default').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
   afterEach(() => {
@@ -48,12 +43,15 @@ describe('AccountsPage', () => {
   });
 
   it('passes empty data to components when loading when not ready', async () => {
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([]);
-    const { container } = render(
-      <swr.SWRConfig value={{ provider: () => new Map() }}>
-        <AccountsPage />
-      </swr.SWRConfig>,
-    );
+    const date = DateTime.fromISO('2022-01-01');
+    jest.spyOn(apiHook, 'default')
+      .mockReturnValueOnce({ data: date } as SWRResponse)
+      .mockReturnValueOnce({ data: [] } as SWRResponse)
+      .mockReturnValueOnce({ data: undefined } as SWRResponse)
+      .mockReturnValueOnce({ data: date } as SWRResponse)
+      .mockReturnValueOnce({ data: [] } as SWRResponse)
+      .mockReturnValueOnce({ data: undefined } as SWRResponse);
+    const { container } = render(<AccountsPage />);
 
     await screen.findByTestId('AddAccountButton');
     expect(AddAccountButton).toHaveBeenLastCalledWith({}, {});
@@ -116,25 +114,25 @@ describe('AccountsPage', () => {
       } as Account,
     ];
 
-    jest.spyOn(PriceDB, 'getTodayQuotes').mockResolvedValue({
+    const todayQuotes = {
       getPrice: (from, to, date) => ({
         guid: `${from}.${to}.${date}`,
         value: 0.98,
       }),
-    } as PriceDBMap);
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue(accounts);
+    } as PriceDBMap;
 
-    const { container } = render(
-      <swr.SWRConfig value={{ provider: () => new Map() }}>
-        <AccountsPage />
-      </swr.SWRConfig>,
-    );
+    const date = DateTime.fromISO('2022-01-01');
+    jest.spyOn(apiHook, 'default')
+      .mockReturnValueOnce({ data: date } as SWRResponse)
+      .mockReturnValueOnce({ data: accounts } as SWRResponse)
+      .mockReturnValueOnce({ data: todayQuotes } as SWRResponse)
+      .mockReturnValueOnce({ data: date } as SWRResponse)
+      .mockReturnValueOnce({ data: accounts } as SWRResponse)
+      .mockReturnValueOnce({ data: todayQuotes } as SWRResponse);
+
+    const { container } = render(<AccountsPage />);
 
     await screen.findByTestId('AccountsTable');
-    expect(queries.getAccountsWithPath).toHaveBeenCalledWith({
-      relations: { splits: { fk_transaction: true } },
-      showRoot: true,
-    });
     expect(AccountsTable).toBeCalledTimes(2);
     expect(AccountsTable).toHaveBeenLastCalledWith(
       {
@@ -201,7 +199,7 @@ describe('AccountsPage', () => {
       } as Account,
     ];
 
-    jest.spyOn(PriceDB, 'getTodayQuotes').mockResolvedValue({
+    const todayQuotes = {
       getPrice: (from, to, date) => ({
         guid: `${from}.${to}.${date}`,
         value: 0.98,
@@ -213,21 +211,21 @@ describe('AccountsPage', () => {
           mnemonic: 'USD',
         },
       }),
-    } as PriceDBMap);
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue(accounts);
+    } as PriceDBMap;
 
-    const { container } = render(
-      <swr.SWRConfig value={{ provider: () => new Map() }}>
-        <AccountsPage />
-      </swr.SWRConfig>,
-    );
+    const date = DateTime.fromISO('2022-01-01');
+    jest.spyOn(apiHook, 'default')
+      .mockReturnValueOnce({ data: date } as SWRResponse)
+      .mockReturnValueOnce({ data: accounts } as SWRResponse)
+      .mockReturnValueOnce({ data: todayQuotes } as SWRResponse)
+      .mockReturnValueOnce({ data: date } as SWRResponse)
+      .mockReturnValueOnce({ data: accounts } as SWRResponse)
+      .mockReturnValueOnce({ data: todayQuotes } as SWRResponse);
+
+    const { container } = render(<AccountsPage />);
 
     await screen.findByTestId('AccountsTable');
-    expect(queries.getAccountsWithPath).toHaveBeenCalledWith({
-      relations: { splits: { fk_transaction: true } },
-      showRoot: true,
-    });
-    expect(AccountsTable).toBeCalledTimes(3);
+    expect(AccountsTable).toBeCalledTimes(2);
     expect(AccountsTable).toHaveBeenLastCalledWith(
       {
         tree: {
@@ -260,26 +258,5 @@ describe('AccountsPage', () => {
       (AccountsTable as jest.Mock).mock.calls[1][0].tree.children[0].children[0].total.toString(),
     ).toEqual('200.00 USD'); // 2 GOOGL * 100 USD
     expect(container).toMatchSnapshot();
-  });
-
-  it('calls SWR data once', async () => {
-    const { rerender } = render(
-      <swr.SWRConfig value={{ provider: () => new Map() }}>
-        <AccountsPage />
-      </swr.SWRConfig>,
-    );
-
-    await screen.findByTestId('AccountsTable');
-
-    rerender(
-      <swr.SWRConfig value={{ provider: () => new Map() }}>
-        <AccountsPage />
-      </swr.SWRConfig>,
-    );
-
-    await screen.findByTestId('AccountsTable');
-    expect(queries.getAccountsWithPath).toBeCalledTimes(1);
-    expect(PriceDB.getTodayQuotes).toBeCalledTimes(1);
-    expect(queries.getEarliestDate).toBeCalledTimes(1);
   });
 });

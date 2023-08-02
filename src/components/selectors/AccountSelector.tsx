@@ -1,9 +1,9 @@
 import React from 'react';
-import useSWRImmutable from 'swr/immutable';
+import type { SWRResponse } from 'swr';
 
 import Selector from '@/components/selectors/Selector';
+import { useApi } from '@/hooks';
 import { Account } from '@/book/entities';
-import { getAccountsWithPath } from '@/book/queries';
 
 export type AccountSelectorProps = {
   placeholder?: string,
@@ -30,10 +30,7 @@ export default function AccountSelector(
     onChange = () => {},
   }: AccountSelectorProps,
 ): JSX.Element {
-  let { data: accounts } = useSWRImmutable(
-    '/api/accounts',
-    getAccountsWithPath,
-  );
+  let { data: accounts } = useApi('/api/accounts') as SWRResponse<Account[]>;
 
   accounts = accounts || [];
   accounts = accounts.filter(account => !(ignoreAccounts).includes(account.type));

@@ -16,6 +16,14 @@ jest.mock('../../models', () => ({
   InvestmentAccount: jest.fn(),
 }));
 
+jest.mock('../../queries/getMainCurrency', () => ({
+  __esModule: true,
+  getMainCurrency: async () => ({
+    guid: 'eur',
+    mnemonic: 'EUR',
+  }) as Commodity,
+}));
+
 describe('getInvestments', () => {
   let datasource: DataSource;
   let mockGetHistory: jest.SpyInstance;
@@ -52,12 +60,10 @@ describe('getInvestments', () => {
       },
       date: DateTime.now(),
     });
-
     mockGetTodayQuotes = jest.spyOn(PriceDB, 'getTodayQuotes').mockResolvedValue(new PriceDBMap([price1]));
     mockGetHistory = jest.spyOn(PriceDB, 'getHistory').mockResolvedValue(new PriceDBMap([price2]));
     mockAccountFind = jest.spyOn(Account, 'find').mockResolvedValue([]);
-    // @ts-ignore
-    InvestmentAccount.mockReturnValue({ guid: 'investment_guid' });
+    (InvestmentAccount as jest.Mock).mockReturnValue({ guid: 'investment_guid' });
   });
 
   afterEach(async () => {
@@ -65,7 +71,7 @@ describe('getInvestments', () => {
   });
 
   it('returns empty investments when no investment accounts', async () => {
-    const investments = await getInvestments('EUR');
+    const investments = await getInvestments();
 
     expect(investments).toEqual([]);
   });
@@ -81,7 +87,7 @@ describe('getInvestments', () => {
     });
     mockAccountFind = jest.spyOn(Account, 'find').mockResolvedValue([account]);
 
-    await getInvestments('EUR');
+    await getInvestments();
 
     expect(mockAccountFind).toHaveBeenCalledWith({
       where: [

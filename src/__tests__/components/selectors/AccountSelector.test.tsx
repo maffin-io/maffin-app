@@ -1,24 +1,24 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { SWRConfig } from 'swr';
+import type { SWRResponse } from 'swr';
 
 import Selector from '@/components/selectors/Selector';
 import { Account, Commodity } from '@/book/entities';
 import { AccountSelector } from '@/components/selectors';
-import * as queries from '@/book/queries';
-
-jest.mock('@/book/queries', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/book/queries'),
-}));
+import * as apiHook from '@/hooks/useApi';
 
 jest.mock('@/components/selectors/Selector', () => jest.fn(
   () => <div data-testid="Selector" />,
 ));
 
+jest.mock('@/hooks/useApi', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/useApi'),
+}));
+
 describe('AccountSelector', () => {
   beforeEach(() => {
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([]);
+    jest.spyOn(apiHook, 'default').mockReturnValue({ data: [] } as SWRResponse);
   });
 
   afterEach(() => {
@@ -26,11 +26,7 @@ describe('AccountSelector', () => {
   });
 
   it('renders as expected', async () => {
-    const { container } = render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <AccountSelector />
-      </SWRConfig>,
-    );
+    const { container } = render(<AccountSelector />);
 
     await screen.findByTestId('Selector');
     expect(Selector).toHaveBeenCalledWith(
@@ -51,24 +47,26 @@ describe('AccountSelector', () => {
   });
 
   it('passes data as expected', async () => {
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
+    jest.spyOn(apiHook, 'default').mockReturnValue(
       {
-        guid: 'guid',
-        path: 'label1',
-      } as Account,
-    ]);
+        data: [
+          {
+            guid: 'guid',
+            path: 'label1',
+          } as Account,
+        ],
+      } as SWRResponse,
+    );
     const mockOnSave = jest.fn();
     const { container } = render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <AccountSelector
-          id="customId"
-          placeholder="My placeholder"
-          isClearable={false}
-          className="class"
-          defaultValue={{ guid: 'guid' } as Account}
-          onChange={mockOnSave}
-        />
-      </SWRConfig>,
+      <AccountSelector
+        id="customId"
+        placeholder="My placeholder"
+        isClearable={false}
+        className="class"
+        defaultValue={{ guid: 'guid' } as Account}
+        onChange={mockOnSave}
+      />,
     );
 
     await screen.findByTestId('Selector');
@@ -108,13 +106,13 @@ describe('AccountSelector', () => {
         } as Commodity,
       } as Account,
     ];
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue(options);
-
-    render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <AccountSelector />
-      </SWRConfig>,
+    jest.spyOn(apiHook, 'default').mockReturnValue(
+      {
+        data: options,
+      } as SWRResponse,
     );
+
+    render(<AccountSelector />);
 
     await screen.findByTestId('Selector');
     expect(Selector).toHaveBeenCalledWith(
@@ -144,14 +142,16 @@ describe('AccountSelector', () => {
         } as Commodity,
       } as Account,
     ];
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue(options);
+    jest.spyOn(apiHook, 'default').mockReturnValue(
+      {
+        data: options,
+      } as SWRResponse,
+    );
 
     render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <AccountSelector
-          ignoreAccounts={['TYPE2']}
-        />
-      </SWRConfig>,
+      <AccountSelector
+        ignoreAccounts={['TYPE2']}
+      />,
     );
 
     await screen.findByTestId('Selector');
@@ -182,13 +182,13 @@ describe('AccountSelector', () => {
         } as Commodity,
       } as Account,
     ];
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue(options);
-
-    render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <AccountSelector />
-      </SWRConfig>,
+    jest.spyOn(apiHook, 'default').mockReturnValue(
+      {
+        data: options,
+      } as SWRResponse,
     );
+
+    render(<AccountSelector />);
 
     await screen.findByTestId('Selector');
     expect(Selector).toHaveBeenCalledWith(
@@ -218,15 +218,13 @@ describe('AccountSelector', () => {
         } as Commodity,
       } as Account,
     ];
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue(options);
-
-    render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <AccountSelector
-          showRoot
-        />
-      </SWRConfig>,
+    jest.spyOn(apiHook, 'default').mockReturnValue(
+      {
+        data: options,
+      } as SWRResponse,
     );
+
+    render(<AccountSelector showRoot />);
 
     await screen.findByTestId('Selector');
     expect(Selector).toHaveBeenCalledWith(
@@ -235,18 +233,5 @@ describe('AccountSelector', () => {
       }),
       {},
     );
-  });
-
-  it('gets accounts once only', async () => {
-    const { rerender } = render(
-      <AccountSelector />,
-    );
-
-    rerender(
-      <AccountSelector />,
-    );
-
-    await screen.findByTestId('Selector');
-    expect(queries.getAccountsWithPath).toHaveBeenCalledTimes(1);
   });
 });

@@ -2,26 +2,21 @@
 
 import React from 'react';
 import classNames from 'classnames';
-import useSWRImmutable from 'swr/immutable';
+import type { SWRResponse } from 'swr';
 
+import type { InvestmentAccount } from '@/book/models';
 import WeightsChart from '@/components/pages/investments/WeightsChart';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import InvestmentsTable from '@/components/pages/investments/InvestmentsTable';
 import DividendChart from '@/components/pages/investments/DividendChart';
 import { toFixed } from '@/helpers/number';
 import Money from '@/book/Money';
-import { getInvestments, getMainCurrency } from '@/book/queries';
+import { useApi } from '@/hooks';
 
 export default function InvestmentsPage(): JSX.Element {
-  const { data: currency } = useSWRImmutable(
-    '/api/main_currency',
-    getMainCurrency,
-  );
+  let { data: investments } = useApi('/api/investments') as SWRResponse<InvestmentAccount[]>;
+  const { data: currency } = useApi('/api/main-currency');
   const mainCurrency = currency?.mnemonic || 'EUR';
-  let { data: investments } = useSWRImmutable(
-    currency ? '/api/investments' : null,
-    () => getInvestments(mainCurrency),
-  );
 
   investments = investments || [];
 

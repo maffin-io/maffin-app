@@ -1,22 +1,28 @@
 'use client';
 
 import React from 'react';
-import useSWRImmutable from 'swr/immutable';
 import { DateTime, Interval } from 'luxon';
+import type { SWRResponse } from 'swr';
 
 import type { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import AccountsTable from '@/components/AccountsTable';
 import AddAccountButton from '@/components/buttons/AddAccountButton';
-import { getAccountsWithPath, getEarliestDate } from '@/book/queries';
-import { PriceDB, PriceDBMap } from '@/book/prices';
+import { PriceDBMap } from '@/book/prices';
 import DateRangeInput from '@/components/DateRangeInput';
+import { useApi } from '@/hooks';
 import type { AccountsTree } from '@/types/accounts';
 
 export default function AccountsPage(): JSX.Element {
-  const { data: earliestDate } = useSWRImmutable(
-    '/api/start-date',
-    () => getEarliestDate(),
+  const { data: earliestDate } = useApi('/api/start-date');
+  let { data: accounts } = useApi('/api/accounts/splits') as SWRResponse<Account[]>;
+  let { data: todayPrices } = useApi('/api/prices/today');
+
+  const [dateRange, setDateRange] = React.useState(
+    Interval.fromDateTimes(
+      earliestDate || DateTime.now().startOf('year'),
+      DateTime.now(),
+    ),
   );
 
   React.useEffect(() => {
@@ -27,26 +33,6 @@ export default function AccountsPage(): JSX.Element {
       ));
     }
   }, [earliestDate]);
-
-  const [dateRange, setDateRange] = React.useState(
-    Interval.fromDateTimes(
-      earliestDate || DateTime.now().startOf('year'),
-      DateTime.now(),
-    ),
-  );
-
-  let { data: accounts } = useSWRImmutable(
-    '/api/accounts/splits',
-    () => getAccountsWithPath({
-      relations: { splits: { fk_transaction: true } },
-      showRoot: true,
-    }),
-  );
-
-  let { data: todayPrices } = useSWRImmutable(
-    '/api/prices/today',
-    PriceDB.getTodayQuotes,
-  );
 
   accounts = accounts || [];
   todayPrices = todayPrices || new PriceDBMap();
