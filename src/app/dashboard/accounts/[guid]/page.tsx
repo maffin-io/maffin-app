@@ -2,10 +2,11 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import useSWRImmutable from 'swr/immutable';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
+import type { SWRResponse } from 'swr';
 
+import type { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import SplitsHistogram from '@/components/pages/account/SplitsHistogram';
 import TotalLineChart from '@/components/pages/account/TotalLineChart';
@@ -13,7 +14,7 @@ import StatisticsWidget from '@/components/StatisticsWidget';
 import { Split } from '@/book/entities';
 import TransactionsTable from '@/components/TransactionsTable';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
-import { getAccountsWithPath } from '@/book/queries';
+import { useApi } from '@/hooks';
 
 export type AccountPageProps = {
   params: {
@@ -22,43 +23,8 @@ export type AccountPageProps = {
 };
 
 export default function AccountPage({ params }: AccountPageProps): JSX.Element {
-  let { data: accounts } = useSWRImmutable(
-    '/api/accounts',
-    getAccountsWithPath,
-  );
-  let { data: splits } = useSWRImmutable(
-    `/api/splits/${params.guid}`,
-    () => {
-      const start = performance.now();
-      const sps = Split.find({
-        where: {
-          fk_account: {
-            guid: params.guid,
-          },
-        },
-        relations: {
-          fk_transaction: {
-            splits: {
-              fk_account: true,
-            },
-          },
-          fk_account: true,
-        },
-        order: {
-          fk_transaction: {
-            date: 'DESC',
-          },
-          // This is so debit is always before credit
-          // so we avoid negative amounts when display
-          // partial totals
-          quantityNum: 'ASC',
-        },
-      });
-      const end = performance.now();
-      console.log(`get splits: ${end - start}ms`);
-      return sps;
-    },
-  );
+  let { data: accounts } = useApi('/api/accounts') as SWRResponse<Account[]>;
+  let { data: splits } = useApi('/api/splits/<guid>', { guid: params.guid }) as SWRResponse<Split[]>;
 
   const router = useRouter();
   // We cant use fallback data to set a default as SWR treats

@@ -5,11 +5,10 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DataSource } from 'typeorm';
-import { SWRConfig } from 'swr';
 import * as swr from 'swr';
+import type { SWRResponse } from 'swr';
 
 import { getAllowedSubAccounts } from '@/book/helpers/accountType';
-import * as queries from '@/book/queries';
 import {
   Account,
   Commodity,
@@ -18,16 +17,13 @@ import {
   Transaction,
 } from '@/book/entities';
 import AccountForm from '@/components/forms/account/AccountForm';
+import * as apiHook from '@/hooks/useApi';
 
-jest.mock('swr', () => ({
-  __esModule: true,
-  ...jest.requireActual('swr'),
-  mutate: jest.fn(),
-}));
+jest.mock('swr');
 
-jest.mock('@/book/queries', () => ({
+jest.mock('@/hooks/useApi', () => ({
   __esModule: true,
-  ...jest.requireActual('@/book/queries'),
+  ...jest.requireActual('@/hooks/useApi'),
 }));
 
 describe('AccountForm', () => {
@@ -75,9 +71,17 @@ describe('AccountForm', () => {
     assetAccount.path = 'Assets';
     expenseAccount.path = 'Expenses';
 
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
-      root, assetAccount, expenseAccount,
-    ]);
+    jest.spyOn(apiHook, 'default')
+      .mockImplementation((key: apiHook.ApiPaths | null) => {
+        if (key === '/api/commodities') {
+          return { data: [eur] } as SWRResponse;
+        }
+        if (key === '/api/accounts') {
+          return { data: [root, assetAccount, expenseAccount] } as SWRResponse;
+        }
+
+        return { data: undefined } as SWRResponse;
+      });
   });
 
   afterEach(async () => {
@@ -87,11 +91,9 @@ describe('AccountForm', () => {
 
   it('renders as expected', async () => {
     const { container } = render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <AccountForm
-          onSave={() => {}}
-        />
-      </SWRConfig>,
+      <AccountForm
+        onSave={() => {}}
+      />,
     );
 
     await screen.findByLabelText('Name');
@@ -103,11 +105,9 @@ describe('AccountForm', () => {
 
   it('button is disabled when form not valid', async () => {
     render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <AccountForm
-          onSave={() => {}}
-        />
-      </SWRConfig>,
+      <AccountForm
+        onSave={() => {}}
+      />,
     );
 
     const button = await screen.findByText('Save');
@@ -143,16 +143,14 @@ describe('AccountForm', () => {
     stockAccount.path = 'Assets:Stock';
     mutualAccount.path = 'Assets:Mutual';
 
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
-      root, assetAccount, expenseAccount, stockAccount, mutualAccount,
-    ]);
+    jest.spyOn(apiHook, 'default').mockReturnValue(
+      { data: [root, assetAccount, expenseAccount, stockAccount, mutualAccount] } as SWRResponse,
+    );
 
     render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <AccountForm
-          onSave={() => {}}
-        />
-      </SWRConfig>,
+      <AccountForm
+        onSave={() => {}}
+      />,
     );
 
     await user.click(screen.getByRole('combobox', { name: 'parentInput' }));
@@ -165,12 +163,11 @@ describe('AccountForm', () => {
   it('creates account with expected params, mutates and saves', async () => {
     const user = userEvent.setup();
     const mockSave = jest.fn();
+
     render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <AccountForm
-          onSave={mockSave}
-        />
-      </SWRConfig>,
+      <AccountForm
+        onSave={mockSave}
+      />,
     );
 
     await user.type(screen.getByLabelText('Name'), 'TestAccount');
@@ -226,17 +223,15 @@ describe('AccountForm', () => {
     }).save();
     bankAccount.path = 'Assets:Bank';
 
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
-      root, assetAccount, expenseAccount, incomeAccount, bankAccount,
-    ]);
+    jest.spyOn(apiHook, 'default').mockReturnValue(
+      { data: [root, assetAccount, expenseAccount, incomeAccount, bankAccount] } as SWRResponse,
+    );
 
     const user = userEvent.setup();
     render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <AccountForm
-          onSave={() => {}}
-        />
-      </SWRConfig>,
+      <AccountForm
+        onSave={() => {}}
+      />,
     );
 
     await user.type(screen.getByLabelText('Name'), 'My account');

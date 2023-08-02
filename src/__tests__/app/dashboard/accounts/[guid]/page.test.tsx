@@ -5,7 +5,7 @@ import {
   render,
   screen,
 } from '@testing-library/react';
-import * as swr from 'swr';
+import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
 import AccountPage from '@/app/dashboard/accounts/[guid]/page';
@@ -14,11 +14,11 @@ import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import SplitsHistogram from '@/components/pages/account/SplitsHistogram';
 import TotalLineChart from '@/components/pages/account/TotalLineChart';
 import { Account, Split } from '@/book/entities';
-import * as queries from '@/book/queries';
+import * as apiHook from '@/hooks/useApi';
 
-jest.mock('swr', () => ({
+jest.mock('@/hooks/useApi', () => ({
   __esModule: true,
-  ...jest.requireActual('swr'),
+  ...jest.requireActual('@/hooks/useApi'),
 }));
 
 jest.mock('@/components/buttons/TransactionFormButton', () => jest.fn(
@@ -37,11 +37,6 @@ jest.mock('@/components/pages/account/TotalLineChart', () => jest.fn(
   () => <div data-testid="TotalLineChart" />,
 ));
 
-jest.mock('@/book/queries', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/book/queries'),
-}));
-
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
@@ -50,15 +45,45 @@ const useRouter = jest.spyOn(require('next/navigation'), 'useRouter');
 
 describe('AccountPage', () => {
   let mockRouterPush: jest.Mock;
-  let mockFindSplits: jest.SpyInstance;
 
   beforeEach(() => {
-    jest.spyOn(swr, 'mutate');
     mockRouterPush = jest.fn();
     useRouter.mockImplementation(() => ({
       push: mockRouterPush,
     }));
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
+    jest.spyOn(apiHook, 'default').mockReturnValue({ data: undefined } as SWRResponse);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('displays loading while accounts is empty', async () => {
+    const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
+
+    await screen.findByText('Loading...');
+    expect(TransactionFormButton).toHaveBeenCalledTimes(0);
+    expect(TransactionsTable).toHaveBeenCalledTimes(0);
+    expect(apiHook.default).toBeCalledTimes(2);
+    expect(apiHook.default).toHaveBeenNthCalledWith(1, '/api/accounts');
+    expect(apiHook.default).toHaveBeenNthCalledWith(2, '/api/splits/<guid>', { guid: 'guid' });
+    expect(container).toMatchSnapshot();
+  });
+
+  it('returns 404 when account not found', async () => {
+    jest.spyOn(apiHook, 'default')
+      .mockReturnValueOnce({ data: [{ guid: 'other' }] } as SWRResponse)
+      .mockReturnValueOnce({ data: [] } as SWRResponse);
+
+    render(<AccountPage params={{ guid: 'guid' }} />);
+
+    await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/404'));
+    expect(TransactionFormButton).toHaveBeenCalledTimes(0);
+    expect(TransactionsTable).toHaveBeenCalledTimes(0);
+  });
+
+  it('renders as expected with account', async () => {
+    const accounts = [
       {
         guid: 'guid',
         path: 'path',
@@ -68,86 +93,27 @@ describe('AccountPage', () => {
         },
         getTotal: () => new Money(100, 'EUR'),
       } as Account,
-    ]);
-    mockFindSplits = jest.spyOn(Split, 'find').mockResolvedValue(
-      [
-        {
-          guid: 'split_guid',
-          transaction: {
-            date: DateTime.fromISO('2023-01-01'),
-          },
-          account: {
-            type: 'TYPE',
-          },
-          quantity: 100,
-        } as Split,
-      ],
-    );
-  });
+    ];
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+    const splits = [
+      {
+        guid: 'split_guid',
+        transaction: {
+          date: DateTime.fromISO('2023-01-01'),
+        },
+        account: {
+          type: 'TYPE',
+        },
+        quantity: 100,
+      } as Split,
+    ];
 
-  it('displays loading while accounts is empty', async () => {
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([]);
-    const { container } = render(
-      <swr.SWRConfig value={{ provider: () => new Map() }}>
-        <AccountPage params={{ guid: 'guid' }} />
-      </swr.SWRConfig>,
-    );
-
-    await screen.findByText('Loading...');
-    expect(TransactionFormButton).toHaveBeenCalledTimes(0);
-    expect(TransactionsTable).toHaveBeenCalledTimes(0);
-    expect(container).toMatchSnapshot();
-  });
-
-  it('returns 404 when account not found', async () => {
-    jest.spyOn(queries, 'getAccountsWithPath').mockResolvedValue([
-      { guid: 'other' } as Account,
-    ]);
-
-    render(
-      <swr.SWRConfig value={{ provider: () => new Map() }}>
-        <AccountPage params={{ guid: 'guid' }} />
-      </swr.SWRConfig>,
-    );
-
-    await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/404'));
-    expect(TransactionFormButton).toHaveBeenCalledTimes(0);
-    expect(TransactionsTable).toHaveBeenCalledTimes(0);
-  });
-
-  it('renders as expected with account', async () => {
-    const { container } = render(
-      <swr.SWRConfig value={{ provider: () => new Map() }}>
-        <AccountPage params={{ guid: 'guid' }} />
-      </swr.SWRConfig>,
-    );
+    jest.spyOn(apiHook, 'default')
+      .mockReturnValueOnce({ data: accounts } as SWRResponse)
+      .mockReturnValueOnce({ data: splits } as SWRResponse);
+    const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
 
     await screen.findByTestId('TransactionsTable');
-    expect(mockFindSplits).toHaveBeenCalledWith({
-      where: {
-        fk_account: {
-          guid: 'guid',
-        },
-      },
-      relations: {
-        fk_transaction: {
-          splits: {
-            fk_account: true,
-          },
-        },
-        fk_account: true,
-      },
-      order: {
-        fk_transaction: {
-          date: 'DESC',
-        },
-        quantityNum: 'ASC',
-      },
-    });
     expect(TransactionFormButton).toHaveBeenLastCalledWith(
       {
         defaultValues: {
@@ -244,19 +210,5 @@ describe('AccountPage', () => {
       {},
     );
     expect(container).toMatchSnapshot();
-  });
-
-  it('retrieves splits and accounts once only', async () => {
-    const { rerender } = render(
-      <AccountPage params={{ guid: 'guid' }} />,
-    );
-
-    rerender(
-      <AccountPage params={{ guid: 'guid' }} />,
-    );
-
-    await screen.findByTestId('TransactionsTable');
-    expect(queries.getAccountsWithPath).toHaveBeenCalledTimes(1);
-    expect(mockFindSplits).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,5 +1,6 @@
-export type UserInfo = {
-  name: string;
-  email: string;
-  image: string;
+export type User = {
+  name: string,
+  email: string,
+  image: string,
+  isLoggedIn: boolean,
 };
