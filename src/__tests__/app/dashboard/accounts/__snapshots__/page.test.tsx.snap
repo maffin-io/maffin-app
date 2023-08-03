@@ -30,7 +30,7 @@ exports[`AccountsPage generates tree as expected, no investments 1`] = `
       class="col-span-3 p-4 mr-4 rounded-sm bg-gunmetal-700"
     >
       <div
-        data-testid="NetWorthRadial"
+        data-testid="NetWorthPie"
       />
     </div>
     <div
@@ -74,7 +74,7 @@ exports[`AccountsPage generates tree as expected, with investments 1`] = `
       class="col-span-3 p-4 mr-4 rounded-sm bg-gunmetal-700"
     >
       <div
-        data-testid="NetWorthRadial"
+        data-testid="NetWorthPie"
       />
     </div>
     <div
@@ -118,7 +118,7 @@ exports[`AccountsPage passes empty data to components when loading when not read
       class="col-span-3 p-4 mr-4 rounded-sm bg-gunmetal-700"
     >
       <div
-        data-testid="NetWorthRadial"
+        data-testid="NetWorthPie"
       />
     </div>
     <div

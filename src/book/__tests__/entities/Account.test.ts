@@ -1,4 +1,4 @@
-import { DateTime, Interval } from 'luxon';
+import { DateTime } from 'luxon';
 import { DataSource, BaseEntity } from 'typeorm';
 
 import {
@@ -352,10 +352,7 @@ describe('Account', () => {
       });
 
       expect(account.getTotal(
-        Interval.fromDateTimes(
-          DateTime.fromISO('2022-01-02'),
-          DateTime.fromISO('2023-01-03'),
-        ),
+        DateTime.fromISO('2023-01-02'),
       ).toString()).toEqual('0.15 EUR');
     });
   });

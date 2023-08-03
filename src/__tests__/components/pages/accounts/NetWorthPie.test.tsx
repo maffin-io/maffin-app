@@ -4,20 +4,20 @@ import { render } from '@testing-library/react';
 import { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import Chart, { ChartProps } from '@/components/charts/Chart';
-import NetWorthRadial from '@/components/pages/accounts/NetWorthRadial';
+import NetWorthPie from '@/components/pages/accounts/NetWorthPie';
 import type { AccountsTree } from '@/types/accounts';
 
 jest.mock('@/components/charts/Chart', () => jest.fn(
   () => <div data-testid="Chart" />,
 ));
 
-describe('NetWorthRadial', () => {
+describe('NetWorthPie', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('creates Chart with no data when no accounts', () => {
-    render(<NetWorthRadial tree={{} as AccountsTree} />);
+    render(<NetWorthPie tree={{} as AccountsTree} />);
 
     expect(Chart).toBeCalledWith(
       {
@@ -78,7 +78,7 @@ describe('NetWorthRadial', () => {
 
   it('computes net worth as expected', () => {
     render(
-      <NetWorthRadial
+      <NetWorthPie
         tree={
           {
             account: { guid: 'root' } as Account,
@@ -103,7 +103,15 @@ describe('NetWorthRadial', () => {
     const options = (Chart as jest.Mock).mock.calls[0][0] as ChartProps;
     expect(options.series).toEqual([1000, 100]);
     expect(options.unit).toEqual('EUR');
-    expect(options?.plotOptions?.pie?.donut?.labels?.total?.formatter?.(0)).toEqual('€900.00');
+    expect(
+      options?.plotOptions?.pie?.donut?.labels?.total?.formatter?.(
+        {
+          globals: {
+            series: [1000, 100],
+          },
+        },
+      ),
+    ).toEqual('€900.00');
     expect(
       options?.dataLabels?.formatter?.(
         0,
@@ -122,7 +130,7 @@ describe('NetWorthRadial', () => {
 
   it('computes net worth when no liabilities', () => {
     render(
-      <NetWorthRadial
+      <NetWorthPie
         tree={
           {
             account: { guid: 'root' } as Account,
@@ -142,6 +150,14 @@ describe('NetWorthRadial', () => {
     const options = (Chart as jest.Mock).mock.calls[0][0] as ChartProps;
     expect(options.series).toEqual([1000, 0]);
     expect(options.unit).toEqual('EUR');
-    expect(options?.plotOptions?.pie?.donut?.labels?.total?.formatter?.(0)).toEqual('€1,000.00');
+    expect(
+      options?.plotOptions?.pie?.donut?.labels?.total?.formatter?.(
+        {
+          globals: {
+            series: [1000, 0],
+          },
+        },
+      ),
+    ).toEqual('€1,000.00');
   });
 });

@@ -3,7 +3,7 @@ import {
   screen,
   render,
 } from '@testing-library/react';
-import { DateTime, Interval } from 'luxon';
+import { DateTime } from 'luxon';
 import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
@@ -12,7 +12,7 @@ import AccountsPage from '@/app/dashboard/accounts/page';
 import AccountsTable from '@/components/AccountsTable';
 import AddAccountButton from '@/components/buttons/AddAccountButton';
 import DateRangeInput from '@/components/DateRangeInput';
-import NetWorthRadial from '@/components/pages/accounts/NetWorthRadial';
+import NetWorthPie from '@/components/pages/accounts/NetWorthPie';
 import { PriceDBMap } from '@/book/prices';
 import * as apiHook from '@/hooks/useApi';
 
@@ -33,8 +33,8 @@ jest.mock('@/components/DateRangeInput', () => jest.fn(
   () => <div data-testid="DateRangeInput" />,
 ));
 
-jest.mock('@/components/pages/accounts/NetWorthRadial', () => jest.fn(
-  () => <div data-testid="NetWorthRadial" />,
+jest.mock('@/components/pages/accounts/NetWorthPie', () => jest.fn(
+  () => <div data-testid="NetWorthPie" />,
 ));
 
 describe('AccountsPage', () => {
@@ -50,9 +50,6 @@ describe('AccountsPage', () => {
   it('passes empty data to components when loading when not ready', async () => {
     const date = DateTime.fromISO('2022-01-01');
     jest.spyOn(apiHook, 'default')
-      .mockReturnValueOnce({ data: date } as SWRResponse)
-      .mockReturnValueOnce({ data: [] } as SWRResponse)
-      .mockReturnValueOnce({ data: undefined } as SWRResponse)
       .mockReturnValueOnce({ data: date } as SWRResponse)
       .mockReturnValueOnce({ data: [] } as SWRResponse)
       .mockReturnValueOnce({ data: undefined } as SWRResponse);
@@ -76,18 +73,19 @@ describe('AccountsPage', () => {
     await screen.findByTestId('DateRangeInput');
     expect(DateRangeInput).toHaveBeenLastCalledWith(
       {
-        dateRange: Interval.fromDateTimes(
-          DateTime.fromISO('2022-01-01'),
-          DateTime.fromISO('2023-01-02'),
-        ),
+        asSingle: true,
+        dateRange: {
+          start: DateTime.fromISO('2023-01-02'),
+          end: DateTime.fromISO('2023-01-02'),
+        },
         earliestDate: DateTime.fromISO('2022-01-01'),
         onChange: expect.any(Function),
       },
       {},
     );
 
-    await screen.findByTestId('NetWorthRadial');
-    expect(NetWorthRadial).toHaveBeenLastCalledWith(
+    await screen.findByTestId('NetWorthPie');
+    expect(NetWorthPie).toHaveBeenLastCalledWith(
       {
         tree: {
           account: {},
@@ -143,9 +141,6 @@ describe('AccountsPage', () => {
     jest.spyOn(apiHook, 'default')
       .mockReturnValueOnce({ data: date } as SWRResponse)
       .mockReturnValueOnce({ data: accounts } as SWRResponse)
-      .mockReturnValueOnce({ data: todayQuotes } as SWRResponse)
-      .mockReturnValueOnce({ data: date } as SWRResponse)
-      .mockReturnValueOnce({ data: accounts } as SWRResponse)
       .mockReturnValueOnce({ data: todayQuotes } as SWRResponse);
 
     const { container } = render(<AccountsPage />);
@@ -170,19 +165,19 @@ describe('AccountsPage', () => {
       },
     };
     await screen.findByTestId('AccountsTable');
-    expect(AccountsTable).toBeCalledTimes(2);
+    expect(AccountsTable).toBeCalledTimes(1);
     expect(AccountsTable).toHaveBeenLastCalledWith(expectedTree, {});
-    expect((AccountsTable as jest.Mock).mock.calls[1][0].tree.total.toString()).toEqual('0.00 EUR');
+    expect((AccountsTable as jest.Mock).mock.calls[0][0].tree.total.toString()).toEqual('0.00 EUR');
     expect(
       // eslint-disable-next-line testing-library/no-node-access
-      (AccountsTable as jest.Mock).mock.calls[1][0].tree.children[0].total.toString(),
+      (AccountsTable as jest.Mock).mock.calls[0][0].tree.children[0].total.toString(),
     ).toEqual('990.00 EUR'); // 1000 USD * 0.98 + 10 EUR
     expect(
       // eslint-disable-next-line testing-library/no-node-access
-      (AccountsTable as jest.Mock).mock.calls[1][0].tree.children[0].children[0].total.toString(),
+      (AccountsTable as jest.Mock).mock.calls[0][0].tree.children[0].children[0].total.toString(),
     ).toEqual('1000.00 USD');
 
-    expect(NetWorthRadial).toHaveBeenLastCalledWith(expectedTree, {});
+    expect(NetWorthPie).toHaveBeenLastCalledWith(expectedTree, {});
 
     expect(container).toMatchSnapshot();
   });
@@ -236,9 +231,6 @@ describe('AccountsPage', () => {
     jest.spyOn(apiHook, 'default')
       .mockReturnValueOnce({ data: date } as SWRResponse)
       .mockReturnValueOnce({ data: accounts } as SWRResponse)
-      .mockReturnValueOnce({ data: todayQuotes } as SWRResponse)
-      .mockReturnValueOnce({ data: date } as SWRResponse)
-      .mockReturnValueOnce({ data: accounts } as SWRResponse)
       .mockReturnValueOnce({ data: todayQuotes } as SWRResponse);
 
     const { container } = render(<AccountsPage />);
@@ -263,19 +255,19 @@ describe('AccountsPage', () => {
       },
     };
     await screen.findByTestId('AccountsTable');
-    expect(AccountsTable).toBeCalledTimes(2);
+    expect(AccountsTable).toBeCalledTimes(1);
     expect(AccountsTable).toHaveBeenLastCalledWith(expectedTree, {});
-    expect((AccountsTable as jest.Mock).mock.calls[1][0].tree.total.toString()).toEqual('0.00 EUR');
+    expect((AccountsTable as jest.Mock).mock.calls[0][0].tree.total.toString()).toEqual('0.00 EUR');
     expect(
       // eslint-disable-next-line testing-library/no-node-access
-      (AccountsTable as jest.Mock).mock.calls[1][0].tree.children[0].total.toString(),
+      (AccountsTable as jest.Mock).mock.calls[0][0].tree.children[0].total.toString(),
     ).toEqual('196.00 EUR'); // 200 USD * 0.98
     expect(
       // eslint-disable-next-line testing-library/no-node-access
-      (AccountsTable as jest.Mock).mock.calls[1][0].tree.children[0].children[0].total.toString(),
+      (AccountsTable as jest.Mock).mock.calls[0][0].tree.children[0].children[0].total.toString(),
     ).toEqual('200.00 USD'); // 2 GOOGL * 100 USD
 
-    expect(NetWorthRadial).toHaveBeenLastCalledWith(expectedTree, {});
+    expect(NetWorthPie).toHaveBeenLastCalledWith(expectedTree, {});
 
     expect(container).toMatchSnapshot();
   });

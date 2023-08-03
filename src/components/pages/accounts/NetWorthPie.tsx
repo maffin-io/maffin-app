@@ -4,13 +4,13 @@ import Chart from '@/components/charts/Chart';
 import type { AccountsTree } from '@/types/accounts';
 import { moneyToString } from '@/helpers/number';
 
-export type NetWorthRadialProps = {
+export type NetWorthPieProps = {
   tree: AccountsTree,
 };
 
-export default function NetWorthRadial({
+export default function NetWorthPie({
   tree,
-}: NetWorthRadialProps): JSX.Element {
+}: NetWorthPieProps): JSX.Element {
   let series: number[] = [];
   let assetsTotal = 0;
   let liabilitiesTotal = 0;
@@ -76,7 +76,10 @@ export default function NetWorthRadial({
                 show: true,
                 showAlways: true,
                 label: 'Net worth',
-                formatter: () => moneyToString(assetsTotal - liabilitiesTotal, unit),
+                formatter: (opts) => moneyToString(
+                  (opts.globals.series[0] || 0) - opts.globals.series[1],
+                  unit,
+                ),
               },
             },
           },

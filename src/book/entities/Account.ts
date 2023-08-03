@@ -9,7 +9,7 @@ import {
   TreeChildren,
   OneToMany,
 } from 'typeorm';
-import { Interval } from 'luxon';
+import { DateTime } from 'luxon';
 
 import type Commodity from './Commodity';
 import Money from '../Money';
@@ -91,15 +91,15 @@ export default class Account extends BaseEntity {
   @OneToMany('Split', (split: Split) => split.fk_account)
     splits!: Split[];
 
-  getTotal(interval?: Interval): Money {
+  getTotal(date?: DateTime): Money {
     if (this.type === 'ROOT') {
       // @ts-ignore
       return null;
     }
 
     let { splits } = this;
-    if (interval) {
-      splits = splits.filter(split => interval.contains(split.transaction.date));
+    if (date) {
+      splits = splits.filter(split => split.transaction.date < date);
     }
 
     const total = splits.reduce(
