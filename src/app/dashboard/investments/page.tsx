@@ -68,7 +68,7 @@ export default function InvestmentsPage(): JSX.Element {
                 title="Value/Cost"
                 stats={`${totalValue.format()}`}
                 description={
-                  `${toFixed(totalCost.toNumber()).toString()} total invested`
+                  `${totalCost.format()} total invested`
                 }
               />
             </div>
@@ -83,7 +83,7 @@ export default function InvestmentsPage(): JSX.Element {
                 title="Unrealized Profit"
                 stats={`${profitAbs.format()} (${toFixed(profitPct)}%)`}
                 description={
-                  `${toFixed(profitAbsWithDividends.toNumber())} (${toFixed(profitPctWithDividends)}%) with dividends`
+                  `${profitAbsWithDividends.format()} (${toFixed(profitPctWithDividends)}%) with dividends`
                 }
               />
             </div>

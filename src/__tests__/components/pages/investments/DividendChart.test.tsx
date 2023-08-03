@@ -126,7 +126,7 @@ describe('DividendChart', () => {
         ],
         showLegend: false,
         type: 'bar',
-        unit: '€',
+        unit: 'EUR',
       },
       {},
     );
@@ -137,7 +137,7 @@ describe('DividendChart', () => {
         id: 'barMonthly',
         stacked: true,
         type: 'bar',
-        unit: '€',
+        unit: 'EUR',
         xCategories: [
           'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
         ],

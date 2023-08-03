@@ -2,7 +2,7 @@ import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import classNames from 'classnames';
 
-import { toFixed } from '@/helpers/number';
+import { toFixed, moneyToString } from '@/helpers/number';
 import Table from '@/components/Table';
 import type { InvestmentAccount } from '@/book/models';
 import { currencyToSymbol } from '@/book/helpers';
@@ -47,8 +47,7 @@ const columns: ColumnDef<InvestmentAccount>[] = [
         <span className="font-14">
           {row.original.quantity.toNumber()}
           @
-          {currencyToSymbol(row.original.currency)}
-          {toFixed(row.original.avgPrice)}
+          {moneyToString(row.original.avgPrice, row.original.currency)}
         </span>
       </p>
     ),
@@ -59,8 +58,7 @@ const columns: ColumnDef<InvestmentAccount>[] = [
     header: 'Today',
     cell: ({ row, getValue }) => (
       <p className="m-0 d-inline-block align-middle font-16">
-        {currencyToSymbol(row.original.currency)}
-        {toFixed(row.original.quoteInfo.price)}
+        {moneyToString(row.original.quoteInfo.price, row.original.currency)}
         <br />
         <span
           className={classNames('badge', {

@@ -3,7 +3,6 @@ import { ApexOptions } from 'apexcharts';
 
 import Chart from '@/components/charts/Chart';
 import { Split } from '@/book/entities';
-import { currencyToSymbol } from '@/book/helpers';
 
 const MONTHS: { [key:number]:string; } = {
   1: 'Jan',
@@ -70,7 +69,7 @@ export default function SplitsHistogram({
       series={series}
       title="Movements per month"
       xCategories={Object.values(MONTHS)}
-      unit={currencyToSymbol(splits[0]?.account.commodity.mnemonic || '')}
+      unit={splits[0]?.account.commodity.mnemonic}
       plotOptions={
         {
           bar: {

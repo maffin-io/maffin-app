@@ -53,12 +53,12 @@ exports[`AccountPage renders as expected with account 1`] = `
             <p
               class=" text-2xl font-semibold my-3"
             >
-              100.00 €
+              €100.00
             </p>
             <span
               class="text-sm"
             >
-              with an average of 100.00 € per month
+              with an average of €100.00 per month
             </span>
           </div>
         </div>
@@ -74,7 +74,7 @@ exports[`AccountPage renders as expected with account 1`] = `
             <p
               class=" text-2xl font-semibold my-3"
             >
-              100.00 €
+              €100.00
             </p>
             <span
               class="text-sm"

@@ -3,7 +3,6 @@ import { ApexOptions } from 'apexcharts';
 
 import Chart from '@/components/charts/Chart';
 import { Split } from '@/book/entities';
-import { currencyToSymbol } from '@/book/helpers';
 
 export type TotalLineChartProps = {
   splits: Split[],
@@ -32,7 +31,7 @@ export default function TotalLineChart({
     <Chart
       type="line"
       series={series}
-      unit={currencyToSymbol(splits[0]?.account.commodity.mnemonic || '')}
+      unit={splits[0]?.account.commodity.mnemonic}
       height={255}
       xAxisType="datetime"
     />

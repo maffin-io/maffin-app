@@ -41,7 +41,11 @@ describe('WeightsChart', () => {
         },
         series: [{ data: [] }],
         type: 'treemap',
-        yFormatter: expect.any(Function),
+        tooltip: {
+          y: {
+            formatter: expect.any(Function),
+          },
+        },
       },
       {},
     );
@@ -147,7 +151,11 @@ describe('WeightsChart', () => {
           },
         ],
         type: 'treemap',
-        yFormatter: expect.any(Function),
+        tooltip: {
+          y: {
+            formatter: expect.any(Function),
+          },
+        },
       },
       {},
     );

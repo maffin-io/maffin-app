@@ -35,3 +35,10 @@ export function toAmountWithScale(n: number): {
 export function toFixed(n: number, decimals = 2): number {
   return parseFloat(n.toFixed(decimals));
 }
+
+export function moneyToString(n: number, currency: string): string {
+  return n.toLocaleString(navigator.language, {
+    style: 'currency',
+    currency: currency || 'EUR',
+  });
+}

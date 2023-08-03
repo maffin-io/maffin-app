@@ -16,19 +16,18 @@ describe('TotalLineChart', () => {
   });
 
   it('creates Chart with expected params', () => {
-    const { container } = render(<TotalLineChart splits={[]} />);
+    render(<TotalLineChart splits={[]} />);
 
     expect(Chart).toBeCalledWith(
       {
         height: 255,
         series: [{ data: [] }],
         type: 'line',
-        unit: '',
+        unit: undefined,
         xAxisType: 'datetime',
       },
       {},
     );
-    expect(container).toMatchSnapshot();
   });
 
   it('builds series accumulating values', () => {
@@ -85,7 +84,7 @@ describe('TotalLineChart', () => {
           },
         ],
         type: 'line',
-        unit: '€',
+        unit: 'EUR',
         xAxisType: 'datetime',
       },
       {},

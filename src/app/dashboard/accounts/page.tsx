@@ -8,6 +8,7 @@ import type { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import AccountsTable from '@/components/AccountsTable';
 import AddAccountButton from '@/components/buttons/AddAccountButton';
+import NetWorthRadial from '@/components/pages/accounts/NetWorthRadial';
 import { PriceDBMap } from '@/book/prices';
 import DateRangeInput from '@/components/DateRangeInput';
 import { useApi } from '@/hooks';
@@ -64,7 +65,10 @@ export default function AccountsPage(): JSX.Element {
           <AddAccountButton />
         </div>
       </div>
-      <div className="grid grid-cols-12 items-top pb-4">
+      <div className="grid grid-cols-12 items-start items-top pb-4">
+        <div className="col-span-3 p-4 mr-4 rounded-sm bg-gunmetal-700">
+          <NetWorthRadial tree={tree} />
+        </div>
         <div className="col-span-3 p-4 mr-4 rounded-sm bg-gunmetal-700">
           <AccountsTable tree={tree} />
         </div>
@@ -88,10 +92,10 @@ function buildNestedRows(
 ): AccountsTree {
   const { childrenIds } = current;
   let total = current.getTotal(dateRange);
-  let subRows: AccountsTree[] = [];
+  let children: AccountsTree[] = [];
 
   if (current.type === 'ROOT') {
-    subRows = childrenIds.map(childId => {
+    children = childrenIds.map(childId => {
       const child = accounts.find(a => a.guid === childId) as Account;
       const childTree = buildNestedRows(child, accounts, todayQuotes, dateRange);
       return childTree;
@@ -105,7 +109,7 @@ function buildNestedRows(
       );
       total = total.convert(price.currency.mnemonic, price.value);
     }
-    subRows = childrenIds.map(childId => {
+    children = childrenIds.map(childId => {
       const child = accounts.find(a => a.guid === childId) as Account;
       const childTree = buildNestedRows(child, accounts, todayQuotes, dateRange);
       let childTotal = childTree.total;
@@ -125,6 +129,6 @@ function buildNestedRows(
   return {
     account: current,
     total,
-    children: subRows,
+    children,
   };
 }

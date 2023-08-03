@@ -4,10 +4,10 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts';
 
-import { toFixed } from '@/helpers/number';
+import { moneyToString } from '@/helpers/number';
 
 export type ChartProps = {
-  type: 'line' | 'bar' | 'pie' | 'donut' | 'treemap',
+  type: 'line' | 'bar' | 'pie' | 'donut' | 'treemap' | 'radialBar',
   series?: ApexOptions['series'],
   labels?: string[],
   id?: string,
@@ -18,13 +18,16 @@ export type ChartProps = {
   stacked?: boolean,
   height?: number,
   xAxisType?: 'datetime' | 'category' | 'numeric' | undefined,
-  yFormatter?: (val: number, opts?: any) => string,
   events?: {
     mounted?(chart: any, options?: any): void
     dataPointSelection?(e: any, chart?: any, options?: any): void
   },
   dataLabels?: ApexOptions['dataLabels'],
   plotOptions?: ApexOptions['plotOptions'],
+  grid?: ApexOptions['grid'],
+  colors?: ApexOptions['colors'],
+  tooltip?: ApexOptions['tooltip'],
+  states?: ApexOptions['states'],
 };
 
 // apexcharts import references window so we need this
@@ -43,12 +46,12 @@ export default function Chart({
   type,
   title,
   id,
-  yFormatter,
   series = [],
   labels = [],
   showLegend = true,
   stacked = false,
   xCategories = [],
+  colors,
   unit = '',
   height = 400,
   xAxisType = undefined,
@@ -57,21 +60,26 @@ export default function Chart({
   },
   plotOptions = {},
   events = {},
+  grid = {},
+  tooltip = {},
+  states = {},
 }: ChartProps): JSX.Element {
   if (!series?.length) {
     return (
       <span>Loading...</span>
     );
   }
-
-  if (!yFormatter) {
-    yFormatter = (val: number) => `${toFixed(val)}${unit}`;
-  }
+  const yFormatter = (val: number) => moneyToString(val, unit);
 
   let options = OPTIONS;
   options = {
     ...options,
+    grid: {
+      borderColor: '#777f85',
+      ...grid,
+    },
     labels,
+    colors,
     chart: {
       ...options.chart,
       id,
@@ -105,11 +113,16 @@ export default function Chart({
       y: {
         formatter: yFormatter,
       },
+      ...tooltip,
     },
     stroke: {
       ...options.stroke,
       width: type === 'line' ? 1 : 0,
       dashArray: type === 'line' ? 5 : 0,
+    },
+    states: {
+      ...options.states,
+      ...states,
     },
   };
 
@@ -127,9 +140,6 @@ export default function Chart({
 }
 
 const OPTIONS: ApexOptions = {
-  grid: {
-    borderColor: '#777f85',
-  },
   chart: {
     width: '100%',
     foreColor: '#94A3B8',

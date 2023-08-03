@@ -1,4 +1,4 @@
-import { toAmountWithScale, toFixed } from '@/helpers/number';
+import { toAmountWithScale, toFixed, moneyToString } from '@/helpers/number';
 
 describe('toAmountWithScale', () => {
   it('works with 0', () => {
@@ -41,5 +41,15 @@ describe('toFixed', () => {
 
   it('works when decimals higher', () => {
     expect(toFixed(2.2536, 10)).toEqual(2.2536);
+  });
+});
+
+describe('moneyToString', () => {
+  it('returns string as expected', () => {
+    expect(moneyToString(1234567.89, 'EUR')).toEqual('€1,234,567.89');
+  });
+
+  it('uses EUR by default if empty currency passed', () => {
+    expect(moneyToString(1234567.89, '')).toEqual('€1,234,567.89');
   });
 });

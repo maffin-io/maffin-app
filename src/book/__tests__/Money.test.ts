@@ -26,9 +26,9 @@ describe('Money', () => {
   });
 
   describe('format', () => {
-    it('normalises scale to 2', () => {
+    it('localises money', () => {
       money = new Money(100, 'USD', 3);
-      expect(money.format()).toEqual('0.10 $');
+      expect(money.format()).toEqual('$0.10');
     });
   });
 
