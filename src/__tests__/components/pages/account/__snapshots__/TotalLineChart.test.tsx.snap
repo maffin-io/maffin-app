@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`TotalLineChart creates Chart with expected params 1`] = `
-<div>
-  <div
-    data-testid="Chart"
-  />
-</div>
-`;

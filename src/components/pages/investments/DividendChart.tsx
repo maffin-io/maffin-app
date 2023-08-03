@@ -37,7 +37,7 @@ export default function DividendChart({
               type="bar"
               series={[{ data: yearData, name: 'dividends' }]}
               showLegend={false}
-              unit={currencyToSymbol(currency)}
+              unit={currency}
               plotOptions={
                 {
                   bar: {
@@ -76,7 +76,7 @@ export default function DividendChart({
               id="barMonthly"
               type="bar"
               series={lastYearMonthlySeries}
-              unit={currencyToSymbol(currency)}
+              unit={currency}
               xCategories={Object.values(MONTHS)}
               stacked
             />

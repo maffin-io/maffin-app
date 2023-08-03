@@ -33,9 +33,9 @@ describe('Chart', () => {
     // @ts-ignore
     const options = ApexChartMock.mock.calls[0][0].options as ApexOptions;
     // @ts-ignore
-    expect(options?.yaxis?.labels.formatter(1)).toEqual('1');
+    expect(options?.yaxis?.labels.formatter(1)).toEqual('€1.00');
     // @ts-ignore
-    expect(options?.tooltip?.y?.formatter(1)).toEqual('1');
+    expect(options?.tooltip?.y?.formatter(1)).toEqual('€1.00');
     expect(ApexChartMock).toHaveBeenCalledWith(
       {
         height: 400,
@@ -150,7 +150,13 @@ describe('Chart', () => {
             mounted: mockMounted,
           }
         }
-        yFormatter={mockYFormatter}
+        tooltip={
+          {
+            y: {
+              formatter: mockYFormatter,
+            },
+          }
+        }
       />,
     );
 
@@ -173,7 +179,7 @@ describe('Chart', () => {
         },
         yaxis: {
           labels: {
-            formatter: mockYFormatter,
+            formatter: expect.any(Function),
           },
         },
         tooltip: {

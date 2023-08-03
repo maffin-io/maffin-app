@@ -24,8 +24,15 @@ exports[`AccountsPage generates tree as expected, no investments 1`] = `
     </div>
   </div>
   <div
-    class="grid grid-cols-12 items-top pb-4"
+    class="grid grid-cols-12 items-start items-top pb-4"
   >
+    <div
+      class="col-span-3 p-4 mr-4 rounded-sm bg-gunmetal-700"
+    >
+      <div
+        data-testid="NetWorthPie"
+      />
+    </div>
     <div
       class="col-span-3 p-4 mr-4 rounded-sm bg-gunmetal-700"
     >
@@ -61,8 +68,15 @@ exports[`AccountsPage generates tree as expected, with investments 1`] = `
     </div>
   </div>
   <div
-    class="grid grid-cols-12 items-top pb-4"
+    class="grid grid-cols-12 items-start items-top pb-4"
   >
+    <div
+      class="col-span-3 p-4 mr-4 rounded-sm bg-gunmetal-700"
+    >
+      <div
+        data-testid="NetWorthPie"
+      />
+    </div>
     <div
       class="col-span-3 p-4 mr-4 rounded-sm bg-gunmetal-700"
     >
@@ -98,8 +112,15 @@ exports[`AccountsPage passes empty data to components when loading when not read
     </div>
   </div>
   <div
-    class="grid grid-cols-12 items-top pb-4"
+    class="grid grid-cols-12 items-start items-top pb-4"
   >
+    <div
+      class="col-span-3 p-4 mr-4 rounded-sm bg-gunmetal-700"
+    >
+      <div
+        data-testid="NetWorthPie"
+      />
+    </div>
     <div
       class="col-span-3 p-4 mr-4 rounded-sm bg-gunmetal-700"
     >

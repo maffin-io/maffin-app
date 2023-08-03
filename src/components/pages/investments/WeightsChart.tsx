@@ -3,8 +3,7 @@ import React from 'react';
 import Chart from '@/components/charts/Chart';
 import type { InvestmentAccount } from '@/book/models';
 import Money from '@/book/Money';
-import { toFixed } from '@/helpers/number';
-import { currencyToSymbol } from '@/book/helpers';
+import { toFixed, moneyToString } from '@/helpers/number';
 
 export type WeightsChartProps = {
   investments: InvestmentAccount[],
@@ -15,7 +14,6 @@ export default function WeightsChart({
   investments,
   totalValue,
 }: WeightsChartProps): JSX.Element {
-  const currencySymbol = currencyToSymbol(totalValue.currency);
   const data: { [ticker: string]: {
     x: string,
     y: number,
@@ -89,12 +87,13 @@ export default function WeightsChart({
           },
         }
       }
-      yFormatter={
-        (val: number, { dataPointIndex, w }) => {
-          const ticker = w.globals.categoryLabels[dataPointIndex];
-          return `${val}${currencySymbol} (${data[ticker].pct}%)`;
-        }
-      }
+      tooltip={{
+        y: {
+          formatter: (val: number, { dataPointIndex, w }) => (
+            `${moneyToString(val, totalValue.currency)} (${data[w.globals.categoryLabels[dataPointIndex]].pct}%)`
+          ),
+        },
+      }}
     />
   );
 }

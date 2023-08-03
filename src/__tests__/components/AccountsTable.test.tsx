@@ -259,7 +259,7 @@ describe('AccountsTable', () => {
       }),
     );
 
-    await screen.findByText('10.00 €');
+    await screen.findByText('€10.00');
     expect(container).toMatchSnapshot();
   });
 });

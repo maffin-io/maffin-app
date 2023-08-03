@@ -59,8 +59,8 @@ describe('InvestmentsPage', () => {
       {
         className: 'mx-6',
         title: 'Value/Cost',
-        stats: '0.00 €',
-        description: '0 total invested',
+        stats: '€0.00',
+        description: '€0.00 total invested',
       },
       {},
     );
@@ -69,8 +69,8 @@ describe('InvestmentsPage', () => {
       {
         className: 'mx-6',
         title: 'Unrealized Profit',
-        stats: '0.00 € (NaN%)',
-        description: '0 (NaN%) with dividends',
+        stats: '€0.00 (NaN%)',
+        description: '€0.00 (NaN%) with dividends',
         statsTextClass: '',
       },
       {},
@@ -80,8 +80,8 @@ describe('InvestmentsPage', () => {
       {
         className: 'mx-6',
         title: 'Realized',
-        stats: '0.00 €',
-        description: '0.00 € from dividends',
+        stats: '€0.00',
+        description: '€0.00 from dividends',
         statsTextClass: 'text-green-500',
       },
       {},
@@ -141,8 +141,8 @@ describe('InvestmentsPage', () => {
       {
         className: 'mx-6',
         title: 'Value/Cost',
-        stats: '5.00 €',
-        description: '4 total invested',
+        stats: '€5.00',
+        description: '€4.00 total invested',
       },
       {},
     );
@@ -151,8 +151,8 @@ describe('InvestmentsPage', () => {
       {
         className: 'mx-6',
         title: 'Unrealized Profit',
-        stats: '1.00 € (25%)',
-        description: '6 (150%) with dividends',
+        stats: '€1.00 (25%)',
+        description: '€6.00 (150%) with dividends',
         statsTextClass: 'text-green-500',
       },
       {},
@@ -162,8 +162,8 @@ describe('InvestmentsPage', () => {
       {
         className: 'mx-6',
         title: 'Realized',
-        stats: '15.00 €',
-        description: '5.00 € from dividends',
+        stats: '€15.00',
+        description: '€5.00 from dividends',
         statsTextClass: 'text-green-500',
       },
       {},
@@ -220,8 +220,8 @@ describe('InvestmentsPage', () => {
       {
         className: 'mx-6',
         title: 'Value/Cost',
-        stats: '5.00 $',
-        description: '4 total invested',
+        stats: '$5.00',
+        description: '$4.00 total invested',
       },
       {},
     );
@@ -230,8 +230,8 @@ describe('InvestmentsPage', () => {
       {
         className: 'mx-6',
         title: 'Unrealized Profit',
-        stats: '1.00 $ (25%)',
-        description: '6 (150%) with dividends',
+        stats: '$1.00 (25%)',
+        description: '$6.00 (150%) with dividends',
         statsTextClass: 'text-green-500',
       },
       {},
@@ -241,8 +241,8 @@ describe('InvestmentsPage', () => {
       {
         className: 'mx-6',
         title: 'Realized',
-        stats: '15.00 $',
-        description: '5.00 $ from dividends',
+        stats: '$15.00',
+        description: '$5.00 from dividends',
         statsTextClass: 'text-green-500',
       },
       {},

@@ -17,14 +17,14 @@ describe('SplitsHistogram', () => {
   });
 
   it('creates Chart with expected params', () => {
-    const { container } = render(<SplitsHistogram splits={[]} />);
+    render(<SplitsHistogram splits={[]} />);
 
     expect(Chart).toBeCalledWith(
       {
         series: [],
         title: 'Movements per month',
         type: 'bar',
-        unit: '',
+        unit: undefined,
         xCategories: [
           'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
         ],
@@ -40,7 +40,6 @@ describe('SplitsHistogram', () => {
       },
       {},
     );
-    expect(container).toMatchSnapshot();
   });
 
   it('builds series accumulating values', () => {
@@ -191,7 +190,7 @@ describe('SplitsHistogram', () => {
         ],
         title: 'Movements per month',
         type: 'bar',
-        unit: '€',
+        unit: 'EUR',
         xCategories: [
           'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
         ],
