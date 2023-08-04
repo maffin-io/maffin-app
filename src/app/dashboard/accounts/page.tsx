@@ -9,6 +9,7 @@ import Money from '@/book/Money';
 import AccountsTable from '@/components/AccountsTable';
 import AddAccountButton from '@/components/buttons/AddAccountButton';
 import NetWorthPie from '@/components/pages/accounts/NetWorthPie';
+import NetWorthHistogram from '@/components/pages/accounts/NetWorthHistogram';
 import { PriceDBMap } from '@/book/prices';
 import DateRangeInput from '@/components/DateRangeInput';
 import { useApi } from '@/hooks';
@@ -27,16 +28,20 @@ export default function AccountsPage(): JSX.Element {
   let tree: AccountsTree = {
     account: {},
     total: new Money(0, 'EUR'),
+    monthlyTotals: {},
     children: [],
   };
   const root = accounts.find(a => a.type === 'ROOT');
   if (root && !todayPrices.isEmpty) {
+    const start = performance.now();
     tree = buildNestedRows(root, accounts, todayPrices, selectedDate);
+    const end = performance.now();
+    console.log(`build nested rows: ${end - start}ms`);
   }
 
   return (
     <>
-      <div className="flex items-center pb-4">
+      <div className="flex items-center">
         <span className="text-xl font-medium">
           Your finances
         </span>
@@ -56,11 +61,16 @@ export default function AccountsPage(): JSX.Element {
         </div>
       </div>
       <div className="grid grid-cols-12 items-start items-top pb-4">
-        <div className="col-span-3 p-4 mr-4 rounded-sm bg-gunmetal-700">
-          <NetWorthPie tree={tree} />
+        <div className="grid grid-cols-12 col-span-3">
+          <div className="col-span-12 p-4 mr-4 rounded-sm bg-gunmetal-700">
+            <NetWorthPie tree={tree} />
+          </div>
+          <div className="col-span-12 p-4 mr-4 rounded-sm bg-gunmetal-700">
+            <AccountsTable tree={tree} />
+          </div>
         </div>
-        <div className="col-span-3 p-4 mr-4 rounded-sm bg-gunmetal-700">
-          <AccountsTable tree={tree} />
+        <div className="col-span-6 p-4 mr-4 rounded-sm bg-gunmetal-700">
+          <NetWorthHistogram tree={tree} startDate={earliestDate} />
         </div>
       </div>
     </>
@@ -82,6 +92,7 @@ function buildNestedRows(
 ): AccountsTree {
   const { childrenIds } = current;
   let total = current.getTotal(date);
+  const monthlyTotals = current.getMonthlyTotals();
   let children: AccountsTree[] = [];
 
   if (current.type === 'ROOT') {
@@ -98,11 +109,18 @@ function buildNestedRows(
         DateTime.now(),
       );
       total = total.convert(price.currency.mnemonic, price.value);
+      Object.entries(monthlyTotals).forEach(([key, monthlyTotal]) => {
+        monthlyTotals[key] = monthlyTotal.convert(
+          price.currency.mnemonic,
+          price.value,
+        );
+      });
     }
     children = childrenIds.map(childId => {
       const child = accounts.find(a => a.guid === childId) as Account;
       const childTree = buildNestedRows(child, accounts, todayQuotes, date);
       let childTotal = childTree.total;
+      const childMonthlyTotals = childTree.monthlyTotals;
       if (childTotal.currency !== commodity) {
         const price = todayQuotes.getPrice(
           childTotal.currency,
@@ -110,8 +128,14 @@ function buildNestedRows(
           DateTime.now(),
         );
         childTotal = childTotal.convert(commodity, price.value);
+        Object.entries(childMonthlyTotals).forEach(([key, monthlyTotal]) => {
+          childMonthlyTotals[key] = monthlyTotal.convert(commodity, price.value);
+        });
       }
       total = total.add(childTotal);
+      Object.entries(childMonthlyTotals).forEach(([key, monthlyTotal]) => {
+        monthlyTotals[key] = monthlyTotal.add(monthlyTotals[key] || new Money(0, commodity));
+      });
       return childTree;
     });
   }
@@ -119,6 +143,7 @@ function buildNestedRows(
   return {
     account: current,
     total,
+    monthlyTotals,
     children,
   };
 }

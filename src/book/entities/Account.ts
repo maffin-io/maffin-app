@@ -104,16 +104,34 @@ export default class Account extends BaseEntity {
 
     const total = splits.reduce(
       (acc, split) => acc.add(
-        new Money(split.quantityNum / split.quantityDenom, this.commodity.mnemonic),
+        new Money(split.quantity, this.commodity.mnemonic),
       ),
       new Money(0, this.commodity.mnemonic),
     );
 
-    if (total.isNegative()) {
+    if (['INCOME', 'LIABILITY'].includes(this.type)) {
       return total.multiply(-1);
     }
 
     return total;
+  }
+
+  getMonthlyTotals(): { [key: string]: Money } {
+    const monthlyTotals: { [key: string]: Money } = {};
+
+    this.splits.forEach(split => {
+      const key = split.transaction.date.toFormat('MMM/yy');
+      let { quantity } = split;
+      if (['INCOME', 'LIABILITY'].includes(this.type)) {
+        quantity = -quantity;
+      }
+      monthlyTotals[key] = new Money(
+        quantity,
+        this.commodity.mnemonic,
+      ).add(monthlyTotals[key] || new Money(0, this.commodity.mnemonic));
+    });
+
+    return monthlyTotals;
   }
 }
 

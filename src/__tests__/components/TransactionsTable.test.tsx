@@ -265,7 +265,7 @@ describe('TransactionsTable', () => {
 
     expect(
       // @ts-ignore
-      dateCol.accessorFn({ transaction: { date: DateTime.fromISO('2023-01-01', { zone: 'utc' }) } }),
+      dateCol.accessorFn({ transaction: { date: DateTime.fromISO('2023-01-01') } }),
     ).toEqual(1672531200000);
 
     expect(dateCol.cell).not.toBeUndefined();

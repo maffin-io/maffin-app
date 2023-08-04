@@ -42,33 +42,31 @@ describe('Chart', () => {
         options: {
           chart: {
             foreColor: '#94A3B8',
-            id: undefined,
             toolbar: {
               show: false,
             },
-            stacked: false,
             width: '100%',
             zoom: {
               autoScaleYaxis: true,
               enabled: true,
               type: 'x',
             },
-            events: {},
-            sparkline: {
-              enabled: false,
-            },
           },
           dataLabels: {
             enabled: false,
+            style: {
+              colors: ['#DDDDDD'],
+              fontFamily: 'Intervariable',
+              fontWeight: '300',
+              fontSize: '14px',
+            },
+            dropShadow: {
+              enabled: false,
+            },
           },
           grid: {
             borderColor: '#777f85',
           },
-          labels: [],
-          legend: {
-            show: true,
-          },
-          plotOptions: {},
           states: {
             active: {
               allowMultipleDataPointsSelection: false,
@@ -80,12 +78,7 @@ describe('Chart', () => {
           },
           stroke: {
             curve: 'smooth',
-            dashArray: 0,
             width: 0,
-          },
-          title: {
-            align: 'left',
-            text: undefined,
           },
           tooltip: {
             fillSeriesColor: true,
@@ -104,8 +97,6 @@ describe('Chart', () => {
             axisBorder: {
               show: false,
             },
-            categories: [],
-            type: undefined,
           },
           yaxis: {
             labels: {
@@ -121,42 +112,33 @@ describe('Chart', () => {
     );
   });
 
-  it('sets optional params', () => {
+  it('merges params', () => {
     const mockYFormatter = jest.fn();
     const mockMounted = jest.fn();
     render(
       <Chart
         series={[1]}
-        title="title"
-        showLegend={false}
-        xCategories={['a', 'b']}
-        xAxisType="datetime"
         type="bar"
-        stacked
         unit="unit"
         height={200}
-        dataLabels={
-          { enabled: true }
-        }
-        plotOptions={
-          {
+        options={{
+          dataLabels: { enabled: true },
+          plotOptions: {
             area: {
               fillTo: 'origin',
             },
-          }
-        }
-        events={
-          {
-            mounted: mockMounted,
-          }
-        }
-        tooltip={
-          {
+          },
+          chart: {
+            events: {
+              mounted: mockMounted,
+            },
+          },
+          tooltip: {
             y: {
               formatter: mockYFormatter,
             },
-          }
-        }
+          },
+        }}
       />,
     );
 
@@ -166,21 +148,6 @@ describe('Chart', () => {
           events: {
             mounted: mockMounted,
           },
-          stacked: true,
-        },
-        title: {
-          text: 'title',
-        },
-        legend: {
-          show: false,
-        },
-        xaxis: {
-          categories: ['a', 'b'],
-        },
-        yaxis: {
-          labels: {
-            formatter: expect.any(Function),
-          },
         },
         tooltip: {
           y: {
@@ -189,6 +156,15 @@ describe('Chart', () => {
         },
         dataLabels: {
           enabled: true,
+          style: {
+            colors: ['#DDDDDD'],
+            fontFamily: 'Intervariable',
+            fontWeight: '300',
+            fontSize: '14px',
+          },
+          dropShadow: {
+            enabled: false,
+          },
         },
         plotOptions: {
           area: {

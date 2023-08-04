@@ -33,7 +33,11 @@ export default function TotalLineChart({
       series={series}
       unit={splits[0]?.account.commodity.mnemonic}
       height={255}
-      xAxisType="datetime"
+      options={{
+        xaxis: {
+          type: 'datetime',
+        },
+      }}
     />
   );
 }

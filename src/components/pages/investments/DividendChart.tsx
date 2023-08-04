@@ -36,49 +36,57 @@ export default function DividendChart({
             <Chart
               type="bar"
               series={[{ data: yearData, name: 'dividends' }]}
-              showLegend={false}
               unit={currency}
-              plotOptions={
-                {
+              options={{
+                legend: {
+                  show: false,
+                },
+                plotOptions: {
                   bar: {
                     horizontal: true,
                     barHeight: '55%',
                   },
-                }
-              }
-              events={
-                {
-                  dataPointSelection: (e, chart) => {
-                    const seriesIndex = 0;
+                },
+                chart: {
+                  events: {
+                    dataPointSelection: (e, chart) => {
+                      const seriesIndex = 0;
 
-                    const selectedPoint = chart.w.globals.selectedDataPoints[0][0];
-                    if (selectedPoint === undefined) {
-                      return [];
-                    }
-                    const selected = chart.w.config.series[seriesIndex].data[selectedPoint] as {
-                      x: string,
-                      y: number,
-                      dividends: { [month: string]: { amount: number, ticker: string }[] },
-                    };
+                      const selectedPoint = chart.w.globals.selectedDataPoints[0][0];
+                      if (selectedPoint === undefined) {
+                        return [];
+                      }
+                      const selected = chart.w.config.series[seriesIndex].data[selectedPoint] as {
+                        x: string,
+                        y: number,
+                        dividends: { [month: string]: { amount: number, ticker: string }[] },
+                      };
 
-                    return ApexCharts.exec('barMonthly', 'updateOptions', {
-                      series: buildMonthlySeries(selected),
-                    });
+                      return ApexCharts.exec('barMonthly', 'updateOptions', {
+                        series: buildMonthlySeries(selected),
+                      });
+                    },
                   },
-                }
-              }
+                },
+              }}
             />
           </div>
         </div>
         <div className="col-span-8">
           <div id="chart-monthly">
             <Chart
-              id="barMonthly"
               type="bar"
               series={lastYearMonthlySeries}
               unit={currency}
-              xCategories={Object.values(MONTHS)}
-              stacked
+              options={{
+                chart: {
+                  id: 'barMonthly',
+                  stacked: true,
+                },
+                xaxis: {
+                  categories: Object.values(MONTHS),
+                },
+              }}
             />
           </div>
         </div>

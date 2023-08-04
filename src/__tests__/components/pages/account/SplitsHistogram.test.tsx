@@ -22,19 +22,27 @@ describe('SplitsHistogram', () => {
     expect(Chart).toBeCalledWith(
       {
         series: [],
-        title: 'Movements per month',
         type: 'bar',
         unit: undefined,
-        xCategories: [
-          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-        ],
-        events: {
-          mounted: expect.any(Function),
-        },
-        plotOptions: {
-          bar: {
-            columnWidth: '55%',
-            horizontal: false,
+        options: {
+          title: {
+            text: 'Movements per month',
+          },
+          xaxis: {
+            categories: [
+              'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+            ],
+          },
+          chart: {
+            events: {
+              mounted: expect.any(Function),
+            },
+          },
+          plotOptions: {
+            bar: {
+              columnWidth: '70%',
+              horizontal: false,
+            },
           },
         },
       },
@@ -56,7 +64,7 @@ describe('SplitsHistogram', () => {
               },
             },
             transaction: {
-              date: DateTime.fromISO('2023-01-02', { zone: 'utc' }),
+              date: DateTime.fromISO('2023-01-02'),
             },
             quantity: 100,
           } as Split,
@@ -70,7 +78,7 @@ describe('SplitsHistogram', () => {
               },
             },
             transaction: {
-              date: DateTime.fromISO('2022-01-01', { zone: 'utc' }),
+              date: DateTime.fromISO('2022-01-01'),
             },
             quantity: -200,
           } as Split,
@@ -188,19 +196,27 @@ describe('SplitsHistogram', () => {
             name: '2023',
           },
         ],
-        title: 'Movements per month',
         type: 'bar',
         unit: 'EUR',
-        xCategories: [
-          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-        ],
-        events: {
-          mounted: expect.any(Function),
-        },
-        plotOptions: {
-          bar: {
-            columnWidth: '55%',
-            horizontal: false,
+        options: {
+          title: {
+            text: 'Movements per month',
+          },
+          xaxis: {
+            categories: [
+              'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+            ],
+          },
+          chart: {
+            events: {
+              mounted: expect.any(Function),
+            },
+          },
+          plotOptions: {
+            bar: {
+              columnWidth: '70%',
+              horizontal: false,
+            },
           },
         },
       },
@@ -220,7 +236,7 @@ describe('SplitsHistogram', () => {
               },
             },
             transaction: {
-              date: DateTime.fromISO('2023-01-02', { zone: 'utc' }),
+              date: DateTime.fromISO('2023-01-02'),
             },
             quantity: 100,
           } as Split,
@@ -234,7 +250,7 @@ describe('SplitsHistogram', () => {
               },
             },
             transaction: {
-              date: DateTime.fromISO('2022-01-01', { zone: 'utc' }),
+              date: DateTime.fromISO('2022-01-01'),
             },
             quantity: -200,
           } as Split,
@@ -242,7 +258,7 @@ describe('SplitsHistogram', () => {
       />,
     );
 
-    const mountedEvent = ChartMock.mock.calls[0][0].events?.mounted as Function;
+    const mountedEvent = ChartMock.mock.calls[0][0].options?.chart?.events?.mounted as Function;
     const mockHideSeries = jest.fn();
     mountedEvent({ hideSeries: mockHideSeries });
     expect(mockHideSeries).toBeCalledTimes(1);

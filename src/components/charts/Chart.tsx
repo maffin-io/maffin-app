@@ -7,27 +7,11 @@ import { ApexOptions } from 'apexcharts';
 import { moneyToString } from '@/helpers/number';
 
 export type ChartProps = {
-  type: 'line' | 'bar' | 'pie' | 'donut' | 'treemap' | 'radialBar',
+  options?: ApexOptions,
   series?: ApexOptions['series'],
-  labels?: string[],
-  id?: string,
-  title?: string,
-  showLegend?: boolean,
-  xCategories?: string[],
-  unit?: string,
-  stacked?: boolean,
+  type?: 'bar' | 'line' | 'pie' | 'donut' | 'treemap',
   height?: number,
-  xAxisType?: 'datetime' | 'category' | 'numeric' | undefined,
-  events?: {
-    mounted?(chart: any, options?: any): void
-    dataPointSelection?(e: any, chart?: any, options?: any): void
-  },
-  dataLabels?: ApexOptions['dataLabels'],
-  plotOptions?: ApexOptions['plotOptions'],
-  grid?: ApexOptions['grid'],
-  colors?: ApexOptions['colors'],
-  tooltip?: ApexOptions['tooltip'],
-  states?: ApexOptions['states'],
+  unit?: string,
 };
 
 // apexcharts import references window so we need this
@@ -43,93 +27,60 @@ const ApexChart = dynamic(
 );
 
 export default function Chart({
-  type,
-  title,
-  id,
+  options = {},
   series = [],
-  labels = [],
-  showLegend = true,
-  stacked = false,
-  xCategories = [],
-  colors,
-  unit = '',
+  type = 'line',
   height = 400,
-  xAxisType = undefined,
-  dataLabels = {
-    enabled: false,
-  },
-  plotOptions = {},
-  events = {},
-  grid = {},
-  tooltip = {},
-  states = {},
+  unit = 'EUR',
 }: ChartProps): JSX.Element {
   if (!series?.length) {
     return (
       <span>Loading...</span>
     );
   }
-  const yFormatter = (val: number) => moneyToString(val, unit);
 
-  let options = OPTIONS;
-  options = {
+  OPTIONS.yaxis = {
+    labels: {
+      formatter: (val: number) => moneyToString(val, unit),
+    },
+  };
+  OPTIONS.tooltip = {
+    ...OPTIONS.tooltip,
+    y: {
+      formatter: (val: number) => moneyToString(val, unit),
+    },
+  };
+
+  const mergedOptions: ApexOptions = {
+    ...OPTIONS,
     ...options,
-    grid: {
-      borderColor: '#777f85',
-      ...grid,
-    },
-    labels,
-    colors,
     chart: {
+      ...OPTIONS.chart,
       ...options.chart,
-      id,
-      sparkline: {
-        enabled: type === 'treemap',
-      },
-      stacked,
-      events,
-    },
-    dataLabels,
-    plotOptions,
-    legend: {
-      show: showLegend,
-    },
-    title: {
-      text: title,
-      align: 'left',
-    },
-    xaxis: {
-      ...options.xaxis,
-      categories: xCategories,
-      type: xAxisType,
-    },
-    yaxis: {
-      labels: {
-        formatter: (type !== 'treemap' && !plotOptions.bar?.horizontal) ? yFormatter : undefined,
-      },
     },
     tooltip: {
+      ...OPTIONS.tooltip,
       ...options.tooltip,
-      y: {
-        formatter: yFormatter,
-      },
-      ...tooltip,
+    },
+    dataLabels: {
+      ...OPTIONS.dataLabels,
+      ...options.dataLabels,
     },
     stroke: {
-      ...options.stroke,
+      ...OPTIONS.stroke,
       width: type === 'line' ? 1 : 0,
-      dashArray: type === 'line' ? 5 : 0,
+      ...options.stroke,
     },
-    states: {
-      ...options.states,
-      ...states,
+    xaxis: {
+      ...OPTIONS.xaxis,
+      ...options.xaxis,
     },
   };
 
   return (
     // @ts-ignore
     <ApexChart
-      options={options}
+      options={mergedOptions}
       series={series}
       type={type}
       // https://stackoverflow.com/questions/75103994
@@ -152,8 +103,22 @@ const OPTIONS: ApexOptions = {
       autoScaleYaxis: true,
     },
   },
+  grid: {
+    borderColor: '#777f85',
+  },
+  dataLabels: {
+    enabled: false,
+    style: {
+      colors: ['#DDDDDD'],
+      fontFamily: 'Intervariable',
+      fontWeight: '300',
+      fontSize: '14px',
+    },
+    dropShadow: {
+      enabled: false,
+    },
+  },
   stroke: {
-    dashArray: 5,
     curve: 'smooth',
   },
   xaxis: {
