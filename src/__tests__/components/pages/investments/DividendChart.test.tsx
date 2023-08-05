@@ -76,39 +76,44 @@ describe('DividendChart', () => {
       {
         series: [
           {
-            name: 'dividends',
+            name: 'Total dividends',
             data: [
               {
-                dividends: {
-                  Feb: [
-                    {
-                      amount: 150,
-                      ticker: 'Account2',
-                    },
-                  ],
-                },
+                dividends: [
+                  [],
+                  [{ amount: 150, ticker: 'Account2' }],
+                  [],
+                  [],
+                  [],
+                  [],
+                  [],
+                  [],
+                  [],
+                  [],
+                  [],
+                  [],
+                ],
                 x: '2022',
                 y: 150,
               },
               {
-                dividends: {
-                  Jan: [
-                    {
-                      amount: 100,
-                      ticker: 'Account1',
-                    },
+                dividends: [
+                  [{ amount: 100, ticker: 'Account1' }],
+                  [],
+                  [],
+                  [],
+                  [
+                    { amount: 130, ticker: 'Account1' },
+                    { amount: 130, ticker: 'Account2' },
                   ],
-                  May: [
-                    {
-                      amount: 130,
-                      ticker: 'Account1',
-                    },
-                    {
-                      amount: 130,
-                      ticker: 'Account2',
-                    },
-                  ],
-                },
+                  [],
+                  [],
+                  [],
+                  [],
+                  [],
+                  [],
+                  [],
+                ],
                 x: '2023',
                 y: 360,
               },
@@ -145,22 +150,43 @@ describe('DividendChart', () => {
         series: [
           {
             name: 'Account1',
-            data: [100, 0, 0, 0, 130, 0, 0, 0, 0, 0, 0, 0],
+            data: [
+              { y: 100, x: 'Jan' },
+              { y: 0, x: 'Feb' },
+              { y: 0, x: 'Mar' },
+              { y: 0, x: 'Apr' },
+              { y: 130, x: 'May' },
+              { y: 0, x: 'Jun' },
+              { y: 0, x: 'Jul' },
+              { y: 0, x: 'Aug' },
+              { y: 0, x: 'Sep' },
+              { y: 0, x: 'Oct' },
+              { y: 0, x: 'Nov' },
+              { y: 0, x: 'Dec' },
+            ],
           },
           {
             name: 'Account2',
-            data: [0, 0, 0, 0, 130, 0, 0, 0, 0, 0, 0, 0],
+            data: [
+              { y: 0, x: 'Jan' },
+              { y: 0, x: 'Feb' },
+              { y: 0, x: 'Mar' },
+              { y: 0, x: 'Apr' },
+              { y: 130, x: 'May' },
+              { y: 0, x: 'Jun' },
+              { y: 0, x: 'Jul' },
+              { y: 0, x: 'Aug' },
+              { y: 0, x: 'Sep' },
+              { y: 0, x: 'Oct' },
+              { y: 0, x: 'Nov' },
+              { y: 0, x: 'Dec' },
+            ],
           },
         ],
         options: {
           chart: {
             id: 'barMonthly',
             stacked: true,
-          },
-          xaxis: {
-            categories: [
-              'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-            ],
           },
         },
       },
@@ -208,29 +234,41 @@ describe('DividendChart', () => {
         config: {
           series: [
             {
-              name: 'dividends',
+              name: 'Total dividends',
               data: [
                 {
-                  dividends: {
-                    Jan: [
-                      {
-                        amount: 100,
-                        ticker: 'Account1',
-                      },
-                    ],
-                  },
+                  dividends: [
+                    [{ amount: 100, ticker: 'Account1' }],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                  ],
                   x: '2022',
                   y: 100,
                 },
                 {
-                  dividends: {
-                    Jan: [
-                      {
-                        amount: 130,
-                        ticker: 'Account1',
-                      },
-                    ],
-                  },
+                  dividends: [
+                    [{ amount: 130, ticker: 'Account1' }],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                  ],
                   x: '2023',
                   y: 130,
                 },
@@ -247,8 +285,21 @@ describe('DividendChart', () => {
       {
         series: [
           {
-            data: [100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             name: 'Account1',
+            data: [
+              { y: 100, x: 'Jan' },
+              { y: 0, x: 'Feb' },
+              { y: 0, x: 'Mar' },
+              { y: 0, x: 'Apr' },
+              { y: 0, x: 'May' },
+              { y: 0, x: 'Jun' },
+              { y: 0, x: 'Jul' },
+              { y: 0, x: 'Aug' },
+              { y: 0, x: 'Sep' },
+              { y: 0, x: 'Oct' },
+              { y: 0, x: 'Nov' },
+              { y: 0, x: 'Dec' },
+            ],
           },
         ],
       },
@@ -293,21 +344,26 @@ describe('DividendChart', () => {
         config: {
           series: [
             {
-              name: 'dividends',
+              name: 'Total dividends',
               data: [
                 {
-                  dividends: {
-                    Jan: [
-                      {
-                        amount: 100,
-                        ticker: 'Account1',
-                      },
-                      {
-                        amount: 130,
-                        ticker: 'Account1',
-                      },
+                  dividends: [
+                    [
+                      { amount: 100, ticker: 'Account1' },
+                      { amount: 130, ticker: 'Account1' },
                     ],
-                  },
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                  ],
                   x: '2023',
                   y: 230,
                 },
@@ -324,8 +380,21 @@ describe('DividendChart', () => {
       {
         series: [
           {
-            data: [230, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             name: 'Account1',
+            data: [
+              { y: 230, x: 'Jan' },
+              { y: 0, x: 'Feb' },
+              { y: 0, x: 'Mar' },
+              { y: 0, x: 'Apr' },
+              { y: 0, x: 'May' },
+              { y: 0, x: 'Jun' },
+              { y: 0, x: 'Jul' },
+              { y: 0, x: 'Aug' },
+              { y: 0, x: 'Sep' },
+              { y: 0, x: 'Oct' },
+              { y: 0, x: 'Nov' },
+              { y: 0, x: 'Dec' },
+            ],
           },
         ],
       },
