@@ -70,7 +70,11 @@ export default function AccountsPage(): JSX.Element {
           </div>
         </div>
         <div className="col-span-6 p-4 mr-4 rounded-sm bg-gunmetal-700">
-          <NetWorthHistogram tree={tree} startDate={earliestDate} />
+          <NetWorthHistogram
+            tree={tree}
+            startDate={earliestDate}
+            selectedDate={selectedDate}
+          />
         </div>
       </div>
     </>

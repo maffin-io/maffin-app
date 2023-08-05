@@ -326,4 +326,14 @@ describe('NetWorthHistogram', () => {
       },
     ]);
   });
+
+  it('selects brush X range with selected date', () => {
+    const selectedDate = DateTime.fromISO('2022-01-01');
+    render(<NetWorthHistogram selectedDate={selectedDate} tree={{} as AccountsTree} />);
+
+    expect((Chart as jest.Mock).mock.calls[1][0].options.chart.selection.xaxis).toEqual({
+      min: selectedDate.minus({ months: 3 }).toMillis(),
+      max: selectedDate.plus({ months: 3 }).toMillis(),
+    });
+  });
 });
