@@ -135,7 +135,7 @@ describe('Account', () => {
     });
   });
 
-  describe('getTotal', () => {
+  describe('getTotal and getMonthlyTotals', () => {
     it('sets expected getTotal for ROOT', async () => {
       account = await Account.findOneByOrFail({ name: 'Root' });
 
@@ -143,7 +143,7 @@ describe('Account', () => {
     });
 
     it.each([
-      'ASSET', 'LIABILITY', 'INCOME',
+      'INCOME', 'LIABILITY',
     ])('sets expected total for %s', async (type) => {
       account = await Account.create({
         name: 'account',
@@ -176,10 +176,50 @@ describe('Account', () => {
 
       account = await Account.findOneOrFail({
         where: { name: 'account' },
-        relations: { splits: true },
+        relations: { splits: { fk_transaction: true } },
       });
 
       expect(account.getTotal().toString()).toEqual('0.15 EUR');
+      expect(account.getMonthlyTotals()['Jan/23'].toString()).toEqual('0.15 EUR');
+    });
+
+    it('sets expected total for ASSET', async () => {
+      account = await Account.create({
+        name: 'account',
+        type: 'ASSET',
+        fk_commodity: eur,
+        parent: root,
+      }).save();
+
+      await Transaction.create({
+        description: 'test',
+        fk_currency: eur,
+        date: DateTime.fromISO('2023-01-01'),
+        splits: [
+          Split.create({
+            valueNum: 10,
+            valueDenom: 100,
+            quantityNum: 15,
+            quantityDenom: 100,
+            fk_account: account2,
+          }),
+          Split.create({
+            valueNum: -10,
+            valueDenom: 100,
+            quantityNum: -15,
+            quantityDenom: 100,
+            fk_account: account,
+          }),
+        ],
+      }).save();
+
+      account = await Account.findOneOrFail({
+        where: { name: 'account' },
+        relations: { splits: { fk_transaction: true } },
+      });
+
+      expect(account.getTotal().toString()).toEqual('-0.15 EUR');
+      expect(account.getMonthlyTotals()['Jan/23'].toString()).toEqual('-0.15 EUR');
     });
 
     it('sets expected total for EXPENSE', async () => {
@@ -221,10 +261,11 @@ describe('Account', () => {
 
       account = await Account.findOneOrFail({
         where: { name: 'account' },
-        relations: { splits: true },
+        relations: { splits: { fk_transaction: true } },
       });
 
       expect(account.getTotal().toString()).toEqual('0.15 EUR');
+      expect(account.getMonthlyTotals()['Jan/23'].toString()).toEqual('0.15 EUR');
     });
 
     it.each([
@@ -281,10 +322,11 @@ describe('Account', () => {
 
       account = await Account.findOneOrFail({
         where: { name: 'stockAccount' },
-        relations: ['splits', 'splits.fk_transaction'],
+        relations: { splits: { fk_transaction: true } },
       });
 
       expect(account.getTotal().toString()).toEqual('2.00 GOOGL');
+      expect(account.getMonthlyTotals()['Jan/23'].toString()).toEqual('2.00 GOOGL');
     });
 
     it('filters according to interval', async () => {

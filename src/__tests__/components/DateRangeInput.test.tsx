@@ -11,7 +11,7 @@ jest.mock('react-tailwindcss-datepicker', () => jest.fn(
 
 describe('DateRangeInput', () => {
   beforeEach(() => {
-    jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-30', { zone: 'utc' }));
+    jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-30'));
   });
 
   afterEach(() => {
@@ -64,11 +64,11 @@ describe('DateRangeInput', () => {
         onChange={jest.fn()}
         dateRange={
           {
-            start: DateTime.fromISO('2023-05-01', { zone: 'utc' }),
-            end: DateTime.fromISO('2023-05-01', { zone: 'utc' }),
+            start: DateTime.fromISO('2023-05-01'),
+            end: DateTime.fromISO('2023-05-01'),
           }
         }
-        earliestDate={DateTime.fromISO('2022-01-01', { zone: 'utc' })}
+        earliestDate={DateTime.fromISO('2022-01-01')}
       />,
     );
 
@@ -77,24 +77,24 @@ describe('DateRangeInput', () => {
         asSingle: true,
         useRange: false,
         value: {
-          startDate: DateTime.fromISO('2023-05-01', { zone: 'utc' }).toJSDate(),
-          endDate: DateTime.fromISO('2023-05-01', { zone: 'utc' }).toJSDate(),
+          startDate: DateTime.fromISO('2023-05-01').toJSDate(),
+          endDate: DateTime.fromISO('2023-05-01').toJSDate(),
         },
-        minDate: DateTime.fromISO('2022-01-01', { zone: 'utc' }).toJSDate(),
+        minDate: DateTime.fromISO('2022-01-01').toJSDate(),
         configs: {
           shortcuts: expect.objectContaining({
             today: {
               text: 'Today',
               period: {
-                start: DateTime.fromISO('2023-01-30', { zone: 'utc' }).toJSDate(),
-                end: DateTime.fromISO('2023-01-30', { zone: 'utc' }).toJSDate(),
+                start: DateTime.fromISO('2023-01-30').toJSDate(),
+                end: DateTime.fromISO('2023-01-30').toJSDate(),
               },
             },
             2022: {
               text: 'End of 2022',
               period: {
-                start: DateTime.fromISO('2022-01-01', { zone: 'utc' }).endOf('year').toJSDate(),
-                end: DateTime.fromISO('2022-01-01', { zone: 'utc' }).endOf('year').toJSDate(),
+                start: DateTime.fromISO('2022-01-01').endOf('year').toJSDate(),
+                end: DateTime.fromISO('2022-01-01').endOf('year').toJSDate(),
               },
             },
           }),

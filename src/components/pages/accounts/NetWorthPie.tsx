@@ -30,65 +30,63 @@ export default function NetWorthPie({
     <Chart
       type="donut"
       series={series}
-      labels={['Assets', 'Liabilities']}
-      colors={['#06B6D4', '#F97316']}
       height={300}
       unit={unit}
-      showLegend={false}
-      tooltip={{
-        enabled: false,
-      }}
-      dataLabels={{
-        enabled: true,
-        // @ts-ignore types are wrong here as for a breakline we need to return
-        // an array
-        formatter: (val: number, opts) => {
-          const name = opts.w.globals.labels[opts.seriesIndex];
-          return [
-            name,
-            moneyToString(
-              opts.w.globals.series[opts.seriesIndex],
-              unit,
-            ),
-          ];
+      options={{
+        labels: ['Assets', 'Liabilities'],
+        colors: ['#06B6D4', '#F97316'],
+        legend: {
+          show: false,
         },
-        style: {
-          colors: ['#DDDDDD'],
-        },
-        dropShadow: {
+        tooltip: {
           enabled: false,
         },
-      }}
-      grid={{
-        padding: {
-          bottom: -110,
+        dataLabels: {
+          enabled: true,
+          // @ts-ignore types are wrong here as for a breakline we need to return
+          // an array
+          formatter: (val: number, opts) => {
+            const name = opts.w.globals.labels[opts.seriesIndex];
+            return [
+              name,
+              moneyToString(
+                opts.w.globals.series[opts.seriesIndex],
+                unit,
+              ),
+            ];
+          },
         },
-      }}
-      plotOptions={{
-        pie: {
-          startAngle: -90,
-          endAngle: 90,
-          offsetY: 10,
-          donut: {
-            labels: {
-              show: true,
-              total: {
+        grid: {
+          padding: {
+            bottom: -110,
+          },
+        },
+        plotOptions: {
+          pie: {
+            startAngle: -90,
+            endAngle: 90,
+            offsetY: 10,
+            donut: {
+              labels: {
                 show: true,
-                showAlways: true,
-                label: 'Net worth',
-                formatter: (opts) => moneyToString(
-                  (opts.globals.series[0] || 0) - opts.globals.series[1],
-                  unit,
-                ),
+                total: {
+                  show: true,
+                  showAlways: true,
+                  label: 'Net worth',
+                  formatter: (opts) => moneyToString(
+                    (opts.globals.series[0] || 0) - opts.globals.series[1],
+                    unit,
+                  ),
+                },
               },
             },
           },
         },
-      }}
-      states={{
-        hover: {
-          filter: {
-            type: 'none',
+        states: {
+          hover: {
+            filter: {
+              type: 'none',
+            },
           },
         },
       }}

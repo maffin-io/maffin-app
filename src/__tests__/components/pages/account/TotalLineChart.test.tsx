@@ -24,7 +24,11 @@ describe('TotalLineChart', () => {
         series: [{ data: [] }],
         type: 'line',
         unit: undefined,
-        xAxisType: 'datetime',
+        options: {
+          xaxis: {
+            type: 'datetime',
+          },
+        },
       },
       {},
     );
@@ -44,7 +48,7 @@ describe('TotalLineChart', () => {
               },
             },
             transaction: {
-              date: DateTime.fromISO('2023-01-02', { zone: 'utc' }),
+              date: DateTime.fromISO('2023-01-02'),
             },
             quantity: 100,
           } as Split,
@@ -58,7 +62,7 @@ describe('TotalLineChart', () => {
               },
             },
             transaction: {
-              date: DateTime.fromISO('2023-01-01', { zone: 'utc' }),
+              date: DateTime.fromISO('2023-01-01'),
             },
             quantity: -200,
           } as Split,
@@ -85,7 +89,11 @@ describe('TotalLineChart', () => {
         ],
         type: 'line',
         unit: 'EUR',
-        xAxisType: 'datetime',
+        options: {
+          xaxis: {
+            type: 'datetime',
+          },
+        },
       },
       {},
     );

@@ -67,29 +67,33 @@ export default function SplitsHistogram({
     <Chart
       type="bar"
       series={series}
-      title="Movements per month"
-      xCategories={Object.values(MONTHS)}
       unit={splits[0]?.account.commodity.mnemonic}
-      plotOptions={
-        {
+      options={{
+        title: {
+          text: 'Movements per month',
+        },
+        xaxis: {
+          categories: Object.values(MONTHS),
+        },
+        plotOptions: {
           bar: {
             horizontal: false,
-            columnWidth: '55%',
+            columnWidth: '70%',
           },
-        }
-      }
-      events={
-        {
-          mounted: (chart) => hiddenSeries.forEach(name => {
-            try {
-              chart.hideSeries(name);
-            } catch {
-              // this fails sometimes for some reason but still renders
-              // as expected. Adding the catch to protect against that.
-            }
-          }),
-        }
-      }
+        },
+        chart: {
+          events: {
+            mounted: (chart) => hiddenSeries.forEach(name => {
+              try {
+                chart.hideSeries(name);
+              } catch {
+                // this fails sometimes for some reason but still renders
+                // as expected. Adding the catch to protect against that.
+              }
+            }),
+          },
+        },
+      }}
     />
   );
 }

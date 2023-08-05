@@ -42,11 +42,11 @@ describe('DividendChart', () => {
               },
               dividends: [
                 {
-                  when: DateTime.fromISO('2023-01-01', { zone: 'utc' }),
+                  when: DateTime.fromISO('2023-01-01'),
                   amountInCurrency: new Money(100, 'EUR'),
                 },
                 {
-                  when: DateTime.fromISO('2023-05-01', { zone: 'utc' }),
+                  when: DateTime.fromISO('2023-05-01'),
                   amountInCurrency: new Money(130, 'EUR'),
                 },
               ],
@@ -57,11 +57,11 @@ describe('DividendChart', () => {
               },
               dividends: [
                 {
-                  when: DateTime.fromISO('2022-02-02', { zone: 'utc' }),
+                  when: DateTime.fromISO('2022-02-02'),
                   amountInCurrency: new Money(150, 'EUR'),
                 },
                 {
-                  when: DateTime.fromISO('2023-05-20', { zone: 'utc' }),
+                  when: DateTime.fromISO('2023-05-20'),
                   amountInCurrency: new Money(130, 'EUR'),
                 },
               ],
@@ -74,15 +74,6 @@ describe('DividendChart', () => {
     expect(Chart).toHaveBeenNthCalledWith(
       1,
       {
-        events: {
-          dataPointSelection: expect.any(Function),
-        },
-        plotOptions: {
-          bar: {
-            barHeight: '55%',
-            horizontal: true,
-          },
-        },
         series: [
           {
             name: 'dividends',
@@ -124,9 +115,24 @@ describe('DividendChart', () => {
             ],
           },
         ],
-        showLegend: false,
         type: 'bar',
         unit: 'EUR',
+        options: {
+          legend: {
+            show: false,
+          },
+          chart: {
+            events: {
+              dataPointSelection: expect.any(Function),
+            },
+          },
+          plotOptions: {
+            bar: {
+              barHeight: '55%',
+              horizontal: true,
+            },
+          },
+        },
       },
       {},
     );
@@ -134,13 +140,8 @@ describe('DividendChart', () => {
     expect(Chart).toHaveBeenNthCalledWith(
       2,
       {
-        id: 'barMonthly',
-        stacked: true,
         type: 'bar',
         unit: 'EUR',
-        xCategories: [
-          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-        ],
         series: [
           {
             name: 'Account1',
@@ -151,6 +152,17 @@ describe('DividendChart', () => {
             data: [0, 0, 0, 0, 130, 0, 0, 0, 0, 0, 0, 0],
           },
         ],
+        options: {
+          chart: {
+            id: 'barMonthly',
+            stacked: true,
+          },
+          xaxis: {
+            categories: [
+              'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+            ],
+          },
+        },
       },
       {},
     );
@@ -170,11 +182,11 @@ describe('DividendChart', () => {
               },
               dividends: [
                 {
-                  when: DateTime.fromISO('2022-01-01', { zone: 'utc' }),
+                  when: DateTime.fromISO('2022-01-01'),
                   amountInCurrency: new Money(100, 'EUR'),
                 },
                 {
-                  when: DateTime.fromISO('2023-01-01', { zone: 'utc' }),
+                  when: DateTime.fromISO('2023-01-01'),
                   amountInCurrency: new Money(130, 'EUR'),
                 },
               ],
@@ -184,7 +196,9 @@ describe('DividendChart', () => {
       />,
     );
 
-    const dataPointSelection = ChartMock.mock.calls[0][0].events?.dataPointSelection as Function;
+    const dataPointSelection = (
+      ChartMock.mock.calls[0][0].options?.chart?.events?.dataPointSelection as Function
+    );
 
     const mockChart = {
       w: {
@@ -253,11 +267,11 @@ describe('DividendChart', () => {
               },
               dividends: [
                 {
-                  when: DateTime.fromISO('2023-01-01', { zone: 'utc' }),
+                  when: DateTime.fromISO('2023-01-01'),
                   amountInCurrency: new Money(100, 'EUR'),
                 },
                 {
-                  when: DateTime.fromISO('2023-01-20', { zone: 'utc' }),
+                  when: DateTime.fromISO('2023-01-20'),
                   amountInCurrency: new Money(130, 'EUR'),
                 },
               ],
@@ -267,7 +281,9 @@ describe('DividendChart', () => {
       />,
     );
 
-    const dataPointSelection = ChartMock.mock.calls[0][0].events?.dataPointSelection as Function;
+    const dataPointSelection = (
+      ChartMock.mock.calls[0][0].options?.chart?.events?.dataPointSelection as Function
+    );
 
     const mockChart = {
       w: {

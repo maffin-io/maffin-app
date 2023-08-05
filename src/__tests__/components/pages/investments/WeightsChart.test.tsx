@@ -22,28 +22,30 @@ describe('WeightsChart', () => {
 
     expect(Chart).toHaveBeenCalledWith(
       {
-        dataLabels: {
-          enabled: true,
-          formatter: expect.any(Function),
-          offsetY: -4,
-          style: {
-            fontSize: '12px',
-          },
-        },
-        height: 650,
-        plotOptions: {
-          treemap: {
-            colorScale: {
-              ranges: [],
-            },
-            useFillColorAsStroke: true,
-          },
-        },
         series: [{ data: [] }],
         type: 'treemap',
-        tooltip: {
-          y: {
+        height: 650,
+        options: {
+          dataLabels: {
+            enabled: true,
             formatter: expect.any(Function),
+            offsetY: -4,
+            style: {
+              fontSize: '12px',
+            },
+          },
+          plotOptions: {
+            treemap: {
+              colorScale: {
+                ranges: [],
+              },
+              useFillColorAsStroke: true,
+            },
+          },
+          tooltip: {
+            y: {
+              formatter: expect.any(Function),
+            },
           },
         },
       },
@@ -89,40 +91,7 @@ describe('WeightsChart', () => {
 
     expect(Chart).toHaveBeenCalledWith(
       {
-        dataLabels: {
-          enabled: true,
-          formatter: expect.any(Function),
-          offsetY: -4,
-          style: {
-            fontSize: '12px',
-          },
-        },
         height: 650,
-        plotOptions: {
-          treemap: {
-            colorScale: {
-              ranges: [
-                {
-                  color: '#d12b2b',
-                  from: 100,
-                  to: 100,
-                },
-                {
-                  color: '#52b12c',
-                  from: 300,
-                  to: 300,
-                },
-                {
-                  color: '#a4d690',
-                  from: 200,
-                  to: 200,
-                },
-
-              ],
-            },
-            useFillColorAsStroke: true,
-          },
-        },
         series: [
           {
             data: [
@@ -151,9 +120,44 @@ describe('WeightsChart', () => {
           },
         ],
         type: 'treemap',
-        tooltip: {
-          y: {
+        options: {
+          dataLabels: {
+            enabled: true,
             formatter: expect.any(Function),
+            offsetY: -4,
+            style: {
+              fontSize: '12px',
+            },
+          },
+          plotOptions: {
+            treemap: {
+              colorScale: {
+                ranges: [
+                  {
+                    color: '#d12b2b',
+                    from: 100,
+                    to: 100,
+                  },
+                  {
+                    color: '#52b12c',
+                    from: 300,
+                    to: 300,
+                  },
+                  {
+                    color: '#a4d690',
+                    from: 200,
+                    to: 200,
+                  },
+
+                ],
+              },
+              useFillColorAsStroke: true,
+            },
+          },
+          tooltip: {
+            y: {
+              formatter: expect.any(Function),
+            },
           },
         },
       },

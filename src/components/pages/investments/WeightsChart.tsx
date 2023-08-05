@@ -62,8 +62,8 @@ export default function WeightsChart({
       type="treemap"
       series={series}
       height={650}
-      dataLabels={
-        {
+      options={{
+        dataLabels: {
           enabled: true,
           style: {
             fontSize: '12px',
@@ -71,10 +71,8 @@ export default function WeightsChart({
           // @ts-ignore
           formatter: (text: string) => `${text}: ${data[text].today}`,
           offsetY: -4,
-        }
-      }
-      plotOptions={
-        {
+        },
+        plotOptions: {
           treemap: {
             useFillColorAsStroke: true,
             colorScale: {
@@ -85,13 +83,13 @@ export default function WeightsChart({
               })),
             },
           },
-        }
-      }
-      tooltip={{
-        y: {
-          formatter: (val: number, { dataPointIndex, w }) => (
-            `${moneyToString(val, totalValue.currency)} (${data[w.globals.categoryLabels[dataPointIndex]].pct}%)`
-          ),
+        },
+        tooltip: {
+          y: {
+            formatter: (val: number, { dataPointIndex, w }) => (
+              `${moneyToString(val, totalValue.currency)} (${data[w.globals.categoryLabels[dataPointIndex]].pct}%)`
+            ),
+          },
         },
       }}
     />

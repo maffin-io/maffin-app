@@ -13,6 +13,7 @@ import AccountsTable from '@/components/AccountsTable';
 import AddAccountButton from '@/components/buttons/AddAccountButton';
 import DateRangeInput from '@/components/DateRangeInput';
 import NetWorthPie from '@/components/pages/accounts/NetWorthPie';
+import NetWorthHistogram from '@/components/pages/accounts/NetWorthHistogram';
 import { PriceDBMap } from '@/book/prices';
 import * as apiHook from '@/hooks/useApi';
 
@@ -35,6 +36,10 @@ jest.mock('@/components/DateRangeInput', () => jest.fn(
 
 jest.mock('@/components/pages/accounts/NetWorthPie', () => jest.fn(
   () => <div data-testid="NetWorthPie" />,
+));
+
+jest.mock('@/components/pages/accounts/NetWorthHistogram', () => jest.fn(
+  () => <div data-testid="NetWorthHistogram" />,
 ));
 
 describe('AccountsPage', () => {
@@ -64,6 +69,7 @@ describe('AccountsPage', () => {
         tree: {
           account: {},
           children: [],
+          monthlyTotals: {},
           total: expect.any(Money),
         },
       },
@@ -90,6 +96,20 @@ describe('AccountsPage', () => {
         tree: {
           account: {},
           children: [],
+          monthlyTotals: {},
+          total: expect.any(Money),
+        },
+      },
+      {},
+    );
+
+    await screen.findByTestId('NetWorthHistogram');
+    expect(NetWorthPie).toHaveBeenLastCalledWith(
+      {
+        tree: {
+          account: {},
+          children: [],
+          monthlyTotals: {},
           total: expect.any(Money),
         },
       },
@@ -106,12 +126,17 @@ describe('AccountsPage', () => {
         name: 'Root',
         type: 'ROOT',
         getTotal: () => new Money(0, 'EUR'),
+        getMonthlyTotals: () => ({}),
         childrenIds: ['a1'],
       } as Account,
       {
         guid: 'a1',
         name: 'Assets',
         getTotal: () => new Money(10, 'EUR'),
+        getMonthlyTotals: (() => ({
+          'Jan/23': new Money(7, 'EUR'),
+          'Feb/23': new Money(3, 'EUR'),
+        })) as typeof Account.prototype.getMonthlyTotals,
         commodity: {
           mnemonic: 'EUR',
         },
@@ -122,6 +147,10 @@ describe('AccountsPage', () => {
         guid: 'a2',
         name: 'Bank',
         getTotal: () => new Money(1000, 'USD'),
+        getMonthlyTotals: (() => ({
+          'Jan/23': new Money(700, 'USD'),
+          'Feb/23': new Money(300, 'USD'),
+        })) as typeof Account.prototype.getMonthlyTotals,
         commodity: {
           mnemonic: 'USD',
         },
@@ -146,38 +175,63 @@ describe('AccountsPage', () => {
     const { container } = render(<AccountsPage />);
 
     const expectedTree = {
-      tree: {
-        account: accounts[0],
-        total: expect.any(Money),
-        children: [
-          {
-            account: accounts[1],
-            total: expect.any(Money),
-            children: [
-              {
-                account: accounts[2],
-                total: expect.any(Money),
-                children: [],
-              },
-            ],
+      account: accounts[0],
+      total: expect.any(Money),
+      monthlyTotals: {},
+      children: [
+        {
+          account: accounts[1],
+          total: expect.any(Money),
+          monthlyTotals: {
+            'Jan/23': expect.any(Money),
+            'Feb/23': expect.any(Money),
           },
-        ],
-      },
+          children: [
+            {
+              account: accounts[2],
+              total: expect.any(Money),
+              monthlyTotals: {
+                'Jan/23': expect.any(Money),
+                'Feb/23': expect.any(Money),
+              },
+              children: [],
+            },
+          ],
+        },
+      ],
     };
     await screen.findByTestId('AccountsTable');
     expect(AccountsTable).toBeCalledTimes(1);
-    expect(AccountsTable).toHaveBeenLastCalledWith(expectedTree, {});
-    expect((AccountsTable as jest.Mock).mock.calls[0][0].tree.total.toString()).toEqual('0.00 EUR');
-    expect(
-      // eslint-disable-next-line testing-library/no-node-access
-      (AccountsTable as jest.Mock).mock.calls[0][0].tree.children[0].total.toString(),
-    ).toEqual('990.00 EUR'); // 1000 USD * 0.98 + 10 EUR
-    expect(
-      // eslint-disable-next-line testing-library/no-node-access
-      (AccountsTable as jest.Mock).mock.calls[0][0].tree.children[0].children[0].total.toString(),
-    ).toEqual('1000.00 USD');
+    expect(AccountsTable).toHaveBeenLastCalledWith({ tree: expectedTree }, {});
+    expect(NetWorthPie).toHaveBeenLastCalledWith({ tree: expectedTree }, {});
+    expect(NetWorthHistogram).toHaveBeenLastCalledWith(
+      {
+        tree: expectedTree,
+        startDate: date,
+      },
+      {},
+    );
 
-    expect(NetWorthPie).toHaveBeenLastCalledWith(expectedTree, {});
+    const resultTree = (AccountsTable as jest.Mock).mock.calls[0][0].tree;
+    expect(resultTree.total.toString()).toEqual('0.00 EUR');
+
+    /* eslint-disable testing-library/no-node-access */
+    expect(resultTree.children[0].total.toString()).toEqual('990.00 EUR'); // 1000 USD * 0.98 + 10 EUR
+    expect(
+      resultTree.children[0].monthlyTotals['Jan/23'].toString(),
+    ).toEqual('693.00 EUR'); // 700 USD * 0.98 + 7 EUR
+    expect(
+      resultTree.children[0].monthlyTotals['Feb/23'].toString(),
+    ).toEqual('297.00 EUR'); // 300 USD * 0.98 + 3 EUR
+
+    expect(resultTree.children[0].children[0].total.toString()).toEqual('1000.00 USD');
+    expect(
+      resultTree.children[0].children[0].monthlyTotals['Jan/23'].toString(),
+    ).toEqual('686.00 EUR'); // 700 USD * 0.98
+    expect(
+      resultTree.children[0].children[0].monthlyTotals['Feb/23'].toString(),
+    ).toEqual('294.00 EUR'); // 300 USD * 0.98
+    /* eslint-enable testing-library/no-node-access */
 
     expect(container).toMatchSnapshot();
   });
@@ -189,12 +243,14 @@ describe('AccountsPage', () => {
         name: 'Root',
         type: 'ROOT',
         getTotal: () => new Money(0, 'EUR'),
+        getMonthlyTotals: () => ({}),
         childrenIds: ['a1'],
       } as Account,
       {
         guid: 'a1',
         name: 'Stocks',
         getTotal: () => new Money(0, 'EUR'),
+        getMonthlyTotals: () => ({}),
         commodity: {
           mnemonic: 'EUR',
         },
@@ -205,6 +261,10 @@ describe('AccountsPage', () => {
         guid: 'a2',
         name: 'GOOGL',
         getTotal: () => new Money(2, 'GOOGL'),
+        getMonthlyTotals: (() => ({
+          'Jan/23': new Money(1, 'GOOGL'),
+          'Feb/23': new Money(1, 'GOOGL'),
+        })) as typeof Account.prototype.getMonthlyTotals,
         commodity: {
           mnemonic: 'GOOGL',
         },
@@ -236,38 +296,61 @@ describe('AccountsPage', () => {
     const { container } = render(<AccountsPage />);
 
     const expectedTree = {
-      tree: {
-        account: accounts[0],
-        total: expect.any(Money),
-        children: [
-          {
-            account: accounts[1],
-            total: expect.any(Money),
-            children: [
-              {
-                account: accounts[2],
-                total: expect.any(Money),
-                children: [],
-              },
-            ],
+      account: accounts[0],
+      total: expect.any(Money),
+      monthlyTotals: {},
+      children: [
+        {
+          account: accounts[1],
+          total: expect.any(Money),
+          monthlyTotals: {
+            'Jan/23': expect.any(Money),
+            'Feb/23': expect.any(Money),
           },
-        ],
-      },
+          children: [
+            {
+              account: accounts[2],
+              total: expect.any(Money),
+              monthlyTotals: {
+                'Jan/23': expect.any(Money),
+                'Feb/23': expect.any(Money),
+              },
+              children: [],
+            },
+          ],
+        },
+      ],
     };
-    await screen.findByTestId('AccountsTable');
     expect(AccountsTable).toBeCalledTimes(1);
-    expect(AccountsTable).toHaveBeenLastCalledWith(expectedTree, {});
-    expect((AccountsTable as jest.Mock).mock.calls[0][0].tree.total.toString()).toEqual('0.00 EUR');
-    expect(
-      // eslint-disable-next-line testing-library/no-node-access
-      (AccountsTable as jest.Mock).mock.calls[0][0].tree.children[0].total.toString(),
-    ).toEqual('196.00 EUR'); // 200 USD * 0.98
-    expect(
-      // eslint-disable-next-line testing-library/no-node-access
-      (AccountsTable as jest.Mock).mock.calls[0][0].tree.children[0].children[0].total.toString(),
-    ).toEqual('200.00 USD'); // 2 GOOGL * 100 USD
+    expect(AccountsTable).toHaveBeenLastCalledWith({ tree: expectedTree }, {});
+    expect(NetWorthPie).toHaveBeenLastCalledWith({ tree: expectedTree }, {});
+    expect(NetWorthHistogram).toHaveBeenLastCalledWith(
+      {
+        tree: expectedTree,
+        startDate: date,
+      },
+      {},
+    );
 
-    expect(NetWorthPie).toHaveBeenLastCalledWith(expectedTree, {});
+    const resultTree = (AccountsTable as jest.Mock).mock.calls[0][0].tree;
+    expect(resultTree.total.toString()).toEqual('0.00 EUR');
+
+    /* eslint-disable testing-library/no-node-access */
+    expect(resultTree.children[0].total.toString()).toEqual('196.00 EUR'); // 200 USD * 0.98
+    expect(
+      resultTree.children[0].monthlyTotals['Jan/23'].toString(),
+    ).toEqual('98.00 EUR'); // 100 USD * 0.98
+    expect(
+      resultTree.children[0].monthlyTotals['Feb/23'].toString(),
+    ).toEqual('98.00 EUR'); // 100 USD * 0.98
+    expect(resultTree.children[0].children[0].total.toString()).toEqual('200.00 USD'); // 2 GOOGL * 100 USD
+    expect(
+      resultTree.children[0].children[0].monthlyTotals['Jan/23'].toString(),
+    ).toEqual('98.00 EUR'); // 100 USD * 0.98
+    expect(
+      resultTree.children[0].children[0].monthlyTotals['Feb/23'].toString(),
+    ).toEqual('98.00 EUR'); // 100 USD * 0.98
+    /* eslint-enable testing-library/no-node-access */
 
     expect(container).toMatchSnapshot();
   });

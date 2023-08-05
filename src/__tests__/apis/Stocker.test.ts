@@ -33,7 +33,7 @@ describe('Stocker', () => {
     });
 
     it('calls API with expected params', async () => {
-      const result = await instance.getPrice('A', DateTime.fromISO('2023-01-01', { zone: 'utc' }));
+      const result = await instance.getPrice('A', DateTime.fromISO('2023-01-01'));
 
       expect(API.get).toHaveBeenCalledWith(
         'stocker',
