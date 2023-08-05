@@ -34,6 +34,11 @@ export default function TotalLineChart({
       unit={splits[0]?.account.commodity.mnemonic}
       height={255}
       options={{
+        chart: {
+          zoom: {
+            enabled: false,
+          },
+        },
         xaxis: {
           type: 'datetime',
         },
