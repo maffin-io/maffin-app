@@ -104,7 +104,7 @@ describe('AccountsPage', () => {
     );
 
     await screen.findByTestId('NetWorthHistogram');
-    expect(NetWorthPie).toHaveBeenLastCalledWith(
+    expect(NetWorthHistogram).toHaveBeenLastCalledWith(
       {
         tree: {
           account: {},
@@ -112,6 +112,8 @@ describe('AccountsPage', () => {
           monthlyTotals: {},
           total: expect.any(Money),
         },
+        selectedDate: DateTime.fromISO('2023-01-02'),
+        startDate: DateTime.fromISO('2022-01-01'),
       },
       {},
     );
@@ -208,6 +210,7 @@ describe('AccountsPage', () => {
       {
         tree: expectedTree,
         startDate: date,
+        selectedDate: DateTime.fromISO('2023-01-02'),
       },
       {},
     );
@@ -328,6 +331,7 @@ describe('AccountsPage', () => {
       {
         tree: expectedTree,
         startDate: date,
+        selectedDate: DateTime.fromISO('2023-01-02'),
       },
       {},
     );

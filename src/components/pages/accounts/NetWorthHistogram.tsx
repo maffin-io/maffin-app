@@ -7,16 +7,26 @@ import { moneyToString } from '@/helpers/number';
 
 export type NetWorthHistogramProps = {
   startDate?: DateTime,
+  selectedDate?: DateTime,
   tree: AccountsTree,
 };
 
 export default function NetWorthHistogram({
   startDate,
+  selectedDate = DateTime.now().minus({ months: 3 }),
   tree,
 }: NetWorthHistogramProps): JSX.Element {
+  const now = DateTime.now();
+  if (now.diff(selectedDate, ['months']).months < 3) {
+    selectedDate = now.minus({ months: 3 });
+  }
+  const brushInterval = Interval.fromDateTimes(
+    selectedDate.minus({ months: 3 }),
+    selectedDate.plus({ months: 3 }),
+  );
   const interval = Interval.fromDateTimes(
-    startDate || DateTime.now(),
-    DateTime.now(),
+    startDate || now,
+    now,
   );
   const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).plus({ month: 1 }));
   dates.pop();
@@ -187,8 +197,8 @@ export default function NetWorthHistogram({
               selection: {
                 enabled: true,
                 xaxis: {
-                  min: DateTime.now().minus({ months: 6 }).toMillis(),
-                  max: DateTime.now().toMillis(),
+                  min: (brushInterval.start as DateTime).toMillis(),
+                  max: (brushInterval.end as DateTime).toMillis(),
                 },
                 fill: {
                   color: '#888',
