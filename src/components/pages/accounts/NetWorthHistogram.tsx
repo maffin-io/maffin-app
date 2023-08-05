@@ -18,7 +18,7 @@ export default function NetWorthHistogram({
     startDate || DateTime.now(),
     DateTime.now(),
   );
-  const dates = interval.splitBy({ month: 1 }).map((d) => (d.start as DateTime).plus({ month: 1 }));
+  const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).plus({ month: 1 }));
   dates.pop();
 
   // Seems apexcharts types are not correct so need to define manually

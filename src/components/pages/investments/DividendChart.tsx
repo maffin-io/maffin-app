@@ -1,5 +1,7 @@
 import React from 'react';
+import { Interval, DateTime, Info } from 'luxon';
 
+import Money from '@/book/Money';
 import type { InvestmentAccount } from '@/book/models';
 import { currencyToSymbol } from '@/book/helpers';
 import Chart from '@/components/charts/Chart';
@@ -18,8 +20,10 @@ export default function DividendChart({
   }
 
   const currency = investments[0].mainCurrency;
-  const yearData = buildSeries(investments);
-  const lastYearMonthlySeries = buildMonthlySeries(yearData[yearData.length - 1]);
+  const yearSeries = buildSeries(investments);
+  const lastYearMonthlySeries = buildMonthlySeries(
+    yearSeries[0].data[yearSeries[0].data.length - 1],
+  );
 
   return (
     <div className="bg-gunmetal-700 rounded-sm m-6 p-4">
@@ -35,7 +39,7 @@ export default function DividendChart({
           <div id="chart-year" className="text-slate-300">
             <Chart
               type="bar"
-              series={[{ data: yearData, name: 'dividends' }]}
+              series={yearSeries}
               unit={currency}
               options={{
                 legend: {
@@ -59,7 +63,7 @@ export default function DividendChart({
                       const selected = chart.w.config.series[seriesIndex].data[selectedPoint] as {
                         x: string,
                         y: number,
-                        dividends: { [month: string]: { amount: number, ticker: string }[] },
+                        dividends: { ticker: string, amount: number }[][],
                       };
 
                       return ApexCharts.exec('barMonthly', 'updateOptions', {
@@ -83,9 +87,6 @@ export default function DividendChart({
                   id: 'barMonthly',
                   stacked: true,
                 },
-                xaxis: {
-                  categories: Object.values(MONTHS),
-                },
               }}
             />
           </div>
@@ -95,74 +96,59 @@ export default function DividendChart({
   );
 }
 
-const MONTHS: { [key:number]: string; } = {
-  0: 'Jan',
-  1: 'Feb',
-  2: 'Mar',
-  3: 'Apr',
-  4: 'May',
-  5: 'Jun',
-  6: 'Jul',
-  7: 'Aug',
-  8: 'Sep',
-  9: 'Oct',
-  10: 'Nov',
-  11: 'Dec',
-};
-
 function buildSeries(investments: InvestmentAccount[]) {
-  const perYear: {
-    [year: number]: {
-      [month: string]: {
-        amount: number,
-        ticker: string,
-      }[],
+  const series: {
+    name: string,
+    data: {
+      x: string,
+      y: number,
+      dividends: { ticker: string, amount: number }[][],
+    }[],
+  }[] = [
+    {
+      name: 'Total dividends',
+      data: [],
     },
-  } = {};
+  ];
+
+  const allDividends: {
+    ticker: string,
+    when: DateTime,
+    amountInCurrency: Money,
+  }[] = [];
   investments.forEach(investment => {
     investment.dividends.forEach(dividend => {
-      const month = MONTHS[dividend.when.month - 1];
-      const { year } = dividend.when;
-
-      if (!(year in perYear)) {
-        perYear[year] = {};
-      }
-
-      const amount = dividend.amountInCurrency.toNumber();
-
-      if (!(month in perYear[year])) {
-        perYear[year][month] = [{
-          amount,
-          ticker: investment.account.name,
-        }];
-      } else {
-        perYear[year][month].push({
-          amount,
-          ticker: investment.account.name,
-        });
-      }
+      allDividends.push({
+        ticker: investment.account.name,
+        ...dividend,
+      });
     });
   });
 
-  const series: {
-    x: string,
-    y: number,
-    dividends: { [month: string]: { amount: number, ticker: string }[] },
-  }[] = [];
-  Object.entries(perYear).forEach(([year, perMonth]) => {
-    let yearTotal = 0;
-    Object.values(perMonth).forEach(monthlyDividend => {
-      monthlyDividend.forEach(dividend => {
-        yearTotal += dividend.amount;
-      });
-    });
+  const startDate = Math.min(...(allDividends.map(dividend => dividend.when.toMillis())));
+  const endDate = Math.max(...(allDividends.map(dividend => dividend.when.toMillis())));
+  const interval = Interval.fromDateTimes(
+    DateTime.fromMillis(startDate),
+    DateTime.fromMillis(endDate),
+  );
+  const years = interval.splitBy({ year: 1 }).map(d => (d.start as DateTime).year);
+  const currentYear = DateTime.now().year;
+  if (!years.includes(currentYear)) {
+    years.push(DateTime.now().year);
+  }
 
-    const yearData = {
-      x: year,
-      y: yearTotal,
-      dividends: perMonth,
-    };
-    series.push(yearData);
+  series[0].data = years.map(y => ({
+    x: y.toString(),
+    y: 0,
+    dividends: Array.from(Array(12), () => []),
+  }));
+
+  allDividends.forEach(dividend => {
+    const yearData = series[0].data[years.indexOf(dividend.when.year)];
+    yearData.y += dividend.amountInCurrency.toNumber();
+    yearData.dividends[dividend.when.month - 1].push(
+      { ticker: dividend.ticker, amount: dividend.amountInCurrency.toNumber() },
+    );
   });
 
   return series;
@@ -172,27 +158,24 @@ function buildMonthlySeries(
   selectedSeries: {
     x: string,
     y: number,
-    dividends: { [month: string]: { amount: number, ticker: string }[] },
+    dividends: { ticker: string, amount: number }[][],
   },
 ) {
-  const tickerSeries: { [ticker: string]: number[] } = {};
+  const series: { name: string, data: { x: string, y: number }[] }[] = [];
+  const tickers = new Set(selectedSeries.dividends.flat().map(d => d.ticker));
 
-  Object.entries(MONTHS).forEach(([monthNumber, month]) => {
-    if (month in selectedSeries.dividends) {
-      selectedSeries.dividends[month].forEach(dividend => {
-        if (!(dividend.ticker in tickerSeries)) {
-          tickerSeries[dividend.ticker] = new Array(12).fill(0);
-        }
-        tickerSeries[dividend.ticker][Number(monthNumber)] += dividend.amount;
-      });
-    }
-  });
-
-  const series: { name: string, data: number[] }[] = [];
-  Object.entries(tickerSeries).forEach(([ticker, monthlyDividends]) => {
+  tickers.forEach(ticker => {
     series.push({
       name: ticker,
-      data: monthlyDividends,
+      data: selectedSeries.dividends.map((monthDividends, index) => ({
+        x: Info.months('short')[index],
+        y: monthDividends.filter(
+          dividend => dividend.ticker === ticker,
+        ).reduce(
+          (total, dividend) => total + dividend.amount,
+          0,
+        ),
+      })),
     });
   });
 

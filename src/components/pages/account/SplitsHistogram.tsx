@@ -1,23 +1,8 @@
 import React from 'react';
-import { ApexOptions } from 'apexcharts';
+import { Interval, DateTime } from 'luxon';
 
 import Chart from '@/components/charts/Chart';
 import { Split } from '@/book/entities';
-
-const MONTHS: { [key:number]:string; } = {
-  1: 'Jan',
-  2: 'Feb',
-  3: 'Mar',
-  4: 'Apr',
-  5: 'May',
-  6: 'Jun',
-  7: 'Jul',
-  8: 'Aug',
-  9: 'Sep',
-  10: 'Oct',
-  11: 'Nov',
-  12: 'Dec',
-};
 
 export type SplitsHistogramProps = {
   splits: Split[],
@@ -26,42 +11,53 @@ export type SplitsHistogramProps = {
 export default function SplitsHistogram({
   splits,
 }: SplitsHistogramProps): JSX.Element {
-  const yearlyAggregate: { [year: string]: { [month: string]: number } } = {};
-
-  splits.forEach(split => {
-    const { year, month } = split.transaction.date;
-    const yearData = yearlyAggregate[year] || {};
-    let { quantity } = split;
-    if (split.account.type === 'INCOME') {
-      quantity = -quantity;
-    }
-    yearData[month] = (yearData[month] || 0) + quantity;
-    yearlyAggregate[year] = yearData;
-  });
-
-  const series: ApexOptions['series'] = [];
   const hiddenSeries: string[] = [];
+  let series: {
+    name: string,
+    data: {
+      x: string,
+      y: number,
+    }[],
+  }[] = [];
 
-  Object.keys(yearlyAggregate).forEach((year, index) => {
-    Object.keys(MONTHS).forEach(month => {
-      if (!series[index]) {
-        series[index] = {
-          name: year,
-          data: [],
-        };
+  if (splits.length) {
+    const interval = Interval.fromDateTimes(
+      splits[splits.length - 1].transaction.date,
+      splits[0]?.transaction.date,
+    );
+    const years = interval.splitBy({ year: 1 }).map(d => (d.start as DateTime).year);
+    const currentYear = DateTime.now().year;
+    if (!years.includes(currentYear)) {
+      years.push(DateTime.now().year);
+    }
+
+    series = years.map(year => {
+      hiddenSeries.push(year.toString());
+      const yearInterval = Interval.fromDateTimes(
+        DateTime.utc(year).startOf('year'),
+        DateTime.utc(year).endOf('year'),
+      );
+      return {
+        name: year.toString(),
+        data: yearInterval.splitBy({ month: 1 }).map(d => ({
+          x: (d.start as DateTime).toFormat('MMM'),
+          y: 0,
+        })),
+      };
+    });
+    hiddenSeries.pop();
+
+    splits.forEach(split => {
+      const { month, year } = split.transaction.date;
+      let { quantity } = split;
+      if (split.account.type === 'INCOME') {
+        quantity = -quantity;
       }
 
-      // @ts-ignore not sure why data type is wrong here...
-      series[index].data.push({
-        x: `${MONTHS[Number(month)]}`,
-        y: yearlyAggregate[year][month] || 0,
-      });
+      const yearSeries = series[years.indexOf(year)];
+      yearSeries.data[month - 1].y += quantity;
     });
-
-    hiddenSeries.push(year);
-  });
-
-  hiddenSeries.pop();
+  }
 
   return (
     <Chart
@@ -71,9 +67,6 @@ export default function SplitsHistogram({
       options={{
         title: {
           text: 'Movements per month',
-        },
-        xaxis: {
-          categories: Object.values(MONTHS),
         },
         plotOptions: {
           bar: {

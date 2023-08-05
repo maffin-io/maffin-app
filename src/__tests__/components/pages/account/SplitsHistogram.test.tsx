@@ -28,11 +28,6 @@ describe('SplitsHistogram', () => {
           title: {
             text: 'Movements per month',
           },
-          xaxis: {
-            categories: [
-              'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-            ],
-          },
           chart: {
             events: {
               mounted: expect.any(Function),
@@ -201,11 +196,6 @@ describe('SplitsHistogram', () => {
         options: {
           title: {
             text: 'Movements per month',
-          },
-          xaxis: {
-            categories: [
-              'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-            ],
           },
           chart: {
             events: {

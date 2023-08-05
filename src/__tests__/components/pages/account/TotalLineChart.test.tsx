@@ -25,6 +25,11 @@ describe('TotalLineChart', () => {
         type: 'line',
         unit: undefined,
         options: {
+          chart: {
+            zoom: {
+              enabled: false,
+            },
+          },
           xaxis: {
             type: 'datetime',
           },
@@ -90,6 +95,11 @@ describe('TotalLineChart', () => {
         type: 'line',
         unit: 'EUR',
         options: {
+          chart: {
+            zoom: {
+              enabled: false,
+            },
+          },
           xaxis: {
             type: 'datetime',
           },
