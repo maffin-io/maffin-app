@@ -8,8 +8,11 @@ import type { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import AccountsTable from '@/components/AccountsTable';
 import AddAccountButton from '@/components/buttons/AddAccountButton';
-import NetWorthPie from '@/components/pages/accounts/NetWorthPie';
-import NetWorthHistogram from '@/components/pages/accounts/NetWorthHistogram';
+import {
+  NetWorthPie,
+  NetWorthHistogram,
+  MonthlyTotalHistogram,
+} from '@/components/pages/accounts';
 import { PriceDBMap } from '@/book/prices';
 import DateRangeInput from '@/components/DateRangeInput';
 import { useApi } from '@/hooks';
@@ -69,12 +72,28 @@ export default function AccountsPage(): JSX.Element {
             <AccountsTable tree={tree} />
           </div>
         </div>
-        <div className="col-span-6 p-4 mr-4 rounded-sm bg-gunmetal-700">
-          <NetWorthHistogram
-            tree={tree}
-            startDate={earliestDate}
-            selectedDate={selectedDate}
-          />
+        <div className="grid grid-cols-12 col-span-9">
+          <div className="col-span-9 p-4 mb-4 mr-4 rounded-sm bg-gunmetal-700">
+            <NetWorthHistogram
+              tree={tree}
+              startDate={earliestDate}
+              selectedDate={selectedDate}
+            />
+          </div>
+          <div className="col-span-6 p-4 mr-4 rounded-sm bg-gunmetal-700">
+            <MonthlyTotalHistogram
+              title="Income"
+              tree={tree.children.find(a => a.account.type === 'INCOME')}
+              selectedDate={selectedDate}
+            />
+          </div>
+          <div className="col-span-6 p-4 mr-4 rounded-sm bg-gunmetal-700">
+            <MonthlyTotalHistogram
+              title="Expenses"
+              tree={tree.children.find(a => a.account.type === 'EXPENSE')}
+              selectedDate={selectedDate}
+            />
+          </div>
         </div>
       </div>
     </>

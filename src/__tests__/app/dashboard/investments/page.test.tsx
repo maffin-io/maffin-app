@@ -4,10 +4,12 @@ import type { SWRResponse } from 'swr';
 
 import { Commodity } from '@/book/entities';
 import InvestmentsPage from '@/app/dashboard/investments/page';
-import WeightsChart from '@/components/pages/investments/WeightsChart';
 import StatisticsWidget from '@/components/StatisticsWidget';
-import InvestmentsTable from '@/components/pages/investments/InvestmentsTable';
-import DividendChart from '@/components/pages/investments/DividendChart';
+import {
+  WeightsChart,
+  DividendChart,
+  InvestmentsTable,
+} from '@/components/pages/investments';
 import Money from '@/book/Money';
 import { InvestmentAccount } from '@/book/models';
 import * as apiHook from '@/hooks/useApi';

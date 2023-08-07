@@ -5,10 +5,12 @@ import classNames from 'classnames';
 import type { SWRResponse } from 'swr';
 
 import type { InvestmentAccount } from '@/book/models';
-import WeightsChart from '@/components/pages/investments/WeightsChart';
+import {
+  WeightsChart,
+  DividendChart,
+  InvestmentsTable,
+} from '@/components/pages/investments';
 import StatisticsWidget from '@/components/StatisticsWidget';
-import InvestmentsTable from '@/components/pages/investments/InvestmentsTable';
-import DividendChart from '@/components/pages/investments/DividendChart';
 import { toFixed } from '@/helpers/number';
 import Money from '@/book/Money';
 import { useApi } from '@/hooks';

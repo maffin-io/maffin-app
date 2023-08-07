@@ -11,10 +11,9 @@ import Money from '@/book/Money';
 import AccountPage from '@/app/dashboard/accounts/[guid]/page';
 import TransactionsTable from '@/components/TransactionsTable';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
-import SplitsHistogram from '@/components/pages/account/SplitsHistogram';
-import TotalLineChart from '@/components/pages/account/TotalLineChart';
 import { Account, Split } from '@/book/entities';
 import * as apiHook from '@/hooks/useApi';
+import { SplitsHistogram, TotalLineChart } from '@/components/pages/account';
 
 jest.mock('@/hooks/useApi', () => ({
   __esModule: true,

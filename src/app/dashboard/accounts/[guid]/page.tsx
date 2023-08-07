@@ -8,8 +8,7 @@ import type { SWRResponse } from 'swr';
 
 import type { Account } from '@/book/entities';
 import Money from '@/book/Money';
-import SplitsHistogram from '@/components/pages/account/SplitsHistogram';
-import TotalLineChart from '@/components/pages/account/TotalLineChart';
+import { SplitsHistogram, TotalLineChart } from '@/components/pages/account';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import { Split } from '@/book/entities';
 import TransactionsTable from '@/components/TransactionsTable';

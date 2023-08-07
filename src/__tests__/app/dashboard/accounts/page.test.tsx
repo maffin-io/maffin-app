@@ -12,8 +12,7 @@ import AccountsPage from '@/app/dashboard/accounts/page';
 import AccountsTable from '@/components/AccountsTable';
 import AddAccountButton from '@/components/buttons/AddAccountButton';
 import DateRangeInput from '@/components/DateRangeInput';
-import NetWorthPie from '@/components/pages/accounts/NetWorthPie';
-import NetWorthHistogram from '@/components/pages/accounts/NetWorthHistogram';
+import { NetWorthPie, NetWorthHistogram, MonthlyTotalHistogram } from '@/components/pages/accounts';
 import { PriceDBMap } from '@/book/prices';
 import * as apiHook from '@/hooks/useApi';
 
@@ -40,6 +39,10 @@ jest.mock('@/components/pages/accounts/NetWorthPie', () => jest.fn(
 
 jest.mock('@/components/pages/accounts/NetWorthHistogram', () => jest.fn(
   () => <div data-testid="NetWorthHistogram" />,
+));
+
+jest.mock('@/components/pages/accounts/MonthlyTotalHistogram', () => jest.fn(
+  () => <div data-testid="MonthlyTotalHistogram" />,
 ));
 
 describe('AccountsPage', () => {
@@ -118,6 +121,27 @@ describe('AccountsPage', () => {
       {},
     );
 
+    expect(screen.getAllByTestId('MonthlyTotalHistogram')).toHaveLength(2);
+    expect(MonthlyTotalHistogram).toBeCalledTimes(2);
+    expect(MonthlyTotalHistogram).toHaveBeenNthCalledWith(
+      1,
+      {
+        title: 'Income',
+        tree: undefined,
+        selectedDate: DateTime.fromISO('2023-01-02'),
+      },
+      {},
+    );
+    expect(MonthlyTotalHistogram).toHaveBeenNthCalledWith(
+      2,
+      {
+        title: 'Expenses',
+        tree: undefined,
+        selectedDate: DateTime.fromISO('2023-01-02'),
+      },
+      {},
+    );
+
     expect(container).toMatchSnapshot();
   });
 
@@ -129,7 +153,7 @@ describe('AccountsPage', () => {
         type: 'ROOT',
         getTotal: () => new Money(0, 'EUR'),
         getMonthlyTotals: () => ({}),
-        childrenIds: ['a1'],
+        childrenIds: ['a1', 'a3', 'a5'],
       } as Account,
       {
         guid: 'a1',
@@ -159,6 +183,62 @@ describe('AccountsPage', () => {
         type: 'BANK',
         childrenIds: [] as string[],
       } as Account,
+      {
+        guid: 'a3',
+        name: 'Expenses',
+        getTotal: () => new Money(1000, 'EUR'),
+        getMonthlyTotals: (() => ({
+          'Jan/23': new Money(700, 'EUR'),
+          'Feb/23': new Money(300, 'EUR'),
+        })) as typeof Account.prototype.getMonthlyTotals,
+        commodity: {
+          mnemonic: 'EUR',
+        },
+        type: 'EXPENSE',
+        childrenIds: ['a4'] as string[],
+      } as Account,
+      {
+        guid: 'a4',
+        name: 'Groceries',
+        getTotal: () => new Money(1000, 'EUR'),
+        getMonthlyTotals: (() => ({
+          'Jan/23': new Money(700, 'EUR'),
+          'Feb/23': new Money(300, 'EUR'),
+        })) as typeof Account.prototype.getMonthlyTotals,
+        commodity: {
+          mnemonic: 'EUR',
+        },
+        type: 'EXPENSE',
+        childrenIds: [] as string[],
+      } as Account,
+      {
+        guid: 'a5',
+        name: 'Income',
+        getTotal: () => new Money(2000, 'EUR'),
+        getMonthlyTotals: (() => ({
+          'Jan/23': new Money(1000, 'EUR'),
+          'Feb/23': new Money(1000, 'EUR'),
+        })) as typeof Account.prototype.getMonthlyTotals,
+        commodity: {
+          mnemonic: 'EUR',
+        },
+        type: 'INCOME',
+        childrenIds: ['a6'] as string[],
+      } as Account,
+      {
+        guid: 'a6',
+        name: 'Salary',
+        getTotal: () => new Money(1000, 'EUR'),
+        getMonthlyTotals: (() => ({
+          'Jan/23': new Money(1000, 'EUR'),
+          'Feb/23': new Money(1000, 'EUR'),
+        })) as typeof Account.prototype.getMonthlyTotals,
+        commodity: {
+          mnemonic: 'EUR',
+        },
+        type: 'INCOME',
+        childrenIds: [] as string[],
+      } as Account,
     ];
 
     const todayQuotes = {
@@ -174,7 +254,7 @@ describe('AccountsPage', () => {
       .mockReturnValueOnce({ data: accounts } as SWRResponse)
       .mockReturnValueOnce({ data: todayQuotes } as SWRResponse);
 
-    const { container } = render(<AccountsPage />);
+    render(<AccountsPage />);
 
     const expectedTree = {
       account: accounts[0],
@@ -200,6 +280,44 @@ describe('AccountsPage', () => {
             },
           ],
         },
+        {
+          account: accounts[3],
+          total: expect.any(Money),
+          monthlyTotals: {
+            'Jan/23': expect.any(Money),
+            'Feb/23': expect.any(Money),
+          },
+          children: [
+            {
+              account: accounts[4],
+              total: expect.any(Money),
+              monthlyTotals: {
+                'Jan/23': expect.any(Money),
+                'Feb/23': expect.any(Money),
+              },
+              children: [],
+            },
+          ],
+        },
+        {
+          account: accounts[5],
+          total: expect.any(Money),
+          monthlyTotals: {
+            'Jan/23': expect.any(Money),
+            'Feb/23': expect.any(Money),
+          },
+          children: [
+            {
+              account: accounts[6],
+              total: expect.any(Money),
+              monthlyTotals: {
+                'Jan/23': expect.any(Money),
+                'Feb/23': expect.any(Money),
+              },
+              children: [],
+            },
+          ],
+        },
       ],
     };
     await screen.findByTestId('AccountsTable');
@@ -210,6 +328,26 @@ describe('AccountsPage', () => {
       {
         tree: expectedTree,
         startDate: date,
+        selectedDate: DateTime.fromISO('2023-01-02'),
+      },
+      {},
+    );
+    expect(MonthlyTotalHistogram).toHaveBeenNthCalledWith(
+      1,
+      {
+        title: 'Income',
+        // eslint-disable-next-line testing-library/no-node-access
+        tree: expectedTree.children[2],
+        selectedDate: DateTime.fromISO('2023-01-02'),
+      },
+      {},
+    );
+    expect(MonthlyTotalHistogram).toHaveBeenNthCalledWith(
+      2,
+      {
+        title: 'Expenses',
+        // eslint-disable-next-line testing-library/no-node-access
+        tree: expectedTree.children[1],
         selectedDate: DateTime.fromISO('2023-01-02'),
       },
       {},
@@ -235,8 +373,6 @@ describe('AccountsPage', () => {
       resultTree.children[0].children[0].monthlyTotals['Feb/23'].toString(),
     ).toEqual('294.00 EUR'); // 300 USD * 0.98
     /* eslint-enable testing-library/no-node-access */
-
-    expect(container).toMatchSnapshot();
   });
 
   it('generates tree as expected, with investments', async () => {
@@ -296,7 +432,7 @@ describe('AccountsPage', () => {
       .mockReturnValueOnce({ data: accounts } as SWRResponse)
       .mockReturnValueOnce({ data: todayQuotes } as SWRResponse);
 
-    const { container } = render(<AccountsPage />);
+    render(<AccountsPage />);
 
     const expectedTree = {
       account: accounts[0],
@@ -355,7 +491,5 @@ describe('AccountsPage', () => {
       resultTree.children[0].children[0].monthlyTotals['Feb/23'].toString(),
     ).toEqual('98.00 EUR'); // 100 USD * 0.98
     /* eslint-enable testing-library/no-node-access */
-
-    expect(container).toMatchSnapshot();
   });
 });
