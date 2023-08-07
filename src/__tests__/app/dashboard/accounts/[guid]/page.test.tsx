@@ -9,11 +9,14 @@ import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
 import AccountPage from '@/app/dashboard/accounts/[guid]/page';
-import TransactionsTable from '@/components/TransactionsTable';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import { Account, Split } from '@/book/entities';
 import * as apiHook from '@/hooks/useApi';
-import { SplitsHistogram, TotalLineChart } from '@/components/pages/account';
+import {
+  SplitsHistogram,
+  TotalLineChart,
+  TransactionsTable,
+} from '@/components/pages/account';
 
 jest.mock('@/hooks/useApi', () => ({
   __esModule: true,
@@ -24,7 +27,7 @@ jest.mock('@/components/buttons/TransactionFormButton', () => jest.fn(
   () => <div data-testid="TransactionFormButton" />,
 ));
 
-jest.mock('@/components/TransactionsTable', () => jest.fn(
+jest.mock('@/components/pages/account/TransactionsTable', () => jest.fn(
   () => <div data-testid="TransactionsTable" />,
 ));
 

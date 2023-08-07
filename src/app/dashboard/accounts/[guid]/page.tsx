@@ -8,10 +8,13 @@ import type { SWRResponse } from 'swr';
 
 import type { Account } from '@/book/entities';
 import Money from '@/book/Money';
-import { SplitsHistogram, TotalLineChart } from '@/components/pages/account';
+import {
+  SplitsHistogram,
+  TotalLineChart,
+  TransactionsTable,
+} from '@/components/pages/account';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import { Split } from '@/book/entities';
-import TransactionsTable from '@/components/TransactionsTable';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import { useApi } from '@/hooks';
 
