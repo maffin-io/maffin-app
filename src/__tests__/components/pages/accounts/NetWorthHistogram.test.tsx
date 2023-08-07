@@ -5,7 +5,7 @@ import { DateTime } from 'luxon';
 import Money from '@/book/Money';
 import { Account } from '@/book/entities';
 import Chart from '@/components/charts/Chart';
-import NetWorthHistogram from '@/components/pages/accounts/NetWorthHistogram';
+import { NetWorthHistogram } from '@/components/pages/accounts';
 import type { AccountsTree } from '@/types/accounts';
 
 jest.mock('@/components/charts/Chart', () => jest.fn(
@@ -220,15 +220,15 @@ describe('NetWorthHistogram', () => {
           },
           {
             x: DateTime.fromISO('2022-11-01'),
-            y: 0,
-          },
-          {
-            x: DateTime.fromISO('2022-12-01'),
             y: 600,
           },
           {
-            x: DateTime.fromISO('2023-01-01'),
+            x: DateTime.fromISO('2022-12-01'),
             y: 400,
+          },
+          {
+            x: DateTime.fromISO('2023-01-01'),
+            y: 0,
           },
         ],
       },
@@ -242,15 +242,15 @@ describe('NetWorthHistogram', () => {
           },
           {
             x: DateTime.fromISO('2022-11-01'),
-            y: -0,
-          },
-          {
-            x: DateTime.fromISO('2022-12-01'),
             y: -400,
           },
           {
-            x: DateTime.fromISO('2023-01-01'),
+            x: DateTime.fromISO('2022-12-01'),
             y: -500,
+          },
+          {
+            x: DateTime.fromISO('2023-01-01'),
+            y: -0,
           },
         ],
       },
@@ -264,15 +264,15 @@ describe('NetWorthHistogram', () => {
           },
           {
             x: DateTime.fromISO('2022-11-01'),
-            y: 0,
-          },
-          {
-            x: DateTime.fromISO('2022-12-01'),
             y: 200,
           },
           {
-            x: DateTime.fromISO('2023-01-01'),
+            x: DateTime.fromISO('2022-12-01'),
             y: -100,
+          },
+          {
+            x: DateTime.fromISO('2023-01-01'),
+            y: 0,
           },
         ],
       },
@@ -286,11 +286,11 @@ describe('NetWorthHistogram', () => {
           },
           {
             x: DateTime.fromISO('2022-11-01'),
-            y: 0,
+            y: 200,
           },
           {
             x: DateTime.fromISO('2022-12-01'),
-            y: 200,
+            y: 100,
           },
           {
             x: DateTime.fromISO('2023-01-01'),
@@ -312,11 +312,11 @@ describe('NetWorthHistogram', () => {
           },
           {
             x: DateTime.fromISO('2022-11-01'),
-            y: 0,
+            y: 200,
           },
           {
             x: DateTime.fromISO('2022-12-01'),
-            y: 200,
+            y: 100,
           },
           {
             x: DateTime.fromISO('2023-01-01'),

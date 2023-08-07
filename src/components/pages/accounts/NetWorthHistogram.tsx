@@ -67,7 +67,7 @@ export default function NetWorthHistogram({
     incomeAccount = tree.children.find(a => a.account.type === 'INCOME');
     const expensesAccount = tree.children.find(a => a.account.type === 'EXPENSE');
     dates.forEach(date => {
-      const monthYear = (date as DateTime).minus({ month: 1 }).toFormat('MMM/yy');
+      const monthYear = (date as DateTime).toFormat('MMM/yy');
       const incomeAmount = (incomeAccount?.monthlyTotals[monthYear]?.toNumber() || 0);
       series[0].data.push({
         y: incomeAmount,
