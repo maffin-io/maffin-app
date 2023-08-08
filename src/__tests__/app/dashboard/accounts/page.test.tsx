@@ -12,7 +12,12 @@ import AccountsPage from '@/app/dashboard/accounts/page';
 import AccountsTable from '@/components/AccountsTable';
 import AddAccountButton from '@/components/buttons/AddAccountButton';
 import DateRangeInput from '@/components/DateRangeInput';
-import { NetWorthPie, NetWorthHistogram, MonthlyTotalHistogram } from '@/components/pages/accounts';
+import {
+  NetWorthPie,
+  NetWorthHistogram,
+  MonthlyTotalHistogram,
+  LatestTransactions,
+} from '@/components/pages/accounts';
 import { PriceDBMap } from '@/book/prices';
 import * as apiHook from '@/hooks/useApi';
 
@@ -43,6 +48,10 @@ jest.mock('@/components/pages/accounts/NetWorthHistogram', () => jest.fn(
 
 jest.mock('@/components/pages/accounts/MonthlyTotalHistogram', () => jest.fn(
   () => <div data-testid="MonthlyTotalHistogram" />,
+));
+
+jest.mock('@/components/pages/accounts/LatestTransactions', () => jest.fn(
+  () => <div data-testid="LatestTransactions" />,
 ));
 
 describe('AccountsPage', () => {
@@ -141,6 +150,9 @@ describe('AccountsPage', () => {
       },
       {},
     );
+
+    await screen.findByTestId('LatestTransactions');
+    expect(LatestTransactions).toHaveBeenLastCalledWith({}, {});
 
     expect(container).toMatchSnapshot();
   });

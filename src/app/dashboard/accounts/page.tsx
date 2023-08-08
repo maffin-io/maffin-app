@@ -12,6 +12,7 @@ import {
   NetWorthPie,
   NetWorthHistogram,
   MonthlyTotalHistogram,
+  LatestTransactions,
 } from '@/components/pages/accounts';
 import { PriceDBMap } from '@/book/prices';
 import DateRangeInput from '@/components/DateRangeInput';
@@ -72,13 +73,16 @@ export default function AccountsPage(): JSX.Element {
             <AccountsTable tree={tree} />
           </div>
         </div>
-        <div className="grid grid-cols-12 col-span-9">
+        <div className="grid grid-cols-12 items-start items-top col-span-9">
           <div className="col-span-9 p-4 mb-4 mr-4 rounded-sm bg-gunmetal-700">
             <NetWorthHistogram
               tree={tree}
               startDate={earliestDate}
               selectedDate={selectedDate}
             />
+          </div>
+          <div className="col-span-3 p-4 mb-4 mr-4 rounded-sm bg-gunmetal-700">
+            <LatestTransactions />
           </div>
           <div className="col-span-6 p-4 mr-4 rounded-sm bg-gunmetal-700">
             <MonthlyTotalHistogram

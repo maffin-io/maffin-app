@@ -45,13 +45,20 @@ exports[`AccountsPage passes empty data to components when loading when not read
       </div>
     </div>
     <div
-      class="grid grid-cols-12 col-span-9"
+      class="grid grid-cols-12 items-start items-top col-span-9"
     >
       <div
         class="col-span-9 p-4 mb-4 mr-4 rounded-sm bg-gunmetal-700"
       >
         <div
           data-testid="NetWorthHistogram"
+        />
+      </div>
+      <div
+        class="col-span-3 p-4 mb-4 mr-4 rounded-sm bg-gunmetal-700"
+      >
+        <div
+          data-testid="LatestTransactions"
         />
       </div>
       <div

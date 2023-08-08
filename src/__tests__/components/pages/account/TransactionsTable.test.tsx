@@ -15,7 +15,7 @@ import {
   Transaction,
 } from '@/book/entities';
 import Table from '@/components/Table';
-import TransactionsTable from '@/components/TransactionsTable';
+import { TransactionsTable } from '@/components/pages/account';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 
 jest.mock('next/link', () => jest.fn(

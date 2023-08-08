@@ -31,6 +31,7 @@ export type ApiPaths = (
   | '/api/investments'
   | '/api/prices/today'
   | '/api/splits/<guid>'
+  | '/api/txs/latest'
   | '/api/user'
 );
 
@@ -66,6 +67,9 @@ const API: {
   },
   '/api/splits/<guid>': {
     f: queries.getSplits,
+  },
+  '/api/txs/latest': {
+    f: queries.getLatestTxs,
   },
   '/api/user': {
     f: getUser,
