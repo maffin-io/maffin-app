@@ -12,9 +12,11 @@ import { moneyToString } from '@/helpers/number';
 export default function LatestTransactions(): JSX.Element {
   let { data: txs } = useApi('/api/txs/latest') as SWRResponse<Transaction[]>;
   txs = txs || [];
+  const title = txs.length ? 'Latest movements' : 'You have no movements yet...';
+
   return (
     <div>
-      <p className="mb-4">Latest movements</p>
+      <p className="mb-4">{title}</p>
       {
         txs.map((tx, index) => {
           const assetSplit = getAssetSplit(tx);
@@ -63,12 +65,4 @@ export default function LatestTransactions(): JSX.Element {
 
 function getAssetSplit(tx: Transaction): Split | undefined {
   return tx.splits.find(split => isAsset(split.account));
-}
-
-function isExpense(tx: Transaction): boolean {
-  return (tx.splits.find(split => split.account.type === 'EXPENSE') && true) || false;
-}
-
-function isIncome(tx: Transaction): boolean {
-  return (tx.splits.find(split => split.account.type === 'INCOME') && true) || false;
 }
