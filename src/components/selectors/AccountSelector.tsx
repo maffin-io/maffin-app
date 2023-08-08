@@ -4,6 +4,7 @@ import type { SWRResponse } from 'swr';
 import Selector from '@/components/selectors/Selector';
 import { useApi } from '@/hooks';
 import { Account } from '@/book/entities';
+import type { AccountsMap } from '@/types/book';
 
 export type AccountSelectorProps = {
   placeholder?: string,
@@ -30,26 +31,27 @@ export default function AccountSelector(
     onChange = () => {},
   }: AccountSelectorProps,
 ): JSX.Element {
-  let { data: accounts } = useApi('/api/accounts') as SWRResponse<Account[]>;
+  let { data: accounts } = useApi('/api/accounts') as SWRResponse<AccountsMap>;
 
-  accounts = accounts || [];
-  accounts = accounts.filter(account => !(ignoreAccounts).includes(account.type));
+  accounts = accounts || {};
+  let options = Object.values(accounts);
+  options = options.filter(account => !(ignoreAccounts).includes(account.type));
   if (!showRoot) {
-    accounts = accounts.filter(account => account.type !== 'ROOT');
+    options = options.filter(account => account.type !== 'ROOT');
   }
 
   // We do this because received account may not have 'path' attribute.
   // This way we ensure it's always there.
   let account: Account | undefined = defaultValue;
   if (defaultValue) {
-    account = accounts.find(a => defaultValue.guid === a.guid);
+    account = accounts[defaultValue.guid];
   }
 
   return (
     <Selector<Account>
       id={id}
       labelAttribute="path"
-      options={accounts}
+      options={options}
       onChange={onChange}
       placeholder={placeholder || 'Choose account'}
       isClearable={isClearable}

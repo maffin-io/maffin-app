@@ -2,6 +2,8 @@ import * as v from 'class-validator';
 import {
   Column,
   Entity, JoinColumn,
+  BeforeInsert,
+  BeforeUpdate,
   ManyToOne,
   RelationId,
   Tree,
@@ -56,25 +58,35 @@ export default class Account extends BaseEntity {
   @v.IsIn(Account.TYPES)
     type!: string;
 
+  @BeforeInsert()
+  @BeforeUpdate()
+  async setPath() {
+    if (this.parent) {
+      this.path = `${this.parent.path}:${this.name}`;
+    }
+  }
+
   @Column({
     type: 'text',
-    select: false,
     default: '',
   })
     path!: string;
 
   @TreeParent()
   @JoinColumn({ name: 'parent_guid' })
-  @v.IsNotEmpty({ message: 'parent is required' })
+  // @v.IsNotEmpty({ message: 'parent is required' })
   @v.ValidateIf(o => o.type !== 'ROOT')
   // Seems TreeParent doesn't let us create referencing the guid of the account
   // and needs the whole object...
     parent!: Account;
 
+  @RelationId((account: Account) => account.parent)
+    parentId: string;
+
   @TreeChildren()
     children!: Account[];
 
-  @RelationId((account: Account) => account.children) // you need to specify target relation
+  @RelationId((account: Account) => account.children)
     childrenIds: string[];
 
   @ManyToOne('Commodity', { eager: true })

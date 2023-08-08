@@ -17,16 +17,16 @@ import {
 import { PriceDBMap } from '@/book/prices';
 import DateRangeInput from '@/components/DateRangeInput';
 import { useApi } from '@/hooks';
-import type { AccountsTree } from '@/types/accounts';
+import type { AccountsTree, AccountsMap } from '@/types/book';
 
 export default function AccountsPage(): JSX.Element {
   const { data: earliestDate } = useApi('/api/start-date');
-  let { data: accounts } = useApi('/api/accounts/splits') as SWRResponse<Account[]>;
+  let { data: accounts } = useApi('/api/accounts') as SWRResponse<AccountsMap>;
   let { data: todayPrices } = useApi('/api/prices/today');
 
   const [selectedDate, setSelectedDate] = React.useState(DateTime.now());
 
-  accounts = accounts || [];
+  accounts = accounts || {};
   todayPrices = todayPrices || new PriceDBMap();
 
   let tree: AccountsTree = {
@@ -35,7 +35,7 @@ export default function AccountsPage(): JSX.Element {
     monthlyTotals: {},
     children: [],
   };
-  const root = accounts.find(a => a.type === 'ROOT');
+  const root = Object.values(accounts).find(a => a.type === 'ROOT');
   if (root && !todayPrices.isEmpty) {
     const start = performance.now();
     tree = buildNestedRows(root, accounts, todayPrices, selectedDate);
@@ -113,7 +113,7 @@ export default function AccountsPage(): JSX.Element {
  */
 function buildNestedRows(
   current: Account,
-  accounts: Account[],
+  accounts: AccountsMap,
   todayQuotes: PriceDBMap,
   date: DateTime,
 ): AccountsTree {
@@ -124,7 +124,7 @@ function buildNestedRows(
 
   if (current.type === 'ROOT') {
     children = childrenIds.map(childId => {
-      const child = accounts.find(a => a.guid === childId) as Account;
+      const child = accounts[childId];
       const childTree = buildNestedRows(child, accounts, todayQuotes, date);
       return childTree;
     });
@@ -144,7 +144,7 @@ function buildNestedRows(
       });
     }
     children = childrenIds.map(childId => {
-      const child = accounts.find(a => a.guid === childId) as Account;
+      const child = accounts[childId];
       const childTree = buildNestedRows(child, accounts, todayQuotes, date);
       let childTotal = childTree.total;
       const childMonthlyTotals = childTree.monthlyTotals;

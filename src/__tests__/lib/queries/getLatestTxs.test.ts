@@ -1,5 +1,5 @@
-import { getLatestTxs } from '@/book/queries';
 import { Transaction } from '@/book/entities';
+import { getLatestTxs } from '@/lib/queries';
 
 describe('getLatestTsx', () => {
   it('calls find as expected', async () => {

@@ -12,7 +12,7 @@ import { Account, Commodity } from '@/book/entities';
  *
  * If we don't find one, returns null
  */
-export async function getMainCurrency(): Promise<Commodity> {
+export default async function getMainCurrency(): Promise<Commodity> {
   const counts = await Account.query(
     `
     SELECT commodity_guid, COUNT(commodity_guid) as count

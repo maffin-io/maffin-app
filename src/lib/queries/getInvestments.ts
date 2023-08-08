@@ -1,9 +1,9 @@
-import { Account } from '../entities';
-import { InvestmentAccount } from '../models';
-import { PriceDB, PriceDBMap } from '../prices';
-import { getMainCurrency } from './getMainCurrency';
+import { Account } from '@/book/entities';
+import { InvestmentAccount } from '@/book/models';
+import { PriceDB, PriceDBMap } from '@/book/prices';
+import getMainCurrency from '@/lib/queries/getMainCurrency';
 
-export async function getInvestments(): Promise<InvestmentAccount[]> {
+export default async function getInvestments(): Promise<InvestmentAccount[]> {
   const mainCurrency = (await getMainCurrency()).mnemonic;
   const start = performance.now();
   const [accounts, todayPrices, mainCurrencyPrices] = await Promise.all([

@@ -6,6 +6,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryColumn,
+  RelationId,
 } from 'typeorm';
 
 import type Account from './Account';
@@ -50,6 +51,9 @@ export default class Split extends BaseEntity {
   get account(): Account {
     return this.fk_account as Account;
   }
+
+  @RelationId((split: Split) => split.fk_account)
+    accountId: string;
 
   // For stock operations, action is set to Buy
   @PrimaryColumn({

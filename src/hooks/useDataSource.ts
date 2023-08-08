@@ -87,6 +87,20 @@ export default function useDataSource(): UseDataSourceReturn {
       entities: [Account, Book, Commodity, Price, Split, Transaction],
     });
     await tempDataSource.initialize();
+
+    const books = await tempDataSource.getRepository(Book).find();
+    const { root } = books[0];
+    const accounts = await tempDataSource.getRepository(Account).find();
+    setAccountPaths(root, accounts);
+    await Promise.all(accounts.map(account => tempDataSource.getRepository(Account).update(
+      {
+        guid: account.guid,
+      },
+      {
+        path: account.path,
+      },
+    )));
+
     const rawBook = tempDataSource.sqljsManager.exportDatabase();
 
     await DATASOURCE.sqljsManager.loadDatabase(rawBook);
@@ -118,4 +132,18 @@ async function createEmptyBook() {
     },
     ['guid'],
   );
+}
+
+function setAccountPaths(current: Account, accounts: Account[]) {
+  const parent = accounts.find(a => a.guid === current.parentId);
+  if (!parent || parent.type === 'ROOT') {
+    current.path = current.name;
+  } else {
+    current.path = `${parent.path}:${current.name}`;
+  }
+
+  current.childrenIds.forEach(childId => {
+    const account = accounts.find(a => a.guid === childId) as Account;
+    setAccountPaths(account, accounts);
+  });
 }

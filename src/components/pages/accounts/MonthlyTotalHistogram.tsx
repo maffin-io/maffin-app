@@ -2,7 +2,7 @@ import React from 'react';
 import { DateTime, Interval } from 'luxon';
 
 import Chart from '@/components/charts/Chart';
-import type { AccountsTree } from '@/types/accounts';
+import type { AccountsTree } from '@/types/book';
 
 export type MonthlyTotalHistogramProps = {
   title: string,
