@@ -18,7 +18,7 @@ jest.mock('@/hooks/useApi', () => ({
 
 describe('AccountSelector', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'default').mockReturnValue({ data: [] } as SWRResponse);
+    jest.spyOn(apiHook, 'default').mockReturnValue({ data: {} } as SWRResponse);
   });
 
   afterEach(() => {
@@ -49,12 +49,12 @@ describe('AccountSelector', () => {
   it('passes data as expected', async () => {
     jest.spyOn(apiHook, 'default').mockReturnValue(
       {
-        data: [
-          {
+        data: {
+          guid: {
             guid: 'guid',
             path: 'label1',
           } as Account,
-        ],
+        },
       } as SWRResponse,
     );
     const mockOnSave = jest.fn();
@@ -64,7 +64,7 @@ describe('AccountSelector', () => {
         placeholder="My placeholder"
         isClearable={false}
         className="class"
-        defaultValue={{ guid: 'guid' } as Account}
+        defaultValue={{ guid: 'guid', path: 'label1' } as Account}
         onChange={mockOnSave}
       />,
     );
@@ -108,7 +108,10 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'default').mockReturnValue(
       {
-        data: options,
+        data: {
+          guid1: options[0],
+          guid2: options[1],
+        },
       } as SWRResponse,
     );
 
@@ -144,7 +147,10 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'default').mockReturnValue(
       {
-        data: options,
+        data: {
+          guid1: options[0],
+          guid2: options[1],
+        },
       } as SWRResponse,
     );
 
@@ -184,7 +190,10 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'default').mockReturnValue(
       {
-        data: options,
+        data: {
+          guid1: options[0],
+          guid2: options[1],
+        },
       } as SWRResponse,
     );
 
@@ -220,7 +229,10 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'default').mockReturnValue(
       {
-        data: options,
+        data: {
+          guid1: options[0],
+          guid2: options[1],
+        },
       } as SWRResponse,
     );
 

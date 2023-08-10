@@ -5,7 +5,7 @@ import { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import Chart, { ChartProps } from '@/components/charts/Chart';
 import NetWorthPie from '@/components/pages/accounts/NetWorthPie';
-import type { AccountsTree } from '@/types/accounts';
+import type { AccountsTree } from '@/types/book';
 
 jest.mock('@/components/charts/Chart', () => jest.fn(
   () => <div data-testid="Chart" />,

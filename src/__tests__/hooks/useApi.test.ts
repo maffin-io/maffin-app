@@ -1,24 +1,15 @@
 import { renderHook } from '@testing-library/react';
 import * as swrImmutable from 'swr/immutable';
+import type { Fetcher, SWRResponse } from 'swr';
 
 import { Commodity } from '@/book/entities';
 import { useApi } from '@/hooks';
-import * as queries from '@/book/queries';
-import * as q from '@/lib/queries';
+import * as queries from '@/lib/queries';
 import { PriceDB } from '@/book/prices';
 import getUser from '@/lib/getUser';
 
 jest.mock('swr/immutable');
-
-jest.mock('@/book/queries', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/book/queries'),
-}));
-
-jest.mock('@/lib/queries', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/lib/queries'),
-}));
+jest.mock('@/lib/queries');
 
 describe('useApi', () => {
   afterEach(() => {
@@ -67,13 +58,18 @@ describe('useApi', () => {
   });
 
   it('calls /api/accounts with expected params', async () => {
+    jest.spyOn(swrImmutable, 'default').mockImplementation(
+      // @ts-ignore
+      (key, f: Fetcher, args): SWRResponse => f(),
+    );
     renderHook(() => useApi('/api/accounts'));
 
     expect(swrImmutable.default).toBeCalledWith(
       '/api/accounts',
-      q.getAccounts,
+      expect.any(Function),
       undefined,
     );
+    expect(queries.getAccounts).toBeCalled();
   });
 
   it('calls /api/investments with expected params', async () => {
@@ -94,19 +90,6 @@ describe('useApi', () => {
       PriceDB.getTodayQuotes,
       undefined,
     );
-  });
-
-  it('calls /api/splits/<guid> with expected params', async () => {
-    jest.spyOn(queries, 'getSplits').mockImplementation();
-    renderHook(() => useApi('/api/splits/<guid>', { guid: '1234-5678' }));
-
-    expect(swrImmutable.default).toBeCalledWith(
-      '/api/splits/1234-5678',
-      expect.any(Function),
-      undefined,
-    );
-    (swrImmutable.default as jest.Mock).mock.calls[0][1]();
-    expect(queries.getSplits).toBeCalledWith('1234-5678');
   });
 
   it('calls /api/user with expected params', async () => {

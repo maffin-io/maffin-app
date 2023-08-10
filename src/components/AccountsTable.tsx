@@ -5,7 +5,7 @@ import { BiCircle, BiSolidRightArrow, BiSolidDownArrow } from 'react-icons/bi';
 import classNames from 'classnames';
 
 import Table from '@/components/Table';
-import type { AccountsTree } from '@/types/accounts';
+import type { AccountsTree } from '@/types/book';
 
 export type AccountsTableProps = {
   tree: AccountsTree,

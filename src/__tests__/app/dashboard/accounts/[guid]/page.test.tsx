@@ -66,16 +66,14 @@ describe('AccountPage', () => {
     await screen.findByText('Loading...');
     expect(TransactionFormButton).toHaveBeenCalledTimes(0);
     expect(TransactionsTable).toHaveBeenCalledTimes(0);
-    expect(apiHook.default).toBeCalledTimes(2);
+    expect(apiHook.default).toBeCalledTimes(1);
     expect(apiHook.default).toHaveBeenNthCalledWith(1, '/api/accounts');
-    expect(apiHook.default).toHaveBeenNthCalledWith(2, '/api/splits/<guid>', { guid: 'guid' });
     expect(container).toMatchSnapshot();
   });
 
   it('returns 404 when account not found', async () => {
     jest.spyOn(apiHook, 'default')
-      .mockReturnValueOnce({ data: [{ guid: 'other' }] } as SWRResponse)
-      .mockReturnValueOnce({ data: [] } as SWRResponse);
+      .mockReturnValueOnce({ data: [{ guid: 'other' }] } as SWRResponse);
 
     render(<AccountPage params={{ guid: 'guid' }} />);
 
@@ -85,8 +83,8 @@ describe('AccountPage', () => {
   });
 
   it('renders as expected with account', async () => {
-    const accounts = [
-      {
+    const accounts = {
+      guid: {
         guid: 'guid',
         path: 'path',
         type: 'TYPE',
@@ -94,25 +92,24 @@ describe('AccountPage', () => {
           mnemonic: 'EUR',
         },
         getTotal: () => new Money(100, 'EUR'),
+        splits: [
+          {
+            guid: 'split_guid',
+            accountId: 'guid',
+            transaction: {
+              date: DateTime.fromISO('2023-01-01'),
+            },
+            account: {
+              type: 'TYPE',
+            },
+            quantity: 100,
+          } as Split,
+        ],
       } as Account,
-    ];
-
-    const splits = [
-      {
-        guid: 'split_guid',
-        transaction: {
-          date: DateTime.fromISO('2023-01-01'),
-        },
-        account: {
-          type: 'TYPE',
-        },
-        quantity: 100,
-      } as Split,
-    ];
+    };
 
     jest.spyOn(apiHook, 'default')
-      .mockReturnValueOnce({ data: accounts } as SWRResponse)
-      .mockReturnValueOnce({ data: splits } as SWRResponse);
+      .mockReturnValueOnce({ data: accounts } as SWRResponse);
     const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
 
     await screen.findByTestId('TransactionsTable');
@@ -133,7 +130,7 @@ describe('AccountPage', () => {
                 },
                 guid: 'guid',
                 path: 'path',
-                splits: [],
+                splits: expect.any(Array),
                 getTotal: expect.any(Function),
                 type: 'TYPE',
               },
@@ -150,21 +147,22 @@ describe('AccountPage', () => {
     );
     expect(TransactionsTable).toHaveBeenLastCalledWith(
       {
-        accounts: [
-          {
+        accounts: {
+          guid: {
             guid: 'guid',
             path: 'path',
             type: 'TYPE',
-            splits: [],
+            splits: expect.any(Array),
             commodity: {
               mnemonic: 'EUR',
             },
             getTotal: expect.any(Function),
           },
-        ],
+        },
         splits: [
           {
             guid: 'split_guid',
+            accountId: 'guid',
             transaction: {
               date: DateTime.fromISO('2023-01-01'),
             },
@@ -179,9 +177,12 @@ describe('AccountPage', () => {
     );
     expect(SplitsHistogram).toHaveBeenLastCalledWith(
       {
+        accountType: 'TYPE',
+        currency: 'EUR',
         splits: [
           {
             guid: 'split_guid',
+            accountId: 'guid',
             transaction: {
               date: DateTime.fromISO('2023-01-01'),
             },
@@ -196,9 +197,12 @@ describe('AccountPage', () => {
     );
     expect(TotalLineChart).toHaveBeenLastCalledWith(
       {
+        accountType: 'TYPE',
+        currency: 'EUR',
         splits: [
           {
             guid: 'split_guid',
+            accountId: 'guid',
             transaction: {
               date: DateTime.fromISO('2023-01-01'),
             },

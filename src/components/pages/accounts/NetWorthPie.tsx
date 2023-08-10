@@ -1,7 +1,7 @@
 import React from 'react';
 
 import Chart from '@/components/charts/Chart';
-import type { AccountsTree } from '@/types/accounts';
+import type { AccountsTree } from '@/types/book';
 import { moneyToString } from '@/helpers/number';
 
 export type NetWorthPieProps = {

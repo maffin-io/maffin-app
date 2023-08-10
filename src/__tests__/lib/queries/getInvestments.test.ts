@@ -7,18 +7,18 @@ import {
   Price,
   Split,
   Transaction,
-} from '../../entities';
-import { getInvestments } from '../../queries';
-import { PriceDB, PriceDBMap } from '../../prices';
-import { InvestmentAccount } from '../../models';
+} from '@/book/entities';
+import { getInvestments } from '@/lib/queries';
+import { PriceDB, PriceDBMap } from '@/book/prices';
+import { InvestmentAccount } from '@/book/models';
 
-jest.mock('../../models', () => ({
+jest.mock('@/book/models', () => ({
   InvestmentAccount: jest.fn(),
 }));
 
-jest.mock('../../queries/getMainCurrency', () => ({
+jest.mock('@/lib/queries/getMainCurrency', () => ({
   __esModule: true,
-  getMainCurrency: async () => ({
+  default: async () => ({
     guid: 'eur',
     mnemonic: 'EUR',
   }) as Commodity,

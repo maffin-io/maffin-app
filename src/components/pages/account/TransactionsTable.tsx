@@ -14,10 +14,11 @@ import {
   Commodity,
   Split,
 } from '@/book/entities';
+import type { AccountsMap } from '@/types/book';
 
 export type TransactionsTableProps = {
   splits: Split[],
-  accounts: Account[],
+  accounts: AccountsMap,
 };
 
 export default function TransactionsTable({
@@ -25,6 +26,8 @@ export default function TransactionsTable({
   accounts,
 }: TransactionsTableProps): JSX.Element {
   columns[2].cell = FromToAccountPartial(accounts);
+  columns[3].cell = AmountPartial(accounts[splits[0].accountId]);
+  columns[4].cell = TotalPartial(accounts);
 
   return (
     <Table<Split>
@@ -63,57 +66,10 @@ const columns: ColumnDef<Split>[] = [
     accessorKey: 'value',
     header: 'Amount',
     enableSorting: false,
-    cell: ({ row }) => {
-      let value = new Money(row.original.quantity, row.original.account.commodity.mnemonic);
-
-      if (row.original.account.type === 'INCOME') {
-        value = value.multiply(-1);
-      }
-      return (
-        <span
-          className={
-            classNames({
-              'text-green-300': value.toNumber() > 0,
-              'text-red-300': value.toNumber() < 0,
-            }, 'flex items-center')
-          }
-        >
-          {value.toNumber() > 0 && <FaArrowUp className="text-xs mr-1" />}
-          {value.toNumber() < 0 && <FaArrowDown className="text-xs mr-1" />}
-          {value.format()}
-        </span>
-      );
-    },
   },
   {
     header: 'Total',
     enableSorting: false,
-    cell: ({ row, table }) => {
-      const { rows } = table.getCoreRowModel();
-      const currentRow = rows.findIndex(
-        (otherRow: Row<Split>) => otherRow.original.guid === row.original.guid,
-      );
-      const nextRows = rows.slice(currentRow, rows.length + 1);
-      const totalPreviousSplits = nextRows.reverse().reduce(
-        (total: Money, otherRow: Row<Split>) => {
-          if (otherRow.original.account.type === 'INCOME') {
-            return total.add(
-              new Money(-otherRow.original.quantity, otherRow.original.account.commodity.mnemonic),
-            );
-          }
-          return total.add(
-            new Money(otherRow.original.quantity, otherRow.original.account.commodity.mnemonic),
-          );
-        },
-        new Money(0, row.original.account.commodity.mnemonic),
-      );
-
-      return (
-        <span>
-          {totalPreviousSplits.format()}
-        </span>
-      );
-    },
   },
   {
     header: 'Actions',
@@ -152,27 +108,30 @@ const columns: ColumnDef<Split>[] = [
 ];
 
 function FromToAccountPartial(
-  accounts: Account[],
+  accounts: AccountsMap,
 ) {
   return function FromToAccount({ row }: CellContext<Split, unknown>): JSX.Element {
-    const { splits } = row.original.transaction;
-    const otherSplits = splits.filter(split => split.account.guid !== row.original.account.guid);
+    const allSplits = Object.values(accounts).map(account => account.splits).flat();
+    const splits = allSplits.filter(
+      split => split.transaction.guid === row.original.transaction.guid,
+    );
+    const otherSplits = splits.filter(split => split.accountId !== row.original.accountId);
 
     return (
       <ul>
         { otherSplits.map(split => {
-          const account = accounts.find(a => a.guid === split.account.guid);
+          const account = accounts[split.accountId];
 
           return (
             <li key={split.guid}>
               <Link
-                href={`/dashboard/accounts/${split.account.guid}`}
+                href={`/dashboard/accounts/${account.guid}`}
                 className={classNames('badge hover:text-slate-300', {
-                  'bg-green-500/20 text-green-300': split.account.type === 'INCOME',
-                  'bg-red-500/20 text-red-300': split.account.type === 'EXPENSE',
-                  'bg-cyan-500/20 text-cyan-300': ['ASSET', 'BANK'].includes(split.account.type),
-                  'bg-orange-500/20 text-orange-300': split.account.type === 'LIABILITY',
-                  'bg-violet-500/20 text-violet-300': ['STOCK', 'MUTUAL'].includes(split.account.type),
+                  'bg-green-500/20 text-green-300': account.type === 'INCOME',
+                  'bg-red-500/20 text-red-300': account.type === 'EXPENSE',
+                  'bg-cyan-500/20 text-cyan-300': ['ASSET', 'BANK'].includes(account.type),
+                  'bg-orange-500/20 text-orange-300': account.type === 'LIABILITY',
+                  'bg-violet-500/20 text-violet-300': ['STOCK', 'MUTUAL'].includes(account.type),
                 })}
               >
                 { account?.path }
@@ -181,6 +140,64 @@ function FromToAccountPartial(
           );
         })}
       </ul>
+    );
+  };
+}
+
+function AmountPartial(
+  account: Account,
+) {
+  return function Amount({ row }: CellContext<Split, unknown>): JSX.Element {
+    let value = new Money(row.original.quantity, account.commodity.mnemonic);
+
+    if (account.type === 'INCOME') {
+      value = value.multiply(-1);
+    }
+    return (
+      <span
+        className={
+          classNames({
+            'text-green-300': value.toNumber() > 0,
+            'text-red-300': value.toNumber() < 0,
+          }, 'flex items-center')
+        }
+      >
+        {value.toNumber() > 0 && <FaArrowUp className="text-xs mr-1" />}
+        {value.toNumber() < 0 && <FaArrowDown className="text-xs mr-1" />}
+        {value.format()}
+      </span>
+    );
+  };
+}
+
+function TotalPartial(
+  accounts: AccountsMap,
+) {
+  return function Total({ row, table }: CellContext<Split, unknown>): JSX.Element {
+    const { rows } = table.getCoreRowModel();
+    const currentRow = rows.findIndex(
+      (otherRow: Row<Split>) => otherRow.original.guid === row.original.guid,
+    );
+    const nextRows = rows.slice(currentRow, rows.length + 1);
+    const totalPreviousSplits = nextRows.reverse().reduce(
+      (total: Money, otherRow: Row<Split>) => {
+        const otherAccount = accounts[otherRow.original.accountId];
+        if (otherAccount.type === 'INCOME') {
+          return total.add(
+            new Money(-otherRow.original.quantity, otherAccount.commodity.mnemonic),
+          );
+        }
+        return total.add(
+          new Money(otherRow.original.quantity, otherAccount.commodity.mnemonic),
+        );
+      },
+      new Money(0, accounts[row.original.accountId].commodity.mnemonic),
+    );
+
+    return (
+      <span>
+        {totalPreviousSplits.format()}
+      </span>
     );
   };
 }

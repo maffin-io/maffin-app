@@ -97,10 +97,9 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                     class=" css-1fdsijx-ValueContainer"
                   >
                     <div
-                      class=" css-1jqq78o-placeholder"
-                      id="react-select-2-placeholder"
+                      class="!text-inherit css-1dimb5e-singleValue"
                     >
-                      &lt;account&gt;
+                      Assets:asset1
                     </div>
                     <div
                       class="!text-inherit css-qbdosj-Input"
@@ -108,7 +107,6 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                     >
                       <input
                         aria-autocomplete="list"
-                        aria-describedby="react-select-2-placeholder"
                         aria-expanded="false"
                         aria-haspopup="true"
                         aria-label="splits.0.account"
@@ -154,7 +152,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                 <input
                   name="splits.0.account"
                   type="hidden"
-                  value=""
+                  value="Assets:asset1"
                 />
               </div>
               <p
@@ -500,10 +498,9 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                     class=" css-1fdsijx-ValueContainer"
                   >
                     <div
-                      class=" css-1jqq78o-placeholder"
-                      id="react-select-6-placeholder"
+                      class="!text-inherit css-olqui2-singleValue"
                     >
-                      &lt;account&gt;
+                      Assets:asset1
                     </div>
                     <div
                       class="!text-inherit css-1h01tm3-Input"
@@ -511,7 +508,6 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                     >
                       <input
                         aria-autocomplete="list"
-                        aria-describedby="react-select-6-placeholder"
                         aria-expanded="false"
                         aria-haspopup="true"
                         aria-label="splits.0.account"
@@ -887,10 +883,9 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                     class=" css-1fdsijx-ValueContainer"
                   >
                     <div
-                      class=" css-1jqq78o-placeholder"
-                      id="react-select-4-placeholder"
+                      class="!text-inherit css-1dimb5e-singleValue"
                     >
-                      &lt;account&gt;
+                      Assets:asset1
                     </div>
                     <div
                       class="!text-inherit css-qbdosj-Input"
@@ -898,7 +893,6 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                     >
                       <input
                         aria-autocomplete="list"
-                        aria-describedby="react-select-4-placeholder"
                         aria-expanded="false"
                         aria-haspopup="true"
                         aria-label="splits.0.account"
@@ -944,7 +938,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                 <input
                   name="splits.0.account"
                   type="hidden"
-                  value=""
+                  value="Assets:asset1"
                 />
               </div>
               <p
