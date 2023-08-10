@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { useDataSource } from '@/hooks';
+import { useDataSource, DataSourceContext } from '@/hooks';
 import useUser from '@/hooks/useUser';
 import Footer from '@/layout/Footer';
 import LeftSidebar from '@/layout/LeftSidebar';
@@ -12,9 +12,9 @@ export default function DashboardLayout({
   children,
 }: React.PropsWithChildren): JSX.Element {
   const { user } = useUser();
-  const { isLoaded } = useDataSource();
+  const hookData = useDataSource();
 
-  if (!user || !isLoaded || user.isLoggedIn === false) {
+  if (!user || !hookData.isLoaded || user.isLoggedIn === false) {
     return <div>Loading...</div>;
   }
 
@@ -22,8 +22,10 @@ export default function DashboardLayout({
     <div className="w-full h-full overflow-hidden">
       <LeftSidebar />
       <div className="mt-20 ml-20 p-3 z-0">
-        <Topbar />
-        {children}
+        <DataSourceContext.Provider value={hookData}>
+          <Topbar />
+          {children}
+        </DataSourceContext.Provider>
       </div>
       <Footer />
     </div>
