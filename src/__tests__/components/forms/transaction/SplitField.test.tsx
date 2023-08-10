@@ -13,12 +13,12 @@ import Stocker from '@/apis/Stocker';
 import type { Account, Commodity } from '@/book/entities';
 import SplitField from '@/components/forms/transaction/SplitField';
 import type { FormValues } from '@/components/forms/transaction/types';
-import * as queries from '@/book/queries';
+import * as queries from '@/lib/queries';
 import * as apiHook from '@/hooks/useApi';
 
-jest.mock('@/book/queries', () => ({
+jest.mock('@/lib/queries', () => ({
   __esModule: true,
-  ...jest.requireActual('@/book/queries'),
+  ...jest.requireActual('@/lib/queries'),
 }));
 
 jest.mock('@/hooks/useApi', () => ({

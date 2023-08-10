@@ -68,7 +68,7 @@ describe('AccountsPage', () => {
     const date = DateTime.fromISO('2022-01-01');
     jest.spyOn(apiHook, 'default')
       .mockReturnValueOnce({ data: date } as SWRResponse)
-      .mockReturnValueOnce({ data: [] } as SWRResponse)
+      .mockReturnValueOnce({ data: {} } as SWRResponse)
       .mockReturnValueOnce({ data: undefined } as SWRResponse);
     const { container } = render(<AccountsPage />);
 
@@ -158,8 +158,8 @@ describe('AccountsPage', () => {
   });
 
   it('generates tree as expected, no investments', async () => {
-    const accounts = [
-      {
+    const accounts = {
+      root: {
         guid: 'root',
         name: 'Root',
         type: 'ROOT',
@@ -167,7 +167,7 @@ describe('AccountsPage', () => {
         getMonthlyTotals: () => ({}),
         childrenIds: ['a1', 'a3', 'a5'],
       } as Account,
-      {
+      a1: {
         guid: 'a1',
         name: 'Assets',
         getTotal: () => new Money(10, 'EUR'),
@@ -181,7 +181,7 @@ describe('AccountsPage', () => {
         type: 'ASSET',
         childrenIds: ['a2'],
       } as Account,
-      {
+      a2: {
         guid: 'a2',
         name: 'Bank',
         getTotal: () => new Money(1000, 'USD'),
@@ -195,7 +195,7 @@ describe('AccountsPage', () => {
         type: 'BANK',
         childrenIds: [] as string[],
       } as Account,
-      {
+      a3: {
         guid: 'a3',
         name: 'Expenses',
         getTotal: () => new Money(1000, 'EUR'),
@@ -209,7 +209,7 @@ describe('AccountsPage', () => {
         type: 'EXPENSE',
         childrenIds: ['a4'] as string[],
       } as Account,
-      {
+      a4: {
         guid: 'a4',
         name: 'Groceries',
         getTotal: () => new Money(1000, 'EUR'),
@@ -223,7 +223,7 @@ describe('AccountsPage', () => {
         type: 'EXPENSE',
         childrenIds: [] as string[],
       } as Account,
-      {
+      a5: {
         guid: 'a5',
         name: 'Income',
         getTotal: () => new Money(2000, 'EUR'),
@@ -237,7 +237,7 @@ describe('AccountsPage', () => {
         type: 'INCOME',
         childrenIds: ['a6'] as string[],
       } as Account,
-      {
+      a6: {
         guid: 'a6',
         name: 'Salary',
         getTotal: () => new Money(1000, 'EUR'),
@@ -251,7 +251,7 @@ describe('AccountsPage', () => {
         type: 'INCOME',
         childrenIds: [] as string[],
       } as Account,
-    ];
+    };
 
     const todayQuotes = {
       getPrice: (from, to, date) => ({
@@ -269,12 +269,12 @@ describe('AccountsPage', () => {
     render(<AccountsPage />);
 
     const expectedTree = {
-      account: accounts[0],
+      account: accounts.root,
       total: expect.any(Money),
       monthlyTotals: {},
       children: [
         {
-          account: accounts[1],
+          account: accounts.a1,
           total: expect.any(Money),
           monthlyTotals: {
             'Jan/23': expect.any(Money),
@@ -282,7 +282,7 @@ describe('AccountsPage', () => {
           },
           children: [
             {
-              account: accounts[2],
+              account: accounts.a2,
               total: expect.any(Money),
               monthlyTotals: {
                 'Jan/23': expect.any(Money),
@@ -293,7 +293,7 @@ describe('AccountsPage', () => {
           ],
         },
         {
-          account: accounts[3],
+          account: accounts.a3,
           total: expect.any(Money),
           monthlyTotals: {
             'Jan/23': expect.any(Money),
@@ -301,7 +301,7 @@ describe('AccountsPage', () => {
           },
           children: [
             {
-              account: accounts[4],
+              account: accounts.a4,
               total: expect.any(Money),
               monthlyTotals: {
                 'Jan/23': expect.any(Money),
@@ -312,7 +312,7 @@ describe('AccountsPage', () => {
           ],
         },
         {
-          account: accounts[5],
+          account: accounts.a5,
           total: expect.any(Money),
           monthlyTotals: {
             'Jan/23': expect.any(Money),
@@ -320,7 +320,7 @@ describe('AccountsPage', () => {
           },
           children: [
             {
-              account: accounts[6],
+              account: accounts.a6,
               total: expect.any(Money),
               monthlyTotals: {
                 'Jan/23': expect.any(Money),
@@ -388,8 +388,8 @@ describe('AccountsPage', () => {
   });
 
   it('generates tree as expected, with investments', async () => {
-    const accounts = [
-      {
+    const accounts = {
+      root: {
         guid: 'root',
         name: 'Root',
         type: 'ROOT',
@@ -397,7 +397,7 @@ describe('AccountsPage', () => {
         getMonthlyTotals: () => ({}),
         childrenIds: ['a1'],
       } as Account,
-      {
+      a1: {
         guid: 'a1',
         name: 'Stocks',
         getTotal: () => new Money(0, 'EUR'),
@@ -408,7 +408,7 @@ describe('AccountsPage', () => {
         type: 'ASSET',
         childrenIds: ['a2'],
       } as Account,
-      {
+      a2: {
         guid: 'a2',
         name: 'GOOGL',
         getTotal: () => new Money(2, 'GOOGL'),
@@ -422,7 +422,7 @@ describe('AccountsPage', () => {
         type: 'STOCK',
         childrenIds: [] as string[],
       } as Account,
-    ];
+    };
 
     const todayQuotes = {
       getPrice: (from, to, date) => ({
@@ -447,12 +447,12 @@ describe('AccountsPage', () => {
     render(<AccountsPage />);
 
     const expectedTree = {
-      account: accounts[0],
+      account: accounts.root,
       total: expect.any(Money),
       monthlyTotals: {},
       children: [
         {
-          account: accounts[1],
+          account: accounts.a1,
           total: expect.any(Money),
           monthlyTotals: {
             'Jan/23': expect.any(Money),
@@ -460,7 +460,7 @@ describe('AccountsPage', () => {
           },
           children: [
             {
-              account: accounts[2],
+              account: accounts.a2,
               total: expect.any(Money),
               monthlyTotals: {
                 'Jan/23': expect.any(Money),

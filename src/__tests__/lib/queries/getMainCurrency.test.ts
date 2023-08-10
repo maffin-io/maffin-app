@@ -5,8 +5,8 @@ import {
   Commodity,
   Split,
   Transaction,
-} from '../../entities';
-import { getMainCurrency } from '../../queries';
+} from '@/book/entities';
+import { getMainCurrency } from '@/lib/queries';
 
 describe('getMainCurrency', () => {
   let eur: Commodity;

@@ -5,7 +5,7 @@ import type { UseFormReturn } from 'react-hook-form';
 import debounce from 'lodash.debounce';
 
 import { isInvestment } from '@/book/helpers/accountType';
-import { getMainCurrency } from '@/book/queries';
+import { getMainCurrency } from '@/lib/queries';
 import Stocker from '@/apis/Stocker';
 import { toFixed } from '@/helpers/number';
 import { AccountSelector } from '@/components/selectors';

@@ -17,13 +17,19 @@ describe('SplitsHistogram', () => {
   });
 
   it('creates Chart with expected params', () => {
-    render(<SplitsHistogram splits={[]} />);
+    render(
+      <SplitsHistogram
+        splits={[]}
+        currency="EUR"
+        accountType="EXPENSE"
+      />,
+    );
 
     expect(Chart).toBeCalledWith(
       {
         series: [],
         type: 'bar',
-        unit: undefined,
+        unit: 'EUR',
         options: {
           title: {
             text: 'Movements per month',
@@ -50,6 +56,8 @@ describe('SplitsHistogram', () => {
     // wrongly
     render(
       <SplitsHistogram
+        currency="EUR"
+        accountType="EXPENSE"
         splits={[
           {
             account: {
@@ -65,9 +73,7 @@ describe('SplitsHistogram', () => {
           } as Split,
           {
             account: {
-              // This is not very accurate as type is always the same but
-              // this way we test INCOME behavior in this same test
-              type: 'INCOME',
+              type: 'ASSET',
               commodity: {
                 mnemonic: 'EUR',
               },
@@ -88,7 +94,7 @@ describe('SplitsHistogram', () => {
             data: [
               {
                 x: 'Jan',
-                y: 200,
+                y: -200,
               },
               {
                 x: 'Feb',
@@ -217,6 +223,8 @@ describe('SplitsHistogram', () => {
   it('hides all series except last', () => {
     render(
       <SplitsHistogram
+        currency="EUR"
+        accountType="EXPENSE"
         splits={[
           {
             account: {
@@ -234,7 +242,7 @@ describe('SplitsHistogram', () => {
             account: {
               // This is not very accurate as type is always the same but
               // this way we test INCOME behavior in this same test
-              type: 'INCOME',
+              type: 'ASSET',
               commodity: {
                 mnemonic: 'EUR',
               },

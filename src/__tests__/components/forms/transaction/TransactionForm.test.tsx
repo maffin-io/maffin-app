@@ -19,14 +19,14 @@ import {
   Transaction,
 } from '@/book/entities';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
-import * as queries from '@/book/queries';
+import * as queries from '@/lib/queries';
 import * as apiHook from '@/hooks/useApi';
 
 jest.mock('swr');
 
-jest.mock('@/book/queries', () => ({
+jest.mock('@/lib/queries', () => ({
   __esModule: true,
-  ...jest.requireActual('@/book/queries'),
+  ...jest.requireActual('@/lib/queries'),
 }));
 
 jest.mock('@/hooks/useApi', () => ({
