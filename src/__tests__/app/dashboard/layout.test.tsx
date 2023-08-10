@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-import type { UseDataSourceReturn } from '@/hooks';
+import type { DataSourceContextType } from '@/hooks';
 import DashboardLayout from '@/app/dashboard/layout';
 import Topbar from '@/layout/Topbar';
 import LeftSidebar from '@/layout/LeftSidebar';
@@ -42,7 +42,7 @@ describe('DashboardLayout', () => {
       },
     });
     jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
-      { isLoaded: true } as UseDataSourceReturn,
+      { isLoaded: true } as DataSourceContextType,
     );
   });
 
@@ -62,7 +62,7 @@ describe('DashboardLayout', () => {
 
   it('returns loading when datasource not available', async () => {
     jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
-      { isLoaded: false } as UseDataSourceReturn,
+      { isLoaded: false } as DataSourceContextType,
     );
     jest.spyOn(userHooks, 'default').mockReturnValue({
       user: {

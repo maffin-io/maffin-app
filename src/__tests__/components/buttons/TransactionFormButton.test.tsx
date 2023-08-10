@@ -10,8 +10,8 @@ import type { Commodity, Split } from '@/book/entities';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import Modal from '@/components/Modal';
-import type { UseDataSourceReturn } from '@/hooks';
-import * as dataSourceHooks from '@/hooks/useDataSource';
+import { DataSourceContext } from '@/hooks';
+import type { DataSourceContextType } from '@/hooks';
 
 jest.mock('@/components/Modal', () => jest.fn(
   (props: React.PropsWithChildren) => (
@@ -20,17 +20,11 @@ jest.mock('@/components/Modal', () => jest.fn(
     </div>
   ),
 ));
-const ModalMock = Modal as jest.MockedFunction<typeof Modal>;
 
 jest.mock('@/components/forms/transaction/TransactionForm', () => jest.fn(
   () => <div data-testid="TransactionForm" />,
 ).mockName('TransactionForm'));
 const TransactionFormMock = TransactionForm as jest.MockedFunction<typeof TransactionForm>;
-
-jest.mock('@/hooks/useDataSource', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/useDataSource'),
-}));
 
 describe('TransactionFormButton', () => {
   afterEach(() => {
@@ -70,7 +64,7 @@ describe('TransactionFormButton', () => {
       {},
     );
 
-    const { children } = ModalMock.mock.calls[0][0];
+    const { children } = (Modal as jest.Mock).mock.calls[0][0];
     // @ts-ignore
     expect(children.type.getMockName()).toEqual('TransactionForm');
     expect(TransactionForm).toHaveBeenLastCalledWith(
@@ -101,9 +95,6 @@ describe('TransactionFormButton', () => {
 
   it('passes expected onSave to TransactionForm', async () => {
     const mockSave = jest.fn();
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
-      { save: mockSave as Function } as UseDataSourceReturn,
-    );
     const defaultValues = {
       date: '',
       description: '',
@@ -114,7 +105,11 @@ describe('TransactionFormButton', () => {
       ],
     };
 
-    render(<TransactionFormButton defaultValues={defaultValues} />);
+    render(
+      <DataSourceContext.Provider value={{ save: mockSave as Function } as DataSourceContextType}>
+        <TransactionFormButton defaultValues={defaultValues} />
+      </DataSourceContext.Provider>,
+    );
 
     // open modal to prove that onSave closes it
     const button = await screen.findByRole('button', { name: /add transaction/i });

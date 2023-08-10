@@ -1,10 +1,10 @@
 import React from 'react';
 import { BiImport } from 'react-icons/bi';
 
-import { useDataSource } from '@/hooks';
+import { DataSourceContext } from '@/hooks';
 
 export default function ImportButton(): JSX.Element {
-  const { isLoaded, importBook } = useDataSource();
+  const { isLoaded, importBook } = React.useContext(DataSourceContext);
   const fileImportInput = React.useRef<HTMLInputElement>(null);
 
   return (

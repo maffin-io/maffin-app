@@ -2,14 +2,14 @@ import React from 'react';
 import { BiCloudUpload, BiLoader } from 'react-icons/bi';
 import useSWRImmutable from 'swr/immutable';
 
-import { useDataSource } from '@/hooks';
+import { DataSourceContext } from '@/hooks';
 
 export default function SaveButton(): JSX.Element {
   const { data: isSaving } = useSWRImmutable(
     '/state/save',
     () => false,
   );
-  const { isLoaded, save } = useDataSource();
+  const { isLoaded, save } = React.useContext(DataSourceContext);
 
   if (!isLoaded) {
     return (

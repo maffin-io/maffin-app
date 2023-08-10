@@ -1,7 +1,7 @@
 import React from 'react';
 import { BiPlusCircle } from 'react-icons/bi';
 
-import { useDataSource } from '@/hooks';
+import { DataSourceContext } from '@/hooks';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import Modal from '@/components/Modal';
 import type { FormValues } from '@/components/forms/transaction/types';
@@ -21,7 +21,7 @@ export default function TransactionFormButton(
     className = 'btn-primary',
   }: TransactionFormButtonProps,
 ): JSX.Element {
-  const { save } = useDataSource();
+  const { save } = React.useContext(DataSourceContext);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   let title = 'Add transaction';

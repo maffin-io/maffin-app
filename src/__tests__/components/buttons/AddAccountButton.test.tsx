@@ -9,8 +9,8 @@ import {
 import AddAccountButton from '@/components/buttons/AddAccountButton';
 import AccountForm from '@/components/forms/account/AccountForm';
 import Modal from '@/components/Modal';
-import type { UseDataSourceReturn } from '@/hooks';
-import * as dataSourceHooks from '@/hooks/useDataSource';
+import { DataSourceContext } from '@/hooks';
+import type { DataSourceContextType } from '@/hooks';
 
 jest.mock('@/components/Modal', () => jest.fn(
   (props: React.PropsWithChildren) => (
@@ -19,17 +19,11 @@ jest.mock('@/components/Modal', () => jest.fn(
     </div>
   ),
 ));
-const ModalMock = Modal as jest.MockedFunction<typeof Modal>;
 
 jest.mock('@/components/forms/account/AccountForm', () => jest.fn(
   () => <div data-testid="AccountForm" />,
 ).mockName('AccountForm'));
 const AccountFormMock = AccountForm as jest.MockedFunction<typeof AccountForm>;
-
-jest.mock('@/hooks/useDataSource', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/useDataSource'),
-}));
 
 describe('AddAccountButton', () => {
   afterEach(() => {
@@ -37,9 +31,7 @@ describe('AddAccountButton', () => {
   });
 
   it('renders hidden modal on mount', async () => {
-    render(
-      <AddAccountButton />,
-    );
+    render(<AddAccountButton />);
     expect(Modal).toHaveBeenLastCalledWith(
       expect.objectContaining({
         open: false,
@@ -49,7 +41,7 @@ describe('AddAccountButton', () => {
       {},
     );
 
-    const { children } = ModalMock.mock.calls[0][0];
+    const { children } = (Modal as jest.Mock).mock.calls[0][0];
     // @ts-ignore
     expect(children.type.getMockName()).toEqual('AccountForm');
     expect(AccountForm).toHaveBeenLastCalledWith(
@@ -62,11 +54,11 @@ describe('AddAccountButton', () => {
 
   it('closes modal and saves', async () => {
     const mockSave = jest.fn();
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
-      { save: mockSave as Function } as UseDataSourceReturn,
+    render(
+      <DataSourceContext.Provider value={{ save: mockSave as Function } as DataSourceContextType}>
+        <AddAccountButton />
+      </DataSourceContext.Provider>,
     );
-
-    render(<AddAccountButton />);
 
     // open modal to prove that onSave closes it
     const button = await screen.findByRole('button', { name: /add account/i });

@@ -9,28 +9,17 @@ import {
 import { SWRConfig, mutate } from 'swr';
 
 import SaveButton from '@/components/buttons/SaveButton';
-import type { UseDataSourceReturn } from '@/hooks';
-import * as dataSourceHooks from '@/hooks/useDataSource';
-
-jest.mock('@/hooks/useDataSource', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/useDataSource'),
-}));
-
-jest.mock('@/hooks/useBookStorage', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/useBookStorage'),
-}));
+import { DataSourceContext } from '@/hooks';
+import type { DataSourceContextType } from '@/hooks';
 
 describe('SaveButton', () => {
   it('loads while unavailable datasource', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
-      { isLoaded: false } as UseDataSourceReturn,
-    );
     const { container } = render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <SaveButton />
-      </SWRConfig>,
+      <DataSourceContext.Provider value={{ isLoaded: false } as DataSourceContextType}>
+        <SWRConfig value={{ provider: () => new Map() }}>
+          <SaveButton />
+        </SWRConfig>
+      </DataSourceContext.Provider>,
     );
 
     await screen.findByText('...');
@@ -38,13 +27,12 @@ describe('SaveButton', () => {
   });
 
   it('renders as expected when datasource ready and not saving', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
-      { isLoaded: true } as UseDataSourceReturn,
-    );
     const { container } = render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <SaveButton />
-      </SWRConfig>,
+      <DataSourceContext.Provider value={{ isLoaded: true } as DataSourceContextType}>
+        <SWRConfig value={{ provider: () => new Map() }}>
+          <SaveButton />
+        </SWRConfig>
+      </DataSourceContext.Provider>,
     );
 
     await screen.findByText('Save');
@@ -52,10 +40,11 @@ describe('SaveButton', () => {
   });
 
   it('renders as expected when datasource ready and saving', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
-      { isLoaded: true } as UseDataSourceReturn,
+    const { container } = render(
+      <DataSourceContext.Provider value={{ isLoaded: true } as DataSourceContextType}>
+        <SaveButton />
+      </DataSourceContext.Provider>,
     );
-    const { container } = render(<SaveButton />);
 
     act(() => {
       mutate('/state/save', true, { revalidate: false });
@@ -67,16 +56,17 @@ describe('SaveButton', () => {
 
   it('calls datasource save on click', async () => {
     const mockSave = jest.fn();
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
-      {
-        isLoaded: true,
-        save: mockSave as Function,
-      } as UseDataSourceReturn,
-    );
     render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <SaveButton />
-      </SWRConfig>,
+      <DataSourceContext.Provider
+        value={{
+          isLoaded: true,
+          save: mockSave as Function,
+        } as DataSourceContextType}
+      >
+        <SWRConfig value={{ provider: () => new Map() }}>
+          <SaveButton />
+        </SWRConfig>
+      </DataSourceContext.Provider>,
     );
 
     const button = screen.getByText('Save');
