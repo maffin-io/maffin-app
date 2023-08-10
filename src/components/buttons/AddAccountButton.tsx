@@ -2,11 +2,11 @@ import React from 'react';
 import Modal from '@/components/Modal';
 import { BiPlusCircle } from 'react-icons/bi';
 
-import { useDataSource } from '@/hooks';
+import { DataSourceContext } from '@/hooks';
 import AccountForm from '@/components/forms/account/AccountForm';
 
 export default function AddAccountButton(): JSX.Element {
-  const { save } = useDataSource();
+  const { save } = React.useContext(DataSourceContext);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   return (

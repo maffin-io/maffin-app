@@ -14,7 +14,7 @@ import {
   Transaction,
 } from '@/book/entities';
 
-export type UseDataSourceReturn = {
+export type DataSourceContextType = {
   datasource: DataSource | null,
   save: () => Promise<void>,
   importBook: (rawBook: Uint8Array) => Promise<void>,
@@ -28,7 +28,14 @@ const DATASOURCE: DataSource = new DataSource({
   entities: [Account, Book, Commodity, Price, Split, Transaction],
 });
 
-export default function useDataSource(): UseDataSourceReturn {
+export const DataSourceContext = React.createContext<DataSourceContextType>({
+  datasource: DATASOURCE,
+  save: async () => {},
+  importBook: async () => {},
+  isLoaded: false,
+});
+
+export default function useDataSource(): DataSourceContextType {
   const { storage } = useBookStorage();
   const [isLoaded, setIsLoaded] = React.useState(DATASOURCE.isInitialized);
 
@@ -71,49 +78,49 @@ export default function useDataSource(): UseDataSourceReturn {
     };
   }
 
-  async function save() {
-    mutate('/state/save', true, { revalidate: false });
-    const rawBook = DATASOURCE.sqljsManager.exportDatabase();
-    await (storage as BookStorage).save(rawBook);
-    mutate('/state/save', false, { revalidate: false });
-  }
-
-  async function importBook(rawData: Uint8Array) {
-    const tempDataSource = new DataSource({
-      type: 'sqljs',
-      synchronize: true,
-      database: rawData,
-      logging: false,
-      entities: [Account, Book, Commodity, Price, Split, Transaction],
-    });
-    await tempDataSource.initialize();
-
-    const books = await tempDataSource.getRepository(Book).find();
-    const { root } = books[0];
-    const accounts = await tempDataSource.getRepository(Account).find();
-    setAccountPaths(root, accounts);
-    await Promise.all(accounts.map(account => tempDataSource.getRepository(Account).update(
-      {
-        guid: account.guid,
-      },
-      {
-        path: account.path,
-      },
-    )));
-
-    const rawBook = tempDataSource.sqljsManager.exportDatabase();
-
-    await DATASOURCE.sqljsManager.loadDatabase(rawBook);
-    mutate((key: string) => key.startsWith('/api'));
-    await save();
-  }
-
   return {
     datasource: DATASOURCE,
-    save,
-    importBook,
+    save: () => save(storage),
+    importBook: (rawData: Uint8Array) => importBook(storage, rawData),
     isLoaded,
   };
+}
+
+async function save(storage: BookStorage | null) {
+  mutate('/state/save', true, { revalidate: false });
+  const rawBook = DATASOURCE.sqljsManager.exportDatabase();
+  await (storage as BookStorage).save(rawBook);
+  mutate('/state/save', false, { revalidate: false });
+}
+
+async function importBook(storage: BookStorage | null, rawData: Uint8Array) {
+  const tempDataSource = new DataSource({
+    type: 'sqljs',
+    synchronize: true,
+    database: rawData,
+    logging: false,
+    entities: [Account, Book, Commodity, Price, Split, Transaction],
+  });
+  await tempDataSource.initialize();
+
+  const books = await tempDataSource.getRepository(Book).find();
+  const { root } = books[0];
+  const accounts = await tempDataSource.getRepository(Account).find();
+  setAccountPaths(root, accounts);
+  await Promise.all(accounts.map(account => tempDataSource.getRepository(Account).update(
+    {
+      guid: account.guid,
+    },
+    {
+      path: account.path,
+    },
+  )));
+
+  const rawBook = tempDataSource.sqljsManager.exportDatabase();
+
+  await DATASOURCE.sqljsManager.loadDatabase(rawBook);
+  mutate((key: string) => key.startsWith('/api'));
+  await save(storage);
 }
 
 // TODO: Need to mutate the accounts SWR key so Root is shown!

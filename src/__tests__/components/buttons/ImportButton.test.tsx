@@ -6,13 +6,8 @@ import {
 import userEvent from '@testing-library/user-event';
 
 import ImportButton from '@/components/buttons/ImportButton';
-import type { UseDataSourceReturn } from '@/hooks';
-import * as dataSourceHooks from '@/hooks/useDataSource';
-
-jest.mock('@/hooks/useDataSource', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/useDataSource'),
-}));
+import { DataSourceContext } from '@/hooks';
+import type { DataSourceContextType } from '@/hooks';
 
 describe('ImportButton', () => {
   afterEach(() => {
@@ -20,10 +15,11 @@ describe('ImportButton', () => {
   });
 
   it('loads while unavailable datasource', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
-      { isLoaded: false } as UseDataSourceReturn,
+    const { container } = render(
+      <DataSourceContext.Provider value={{ isLoaded: false } as DataSourceContextType}>
+        <ImportButton />
+      </DataSourceContext.Provider>,
     );
-    const { container } = render(<ImportButton />);
 
     const e = await screen.findByRole('menuitem', { name: 'Import' });
     expect(e).toBeDisabled();
@@ -31,10 +27,11 @@ describe('ImportButton', () => {
   });
 
   it('renders as expected when datasource ready', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
-      { isLoaded: true } as UseDataSourceReturn,
+    render(
+      <DataSourceContext.Provider value={{ isLoaded: true } as DataSourceContextType}>
+        <ImportButton />
+      </DataSourceContext.Provider>,
     );
-    render(<ImportButton />);
 
     const e = await screen.findByRole('menuitem', { name: 'Import' });
     expect(e).not.toBeDisabled();
@@ -42,16 +39,19 @@ describe('ImportButton', () => {
 
   it('uploads and imports data into datasource', async () => {
     const mockImportBook = jest.fn();
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
-      {
-        isLoaded: true,
-        importBook: mockImportBook as Function,
-      } as UseDataSourceReturn,
-    );
     const file = new File(['hello'], 'hello.png', { type: 'image/png' });
     const user = userEvent.setup();
 
-    render(<ImportButton />);
+    render(
+      <DataSourceContext.Provider
+        value={{
+          isLoaded: true,
+          importBook: mockImportBook as Function,
+        } as DataSourceContextType}
+      >
+        <ImportButton />
+      </DataSourceContext.Provider>,
+    );
 
     const importButton = await screen.findByRole('menuitem', { name: 'Import' });
     await user.click(importButton);
