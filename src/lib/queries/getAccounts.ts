@@ -1,4 +1,5 @@
 import { Account } from '@/book/entities';
+import type { AccountsMap } from '@/types/book';
 
 /**
  * Returns all the accounts with their splits and transactions. The splits
@@ -6,7 +7,7 @@ import { Account } from '@/book/entities';
  *
  * This query is costly and cost increases with the number of splits/accounts/transactions
  */
-export default async function getAccounts(): Promise<Account[]> {
+export default async function getAccounts(): Promise<AccountsMap> {
   const accounts = await Account.find({
     relations: {
       splits: {
@@ -26,5 +27,13 @@ export default async function getAccounts(): Promise<Account[]> {
     },
   });
 
-  return accounts;
+  const accountsMap: AccountsMap = {};
+  accounts.forEach(account => {
+    if (account.type === 'ROOT' && !account.name.startsWith('Template')) {
+      accountsMap.root = account;
+    }
+    accountsMap[account.guid] = account;
+  });
+
+  return accountsMap;
 }

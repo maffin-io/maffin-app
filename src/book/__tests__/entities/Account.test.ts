@@ -126,6 +126,7 @@ describe('Account', () => {
         {
           guid: expect.any(String),
           action: '',
+          accountId: expect.any(String),
           valueNum: -10,
           valueDenom: 100,
           quantityNum: -15,

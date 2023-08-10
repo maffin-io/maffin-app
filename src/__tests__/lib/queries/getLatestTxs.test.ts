@@ -1,4 +1,4 @@
-import { getLatestTxs } from '@/book/queries';
+import { getLatestTxs } from '@/lib/queries';
 import { Transaction } from '@/book/entities';
 
 describe('getLatestTsx', () => {

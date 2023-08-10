@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 
 import { Transaction } from '@/book/entities';
-import { getEarliestDate } from '@/book/queries';
+import { getEarliestDate } from '@/lib/queries';
 
 describe('getEarliestDate', () => {
   beforeEach(() => {

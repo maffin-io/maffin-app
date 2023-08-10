@@ -6,17 +6,21 @@ import { Split } from '@/book/entities';
 
 export type TotalLineChartProps = {
   splits: Split[],
+  accountType: string,
+  currency: string,
 };
 
 export default function TotalLineChart({
   splits,
+  accountType,
+  currency,
 }: TotalLineChartProps): JSX.Element {
   const series: ApexOptions['series'] = [{ data: [] }];
 
   let totalAggregate = 0;
   splits.slice().reverse().forEach(split => {
     let { quantity } = split;
-    if (split.account.type === 'INCOME') {
+    if (accountType === 'INCOME') {
       quantity = -quantity;
     }
     totalAggregate += quantity;
@@ -31,7 +35,7 @@ export default function TotalLineChart({
     <Chart
       type="line"
       series={series}
-      unit={splits[0]?.account.commodity.mnemonic}
+      unit={currency}
       height={255}
       options={{
         chart: {

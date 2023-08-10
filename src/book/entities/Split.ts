@@ -5,6 +5,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  RelationId,
   PrimaryColumn,
 } from 'typeorm';
 
@@ -46,6 +47,9 @@ export default class Split extends BaseEntity {
   @CheckValueSymbol()
   @v.IsNotEmpty({ message: 'account is required' })
     fk_account!: Account;
+
+  @RelationId((split: Split) => split.fk_account)
+    accountId: string;
 
   get account(): Account {
     return this.fk_account as Account;

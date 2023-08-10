@@ -1,6 +1,6 @@
 import { Transaction } from '@/book/entities';
 
-export async function getLatestTxs(): Promise<Transaction[]> {
+export default async function getLatestTxs(): Promise<Transaction[]> {
   const txs = await Transaction.find({
     relations: {
       splits: {

@@ -6,10 +6,14 @@ import { Split } from '@/book/entities';
 
 export type SplitsHistogramProps = {
   splits: Split[],
+  accountType: string,
+  currency: string,
 };
 
 export default function SplitsHistogram({
   splits,
+  accountType,
+  currency,
 }: SplitsHistogramProps): JSX.Element {
   const hiddenSeries: string[] = [];
   let series: {
@@ -50,7 +54,7 @@ export default function SplitsHistogram({
     splits.forEach(split => {
       const { month, year } = split.transaction.date;
       let { quantity } = split;
-      if (split.account.type === 'INCOME') {
+      if (accountType === 'INCOME') {
         quantity = -quantity;
       }
 
@@ -63,7 +67,7 @@ export default function SplitsHistogram({
     <Chart
       type="bar"
       series={series}
-      unit={splits[0]?.account.commodity.mnemonic}
+      unit={currency}
       options={{
         title: {
           text: 'Movements per month',

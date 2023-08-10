@@ -6,7 +6,6 @@ import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import type { SWRResponse } from 'swr';
 
-import type { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import {
   SplitsHistogram,
@@ -17,6 +16,8 @@ import StatisticsWidget from '@/components/StatisticsWidget';
 import { Split } from '@/book/entities';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import { useApi } from '@/hooks';
+import type { Account } from '@/book/entities';
+import type { AccountsMap } from '@/types/book';
 
 export type AccountPageProps = {
   params: {
@@ -25,17 +26,15 @@ export type AccountPageProps = {
 };
 
 export default function AccountPage({ params }: AccountPageProps): JSX.Element {
-  let { data: accounts } = useApi('/api/accounts') as SWRResponse<Account[]>;
-  let { data: splits } = useApi('/api/splits/<guid>', { guid: params.guid }) as SWRResponse<Split[]>;
-
   const router = useRouter();
+  let { data: accounts } = useApi('/api/accounts') as SWRResponse<AccountsMap>;
+
   // We cant use fallback data to set a default as SWR treats
   // fallback data as stale data which means with immutable we will
   // never refresh the data.
-  accounts = accounts || [];
-  splits = splits || [];
+  accounts = accounts || {};
 
-  if (!accounts.length) {
+  if (!Object.keys(accounts).length) {
     return (
       <div>
         Loading...
@@ -43,7 +42,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
     );
   }
 
-  const account = accounts.find(a => a.guid === params.guid);
+  const account = accounts[params.guid] as Account;
   if (!account) {
     router.push('/404');
     return (
@@ -52,15 +51,13 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
       </div>
     );
   }
-  account.splits = splits;
+
+  const { splits } = account;
   const total = account.getTotal();
   const average = new Money(total.toNumber() / (splits.length && (splits[0].transaction.date.diff(
     splits[splits.length - 1].transaction.date,
     ['months', 'days'],
   ).months || 1)) || 0, account.commodity.mnemonic);
-  // Setting to empty as this creates errors when rendering
-  // transaction form and couldnt find why.
-  account.splits = [];
 
   let totalKeyword = 'have';
   if (account.type === 'EXPENSE') {
@@ -81,7 +78,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
     }
 
     let { quantity } = split;
-    if (split.account.type === 'INCOME') {
+    if (accounts?.[split.accountId].type === 'INCOME') {
       quantity = -quantity;
     }
 
@@ -146,16 +143,24 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
               />
             </div>
             <div className="col-span-12 bg-gunmetal-700 rounded-sm my-6 mr-6">
-              <TotalLineChart splits={splits} />
+              <TotalLineChart
+                currency={account.commodity.mnemonic}
+                accountType={account.type}
+                splits={splits}
+              />
             </div>
           </div>
         </div>
         <div className="col-span-6 bg-gunmetal-700 rounded-sm mb-6 p-4">
-          <SplitsHistogram splits={splits.filter(split => split.quantity !== 0)} />
+          <SplitsHistogram
+            currency={account.commodity.mnemonic}
+            accountType={account.type}
+            splits={splits.filter(split => split.quantity !== 0)}
+          />
         </div>
       </div>
       <TransactionsTable
-        splits={splits}
+        splits={account.splits}
         accounts={accounts}
       />
     </>

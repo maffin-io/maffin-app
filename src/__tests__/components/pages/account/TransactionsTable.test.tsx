@@ -4,16 +4,11 @@ import {
   render,
   screen,
 } from '@testing-library/react';
-import { DataSource } from 'typeorm';
 import type { LinkProps } from 'next/link';
 import { BiEdit, BiXCircle } from 'react-icons/bi';
+import type { AccountsMap } from '@/types/book';
 
-import {
-  Account,
-  Commodity,
-  Split,
-  Transaction,
-} from '@/book/entities';
+import { Commodity } from '@/book/entities';
 import Table from '@/components/Table';
 import { TransactionsTable } from '@/components/pages/account';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
@@ -40,109 +35,71 @@ jest.mock('@/components/buttons/TransactionFormButton', () => jest.fn(
 ));
 
 describe('TransactionsTable', () => {
-  let datasource: DataSource;
   let eur: Commodity;
-  let root: Account;
-  let account1: Account;
-  let account2: Account;
-  let transaction: Transaction;
-  let splits: Split[];
+  let accounts: AccountsMap;
 
   beforeEach(async () => {
-    datasource = new DataSource({
-      type: 'sqljs',
-      dropSchema: true,
-      entities: [Account, Commodity, Split, Transaction],
-      synchronize: true,
-      logging: false,
-    });
-    await datasource.initialize();
-
-    eur = await Commodity.create({
+    eur = {
       guid: 'eur',
       namespace: 'CURRENCY',
       mnemonic: 'EUR',
-    }).save();
+    } as Commodity;
 
-    root = await Account.create({
-      name: 'Root',
-      type: 'ROOT',
-    }).save();
-
-    account1 = await Account.create({
-      guid: 'account_guid_1',
-      name: 'bank',
-      type: 'ASSET',
-      fk_commodity: eur,
-      parent: root,
-    }).save();
-
-    account2 = await Account.create({
-      guid: 'account_guid_2',
-      name: 'expense',
-      type: 'EXPENSE',
-      fk_commodity: eur,
-      parent: root,
-    }).save();
-
-    transaction = await Transaction.create({
-      guid: 'tx_guid',
-      description: 'random expense',
-      fk_currency: eur,
-      date: DateTime.fromISO('2023-01-01'),
-      splits: [
-        {
-          guid: 'split_guid_1',
-          valueNum: -10,
-          valueDenom: 100,
-          quantityNum: -15,
-          quantityDenom: 100,
-          fk_account: account1,
-        },
-        {
-          guid: 'split_guid_2',
-          valueNum: 10,
-          valueDenom: 100,
-          quantityNum: 15,
-          quantityDenom: 100,
-          fk_account: account2,
-        },
-      ],
-    }).save();
-
-    splits = await Split.find({
-      where: {
-        fk_account: {
-          guid: account1.guid,
-        },
-      },
-      relations: {
-        fk_transaction: {
-          splits: {
-            fk_account: true,
+    accounts = {
+      account_guid_1: {
+        guid: 'account_guid_1',
+        name: 'bank',
+        type: 'ASSET',
+        commodity: eur,
+        path: 'Assets:bank',
+        splits: [
+          {
+            guid: 'split_guid_1',
+            value: -100,
+            quantity: -100,
+            accountId: 'account_guid_1',
+            transaction: {
+              guid: 'tx_guid',
+              description: 'random expense',
+              date: DateTime.fromISO('2023-01-01'),
+              currency: eur,
+            },
           },
-        },
-        fk_account: true,
+        ],
       },
-      order: {
-        fk_transaction: {
-          date: 'DESC',
-        },
-        quantityNum: 'ASC',
+      account_guid_2: {
+        guid: 'account_guid_2',
+        name: 'expense',
+        type: 'EXPENSE',
+        path: 'Expenses:expense',
+        commodity: eur,
+        splits: [
+          {
+            guid: 'split_guid_2',
+            value: 100,
+            quantity: 100,
+            accountId: 'account_guid_2',
+            transaction: {
+              guid: 'tx_guid',
+              description: 'random expense',
+              date: DateTime.fromISO('2023-01-01'),
+              currency: eur,
+            },
+          },
+        ],
       },
-    });
+    };
   });
 
   afterEach(async () => {
     jest.clearAllMocks();
-    await datasource.destroy();
   });
 
   it('creates Table with expected params', async () => {
     render(
       <TransactionsTable
-        splits={splits}
-        accounts={[account1, account2]}
+        splits={accounts.account_guid_1.splits}
+        accounts={accounts}
       />,
     );
 
@@ -184,76 +141,15 @@ describe('TransactionsTable', () => {
           cell: expect.any(Function),
         },
       ],
-      data: [
-        {
-          ...transaction.splits[0],
-          fk_account: {
-            guid: 'account_guid_1',
-            name: 'bank',
-            type: 'ASSET',
-            fk_commodity: eur,
-            childrenIds: [],
-            path: 'bank',
-            parentId: root.guid,
-          },
-          fk_transaction: {
-            ...transaction,
-            splits: [
-              {
-                action: '',
-                fk_account: {
-                  guid: account1.guid,
-                  name: 'bank',
-                  type: 'ASSET',
-                  fk_commodity: eur,
-                  childrenIds: [],
-                  path: 'bank',
-                  parentId: root.guid,
-                },
-                guid: 'split_guid_1',
-                quantityDenom: 100,
-                quantityNum: -15,
-                valueDenom: 100,
-                valueNum: -10,
-              },
-              {
-                action: '',
-                fk_account: {
-                  guid: account2.guid,
-                  name: 'expense',
-                  type: 'EXPENSE',
-                  fk_commodity: eur,
-                  childrenIds: [],
-                  path: 'expense',
-                  parentId: root.guid,
-                },
-                guid: 'split_guid_2',
-                quantityDenom: 100,
-                quantityNum: 15,
-                valueDenom: 100,
-                valueNum: 10,
-              },
-            ],
-          },
-        },
-      ],
+      data: accounts.account_guid_1.splits,
     }, {});
   });
 
   it('renders Date column as expected', async () => {
     render(
       <TransactionsTable
-        splits={splits}
-        accounts={[
-          {
-            ...account1,
-            path: 'Assets:bank',
-          } as Account,
-          {
-            ...account2,
-            path: 'Expenses:expense',
-          } as Account,
-        ]}
+        splits={accounts.account_guid_1.splits}
+        accounts={accounts}
       />,
     );
 
@@ -270,9 +166,7 @@ describe('TransactionsTable', () => {
       // @ts-ignore
       dateCol.cell({
         row: {
-          original: {
-            transaction,
-          },
+          original: accounts.account_guid_1.splits[0],
         },
       }),
     );
@@ -283,17 +177,8 @@ describe('TransactionsTable', () => {
   it('renders FromTo column as expected', async () => {
     render(
       <TransactionsTable
-        splits={splits}
-        accounts={[
-          {
-            ...account1,
-            path: 'Assets:bank',
-          } as Account,
-          {
-            ...account2,
-            path: 'Expenses:expense',
-          } as Account,
-        ]}
+        splits={accounts.account_guid_1.splits}
+        accounts={accounts}
       />,
     );
 
@@ -305,42 +190,7 @@ describe('TransactionsTable', () => {
       // @ts-ignore
       fromToCol.cell({
         row: {
-          original: {
-            transaction: {
-              ...transaction,
-              splits: [
-                {
-                  action: '',
-                  account: {
-                    guid: account1.guid,
-                    name: 'bank',
-                    type: 'ASSET',
-                    fk_commodity: eur,
-                  },
-                  guid: expect.any(String),
-                  quantityDenom: 100,
-                  quantityNum: 15,
-                  valueDenom: 100,
-                  valueNum: 10,
-                },
-                {
-                  action: '',
-                  account: {
-                    guid: account2.guid,
-                    name: 'expense',
-                    type: 'EXPENSE',
-                    fk_commodity: eur,
-                  },
-                  guid: expect.any(String),
-                  quantityDenom: 100,
-                  quantityNum: -15,
-                  valueDenom: 100,
-                  valueNum: -10,
-                },
-              ],
-            },
-            account: account1,
-          },
+          original: accounts.account_guid_1.splits[0],
         },
       }),
     );
@@ -351,17 +201,8 @@ describe('TransactionsTable', () => {
   it('renders Amount column as expected', async () => {
     render(
       <TransactionsTable
-        splits={splits}
-        accounts={[
-          {
-            ...account1,
-            path: 'Assets:bank',
-          } as Account,
-          {
-            ...account2,
-            path: 'Expenses:expense',
-          } as Account,
-        ]}
+        splits={accounts.account_guid_1.splits}
+        accounts={accounts}
       />,
     );
 
@@ -369,17 +210,25 @@ describe('TransactionsTable', () => {
     const amountCol = TableMock.mock.calls[0][0].columns[3];
 
     expect(amountCol.cell).not.toBeUndefined();
-    const { container } = render(
+    let { container } = render(
       // @ts-ignore
       amountCol.cell({
         row: {
-          original: {
-            quantity: 100,
-            account: account1,
-          },
+          original: accounts.account_guid_2.splits[0],
         },
       }),
     );
+
+    expect(container).toMatchSnapshot();
+
+    ({ container } = render(
+      // @ts-ignore
+      amountCol.cell({
+        row: {
+          original: accounts.account_guid_1.splits[0],
+        },
+      }),
+    ));
 
     expect(container).toMatchSnapshot();
   });
@@ -387,17 +236,8 @@ describe('TransactionsTable', () => {
   it('renders Total column as expected', async () => {
     render(
       <TransactionsTable
-        splits={splits}
-        accounts={[
-          {
-            ...account1,
-            path: 'Assets:bank',
-          } as Account,
-          {
-            ...account2,
-            path: 'Expenses:expense',
-          } as Account,
-        ]}
+        splits={accounts.account_guid_1.splits}
+        accounts={accounts}
       />,
     );
 
@@ -410,14 +250,16 @@ describe('TransactionsTable', () => {
       original: {
         guid: 'split0',
         quantity: 100,
-        account: account1,
+        accountId: 'account_guid_1',
+        account: accounts.account_guid_1,
       },
     };
     const row2 = {
       original: {
         guid: 'split1',
         quantity: 150,
-        account: account1,
+        accountId: 'account_guid_1',
+        account: accounts.account_guid_1,
       },
     };
     const { container } = render(
@@ -436,17 +278,8 @@ describe('TransactionsTable', () => {
   it('renders Actions column as expected', async () => {
     render(
       <TransactionsTable
-        splits={splits}
-        accounts={[
-          {
-            ...account1,
-            path: 'Assets:bank',
-          } as Account,
-          {
-            ...account2,
-            path: 'Expenses:expense',
-          } as Account,
-        ]}
+        splits={accounts.account_guid_1.splits}
+        accounts={accounts}
       />,
     );
 
@@ -459,11 +292,7 @@ describe('TransactionsTable', () => {
       // @ts-ignore
       actionsCol.cell({
         row: {
-          original: {
-            quantity: 100,
-            account: account1,
-            transaction,
-          },
+          original: accounts.account_guid_2.splits[0],
         },
       }),
     );
@@ -476,9 +305,9 @@ describe('TransactionsTable', () => {
         className: 'link',
         children: <BiEdit className="flex" />,
         defaultValues: {
-          ...transaction,
-          date: transaction.date.toISODate(),
-          fk_currency: transaction.currency as Commodity,
+          ...accounts.account_guid_2.splits[0].transaction,
+          date: '2023-01-01',
+          fk_currency: eur,
         },
       },
       {},
@@ -490,9 +319,9 @@ describe('TransactionsTable', () => {
         className: 'link',
         children: <BiXCircle className="flex" />,
         defaultValues: {
-          ...transaction,
-          date: transaction.date.toISODate(),
-          fk_currency: transaction.currency as Commodity,
+          ...accounts.account_guid_2.splits[0].transaction,
+          date: '2023-01-01',
+          fk_currency: eur,
         },
       },
       {},
