@@ -191,6 +191,8 @@ describe('AccountForm', () => {
       type: 'ASSET',
       fk_commodity: eur,
       childrenIds: [],
+      parentId: assetAccount.guid,
+      path: 'Assets:TestAccount',
     });
     expect(mockSave).toHaveBeenCalledTimes(1);
     expect(swr.mutate).toBeCalledTimes(1);

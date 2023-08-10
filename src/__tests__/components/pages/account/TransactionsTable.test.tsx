@@ -142,16 +142,7 @@ describe('TransactionsTable', () => {
     render(
       <TransactionsTable
         splits={splits}
-        accounts={[
-          {
-            ...account1,
-            path: 'Assets:bank',
-          } as Account,
-          {
-            ...account2,
-            path: 'Expenses:expense',
-          } as Account,
-        ]}
+        accounts={[account1, account2]}
       />,
     );
 
@@ -202,6 +193,8 @@ describe('TransactionsTable', () => {
             type: 'ASSET',
             fk_commodity: eur,
             childrenIds: [],
+            path: 'bank',
+            parentId: root.guid,
           },
           fk_transaction: {
             ...transaction,
@@ -214,6 +207,8 @@ describe('TransactionsTable', () => {
                   type: 'ASSET',
                   fk_commodity: eur,
                   childrenIds: [],
+                  path: 'bank',
+                  parentId: root.guid,
                 },
                 guid: 'split_guid_1',
                 quantityDenom: 100,
@@ -229,6 +224,8 @@ describe('TransactionsTable', () => {
                   type: 'EXPENSE',
                   fk_commodity: eur,
                   childrenIds: [],
+                  path: 'expense',
+                  parentId: root.guid,
                 },
                 guid: 'split_guid_2',
                 quantityDenom: 100,

@@ -4,6 +4,7 @@ import * as swrImmutable from 'swr/immutable';
 import { Commodity } from '@/book/entities';
 import { useApi } from '@/hooks';
 import * as queries from '@/book/queries';
+import * as q from '@/lib/queries';
 import { PriceDB } from '@/book/prices';
 import getUser from '@/lib/getUser';
 
@@ -12,6 +13,11 @@ jest.mock('swr/immutable');
 jest.mock('@/book/queries', () => ({
   __esModule: true,
   ...jest.requireActual('@/book/queries'),
+}));
+
+jest.mock('@/lib/queries', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/lib/queries'),
 }));
 
 describe('useApi', () => {
@@ -65,26 +71,8 @@ describe('useApi', () => {
 
     expect(swrImmutable.default).toBeCalledWith(
       '/api/accounts',
-      queries.getAccountsWithPath,
+      q.getAccounts,
       undefined,
-    );
-  });
-
-  it('calls /api/accounts/splits with expected params', async () => {
-    jest.spyOn(queries, 'getAccountsWithPath').mockImplementation();
-    renderHook(() => useApi('/api/accounts/splits'));
-
-    expect(swrImmutable.default).toBeCalledWith(
-      '/api/accounts/splits',
-      expect.any(Function),
-      undefined,
-    );
-    (swrImmutable.default as jest.Mock).mock.calls[0][1]();
-    expect(queries.getAccountsWithPath).toBeCalledWith(
-      {
-        relations: { splits: { fk_transaction: true } },
-        showRoot: true,
-      },
     );
   });
 

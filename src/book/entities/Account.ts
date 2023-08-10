@@ -4,6 +4,7 @@ import {
   Entity, JoinColumn,
   ManyToOne,
   RelationId,
+  BeforeInsert,
   Tree,
   TreeParent,
   TreeChildren,
@@ -56,9 +57,20 @@ export default class Account extends BaseEntity {
   @v.IsIn(Account.TYPES)
     type!: string;
 
+  @BeforeInsert()
+  async setPath() {
+    if (this.type === 'ROOT' || this.parent?.type === 'ROOT') {
+      this.path = this.name;
+    } else {
+      // havent found a way to control BeforeInsert order.
+      // The validation one executes after this so we have to protect
+      // against parent not existing (which is mandatory).
+      this.path = `${this.parent?.path}:${this.name}`;
+    }
+  }
+
   @Column({
     type: 'text',
-    select: false,
     default: '',
   })
     path!: string;
@@ -71,10 +83,13 @@ export default class Account extends BaseEntity {
   // and needs the whole object...
     parent!: Account;
 
+  @RelationId((account: Account) => account.parent)
+    parentId: string;
+
   @TreeChildren()
     children!: Account[];
 
-  @RelationId((account: Account) => account.children) // you need to specify target relation
+  @RelationId((account: Account) => account.children)
     childrenIds: string[];
 
   @ManyToOne('Commodity', { eager: true })
