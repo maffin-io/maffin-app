@@ -21,7 +21,7 @@ import type { AccountsTree } from '@/types/accounts';
 
 export default function AccountsPage(): JSX.Element {
   const { data: earliestDate } = useApi('/api/start-date');
-  let { data: accounts } = useApi('/api/accounts/splits') as SWRResponse<Account[]>;
+  let { data: accounts } = useApi('/api/accounts') as SWRResponse<Account[]>;
   let { data: todayPrices } = useApi('/api/prices/today');
 
   const [selectedDate, setSelectedDate] = React.useState(DateTime.now());

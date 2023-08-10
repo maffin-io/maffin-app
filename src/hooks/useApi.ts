@@ -3,6 +3,7 @@ import { Fetcher, SWRResponse, SWRConfiguration } from 'swr';
 
 import { Commodity } from '@/book/entities';
 import * as queries from '@/book/queries';
+import * as q from '@/lib/queries';
 import { PriceDB } from '@/book/prices';
 import getUser from '@/lib/getUser';
 
@@ -27,7 +28,6 @@ export type ApiPaths = (
   | '/api/main-currency'
   | '/api/commodities'
   | '/api/accounts'
-  | '/api/accounts/splits'
   | '/api/investments'
   | '/api/prices/today'
   | '/api/splits/<guid>'
@@ -51,13 +51,7 @@ const API: {
     f: Commodity.find,
   },
   '/api/accounts': {
-    f: queries.getAccountsWithPath,
-  },
-  '/api/accounts/splits': {
-    f: () => queries.getAccountsWithPath({
-      relations: { splits: { fk_transaction: true } },
-      showRoot: true,
-    }),
+    f: q.getAccounts,
   },
   '/api/investments': {
     f: queries.getInvestments,

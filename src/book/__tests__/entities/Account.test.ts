@@ -133,6 +133,20 @@ describe('Account', () => {
         },
       ]);
     });
+
+    it('sets path on save', async () => {
+      const account3 = await Account.create({
+        name: 'Groceries',
+        type: 'EXPENSE',
+        parent: account2,
+        fk_commodity: eur,
+      }).save();
+
+      expect(root.path).toEqual('Root');
+      expect(account.path).toEqual('name');
+      expect(account2.path).toEqual('Expenses');
+      expect(account3.path).toEqual('Expenses:Groceries');
+    });
   });
 
   describe('getTotal and getMonthlyTotals', () => {

@@ -211,16 +211,27 @@ describe('useDataSource', () => {
     });
 
     describe('importBook', () => {
+      beforeEach(() => {
+        jest.spyOn(Account, 'update').mockImplementation();
+        jest.spyOn(Account, 'find').mockResolvedValue([
+          {
+            guid: 'root',
+            name: 'Root',
+            path: '',
+            type: 'ROOT',
+            childrenIds: [] as string[],
+          } as Account,
+        ]);
+      });
+
       it('loads datasource database, mutates and saves', async () => {
         const { result } = renderHook(() => useDataSource());
 
         await waitFor(() => expect(result.current.isLoaded).toBe(true));
         const datasource = result.current.datasource as DataSource;
 
-        const mockSave = jest.fn();
         const rawData = new Uint8Array([22, 33]);
         await result.current.importBook(rawData);
-        result.current.save = mockSave;
 
         expect(datasource.sqljsManager.loadDatabase).toBeCalledWith(rawData);
 
@@ -246,6 +257,54 @@ describe('useDataSource', () => {
 
         const mockStorage = (storageHooks.default as jest.Mock).mock.results[0].value.storage;
         expect(mockStorage.save).toBeCalledWith(new Uint8Array([22, 33]));
+      });
+
+      it('sets accounts paths', async () => {
+        const { result } = renderHook(() => useDataSource());
+
+        await waitFor(() => expect(result.current.isLoaded).toBe(true));
+
+        const rawData = new Uint8Array([22, 33]);
+
+        jest.spyOn(Account, 'update').mockImplementation();
+        jest.spyOn(Account, 'find').mockResolvedValue([
+          {
+            guid: 'root',
+            name: 'Root',
+            path: '',
+            type: 'ROOT',
+            childrenIds: ['1'],
+          } as Account,
+          {
+            guid: '1',
+            name: 'Expenses',
+            path: '',
+            parentId: 'root',
+            childrenIds: ['2'],
+          } as Account,
+          {
+            guid: '2',
+            name: 'Utilities',
+            path: '',
+            parentId: '1',
+            childrenIds: ['3'],
+          } as Account,
+          {
+            guid: '3',
+            name: 'Water',
+            path: '',
+            parentId: '2',
+            childrenIds: [] as string[],
+          } as Account,
+        ]);
+
+        await result.current.importBook(rawData);
+
+        expect(Account.update).toBeCalledTimes(4);
+        expect(Account.update).toHaveBeenNthCalledWith(1, { guid: 'root' }, { path: 'Root' });
+        expect(Account.update).toHaveBeenNthCalledWith(2, { guid: '1' }, { path: 'Expenses' });
+        expect(Account.update).toHaveBeenNthCalledWith(3, { guid: '2' }, { path: 'Expenses:Utilities' });
+        expect(Account.update).toHaveBeenNthCalledWith(4, { guid: '3' }, { path: 'Expenses:Utilities:Water' });
       });
     });
   });
