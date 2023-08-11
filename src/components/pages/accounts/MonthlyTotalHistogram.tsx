@@ -37,7 +37,9 @@ export default function MonthlyTotalHistogram({
       series.push({
         name: leaf.account.name,
         data: dates.map(date => ({
-          y: leaf.monthlyTotals[date.toFormat('MMM/yy')]?.toNumber() || 0,
+          y: tree.account.type === 'INCOME'
+            ? (leaf.monthlyTotals[date.toFormat('MM/yyyy')]?.toNumber() || 0) * -1
+            : leaf.monthlyTotals[date.toFormat('MM/yyyy')]?.toNumber() || 0,
           x: date.startOf('month').plus({ days: 1 }).toMillis(),
         })),
       });

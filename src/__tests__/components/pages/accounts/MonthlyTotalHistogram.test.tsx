@@ -88,8 +88,8 @@ describe('NetWorthHistogram', () => {
                 },
                 total: new Money(2000, 'EUR'),
                 monthlyTotals: {
-                  'Nov/22': new Money(1000, 'EUR'),
-                  'Dec/22': new Money(1000, 'EUR'),
+                  '11/2022': new Money(-1000, 'EUR'),
+                  '12/2022': new Money(-1000, 'EUR'),
                 },
                 children: [],
               },
@@ -133,8 +133,8 @@ describe('NetWorthHistogram', () => {
                 },
                 total: new Money(2000, 'EUR'),
                 monthlyTotals: {
-                  'Nov/21': new Money(1000, 'EUR'),
-                  'Dec/21': new Money(1000, 'EUR'),
+                  '11/2021': new Money(-1000, 'EUR'),
+                  '12/2021': new Money(-1000, 'EUR'),
                 },
                 children: [],
               },
@@ -176,8 +176,8 @@ describe('NetWorthHistogram', () => {
                 },
                 total: new Money(2000, 'EUR'),
                 monthlyTotals: {
-                  'Nov/22': new Money(1000, 'EUR'),
-                  'Dec/22': new Money(1000, 'EUR'),
+                  '11/2022': new Money(-1000, 'EUR'),
+                  '12/2022': new Money(-1000, 'EUR'),
                 },
                 children: [],
               },
@@ -190,8 +190,8 @@ describe('NetWorthHistogram', () => {
                 },
                 total: new Money(200, 'EUR'),
                 monthlyTotals: {
-                  'Nov/22': new Money(150, 'EUR'),
-                  'Dec/22': new Money(50, 'EUR'),
+                  '11/2022': new Money(-150, 'EUR'),
+                  '12/2022': new Money(-50, 'EUR'),
                 },
                 children: [],
               },
@@ -209,23 +209,23 @@ describe('NetWorthHistogram', () => {
         data: [
           {
             x: now.minus({ months: 7 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: 0,
+            y: -0,
           },
           {
             x: now.minus({ months: 6 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: 0,
+            y: -0,
           },
           {
             x: now.minus({ months: 5 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: 0,
+            y: -0,
           },
           {
             x: now.minus({ months: 4 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: 0,
+            y: -0,
           },
           {
             x: now.minus({ months: 3 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: 0,
+            y: -0,
           },
           {
             x: now.minus({ months: 2 }).startOf('month').plus({ days: 1 }).toMillis(),
@@ -237,7 +237,7 @@ describe('NetWorthHistogram', () => {
           },
           {
             x: now.startOf('month').plus({ days: 1 }).toMillis(),
-            y: 0,
+            y: -0,
           },
         ],
       },
@@ -246,23 +246,23 @@ describe('NetWorthHistogram', () => {
         data: [
           {
             x: now.minus({ months: 7 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: 0,
+            y: -0,
           },
           {
             x: now.minus({ months: 6 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: 0,
+            y: -0,
           },
           {
             x: now.minus({ months: 5 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: 0,
+            y: -0,
           },
           {
             x: now.minus({ months: 4 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: 0,
+            y: -0,
           },
           {
             x: now.minus({ months: 3 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: 0,
+            y: -0,
           },
           {
             x: now.minus({ months: 2 }).startOf('month').plus({ days: 1 }).toMillis(),
@@ -274,7 +274,7 @@ describe('NetWorthHistogram', () => {
           },
           {
             x: now.startOf('month').plus({ days: 1 }).toMillis(),
-            y: 0,
+            y: -0,
           },
         ],
       },

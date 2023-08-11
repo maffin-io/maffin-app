@@ -91,7 +91,7 @@ describe('NetWorthPie', () => {
               },
               {
                 account: { guid: 'liabilities', type: 'LIABILITY' },
-                total: new Money(100, 'EUR'),
+                total: new Money(-100, 'EUR'),
                 monthlyTotals: {},
                 children: [],
               },
@@ -151,13 +151,13 @@ describe('NetWorthPie', () => {
     );
 
     const props = (Chart as jest.Mock).mock.calls[0][0] as ChartProps;
-    expect(props.series).toEqual([1000, 0]);
+    expect(props.series).toEqual([1000, -0]);
     expect(props.unit).toEqual('EUR');
     expect(
       props.options?.plotOptions?.pie?.donut?.labels?.total?.formatter?.(
         {
           globals: {
-            series: [1000, 0],
+            series: [1000, -0],
           },
         },
       ),

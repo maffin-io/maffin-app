@@ -74,12 +74,16 @@ const columns: ColumnDef<AccountsTree>[] = [
     ),
   },
   {
-    accessorFn: (row: AccountsTree) => row.total.toNumber(),
+    accessorFn: (row: AccountsTree) => Math.abs(row.total.toNumber()),
     id: 'total',
     header: '',
     cell: ({ row }) => (
       <span>
-        {row.original.total.format()}
+        {
+          ['INCOME', 'LIABILITY'].includes(row.original.account.type)
+            ? row.original.total.multiply(-1).format()
+            : row.original.total.format()
+        }
       </span>
     ),
   },

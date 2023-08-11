@@ -6,9 +6,9 @@ import type { SWRResponse } from 'swr';
 
 import type { Account } from '@/book/entities';
 import Money from '@/book/Money';
-import AccountsTable from '@/components/AccountsTable';
 import AddAccountButton from '@/components/buttons/AddAccountButton';
 import {
+  AccountsTable,
   NetWorthPie,
   NetWorthHistogram,
   MonthlyTotalHistogram,
@@ -18,15 +18,18 @@ import { PriceDBMap } from '@/book/prices';
 import DateRangeInput from '@/components/DateRangeInput';
 import { useApi } from '@/hooks';
 import type { AccountsTree, AccountsMap } from '@/types/book';
+import type { MonthlyTotals } from '@/lib/queries';
 
 export default function AccountsPage(): JSX.Element {
   const { data: earliestDate } = useApi('/api/start-date');
   let { data: accounts } = useApi('/api/accounts') as SWRResponse<AccountsMap>;
+  let { data: monthlyTotals } = useApi('/api/accounts/monthly-totals') as SWRResponse<MonthlyTotals>;
   let { data: todayPrices } = useApi('/api/prices/today');
 
   const [selectedDate, setSelectedDate] = React.useState(DateTime.now());
 
   accounts = accounts || {};
+  monthlyTotals = monthlyTotals || {};
   todayPrices = todayPrices || new PriceDBMap();
 
   let tree: AccountsTree = {
@@ -38,7 +41,7 @@ export default function AccountsPage(): JSX.Element {
   const { root } = accounts;
   if (root && !todayPrices.isEmpty) {
     const start = performance.now();
-    tree = buildNestedRows(root, accounts, todayPrices, selectedDate);
+    tree = buildNestedRows(root, accounts, monthlyTotals, todayPrices, selectedDate);
     const end = performance.now();
     console.log(`build nested rows: ${end - start}ms`);
   }
@@ -114,38 +117,42 @@ export default function AccountsPage(): JSX.Element {
 function buildNestedRows(
   current: Account,
   accounts: AccountsMap,
+  monthlyTotals: MonthlyTotals,
   todayQuotes: PriceDBMap,
   date: DateTime,
 ): AccountsTree {
   const { childrenIds } = current;
-  let total = current.getTotal(date);
-  const monthlyTotals = current.getMonthlyTotals();
   let children: AccountsTree[] = [];
+  const currentMonthlyTotals: { [key: string]: Money } = {};
+  let commodity = current.commodity?.mnemonic;
 
   if (current.type === 'ROOT') {
     children = childrenIds.map(childId => {
       const child = accounts[childId];
-      const childTree = buildNestedRows(child, accounts, todayQuotes, date);
+      const childTree = buildNestedRows(child, accounts, monthlyTotals, todayQuotes, date);
       return childTree;
     });
   } else {
-    const commodity = current.commodity.mnemonic;
+    Object.entries(monthlyTotals[current.guid] || {}).forEach(([key, n]) => {
+      currentMonthlyTotals[key] = new Money(n, current.commodity.mnemonic);
+    });
     if (['STOCK', 'MUTUAL'].includes(current.type)) {
       const price = todayQuotes.getStockPrice(
-        current.commodity.mnemonic,
+        commodity,
         DateTime.now(),
       );
-      total = total.convert(price.currency.mnemonic, price.value);
-      Object.entries(monthlyTotals).forEach(([key, monthlyTotal]) => {
-        monthlyTotals[key] = monthlyTotal.convert(
+      Object.entries(monthlyTotals[current.guid] || {}).forEach(([key, n]) => {
+        const monthlyTotal = new Money(n, commodity);
+        currentMonthlyTotals[key] = monthlyTotal.convert(
           price.currency.mnemonic,
           price.value,
         );
       });
+      commodity = price.currency.mnemonic;
     }
     children = childrenIds.map(childId => {
       const child = accounts[childId];
-      const childTree = buildNestedRows(child, accounts, todayQuotes, date);
+      const childTree = buildNestedRows(child, accounts, monthlyTotals, todayQuotes, date);
       let childTotal = childTree.total;
       const childMonthlyTotals = childTree.monthlyTotals;
       if (childTotal.currency !== commodity) {
@@ -159,9 +166,10 @@ function buildNestedRows(
           childMonthlyTotals[key] = monthlyTotal.convert(commodity, price.value);
         });
       }
-      total = total.add(childTotal);
       Object.entries(childMonthlyTotals).forEach(([key, monthlyTotal]) => {
-        monthlyTotals[key] = monthlyTotal.add(monthlyTotals[key] || new Money(0, commodity));
+        currentMonthlyTotals[key] = monthlyTotal.add(
+          currentMonthlyTotals[key] || new Money(0, commodity),
+        );
       });
       return childTree;
     });
@@ -169,8 +177,11 @@ function buildNestedRows(
 
   return {
     account: current,
-    total,
-    monthlyTotals,
+    total: Object.values(currentMonthlyTotals).reduce(
+      (total, amount) => total.add(amount),
+      new Money(0, commodity),
+    ),
+    monthlyTotals: currentMonthlyTotals,
     children,
   };
 }

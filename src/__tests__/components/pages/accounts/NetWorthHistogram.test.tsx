@@ -188,8 +188,8 @@ describe('NetWorthHistogram', () => {
                 account: { guid: 'income', type: 'INCOME', commodity: { mnemonic: 'EUR' } },
                 total: new Money(1000, 'EUR'),
                 monthlyTotals: {
-                  'Nov/22': new Money(600, 'EUR'),
-                  'Dec/22': new Money(400, 'EUR'),
+                  '11/2022': new Money(-600, 'EUR'),
+                  '12/2022': new Money(-400, 'EUR'),
                 },
                 children: [],
               },
@@ -197,8 +197,8 @@ describe('NetWorthHistogram', () => {
                 account: { guid: 'expenses', type: 'EXPENSE' },
                 total: new Money(500, 'EUR'),
                 monthlyTotals: {
-                  'Nov/22': new Money(400, 'EUR'),
-                  'Dec/22': new Money(500, 'EUR'),
+                  '11/2022': new Money(400, 'EUR'),
+                  '12/2022': new Money(500, 'EUR'),
                 },
                 children: [],
               },
@@ -216,7 +216,7 @@ describe('NetWorthHistogram', () => {
         data: [
           {
             x: DateTime.fromISO('2022-10-01'),
-            y: 0,
+            y: -0,
           },
           {
             x: DateTime.fromISO('2022-11-01'),
@@ -228,7 +228,7 @@ describe('NetWorthHistogram', () => {
           },
           {
             x: DateTime.fromISO('2023-01-01'),
-            y: 0,
+            y: -0,
           },
         ],
       },
@@ -260,7 +260,7 @@ describe('NetWorthHistogram', () => {
         data: [
           {
             x: DateTime.fromISO('2022-10-01'),
-            y: 0,
+            y: -0,
           },
           {
             x: DateTime.fromISO('2022-11-01'),
@@ -272,7 +272,7 @@ describe('NetWorthHistogram', () => {
           },
           {
             x: DateTime.fromISO('2023-01-01'),
-            y: 0,
+            y: -0,
           },
         ],
       },

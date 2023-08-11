@@ -9,10 +9,10 @@ import type { SWRResponse } from 'swr';
 import Money from '@/book/Money';
 import type { Account } from '@/book/entities';
 import AccountsPage from '@/app/dashboard/accounts/page';
-import AccountsTable from '@/components/AccountsTable';
 import AddAccountButton from '@/components/buttons/AddAccountButton';
 import DateRangeInput from '@/components/DateRangeInput';
 import {
+  AccountsTable,
   NetWorthPie,
   NetWorthHistogram,
   MonthlyTotalHistogram,
@@ -30,7 +30,7 @@ jest.mock('@/components/buttons/AddAccountButton', () => jest.fn(
   () => <div data-testid="AddAccountButton" />,
 ));
 
-jest.mock('@/components/AccountsTable', () => jest.fn(
+jest.mock('@/components/pages/accounts/AccountsTable', () => jest.fn(
   () => <div data-testid="AccountsTable" />,
 ));
 
@@ -68,6 +68,7 @@ describe('AccountsPage', () => {
     const date = DateTime.fromISO('2022-01-01');
     jest.spyOn(apiHook, 'default')
       .mockReturnValueOnce({ data: date } as SWRResponse)
+      .mockReturnValueOnce({ data: {} } as SWRResponse)
       .mockReturnValueOnce({ data: {} } as SWRResponse)
       .mockReturnValueOnce({ data: undefined } as SWRResponse);
     const { container } = render(<AccountsPage />);
@@ -163,18 +164,11 @@ describe('AccountsPage', () => {
         guid: 'root',
         name: 'Root',
         type: 'ROOT',
-        getTotal: () => new Money(0, 'EUR'),
-        getMonthlyTotals: () => ({}),
         childrenIds: ['a1', 'a3', 'a5'],
       } as Account,
       a1: {
         guid: 'a1',
         name: 'Assets',
-        getTotal: () => new Money(10, 'EUR'),
-        getMonthlyTotals: (() => ({
-          'Jan/23': new Money(7, 'EUR'),
-          'Feb/23': new Money(3, 'EUR'),
-        })) as typeof Account.prototype.getMonthlyTotals,
         commodity: {
           mnemonic: 'EUR',
         },
@@ -184,11 +178,6 @@ describe('AccountsPage', () => {
       a2: {
         guid: 'a2',
         name: 'Bank',
-        getTotal: () => new Money(1000, 'USD'),
-        getMonthlyTotals: (() => ({
-          'Jan/23': new Money(700, 'USD'),
-          'Feb/23': new Money(300, 'USD'),
-        })) as typeof Account.prototype.getMonthlyTotals,
         commodity: {
           mnemonic: 'USD',
         },
@@ -198,11 +187,6 @@ describe('AccountsPage', () => {
       a3: {
         guid: 'a3',
         name: 'Expenses',
-        getTotal: () => new Money(1000, 'EUR'),
-        getMonthlyTotals: (() => ({
-          'Jan/23': new Money(700, 'EUR'),
-          'Feb/23': new Money(300, 'EUR'),
-        })) as typeof Account.prototype.getMonthlyTotals,
         commodity: {
           mnemonic: 'EUR',
         },
@@ -212,11 +196,6 @@ describe('AccountsPage', () => {
       a4: {
         guid: 'a4',
         name: 'Groceries',
-        getTotal: () => new Money(1000, 'EUR'),
-        getMonthlyTotals: (() => ({
-          'Jan/23': new Money(700, 'EUR'),
-          'Feb/23': new Money(300, 'EUR'),
-        })) as typeof Account.prototype.getMonthlyTotals,
         commodity: {
           mnemonic: 'EUR',
         },
@@ -226,11 +205,6 @@ describe('AccountsPage', () => {
       a5: {
         guid: 'a5',
         name: 'Income',
-        getTotal: () => new Money(2000, 'EUR'),
-        getMonthlyTotals: (() => ({
-          'Jan/23': new Money(1000, 'EUR'),
-          'Feb/23': new Money(1000, 'EUR'),
-        })) as typeof Account.prototype.getMonthlyTotals,
         commodity: {
           mnemonic: 'EUR',
         },
@@ -240,11 +214,6 @@ describe('AccountsPage', () => {
       a6: {
         guid: 'a6',
         name: 'Salary',
-        getTotal: () => new Money(1000, 'EUR'),
-        getMonthlyTotals: (() => ({
-          'Jan/23': new Money(1000, 'EUR'),
-          'Feb/23': new Money(1000, 'EUR'),
-        })) as typeof Account.prototype.getMonthlyTotals,
         commodity: {
           mnemonic: 'EUR',
         },
@@ -264,6 +233,34 @@ describe('AccountsPage', () => {
     jest.spyOn(apiHook, 'default')
       .mockReturnValueOnce({ data: date } as SWRResponse)
       .mockReturnValueOnce({ data: accounts } as SWRResponse)
+      .mockReturnValueOnce({
+        data: {
+          a1: {
+            '01/2023': 7,
+            '02/2023': 3,
+          },
+          a2: {
+            '01/2023': 700,
+            '02/2023': 300,
+          },
+          a3: {
+            '01/2023': 700,
+            '02/2023': 300,
+          },
+          a4: {
+            '01/2023': 700,
+            '02/2023': 300,
+          },
+          a5: {
+            '01/2023': -1000,
+            '02/2023': -1000,
+          },
+          a6: {
+            '01/2023': -1000,
+            '02/2023': -1000,
+          },
+        },
+      } as SWRResponse)
       .mockReturnValueOnce({ data: todayQuotes } as SWRResponse);
 
     render(<AccountsPage />);
@@ -277,16 +274,16 @@ describe('AccountsPage', () => {
           account: accounts.a1,
           total: expect.any(Money),
           monthlyTotals: {
-            'Jan/23': expect.any(Money),
-            'Feb/23': expect.any(Money),
+            '01/2023': expect.any(Money),
+            '02/2023': expect.any(Money),
           },
           children: [
             {
               account: accounts.a2,
               total: expect.any(Money),
               monthlyTotals: {
-                'Jan/23': expect.any(Money),
-                'Feb/23': expect.any(Money),
+                '01/2023': expect.any(Money),
+                '02/2023': expect.any(Money),
               },
               children: [],
             },
@@ -296,16 +293,16 @@ describe('AccountsPage', () => {
           account: accounts.a3,
           total: expect.any(Money),
           monthlyTotals: {
-            'Jan/23': expect.any(Money),
-            'Feb/23': expect.any(Money),
+            '01/2023': expect.any(Money),
+            '02/2023': expect.any(Money),
           },
           children: [
             {
               account: accounts.a4,
               total: expect.any(Money),
               monthlyTotals: {
-                'Jan/23': expect.any(Money),
-                'Feb/23': expect.any(Money),
+                '01/2023': expect.any(Money),
+                '02/2023': expect.any(Money),
               },
               children: [],
             },
@@ -315,16 +312,16 @@ describe('AccountsPage', () => {
           account: accounts.a5,
           total: expect.any(Money),
           monthlyTotals: {
-            'Jan/23': expect.any(Money),
-            'Feb/23': expect.any(Money),
+            '01/2023': expect.any(Money),
+            '02/2023': expect.any(Money),
           },
           children: [
             {
               account: accounts.a6,
               total: expect.any(Money),
               monthlyTotals: {
-                'Jan/23': expect.any(Money),
-                'Feb/23': expect.any(Money),
+                '01/2023': expect.any(Money),
+                '02/2023': expect.any(Money),
               },
               children: [],
             },
@@ -366,23 +363,22 @@ describe('AccountsPage', () => {
     );
 
     const resultTree = (AccountsTable as jest.Mock).mock.calls[0][0].tree;
-    expect(resultTree.total.toString()).toEqual('0.00 EUR');
 
     /* eslint-disable testing-library/no-node-access */
     expect(resultTree.children[0].total.toString()).toEqual('990.00 EUR'); // 1000 USD * 0.98 + 10 EUR
     expect(
-      resultTree.children[0].monthlyTotals['Jan/23'].toString(),
+      resultTree.children[0].monthlyTotals['01/2023'].toString(),
     ).toEqual('693.00 EUR'); // 700 USD * 0.98 + 7 EUR
     expect(
-      resultTree.children[0].monthlyTotals['Feb/23'].toString(),
+      resultTree.children[0].monthlyTotals['02/2023'].toString(),
     ).toEqual('297.00 EUR'); // 300 USD * 0.98 + 3 EUR
 
     expect(resultTree.children[0].children[0].total.toString()).toEqual('1000.00 USD');
     expect(
-      resultTree.children[0].children[0].monthlyTotals['Jan/23'].toString(),
+      resultTree.children[0].children[0].monthlyTotals['01/2023'].toString(),
     ).toEqual('686.00 EUR'); // 700 USD * 0.98
     expect(
-      resultTree.children[0].children[0].monthlyTotals['Feb/23'].toString(),
+      resultTree.children[0].children[0].monthlyTotals['02/2023'].toString(),
     ).toEqual('294.00 EUR'); // 300 USD * 0.98
     /* eslint-enable testing-library/no-node-access */
   });
@@ -393,15 +389,11 @@ describe('AccountsPage', () => {
         guid: 'root',
         name: 'Root',
         type: 'ROOT',
-        getTotal: () => new Money(0, 'EUR'),
-        getMonthlyTotals: () => ({}),
         childrenIds: ['a1'],
       } as Account,
       a1: {
         guid: 'a1',
         name: 'Stocks',
-        getTotal: () => new Money(0, 'EUR'),
-        getMonthlyTotals: () => ({}),
         commodity: {
           mnemonic: 'EUR',
         },
@@ -411,11 +403,6 @@ describe('AccountsPage', () => {
       a2: {
         guid: 'a2',
         name: 'GOOGL',
-        getTotal: () => new Money(2, 'GOOGL'),
-        getMonthlyTotals: (() => ({
-          'Jan/23': new Money(1, 'GOOGL'),
-          'Feb/23': new Money(1, 'GOOGL'),
-        })) as typeof Account.prototype.getMonthlyTotals,
         commodity: {
           mnemonic: 'GOOGL',
         },
@@ -442,6 +429,14 @@ describe('AccountsPage', () => {
     jest.spyOn(apiHook, 'default')
       .mockReturnValueOnce({ data: date } as SWRResponse)
       .mockReturnValueOnce({ data: accounts } as SWRResponse)
+      .mockReturnValueOnce({
+        data: {
+          a2: {
+            '01/2023': 1,
+            '02/2023': 1,
+          },
+        },
+      } as SWRResponse)
       .mockReturnValueOnce({ data: todayQuotes } as SWRResponse);
 
     render(<AccountsPage />);
@@ -455,16 +450,16 @@ describe('AccountsPage', () => {
           account: accounts.a1,
           total: expect.any(Money),
           monthlyTotals: {
-            'Jan/23': expect.any(Money),
-            'Feb/23': expect.any(Money),
+            '01/2023': expect.any(Money),
+            '02/2023': expect.any(Money),
           },
           children: [
             {
               account: accounts.a2,
               total: expect.any(Money),
               monthlyTotals: {
-                'Jan/23': expect.any(Money),
-                'Feb/23': expect.any(Money),
+                '01/2023': expect.any(Money),
+                '02/2023': expect.any(Money),
               },
               children: [],
             },
@@ -485,22 +480,21 @@ describe('AccountsPage', () => {
     );
 
     const resultTree = (AccountsTable as jest.Mock).mock.calls[0][0].tree;
-    expect(resultTree.total.toString()).toEqual('0.00 EUR');
 
     /* eslint-disable testing-library/no-node-access */
     expect(resultTree.children[0].total.toString()).toEqual('196.00 EUR'); // 200 USD * 0.98
     expect(
-      resultTree.children[0].monthlyTotals['Jan/23'].toString(),
+      resultTree.children[0].monthlyTotals['01/2023'].toString(),
     ).toEqual('98.00 EUR'); // 100 USD * 0.98
     expect(
-      resultTree.children[0].monthlyTotals['Feb/23'].toString(),
+      resultTree.children[0].monthlyTotals['02/2023'].toString(),
     ).toEqual('98.00 EUR'); // 100 USD * 0.98
     expect(resultTree.children[0].children[0].total.toString()).toEqual('200.00 USD'); // 2 GOOGL * 100 USD
     expect(
-      resultTree.children[0].children[0].monthlyTotals['Jan/23'].toString(),
+      resultTree.children[0].children[0].monthlyTotals['01/2023'].toString(),
     ).toEqual('98.00 EUR'); // 100 USD * 0.98
     expect(
-      resultTree.children[0].children[0].monthlyTotals['Feb/23'].toString(),
+      resultTree.children[0].children[0].monthlyTotals['02/2023'].toString(),
     ).toEqual('98.00 EUR'); // 100 USD * 0.98
     /* eslint-enable testing-library/no-node-access */
   });

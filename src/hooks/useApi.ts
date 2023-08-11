@@ -10,20 +10,36 @@ import getUser from '@/lib/getUser';
  * Wrapper around SWR to make the usable keys explicit and re-usable
  */
 export default function useApi(key: ApiPaths | null): SWRResponse {
-  const f = key !== null ? API[key].f : () => {};
-  const swrArgs = key !== null ? API[key].swrArgs : undefined;
+  let apiKey = key;
+  if (key?.startsWith('/api/splits/')) {
+    apiKey = '/api/splits/<guid>';
+  }
+  const f = apiKey !== null ? API[apiKey].f : () => {};
+  const swrArgs = apiKey !== null ? API[apiKey].swrArgs : undefined;
 
-  return useSWRImmutable(key, f, swrArgs);
+  const result = useSWRImmutable(key, f, swrArgs);
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  return result;
 }
 
 export type ApiPaths = (
   '/api/start-date'
   | '/api/main-currency'
   | '/api/commodities'
-  | '/api/accounts'
-  | '/api/investments'
-  | '/api/prices/today'
   | '/api/txs/latest'
+
+  | '/api/accounts'
+  | '/api/accounts/monthly-totals'
+  | '/api/accounts/tree'
+
+  | `/api/splits/${string}`
+  | '/api/investments'
+
+  | '/api/prices/today'
   | '/api/user'
 );
 
@@ -40,12 +56,46 @@ const API: {
     f: queries.getMainCurrency,
   },
   '/api/commodities': {
-    f: Commodity.find,
+    f: async (k: string) => {
+      const start = performance.now();
+      const r = await Commodity.find();
+      const end = performance.now();
+      console.log(`${k}: ${end - start}ms`);
+      return r;
+    },
   },
   '/api/accounts': {
     f: async (k: string) => {
       const start = performance.now();
       const r = await queries.getAccounts();
+      const end = performance.now();
+      console.log(`${k}: ${end - start}ms`);
+      return r;
+    },
+  },
+  '/api/accounts/monthly-totals': {
+    f: async (k: string) => {
+      const start = performance.now();
+      const r = await queries.getMonthlyTotals();
+      const end = performance.now();
+      console.log(`${k}: ${end - start}ms`);
+      return r;
+    },
+  },
+  '/api/accounts/tree': {
+    f: async (k: string) => {
+      const start = performance.now();
+      const r = await queries.getAccounts();
+      const end = performance.now();
+      console.log(`${k}: ${end - start}ms`);
+      return r;
+    },
+  },
+  '/api/splits/<guid>': {
+    f: async (k: string) => {
+      const start = performance.now();
+      const accountGuid = k.split('/').at(-1) || '';
+      const r = await queries.getSplits(accountGuid);
       const end = performance.now();
       console.log(`${k}: ${end - start}ms`);
       return r;

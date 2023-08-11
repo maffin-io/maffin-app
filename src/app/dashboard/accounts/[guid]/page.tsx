@@ -28,11 +28,13 @@ export type AccountPageProps = {
 export default function AccountPage({ params }: AccountPageProps): JSX.Element {
   const router = useRouter();
   let { data: accounts } = useApi('/api/accounts') as SWRResponse<AccountsMap>;
+  let { data: splits } = useApi(`/api/splits/${params.guid}`) as SWRResponse<Split[]>;
 
   // We cant use fallback data to set a default as SWR treats
   // fallback data as stale data which means with immutable we will
   // never refresh the data.
   accounts = accounts || {};
+  splits = splits || [];
 
   if (!Object.keys(accounts).length) {
     return (
@@ -52,12 +54,15 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
     );
   }
 
-  const { splits } = account;
-  const total = account.getTotal();
-  const average = new Money(total.toNumber() / (splits.length && (splits[0].transaction.date.diff(
+  const total = new Money(splits.reduce(
+    (acc, split) => acc + split.quantity,
+    0,
+  ), account.commodity.mnemonic);
+  const numMonths = (splits.length && (splits[0].transaction.date.diff(
     splits[splits.length - 1].transaction.date,
     ['months', 'days'],
-  ).months || 1)) || 0, account.commodity.mnemonic);
+  ).months || 1)) || 1;
+  const average = new Money(total.toNumber() / numMonths, account.commodity.mnemonic);
 
   let totalKeyword = 'have';
   if (account.type === 'EXPENSE') {
@@ -78,7 +83,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
     }
 
     let { quantity } = split;
-    if (accounts?.[split.accountId].type === 'INCOME') {
+    if (accounts?.[split.account.guid].type === 'INCOME') {
       quantity = -quantity;
     }
 
@@ -160,7 +165,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
         </div>
       </div>
       <TransactionsTable
-        splits={account.splits}
+        splits={splits}
         accounts={accounts}
       />
     </>

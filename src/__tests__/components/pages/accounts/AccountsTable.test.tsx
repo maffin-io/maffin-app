@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-import AccountsTable from '@/components/AccountsTable';
+import { AccountsTable } from '@/components/pages/accounts';
 import Table from '@/components/Table';
 import { Account } from '@/book/entities';
 import Money from '@/book/Money';
@@ -22,6 +22,7 @@ describe('AccountsTable', () => {
         tree={
           {
             account: {},
+            monthlyTotals: {},
             total: new Money(0, 'EUR'),
             children: [],
           }
@@ -71,12 +72,12 @@ describe('AccountsTable', () => {
         childrenIds: ['a1'],
       } as Account,
       total: new Money(100, 'EUR'),
+      monthlyTotals: {},
       children: [
         {
           account: {
             guid: 'a1',
             name: 'Assets',
-            getTotal: () => new Money(10, 'EUR'),
             commodity: {
               mnemonic: 'EUR',
             },
@@ -84,6 +85,7 @@ describe('AccountsTable', () => {
             childrenIds: [] as string[],
           } as Account,
           total: new Money(70, 'EUR'),
+          monthlyTotals: {},
           children: [],
         },
       ],
@@ -134,6 +136,7 @@ describe('AccountsTable', () => {
         childrenIds: ['a1'],
       } as Account,
       total: new Money(100, 'EUR'),
+      monthlyTotals: {},
       children: [],
     };
 
@@ -168,6 +171,7 @@ describe('AccountsTable', () => {
         childrenIds: ['a1'],
       } as Account,
       total: new Money(100, 'EUR'),
+      monthlyTotals: {},
       children: [],
     };
 
@@ -202,6 +206,7 @@ describe('AccountsTable', () => {
         childrenIds: ['a1'],
       } as Account,
       total: new Money(100, 'EUR'),
+      monthlyTotals: {},
       children: [],
     };
 
@@ -235,6 +240,7 @@ describe('AccountsTable', () => {
         childrenIds: ['a1'],
       } as Account,
       total: new Money(10, 'EUR'),
+      monthlyTotals: {},
       children: [],
     };
 
@@ -247,6 +253,44 @@ describe('AccountsTable', () => {
     expect(
       // @ts-ignore
       totalCol.accessorFn({ total: new Money(10, 'EUR') }),
+    ).toEqual(10);
+
+    expect(totalCol.cell).not.toBeUndefined();
+    const { container } = render(
+      // @ts-ignore
+      totalCol.cell({
+        row: {
+          original: tree,
+        },
+      }),
+    );
+
+    await screen.findByText('€10.00');
+    expect(container).toMatchSnapshot();
+  });
+
+  it('renders Total column as expected when INCOME', async () => {
+    const tree = {
+      account: {
+        guid: 'salary',
+        name: 'Salary',
+        type: 'INCOME',
+        childrenIds: ['a1'],
+      } as Account,
+      total: new Money(-10, 'EUR'),
+      monthlyTotals: {},
+      children: [],
+    };
+
+    render(<AccountsTable tree={tree} />);
+
+    await screen.findByTestId('Table');
+    expect(Table).toBeCalledTimes(1);
+    const totalCol = TableMock.mock.calls[0][0].columns[1];
+
+    expect(
+      // @ts-ignore
+      totalCol.accessorFn({ total: new Money(-10, 'EUR') }),
     ).toEqual(10);
 
     expect(totalCol.cell).not.toBeUndefined();

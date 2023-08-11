@@ -21,7 +21,7 @@ export default function NetWorthPie({
     const liabilitiesAccount = tree.children.find(a => a.account.type === 'LIABILITY');
 
     assetsTotal = assetsAccount?.total.toNumber() || 0;
-    liabilitiesTotal = liabilitiesAccount?.total.toNumber() || 0;
+    liabilitiesTotal = (liabilitiesAccount?.total.toNumber() || 0) * -1;
     unit = assetsAccount?.account.commodity.mnemonic;
     series = [assetsTotal, liabilitiesTotal];
   }

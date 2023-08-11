@@ -115,3 +115,11 @@ exports[`AccountsTable renders Total column as expected 1`] = `
   </span>
 </div>
 `;
+
+exports[`AccountsTable renders Total column as expected when INCOME 1`] = `
+<div>
+  <span>
+    €10.00
+  </span>
+</div>
+`;
