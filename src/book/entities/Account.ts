@@ -3,6 +3,7 @@ import {
   Column,
   Entity, JoinColumn,
   ManyToOne,
+  OneToMany,
   RelationId,
   BeforeInsert,
   Tree,
@@ -11,6 +12,7 @@ import {
 } from 'typeorm';
 
 import type Commodity from './Commodity';
+import type Split from './Split';
 import BaseEntity from './BaseEntity';
 import { isInvestment, getAllowedSubAccounts } from '../helpers/accountType';
 
@@ -98,6 +100,9 @@ export default class Account extends BaseEntity {
   get commodity(): Commodity {
     return this.fk_commodity as Commodity;
   }
+
+  @OneToMany('Split', (split: Split) => split.fk_account)
+    splits!: Split[];
 }
 
 // https://github.com/typeorm/typeorm/issues/4714

@@ -59,7 +59,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       1,
       {
-        className: 'mx-6',
+        className: 'ml-6',
         title: 'Value/Cost',
         stats: '€0.00',
         description: '€0.00 total invested',
@@ -69,7 +69,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       2,
       {
-        className: 'mx-6',
+        className: 'ml-6',
         title: 'Unrealized Profit',
         stats: '€0.00 (NaN%)',
         description: '€0.00 (NaN%) with dividends',
@@ -141,7 +141,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       1,
       {
-        className: 'mx-6',
+        className: 'ml-6',
         title: 'Value/Cost',
         stats: '€5.00',
         description: '€4.00 total invested',
@@ -151,7 +151,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       2,
       {
-        className: 'mx-6',
+        className: 'ml-6',
         title: 'Unrealized Profit',
         stats: '€1.00 (25%)',
         description: '€6.00 (150%) with dividends',
@@ -220,7 +220,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       1,
       {
-        className: 'mx-6',
+        className: 'ml-6',
         title: 'Value/Cost',
         stats: '$5.00',
         description: '$4.00 total invested',
@@ -230,7 +230,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       2,
       {
-        className: 'mx-6',
+        className: 'ml-6',
         title: 'Unrealized Profit',
         stats: '$1.00 (25%)',
         description: '$6.00 (150%) with dividends',

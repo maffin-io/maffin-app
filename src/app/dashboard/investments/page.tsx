@@ -66,7 +66,7 @@ export default function InvestmentsPage(): JSX.Element {
           <div className="grid grid-cols-12">
             <div className="col-span-4">
               <StatisticsWidget
-                className="mx-6"
+                className="ml-6"
                 title="Value/Cost"
                 stats={`${totalValue.format()}`}
                 description={
@@ -77,7 +77,7 @@ export default function InvestmentsPage(): JSX.Element {
 
             <div className="col-span-4">
               <StatisticsWidget
-                className="mx-6"
+                className="ml-6"
                 statsTextClass={classNames({
                   'text-green-500': profitPct >= 0,
                   'text-red-400': profitPct < 0,

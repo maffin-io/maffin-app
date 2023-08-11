@@ -70,7 +70,6 @@ export default function WeightsChart({
           },
           // @ts-ignore
           formatter: (text: string) => `${text}: ${data[text].today}`,
-          offsetY: -4,
         },
         plotOptions: {
           treemap: {

@@ -29,7 +29,6 @@ describe('WeightsChart', () => {
           dataLabels: {
             enabled: true,
             formatter: expect.any(Function),
-            offsetY: -4,
             style: {
               fontSize: '12px',
             },
@@ -124,7 +123,6 @@ describe('WeightsChart', () => {
           dataLabels: {
             enabled: true,
             formatter: expect.any(Function),
-            offsetY: -4,
             style: {
               fontSize: '12px',
             },

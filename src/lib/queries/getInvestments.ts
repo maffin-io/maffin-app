@@ -13,6 +13,8 @@ export default async function getInvestments(): Promise<InvestmentAccount[]> {
         { type: 'MUTUAL' },
       ],
       relations: {
+        // This is very similar to `getSplits` query. In the future
+        // we may want to try to re-use it
         splits: {
           fk_transaction: {
             splits: {
@@ -39,16 +41,12 @@ export default async function getInvestments(): Promise<InvestmentAccount[]> {
   ]);
   const investments = accounts.map(
     account => {
-      try {
-        const investment = new InvestmentAccount(
-          account,
-          mainCurrency,
-          pricesMap,
-        );
-        return investment;
-      } catch (e) {
-        throw new Error(`Failed to create investment from account ${account.guid}: ${e}`);
-      }
+      const investment = new InvestmentAccount(
+        account,
+        mainCurrency,
+        pricesMap,
+      );
+      return investment;
     },
   );
   const end = performance.now();
