@@ -74,8 +74,7 @@ describe('AccountPage', () => {
 
   it('returns 404 when account not found', async () => {
     jest.spyOn(apiHook, 'default')
-      .mockReturnValueOnce({ data: [{ guid: 'other' }] } as SWRResponse)
-      .mockReturnValueOnce({ data: [] } as SWRResponse);
+      .mockReturnValueOnce({ data: [{ guid: 'other' }] } as SWRResponse);
 
     render(<AccountPage params={{ guid: 'guid' }} />);
 

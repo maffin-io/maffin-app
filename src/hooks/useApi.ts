@@ -34,7 +34,6 @@ export type ApiPaths = (
 
   | '/api/accounts'
   | '/api/accounts/monthly-totals'
-  | '/api/accounts/tree'
 
   | `/api/splits/${string}`
   | '/api/investments'
@@ -77,15 +76,6 @@ const API: {
     f: async (k: string) => {
       const start = performance.now();
       const r = await queries.getMonthlyTotals();
-      const end = performance.now();
-      console.log(`${k}: ${end - start}ms`);
-      return r;
-    },
-  },
-  '/api/accounts/tree': {
-    f: async (k: string) => {
-      const start = performance.now();
-      const r = await queries.getAccounts();
       const end = performance.now();
       console.log(`${k}: ${end - start}ms`);
       return r;
