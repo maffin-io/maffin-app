@@ -11,7 +11,7 @@ jest.mock('@/components/charts/Chart', () => jest.fn(
   () => <div data-testid="Chart" />,
 ));
 
-describe('NetWorthHistogram', () => {
+describe('MonthlyTotalHistogram', () => {
   const now = DateTime.fromISO('2023-01-02');
 
   beforeEach(() => {
@@ -23,7 +23,13 @@ describe('NetWorthHistogram', () => {
   });
 
   it('renders with empty tree', () => {
-    render(<MonthlyTotalHistogram title="Title" />);
+    render(
+      <MonthlyTotalHistogram
+        title="Title"
+        tree={undefined}
+        monthlyTotals={{}}
+      />,
+    );
 
     expect(Chart).toBeCalledWith(
       {
@@ -76,9 +82,7 @@ describe('NetWorthHistogram', () => {
               type: 'INCOME',
               commodity: { mnemonic: 'EUR' },
             } as Account,
-            total: new Money(0, 'EUR'),
-            monthlyTotals: {},
-            children: [
+            leaves: [
               {
                 account: {
                   guid: 'Salary',
@@ -86,16 +90,17 @@ describe('NetWorthHistogram', () => {
                   type: 'INCOME',
                   commodity: { mnemonic: 'EUR' },
                 },
-                total: new Money(2000, 'EUR'),
-                monthlyTotals: {
-                  '11/2022': new Money(-1000, 'EUR'),
-                  '12/2022': new Money(-1000, 'EUR'),
-                },
-                children: [],
+                leaves: [],
               },
             ],
           }
         }
+        monthlyTotals={{
+          Salary: {
+            '11/2022': new Money(-1000, 'EUR'),
+            '12/2022': new Money(-1000, 'EUR'),
+          },
+        }}
       />,
     );
 
@@ -121,9 +126,7 @@ describe('NetWorthHistogram', () => {
               type: 'INCOME',
               commodity: { mnemonic: 'EUR' },
             } as Account,
-            total: new Money(0, 'EUR'),
-            monthlyTotals: {},
-            children: [
+            leaves: [
               {
                 account: {
                   guid: 'Salary',
@@ -131,16 +134,17 @@ describe('NetWorthHistogram', () => {
                   type: 'INCOME',
                   commodity: { mnemonic: 'EUR' },
                 },
-                total: new Money(2000, 'EUR'),
-                monthlyTotals: {
-                  '11/2021': new Money(-1000, 'EUR'),
-                  '12/2021': new Money(-1000, 'EUR'),
-                },
-                children: [],
+                leaves: [],
               },
             ],
           }
         }
+        monthlyTotals={{
+          Salary: {
+            '11/2021': new Money(-1000, 'EUR'),
+            '12/2021': new Money(-1000, 'EUR'),
+          },
+        }}
       />,
     );
 
@@ -164,9 +168,7 @@ describe('NetWorthHistogram', () => {
               type: 'INCOME',
               commodity: { mnemonic: 'EUR' },
             } as Account,
-            total: new Money(0, 'EUR'),
-            monthlyTotals: {},
-            children: [
+            leaves: [
               {
                 account: {
                   guid: 'Salary',
@@ -174,12 +176,7 @@ describe('NetWorthHistogram', () => {
                   type: 'INCOME',
                   commodity: { mnemonic: 'EUR' },
                 },
-                total: new Money(2000, 'EUR'),
-                monthlyTotals: {
-                  '11/2022': new Money(-1000, 'EUR'),
-                  '12/2022': new Money(-1000, 'EUR'),
-                },
-                children: [],
+                leaves: [],
               },
               {
                 account: {
@@ -188,16 +185,21 @@ describe('NetWorthHistogram', () => {
                   type: 'INCOME',
                   commodity: { mnemonic: 'EUR' },
                 },
-                total: new Money(200, 'EUR'),
-                monthlyTotals: {
-                  '11/2022': new Money(-150, 'EUR'),
-                  '12/2022': new Money(-50, 'EUR'),
-                },
-                children: [],
+                leaves: [],
               },
             ],
           }
         }
+        monthlyTotals={{
+          Salary: {
+            '11/2022': new Money(-1000, 'EUR'),
+            '12/2022': new Money(-1000, 'EUR'),
+          },
+          Dividends: {
+            '11/2022': new Money(-150, 'EUR'),
+            '12/2022': new Money(-50, 'EUR'),
+          },
+        }}
       />,
     );
 

@@ -19,14 +19,8 @@ describe('AccountsTable', () => {
   it('creates empty Table with expected params', async () => {
     const { container } = render(
       <AccountsTable
-        tree={
-          {
-            account: {},
-            monthlyTotals: {},
-            total: new Money(0, 'EUR'),
-            children: [],
-          }
-        }
+        accounts={{ root: { childrenIds: [] } }}
+        monthlyTotals={{}}
       />,
     );
 
@@ -64,18 +58,16 @@ describe('AccountsTable', () => {
   });
 
   it('creates table with expected params', async () => {
-    const tree = {
-      account: {
-        guid: 'root',
-        name: 'Root',
-        type: 'ROOT',
-        childrenIds: ['a1'],
-      } as Account,
-      total: new Money(100, 'EUR'),
-      monthlyTotals: {},
-      children: [
-        {
-          account: {
+    render(
+      <AccountsTable
+        accounts={{
+          root: {
+            guid: 'root',
+            name: 'Root',
+            type: 'ROOT',
+            childrenIds: ['a1'],
+          } as Account,
+          a1: {
             guid: 'a1',
             name: 'Assets',
             commodity: {
@@ -83,15 +75,13 @@ describe('AccountsTable', () => {
             },
             type: 'ASSET',
             childrenIds: [] as string[],
-          } as Account,
-          total: new Money(70, 'EUR'),
-          monthlyTotals: {},
-          children: [],
-        },
-      ],
-    };
-
-    render(<AccountsTable tree={tree} />);
+          },
+        }}
+        monthlyTotals={{
+          a1: { '01/2023': new Money(100, 'EUR') },
+        }}
+      />,
+    );
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -113,7 +103,21 @@ describe('AccountsTable', () => {
           },
         ],
         // eslint-disable-next-line testing-library/no-node-access
-        data: tree.children,
+        data: [
+          {
+            account: {
+              guid: 'a1',
+              name: 'Assets',
+              type: 'ASSET',
+              commodity: {
+                mnemonic: 'EUR',
+              },
+              childrenIds: [],
+            },
+            leaves: [],
+            total: expect.any(Money),
+          },
+        ],
         initialSort: {
           desc: true,
           id: 'total',
@@ -136,11 +140,15 @@ describe('AccountsTable', () => {
         childrenIds: ['a1'],
       } as Account,
       total: new Money(100, 'EUR'),
-      monthlyTotals: {},
-      children: [],
+      leaves: [],
     };
 
-    render(<AccountsTable tree={tree} />);
+    render(
+      <AccountsTable
+        accounts={{ root: { childrenIds: [] } }}
+        monthlyTotals={{}}
+      />,
+    );
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -175,7 +183,12 @@ describe('AccountsTable', () => {
       children: [],
     };
 
-    render(<AccountsTable tree={tree} />);
+    render(
+      <AccountsTable
+        accounts={{ root: { childrenIds: [] } }}
+        monthlyTotals={{}}
+      />,
+    );
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -210,7 +223,12 @@ describe('AccountsTable', () => {
       children: [],
     };
 
-    render(<AccountsTable tree={tree} />);
+    render(
+      <AccountsTable
+        accounts={{ root: { childrenIds: [] } }}
+        monthlyTotals={{}}
+      />,
+    );
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -240,11 +258,15 @@ describe('AccountsTable', () => {
         childrenIds: ['a1'],
       } as Account,
       total: new Money(10, 'EUR'),
-      monthlyTotals: {},
       children: [],
     };
 
-    render(<AccountsTable tree={tree} />);
+    render(
+      <AccountsTable
+        accounts={{ root: { childrenIds: [] } }}
+        monthlyTotals={{}}
+      />,
+    );
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -253,44 +275,6 @@ describe('AccountsTable', () => {
     expect(
       // @ts-ignore
       totalCol.accessorFn({ total: new Money(10, 'EUR') }),
-    ).toEqual(10);
-
-    expect(totalCol.cell).not.toBeUndefined();
-    const { container } = render(
-      // @ts-ignore
-      totalCol.cell({
-        row: {
-          original: tree,
-        },
-      }),
-    );
-
-    await screen.findByText('€10.00');
-    expect(container).toMatchSnapshot();
-  });
-
-  it('renders Total column as expected when INCOME', async () => {
-    const tree = {
-      account: {
-        guid: 'salary',
-        name: 'Salary',
-        type: 'INCOME',
-        childrenIds: ['a1'],
-      } as Account,
-      total: new Money(-10, 'EUR'),
-      monthlyTotals: {},
-      children: [],
-    };
-
-    render(<AccountsTable tree={tree} />);
-
-    await screen.findByTestId('Table');
-    expect(Table).toBeCalledTimes(1);
-    const totalCol = TableMock.mock.calls[0][0].columns[1];
-
-    expect(
-      // @ts-ignore
-      totalCol.accessorFn({ total: new Money(-10, 'EUR') }),
     ).toEqual(10);
 
     expect(totalCol.cell).not.toBeUndefined();

@@ -3,6 +3,7 @@ import type { Currency as DineroCurrency } from 'dinero.js';
 import * as djs from 'dinero.js';
 
 import { toAmountWithScale, moneyToString } from '@/helpers/number';
+import { currencyToSymbol } from './helpers';
 
 export default class Money {
   private _raw: djs.Dinero<number>;
@@ -61,10 +62,17 @@ export default class Money {
    * The result is a localized string with the currency as a symbol
    */
   format(scale = 2): string {
-    return djs.toDecimal(
-      djs.transformScale(this._raw, scale),
-      ({ value, currency }) => moneyToString(Number(value), currency.code),
-    );
+    try {
+      return djs.toDecimal(
+        djs.transformScale(this._raw, scale),
+        ({ value, currency }) => moneyToString(Number(value), currency.code),
+      );
+    } catch {
+      return djs.toDecimal(
+        djs.transformScale(this._raw, scale),
+        ({ value, currency }) => `${value} ${currencyToSymbol(currency.code)}`,
+      );
+    }
   }
 
   toNumber(): number {

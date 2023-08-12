@@ -14,16 +14,16 @@ import type { Account, Commodity } from '@/book/entities';
 import SplitField from '@/components/forms/transaction/SplitField';
 import type { FormValues } from '@/components/forms/transaction/types';
 import * as queries from '@/lib/queries';
-import * as apiHook from '@/hooks/useApi';
+import * as apiHook from '@/hooks/api';
 
 jest.mock('@/lib/queries', () => ({
   __esModule: true,
   ...jest.requireActual('@/lib/queries'),
 }));
 
-jest.mock('@/hooks/useApi', () => ({
+jest.mock('@/hooks/api', () => ({
   __esModule: true,
-  ...jest.requireActual('@/hooks/useApi'),
+  ...jest.requireActual('@/hooks/api'),
 }));
 
 describe('SplitField', () => {
@@ -36,7 +36,7 @@ describe('SplitField', () => {
     } as Commodity;
 
     jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
-    jest.spyOn(apiHook, 'default')
+    jest.spyOn(apiHook, 'useAccounts')
       .mockReturnValue({ data: undefined } as SWRResponse);
   });
 
@@ -66,7 +66,7 @@ describe('SplitField', () => {
 
   it('shows value field when txCurrency is different', async () => {
     const user = userEvent.setup();
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [
           {
@@ -92,7 +92,7 @@ describe('SplitField', () => {
 
   it('sets currency to account selection', async () => {
     const user = userEvent.setup();
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [
           {
@@ -135,7 +135,7 @@ describe('SplitField', () => {
 
   it('sets value * exchangeRate when quantity changes and currency is not txCurrency', async () => {
     const user = userEvent.setup();
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [
           {
@@ -174,7 +174,7 @@ describe('SplitField', () => {
 
   it('sets value * exchangeRate when quantity changes and currency is not txCurrency, investment', async () => {
     const user = userEvent.setup();
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [
           {

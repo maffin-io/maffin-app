@@ -5,20 +5,20 @@ import type { SWRResponse } from 'swr';
 import Selector from '@/components/selectors/Selector';
 import { Commodity } from '@/book/entities';
 import { CommoditySelector } from '@/components/selectors';
-import * as apiHook from '@/hooks/useApi';
+import * as apiHook from '@/hooks/api';
 
 jest.mock('@/components/selectors/Selector', () => jest.fn(
   () => <div data-testid="Selector" />,
 ));
 
-jest.mock('@/hooks/useApi', () => ({
+jest.mock('@/hooks/api', () => ({
   __esModule: true,
-  ...jest.requireActual('@/hooks/useApi'),
+  ...jest.requireActual('@/hooks/api'),
 }));
 
 describe('CommoditySelector', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'default').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useCommodities').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
   afterEach(() => {
@@ -46,7 +46,7 @@ describe('CommoditySelector', () => {
   });
 
   it('renders as expected with no available commodities', async () => {
-    jest.spyOn(apiHook, 'default').mockReturnValue({ data: [] } as SWRResponse);
+    jest.spyOn(apiHook, 'useCommodities').mockReturnValue({ data: [] } as SWRResponse);
     render(<CommoditySelector />);
 
     await screen.findByTestId('Selector');
@@ -110,7 +110,7 @@ describe('CommoditySelector', () => {
         namespace: 'AS',
       } as Commodity,
     ];
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useCommodities').mockReturnValue(
       {
         data: options,
       } as SWRResponse,
@@ -142,7 +142,7 @@ describe('CommoditySelector', () => {
         namespace: 'AS',
       } as Commodity,
     ];
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useCommodities').mockReturnValue(
       {
         data: options,
       } as SWRResponse,

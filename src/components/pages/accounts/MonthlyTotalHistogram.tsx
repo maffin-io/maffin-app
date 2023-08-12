@@ -3,17 +3,20 @@ import { DateTime, Interval } from 'luxon';
 
 import Chart from '@/components/charts/Chart';
 import type { AccountsTree } from '@/types/book';
+import { MonthlyTotals } from '@/lib/queries';
 
 export type MonthlyTotalHistogramProps = {
   title: string,
   selectedDate?: DateTime,
   tree?: AccountsTree,
+  monthlyTotals: MonthlyTotals,
 };
 
 export default function MonthlyTotalHistogram({
   title,
   selectedDate = DateTime.now().minus({ months: 4 }),
   tree,
+  monthlyTotals,
 }: MonthlyTotalHistogramProps): JSX.Element {
   const now = DateTime.now();
 
@@ -33,13 +36,13 @@ export default function MonthlyTotalHistogram({
   }[] = [];
 
   if (tree) {
-    tree.children.forEach(leaf => {
+    tree.leaves.forEach(leaf => {
       series.push({
         name: leaf.account.name,
         data: dates.map(date => ({
           y: tree.account.type === 'INCOME'
-            ? (leaf.monthlyTotals[date.toFormat('MM/yyyy')]?.toNumber() || 0) * -1
-            : leaf.monthlyTotals[date.toFormat('MM/yyyy')]?.toNumber() || 0,
+            ? (monthlyTotals[leaf.account.guid]?.[date.toFormat('MM/yyyy')]?.toNumber() || 0) * -1
+            : monthlyTotals[leaf.account.guid]?.[date.toFormat('MM/yyyy')]?.toNumber() || 0,
           x: date.startOf('month').plus({ days: 1 }).toMillis(),
         })),
       });

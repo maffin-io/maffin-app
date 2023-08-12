@@ -7,20 +7,19 @@ import {
 } from '@testing-library/react';
 import type { SWRResponse } from 'swr';
 
-import Money from '@/book/Money';
 import AccountPage from '@/app/dashboard/accounts/[guid]/page';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import { Account, Split } from '@/book/entities';
-import * as apiHook from '@/hooks/useApi';
+import * as apiHook from '@/hooks/api';
 import {
   SplitsHistogram,
   TotalLineChart,
   TransactionsTable,
 } from '@/components/pages/account';
 
-jest.mock('@/hooks/useApi', () => ({
+jest.mock('@/hooks/api', () => ({
   __esModule: true,
-  ...jest.requireActual('@/hooks/useApi'),
+  ...jest.requireActual('@/hooks/api'),
 }));
 
 jest.mock('@/components/buttons/TransactionFormButton', () => jest.fn(
@@ -53,7 +52,8 @@ describe('AccountPage', () => {
     useRouter.mockImplementation(() => ({
       push: mockRouterPush,
     }));
-    jest.spyOn(apiHook, 'default').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
   afterEach(() => {
@@ -66,14 +66,11 @@ describe('AccountPage', () => {
     await screen.findByText('Loading...');
     expect(TransactionFormButton).toHaveBeenCalledTimes(0);
     expect(TransactionsTable).toHaveBeenCalledTimes(0);
-    expect(apiHook.default).toBeCalledTimes(2);
-    expect(apiHook.default).toHaveBeenNthCalledWith(1, '/api/accounts');
-    expect(apiHook.default).toHaveBeenNthCalledWith(2, '/api/splits/guid');
     expect(container).toMatchSnapshot();
   });
 
   it('returns 404 when account not found', async () => {
-    jest.spyOn(apiHook, 'default')
+    jest.spyOn(apiHook, 'useAccounts')
       .mockReturnValueOnce({ data: [{ guid: 'other' }] } as SWRResponse);
 
     render(<AccountPage params={{ guid: 'guid' }} />);
@@ -112,9 +109,8 @@ describe('AccountPage', () => {
       } as Split,
     ];
 
-    jest.spyOn(apiHook, 'default')
-      .mockReturnValueOnce({ data: accounts } as SWRResponse)
-      .mockReturnValueOnce({ data: splits } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValueOnce({ data: accounts } as SWRResponse);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValueOnce({ data: splits } as SWRResponse);
 
     const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
 

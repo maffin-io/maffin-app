@@ -4,7 +4,5 @@ export type AccountsMap = { [guid: string]: Account };
 
 export type AccountsTree = {
   account: Account,
-  total: Money, // Total including the children totals
-  monthlyTotals: { [key: string]: Money }, // key in format MM/yyyy
-  children: AccountsTree[],
+  leaves: AccountsTree[],
 };

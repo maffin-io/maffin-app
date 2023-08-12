@@ -31,7 +31,7 @@ export default function Chart({
   series = [],
   type = 'line',
   height = 400,
-  unit = 'EUR',
+  unit = '',
 }: ChartProps): JSX.Element {
   if (!series?.length) {
     return (

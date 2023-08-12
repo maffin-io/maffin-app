@@ -1,10 +1,8 @@
 import React from 'react';
-import type { SWRResponse } from 'swr';
 
 import Selector from '@/components/selectors/Selector';
-import { useApi } from '@/hooks';
+import { useAccounts } from '@/hooks/api';
 import { Account } from '@/book/entities';
-import type { AccountsMap } from '@/types/book';
 
 export type AccountSelectorProps = {
   placeholder?: string,
@@ -31,7 +29,7 @@ export default function AccountSelector(
     onChange = () => {},
   }: AccountSelectorProps,
 ): JSX.Element {
-  let { data: accounts } = useApi('/api/accounts') as SWRResponse<AccountsMap>;
+  let { data: accounts } = useAccounts();
 
   accounts = accounts || {};
   let options = Object.values(accounts);

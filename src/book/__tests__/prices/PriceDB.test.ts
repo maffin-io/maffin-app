@@ -1,16 +1,16 @@
 import { DateTime } from 'luxon';
 import { DataSource } from 'typeorm';
 
-import { PriceDB } from '../../prices';
+import { PriceDB } from '@/book/prices';
 import {
   Account,
   Transaction,
   Commodity,
   Price,
   Split,
-} from '../../entities';
-import Stocker from '../../../apis/Stocker';
-import { toFixed } from '../../../helpers/number';
+} from '@/book/entities';
+import Stocker from '@/apis/Stocker';
+import { toFixed } from '@/helpers/number';
 
 describe('PriceDB', () => {
   let datasource: DataSource;

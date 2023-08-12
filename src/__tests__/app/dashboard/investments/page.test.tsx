@@ -12,11 +12,11 @@ import {
 } from '@/components/pages/investments';
 import Money from '@/book/Money';
 import { InvestmentAccount } from '@/book/models';
-import * as apiHook from '@/hooks/useApi';
+import * as apiHook from '@/hooks/api';
 
-jest.mock('@/hooks/useApi', () => ({
+jest.mock('@/hooks/api', () => ({
   __esModule: true,
-  ...jest.requireActual('@/hooks/useApi'),
+  ...jest.requireActual('@/hooks/api'),
 }));
 
 jest.mock('@/components/pages/investments/WeightsChart', () => jest.fn(
@@ -38,7 +38,8 @@ jest.mock('@/components/pages/investments/InvestmentsTable', () => jest.fn(
 
 describe('InvestmentsPage', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'default').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
   afterEach(() => {
@@ -100,9 +101,6 @@ describe('InvestmentsPage', () => {
       },
       {},
     );
-    expect(apiHook.default).toBeCalledTimes(2);
-    expect(apiHook.default).toHaveBeenNthCalledWith(1, '/api/investments');
-    expect(apiHook.default).toHaveBeenNthCalledWith(2, '/api/main-currency');
     expect(container).toMatchSnapshot();
   });
 
@@ -122,9 +120,8 @@ describe('InvestmentsPage', () => {
       realizedDividendsInCurrency: new Money(5, 'EUR'),
     } as InvestmentAccount;
 
-    jest.spyOn(apiHook, 'default')
-      .mockReturnValueOnce({ data: [investment1] } as SWRResponse)
-      .mockReturnValueOnce({ data: mainCurrency } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValueOnce({ data: [investment1] } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValueOnce({ data: mainCurrency } as SWRResponse);
 
     const { container } = render(<InvestmentsPage />);
 
@@ -201,9 +198,8 @@ describe('InvestmentsPage', () => {
       realizedDividendsInCurrency: new Money(5, 'USD'),
     } as InvestmentAccount;
 
-    jest.spyOn(apiHook, 'default')
-      .mockReturnValueOnce({ data: [investment1] } as SWRResponse)
-      .mockReturnValueOnce({ data: mainCurrency } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValueOnce({ data: [investment1] } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValueOnce({ data: mainCurrency } as SWRResponse);
 
     const { container } = render(<InvestmentsPage />);
 
@@ -280,9 +276,8 @@ describe('InvestmentsPage', () => {
       realizedDividendsInCurrency: new Money(5, 'EUR'),
     } as InvestmentAccount;
 
-    jest.spyOn(apiHook, 'default')
-      .mockReturnValueOnce({ data: [investment1] } as SWRResponse)
-      .mockReturnValueOnce({ data: mainCurrency } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValueOnce({ data: [investment1] } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValueOnce({ data: mainCurrency } as SWRResponse);
 
     render(<InvestmentsPage />);
 

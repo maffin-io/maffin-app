@@ -24,6 +24,15 @@ jest.mock('@/lib/queries/getMainCurrency', () => ({
   }) as Commodity,
 }));
 
+jest.mock('@/book/prices', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/book/prices'),
+  PriceDB: {
+    getTodayQuotes: jest.fn(),
+    getHistory: jest.fn(),
+  },
+}));
+
 describe('getInvestments', () => {
   let datasource: DataSource;
   let mockGetHistory: jest.SpyInstance;

@@ -4,7 +4,6 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
-import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
 import {
@@ -15,9 +14,8 @@ import {
 import StatisticsWidget from '@/components/StatisticsWidget';
 import { Split } from '@/book/entities';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
-import { useApi } from '@/hooks';
+import { useAccounts, useSplits } from '@/hooks/api';
 import type { Account } from '@/book/entities';
-import type { AccountsMap } from '@/types/book';
 
 export type AccountPageProps = {
   params: {
@@ -27,8 +25,8 @@ export type AccountPageProps = {
 
 export default function AccountPage({ params }: AccountPageProps): JSX.Element {
   const router = useRouter();
-  let { data: accounts } = useApi('/api/accounts') as SWRResponse<AccountsMap>;
-  let { data: splits } = useApi(`/api/splits/${params.guid}`) as SWRResponse<Split[]>;
+  let { data: accounts } = useAccounts();
+  let { data: splits } = useSplits(params.guid);
 
   // We cant use fallback data to set a default as SWR treats
   // fallback data as stale data which means with immutable we will

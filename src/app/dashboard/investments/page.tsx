@@ -2,9 +2,7 @@
 
 import React from 'react';
 import classNames from 'classnames';
-import type { SWRResponse } from 'swr';
 
-import type { InvestmentAccount } from '@/book/models';
 import {
   WeightsChart,
   DividendChart,
@@ -13,11 +11,11 @@ import {
 import StatisticsWidget from '@/components/StatisticsWidget';
 import { toFixed } from '@/helpers/number';
 import Money from '@/book/Money';
-import { useApi } from '@/hooks';
+import { useInvestments, useMainCurrency } from '@/hooks/api';
 
 export default function InvestmentsPage(): JSX.Element {
-  let { data: investments } = useApi('/api/investments') as SWRResponse<InvestmentAccount[]>;
-  const { data: currency } = useApi('/api/main-currency');
+  let { data: investments } = useInvestments();
+  const { data: currency } = useMainCurrency();
   const mainCurrency = currency?.mnemonic || 'EUR';
 
   investments = investments || [];
