@@ -9,7 +9,10 @@ export default async function getAccounts(): Promise<AccountsMap> {
     if (account.type === 'ROOT' && !account.name.startsWith('Template')) {
       accountsMap.root = account;
     }
-    accountsMap[account.guid] = account;
+
+    if (account.type !== 'ROOT') {
+      accountsMap[account.guid] = account;
+    }
   });
 
   return accountsMap;
