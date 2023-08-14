@@ -2,6 +2,7 @@ import React from 'react';
 import { DataSource } from 'typeorm';
 import initSqlJs from 'sql.js';
 import { mutate } from 'swr';
+import pako from 'pako';
 
 import useBookStorage from '@/hooks/useBookStorage';
 import type BookStorage from '@/apis/BookStorage';
@@ -94,10 +95,16 @@ async function save(storage: BookStorage | null) {
 }
 
 async function importBook(storage: BookStorage | null, rawData: Uint8Array) {
+  let parsedData;
+  try {
+    parsedData = pako.ungzip(rawData);
+  } catch (err) {
+    parsedData = rawData;
+  }
   const tempDataSource = new DataSource({
     type: 'sqljs',
     synchronize: true,
-    database: rawData,
+    database: parsedData,
     logging: false,
     entities: [Account, Book, Commodity, Price, Split, Transaction],
   });

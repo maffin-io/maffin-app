@@ -73,7 +73,7 @@ export default class BookStorage {
     );
     const binaryContent = await response.arrayBuffer();
 
-    const data = pako.inflate(binaryContent) || new Uint8Array();
+    const data = pako.ungzip(binaryContent) || new Uint8Array();
     const end = performance.now();
     console.log(`get book: ${end - start}ms`);
     return data;
@@ -99,7 +99,7 @@ export default class BookStorage {
           Authorization: `Bearer ${this.gapiClient.getToken().access_token}`,
           'Content-Type': 'application/vnd.sqlite3',
         }),
-        body: new Blob([pako.deflate(rawBook)], { type: 'application/vnd.sqlite3' }),
+        body: new Blob([pako.gzip(rawBook)], { type: 'application/vnd.sqlite3' }),
       },
     );
     const end = performance.now();
