@@ -10,7 +10,7 @@ describe('GoogleDrive', () => {
   let mockFetch: jest.SpyInstance;
 
   beforeEach(() => {
-    rawBook = pako.deflate('rawBook');
+    rawBook = pako.gzip('rawBook');
     mockDriveClient = {
       files: {
         // @ts-ignore
@@ -253,7 +253,7 @@ describe('GoogleDrive', () => {
           method: 'GET',
         },
       );
-      expect(content).toEqual(pako.inflate(rawBook));
+      expect(content).toEqual(pako.ungzip(rawBook));
     });
   });
 
