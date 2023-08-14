@@ -53,17 +53,19 @@ function getTreeTotals(
     childId => getTreeTotals(accounts[childId], accounts, monthlyTotals, selectedDate),
   );
 
+  const accountTotal = Object.entries(monthlyTotals[current.guid] || {}).reduce(
+    (total, [monthYear, amount]) => {
+      if (DateTime.fromFormat(monthYear, 'MM/yyyy') <= selectedDate) {
+        return total.add(amount);
+      }
+      return total;
+    },
+    new Money(0, current.commodity?.mnemonic || ''),
+  );
+
   return {
     account: current,
-    total: Object.entries(monthlyTotals[current.guid] || {}).reduce(
-      (total, [monthYear, amount]) => {
-        if (DateTime.fromFormat(monthYear, 'MM/yyyy') <= selectedDate) {
-          return total.add(amount);
-        }
-        return total;
-      },
-      new Money(0, current.commodity?.mnemonic || ''),
-    ),
+    total: ['INCOME', 'LIABILITY'].includes(current.type) ? accountTotal.multiply(-1) : accountTotal,
     leaves,
   };
 }
@@ -113,7 +115,7 @@ const columns: ColumnDef<AccountsTableRow>[] = [
     ),
   },
   {
-    accessorFn: (row: AccountsTableRow) => Math.abs(row.total.toNumber()),
+    accessorFn: (row: AccountsTableRow) => row.total.toNumber(),
     id: 'total',
     header: '',
     cell: ({ row }) => (
