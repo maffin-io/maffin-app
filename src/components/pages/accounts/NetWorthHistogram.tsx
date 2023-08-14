@@ -28,7 +28,7 @@ export default function NetWorthHistogram({
     selectedDate.plus({ months: 3 }),
   );
   const interval = Interval.fromDateTimes(
-    startDate || now,
+    startDate?.minus({ month: 1 }) || now,
     now,
   );
   const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).plus({ month: 1 }));
