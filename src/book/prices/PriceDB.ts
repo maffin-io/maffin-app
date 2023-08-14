@@ -7,83 +7,78 @@ import { Price, Commodity } from '../entities';
 import PriceDBMap from './PriceDBMap';
 import Money from '../Money';
 
-export default class PriceDB {
-  /**
-   * Returns Money containg the rate to convert from to to.
-   * If date not passed it returns the latest price. If passed,
-   * it finds any rate between -1 +1 day
-   *
-   * If no rate is found it throws an error.
-   */
-  static async getRate(from: string, to: string, when?: DateTime): Promise<Money> {
-    if (from === to) {
-      return new Money(1, to);
-    }
-
-    let query = Price
-      .createQueryBuilder('prices')
-      .leftJoinAndSelect('prices.fk_commodity', 'commodity')
-      .leftJoinAndSelect('prices.fk_currency', 'currency')
-      .where('commodity.mnemonic = :from', { from })
-      .andWhere('currency.mnemonic = :to', { to });
-
-    if (when) {
-      query = query
-        .andWhere('date(prices.date) >= :dateStart', { dateStart: when.minus({ days: 1 }).toISODate() })
-        .andWhere('date(prices.date) <= :dateEnd', { dateEnd: when.plus({ days: 1 }).toISODate() });
-    }
-
-    const rate = await query
-      .orderBy({ date: 'DESC' })
-      .getOneOrFail();
-
-    return new Money(rate.value, to);
+/**
+ * Returns Money containg the rate to convert from to to.
+ * If date not passed it returns the latest price. If passed,
+ * it finds any rate between -1 +1 day
+ *
+ * If no rate is found it throws an error.
+ */
+export async function getRate(from: string, to: string, when?: DateTime): Promise<Money> {
+  if (from === to) {
+    return new Money(1, to);
   }
 
-  /**
-   * Retrieves todays quotes from stocker and returns them plus storing them
-   * in Price.
-   *
-   * The quotes retrieved are:
-   *   - All permutations of currency combinations existing in commodities table
-   *   - All prices for stock/mutual accounts (with type) in the currency
-   */
-  static async getTodayQuotes(): Promise<PriceDBMap> {
-    const start = performance.now();
-    const [currencyQuotes, investmentQuotes] = await Promise.all([
-      getCurrencyQuotes(),
-      getInvestmentQuotes(),
-    ]);
-    const end = performance.now();
-    console.log(`get today quotes: ${end - start}ms`);
+  let query = Price
+    .createQueryBuilder('prices')
+    .leftJoinAndSelect('prices.fk_commodity', 'commodity')
+    .leftJoinAndSelect('prices.fk_currency', 'currency')
+    .where('commodity.mnemonic = :from', { from })
+    .andWhere('currency.mnemonic = :to', { to });
 
-    return new PriceDBMap([
-      ...currencyQuotes,
-      ...investmentQuotes,
-    ]);
+  if (when) {
+    query = query
+      .andWhere('date(prices.date) >= :dateStart', { dateStart: when.minus({ days: 1 }).toISODate() })
+      .andWhere('date(prices.date) <= :dateEnd', { dateEnd: when.plus({ days: 1 }).toISODate() });
   }
 
-  /**
-   * Scans Price data to return all the historical data for a given commodity
-   * specified as 'from'.
-   *
-   * @param to - the commodity to convert to
-   * @returns - object where key is from.to.date and value is the Price object
-   */
-  static async getHistory(to: string): Promise<PriceDBMap> {
-    const start = performance.now();
-    const prices = await Price
-      .createQueryBuilder('prices')
-      .leftJoinAndSelect('prices.fk_commodity', 'commodity')
-      .leftJoinAndSelect('prices.fk_currency', 'currency')
-      .where('currency.mnemonic = :to', { to })
-      .getMany();
+  const rate = await query
+    .orderBy({ date: 'DESC' })
+    .getOneOrFail();
 
-    const end = performance.now();
-    console.log(`get currency exchange history: ${end - start}ms`);
+  return new Money(rate.value, to);
+}
 
-    return new PriceDBMap(prices);
-  }
+/**
+ * Retrieves todays quotes from stocker and returns them plus storing them
+ * in Price.
+ *
+ * The quotes retrieved are:
+ *   - All permutations of currency combinations existing in commodities table
+ *   - All prices for stock/mutual accounts (with type) in the currency
+ */
+export async function getTodayQuotes(): Promise<PriceDBMap> {
+  const [currencyQuotes, investmentQuotes] = await Promise.all([
+    getCurrencyQuotes(),
+    getInvestmentQuotes(),
+  ]);
+
+  return new PriceDBMap([
+    ...currencyQuotes,
+    ...investmentQuotes,
+  ]);
+}
+
+/**
+ * Scans Price data to return all the historical data for a given commodity
+ * specified as 'from'.
+ *
+ * @param to - the commodity to convert to
+ * @returns - object where key is from.to.date and value is the Price object
+ */
+export async function getHistory(to: string): Promise<PriceDBMap> {
+  const start = performance.now();
+  const prices = await Price
+    .createQueryBuilder('prices')
+    .leftJoinAndSelect('prices.fk_commodity', 'commodity')
+    .leftJoinAndSelect('prices.fk_currency', 'currency')
+    .where('currency.mnemonic = :to', { to })
+    .getMany();
+
+  const end = performance.now();
+  console.log(`get currency exchange history: ${end - start}ms`);
+
+  return new PriceDBMap(prices);
 }
 
 async function getCurrencyQuotes(): Promise<Price[]> {

@@ -1,16 +1,15 @@
 import React from 'react';
-import type { SWRResponse } from 'swr';
 import { BiCalendar, BiUpArrowAlt, BiDownArrowAlt } from 'react-icons/bi';
 import Link from 'next/link';
 import classNames from 'classnames';
 
-import { useApi } from '@/hooks';
+import { useLatestTxs } from '@/hooks/api';
 import { isAsset } from '@/book/helpers/accountType';
 import type { Split, Transaction } from '@/book/entities';
 import { moneyToString } from '@/helpers/number';
 
 export default function LatestTransactions(): JSX.Element {
-  let { data: txs } = useApi('/api/txs/latest') as SWRResponse<Transaction[]>;
+  let { data: txs } = useLatestTxs();
   txs = txs || [];
   const title = txs.length ? 'Latest movements' : 'You have no movements yet...';
 

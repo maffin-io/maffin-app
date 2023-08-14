@@ -1,8 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 
-import useGapiClient from '@/hooks/useGapiClient';
-import useApi from '@/hooks/useApi';
+import { useUser as useApiUser } from '@/hooks/api';
 import type { User } from '@/types/user';
 
 const emptyUser: User = {
@@ -14,8 +13,7 @@ const emptyUser: User = {
 
 export default function useUser(): { user: User } {
   const router = useRouter();
-  const [isGapiLoaded] = useGapiClient();
-  const { data: user } = useApi(isGapiLoaded ? '/api/user' : null);
+  const { data: user } = useApiUser();
 
   React.useEffect(() => {
     if (user && !user.isLoggedIn) {
@@ -23,7 +21,7 @@ export default function useUser(): { user: User } {
       router.push('/user/login');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isGapiLoaded, user]);
+  }, [user]);
 
   if (!user) {
     return { user: emptyUser };

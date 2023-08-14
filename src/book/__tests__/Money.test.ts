@@ -30,6 +30,11 @@ describe('Money', () => {
       money = new Money(100, 'USD', 3);
       expect(money.format()).toEqual('$0.10');
     });
+
+    it('fallbacks when invalid currency', () => {
+      money = new Money(100, 'GOOGL');
+      expect(money.format()).toEqual('100.00 GOOGL');
+    });
   });
 
   describe('toNumber', () => {

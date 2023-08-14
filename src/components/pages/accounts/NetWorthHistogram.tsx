@@ -4,17 +4,20 @@ import { DateTime, Interval } from 'luxon';
 import Chart from '@/components/charts/Chart';
 import type { AccountsTree } from '@/types/book';
 import { moneyToString } from '@/helpers/number';
+import { MonthlyTotals } from '@/lib/queries';
 
 export type NetWorthHistogramProps = {
   startDate?: DateTime,
   selectedDate?: DateTime,
   tree: AccountsTree,
+  monthlyTotals: MonthlyTotals
 };
 
 export default function NetWorthHistogram({
   startDate,
   selectedDate = DateTime.now().minus({ months: 3 }),
   tree,
+  monthlyTotals,
 }: NetWorthHistogramProps): JSX.Element {
   const now = DateTime.now();
   if (now.diff(selectedDate, ['months']).months < 3) {
@@ -63,24 +66,28 @@ export default function NetWorthHistogram({
   ];
 
   let incomeAccount: AccountsTree | undefined;
-  if ((tree?.children || []).length) {
-    incomeAccount = tree.children.find(a => a.account.type === 'INCOME');
-    const expensesAccount = tree.children.find(a => a.account.type === 'EXPENSE');
+  if ((tree?.leaves || []).length) {
+    incomeAccount = tree.leaves.find(a => a.account.type === 'INCOME');
+    const expensesAccount = tree.leaves.find(a => a.account.type === 'EXPENSE');
     dates.forEach(date => {
-      const monthYear = (date as DateTime).toFormat('MMM/yy');
-      const incomeAmount = (incomeAccount?.monthlyTotals[monthYear]?.toNumber() || 0);
+      const monthYear = (date as DateTime).toFormat('MM/yyyy');
+      const incomeAmount = (
+        monthlyTotals[incomeAccount?.account.guid]?.[monthYear]?.toNumber() || 0
+      );
       series[0].data.push({
-        y: incomeAmount,
+        y: -incomeAmount,
         x: date,
       });
 
-      const expenseAmount = (expensesAccount?.monthlyTotals[monthYear]?.toNumber() || 0);
+      const expenseAmount = (
+        monthlyTotals[expensesAccount?.account.guid]?.[monthYear]?.toNumber() || 0
+      );
       series[1].data.push({
         y: -expenseAmount,
         x: date,
       });
 
-      const netProfit = incomeAmount - expenseAmount;
+      const netProfit = -incomeAmount - expenseAmount;
       series[2].data.push({
         y: netProfit,
         x: date,
@@ -100,6 +107,7 @@ export default function NetWorthHistogram({
         type="line"
         series={series}
         height={350}
+        unit={incomeAccount?.account.commodity.mnemonic}
         options={{
           chart: {
             id: 'netWorthHistogram',

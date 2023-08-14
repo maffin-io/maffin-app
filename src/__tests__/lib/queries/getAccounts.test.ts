@@ -1,99 +1,66 @@
-import { Account } from '@/book/entities';
+import { DataSource } from 'typeorm';
+
+import {
+  Account,
+  Commodity,
+  Price,
+  Split,
+  Transaction,
+} from '@/book/entities';
 import { getAccounts } from '@/lib/queries';
 
 describe('getAccounts', () => {
-  beforeEach(() => {
-    jest.spyOn(Account, 'find').mockResolvedValue([]);
+  let datasource: DataSource;
+
+  beforeEach(async () => {
+    datasource = new DataSource({
+      type: 'sqljs',
+      dropSchema: true,
+      entities: [Account, Commodity, Price, Split, Transaction],
+      synchronize: true,
+      logging: false,
+    });
+    await datasource.initialize();
+
+    const eur = await Commodity.create({
+      namespace: 'CURRENCY',
+      mnemonic: 'EUR',
+    }).save();
+
+    const root = await Account.create({
+      guid: 'a',
+      type: 'ROOT',
+      name: 'Root',
+    }).save();
+
+    await Account.create({
+      guid: 'assets',
+      name: 'Assets',
+      type: 'ASSET',
+      fk_commodity: eur,
+      parent: root,
+    }).save();
+
+    await Account.create({
+      guid: 'expenses',
+      name: 'Expenses',
+      type: 'EXPENSE',
+      fk_commodity: eur,
+      parent: root,
+    }).save();
   });
 
-  it('calls find with expected params', async () => {
-    await getAccounts();
-
-    expect(Account.find).toBeCalledWith(
-      {
-        relations: {
-          splits: {
-            fk_transaction: true,
-          },
-        },
-        order: {
-          splits: {
-            fk_transaction: {
-              date: 'DESC',
-            },
-            quantityNum: 'ASC',
-          },
-        },
-      },
-    );
+  afterEach(async () => {
+    jest.resetAllMocks();
+    await datasource.destroy();
   });
 
-  it('returns accounts as is', async () => {
-    const expectedAccounts = [
-      {
-        guid: '1',
-        name: '1',
-      } as Account,
-      {
-        guid: '2',
-        name: '2',
-      } as Account,
-    ];
-    jest.spyOn(Account, 'find').mockResolvedValue(expectedAccounts);
+  it('returns accounts as expected', async () => {
     const accounts = await getAccounts();
 
-    expect(accounts).toEqual({
-      1: expectedAccounts[0],
-      2: expectedAccounts[1],
-    });
-  });
-
-  it('stores root account in proper key', async () => {
-    const expectedAccounts = [
-      {
-        guid: '1',
-        type: 'ROOT',
-        name: 'Root',
-      } as Account,
-      {
-        guid: '2',
-        name: '2',
-      } as Account,
-    ];
-    jest.spyOn(Account, 'find').mockResolvedValue(expectedAccounts);
-    const accounts = await getAccounts();
-
-    expect(accounts).toEqual({
-      root: expectedAccounts[0],
-      1: expectedAccounts[0],
-      2: expectedAccounts[1],
-    });
-  });
-
-  /**
-   * Seems template root is a default account that gnucash creates
-   * so we dont want to set that one as root
-   */
-  it('ignores template root account', async () => {
-    const expectedAccounts = [
-      {
-        guid: '1',
-        type: 'ROOT',
-        name: 'Root',
-      } as Account,
-      {
-        guid: '2',
-        type: 'ROOT',
-        name: 'Template root',
-      } as Account,
-    ];
-    jest.spyOn(Account, 'find').mockResolvedValue(expectedAccounts);
-    const accounts = await getAccounts();
-
-    expect(accounts).toEqual({
-      root: expectedAccounts[0],
-      1: expectedAccounts[0],
-      2: expectedAccounts[1],
-    });
+    expect(accounts.root.guid).toEqual('a');
+    expect(accounts.a.guid).toEqual('a');
+    expect(accounts.assets.guid).toEqual('assets');
+    expect(accounts.expenses.guid).toEqual('expenses');
   });
 });

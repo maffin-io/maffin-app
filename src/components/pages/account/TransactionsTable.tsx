@@ -26,7 +26,7 @@ export default function TransactionsTable({
   accounts,
 }: TransactionsTableProps): JSX.Element {
   columns[2].cell = FromToAccountPartial(accounts);
-  columns[3].cell = AmountPartial(accounts[splits[0].accountId]);
+  columns[3].cell = AmountPartial(accounts[splits[0]?.account.guid]);
   columns[4].cell = TotalPartial(accounts);
 
   return (
@@ -111,16 +111,13 @@ function FromToAccountPartial(
   accounts: AccountsMap,
 ) {
   return function FromToAccount({ row }: CellContext<Split, unknown>): JSX.Element {
-    const allSplits = Object.values(accounts).map(account => account.splits).flat();
-    const splits = allSplits.filter(
-      split => split.transaction.guid === row.original.transaction.guid,
-    );
-    const otherSplits = splits.filter(split => split.accountId !== row.original.accountId);
+    const { splits } = row.original.transaction;
+    const otherSplits = splits.filter(split => split.account.guid !== row.original.account.guid);
 
     return (
       <ul>
         { otherSplits.map(split => {
-          const account = accounts[split.accountId];
+          const account = accounts[split.account.guid];
 
           return (
             <li key={split.guid}>
@@ -145,12 +142,12 @@ function FromToAccountPartial(
 }
 
 function AmountPartial(
-  account: Account,
+  account?: Account,
 ) {
   return function Amount({ row }: CellContext<Split, unknown>): JSX.Element {
-    let value = new Money(row.original.quantity, account.commodity.mnemonic);
+    let value = new Money(row.original.quantity, account?.commodity.mnemonic || '');
 
-    if (account.type === 'INCOME') {
+    if (account?.type === 'INCOME') {
       value = value.multiply(-1);
     }
     return (
@@ -181,7 +178,7 @@ function TotalPartial(
     const nextRows = rows.slice(currentRow, rows.length + 1);
     const totalPreviousSplits = nextRows.reverse().reduce(
       (total: Money, otherRow: Row<Split>) => {
-        const otherAccount = accounts[otherRow.original.accountId];
+        const otherAccount = accounts[otherRow.original.account.guid];
         if (otherAccount.type === 'INCOME') {
           return total.add(
             new Money(-otherRow.original.quantity, otherAccount.commodity.mnemonic),
@@ -191,7 +188,7 @@ function TotalPartial(
           new Money(otherRow.original.quantity, otherAccount.commodity.mnemonic),
         );
       },
-      new Money(0, accounts[row.original.accountId].commodity.mnemonic),
+      new Money(0, accounts[row.original.account.guid].commodity.mnemonic),
     );
 
     return (

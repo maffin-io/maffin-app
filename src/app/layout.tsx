@@ -1,6 +1,9 @@
 import React from 'react';
+import { Settings } from 'luxon';
 
 import '@/css/globals.css';
+
+Settings.throwOnInvalid = true;
 
 export const metadata = {
   title: 'maffin.io',

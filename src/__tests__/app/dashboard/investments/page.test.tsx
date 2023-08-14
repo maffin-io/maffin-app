@@ -12,11 +12,11 @@ import {
 } from '@/components/pages/investments';
 import Money from '@/book/Money';
 import { InvestmentAccount } from '@/book/models';
-import * as apiHook from '@/hooks/useApi';
+import * as apiHook from '@/hooks/api';
 
-jest.mock('@/hooks/useApi', () => ({
+jest.mock('@/hooks/api', () => ({
   __esModule: true,
-  ...jest.requireActual('@/hooks/useApi'),
+  ...jest.requireActual('@/hooks/api'),
 }));
 
 jest.mock('@/components/pages/investments/WeightsChart', () => jest.fn(
@@ -38,7 +38,8 @@ jest.mock('@/components/pages/investments/InvestmentsTable', () => jest.fn(
 
 describe('InvestmentsPage', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'default').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
   afterEach(() => {
@@ -59,7 +60,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       1,
       {
-        className: 'mx-6',
+        className: 'ml-6',
         title: 'Value/Cost',
         stats: '€0.00',
         description: '€0.00 total invested',
@@ -69,7 +70,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       2,
       {
-        className: 'mx-6',
+        className: 'ml-6',
         title: 'Unrealized Profit',
         stats: '€0.00 (NaN%)',
         description: '€0.00 (NaN%) with dividends',
@@ -100,9 +101,6 @@ describe('InvestmentsPage', () => {
       },
       {},
     );
-    expect(apiHook.default).toBeCalledTimes(2);
-    expect(apiHook.default).toHaveBeenNthCalledWith(1, '/api/investments');
-    expect(apiHook.default).toHaveBeenNthCalledWith(2, '/api/main-currency');
     expect(container).toMatchSnapshot();
   });
 
@@ -122,9 +120,8 @@ describe('InvestmentsPage', () => {
       realizedDividendsInCurrency: new Money(5, 'EUR'),
     } as InvestmentAccount;
 
-    jest.spyOn(apiHook, 'default')
-      .mockReturnValueOnce({ data: [investment1] } as SWRResponse)
-      .mockReturnValueOnce({ data: mainCurrency } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValueOnce({ data: [investment1] } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValueOnce({ data: mainCurrency } as SWRResponse);
 
     const { container } = render(<InvestmentsPage />);
 
@@ -141,7 +138,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       1,
       {
-        className: 'mx-6',
+        className: 'ml-6',
         title: 'Value/Cost',
         stats: '€5.00',
         description: '€4.00 total invested',
@@ -151,7 +148,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       2,
       {
-        className: 'mx-6',
+        className: 'ml-6',
         title: 'Unrealized Profit',
         stats: '€1.00 (25%)',
         description: '€6.00 (150%) with dividends',
@@ -201,9 +198,8 @@ describe('InvestmentsPage', () => {
       realizedDividendsInCurrency: new Money(5, 'USD'),
     } as InvestmentAccount;
 
-    jest.spyOn(apiHook, 'default')
-      .mockReturnValueOnce({ data: [investment1] } as SWRResponse)
-      .mockReturnValueOnce({ data: mainCurrency } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValueOnce({ data: [investment1] } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValueOnce({ data: mainCurrency } as SWRResponse);
 
     const { container } = render(<InvestmentsPage />);
 
@@ -220,7 +216,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       1,
       {
-        className: 'mx-6',
+        className: 'ml-6',
         title: 'Value/Cost',
         stats: '$5.00',
         description: '$4.00 total invested',
@@ -230,7 +226,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       2,
       {
-        className: 'mx-6',
+        className: 'ml-6',
         title: 'Unrealized Profit',
         stats: '$1.00 (25%)',
         description: '$6.00 (150%) with dividends',
@@ -280,9 +276,8 @@ describe('InvestmentsPage', () => {
       realizedDividendsInCurrency: new Money(5, 'EUR'),
     } as InvestmentAccount;
 
-    jest.spyOn(apiHook, 'default')
-      .mockReturnValueOnce({ data: [investment1] } as SWRResponse)
-      .mockReturnValueOnce({ data: mainCurrency } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValueOnce({ data: [investment1] } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValueOnce({ data: mainCurrency } as SWRResponse);
 
     render(<InvestmentsPage />);
 

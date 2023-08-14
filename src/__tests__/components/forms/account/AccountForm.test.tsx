@@ -17,13 +17,13 @@ import {
   Transaction,
 } from '@/book/entities';
 import AccountForm from '@/components/forms/account/AccountForm';
-import * as apiHook from '@/hooks/useApi';
+import * as apiHook from '@/hooks/api';
 
 jest.mock('swr');
 
-jest.mock('@/hooks/useApi', () => ({
+jest.mock('@/hooks/api', () => ({
   __esModule: true,
-  ...jest.requireActual('@/hooks/useApi'),
+  ...jest.requireActual('@/hooks/api'),
 }));
 
 describe('AccountForm', () => {
@@ -71,17 +71,8 @@ describe('AccountForm', () => {
     assetAccount.path = 'Assets';
     expenseAccount.path = 'Expenses';
 
-    jest.spyOn(apiHook, 'default')
-      .mockImplementation((key: apiHook.ApiPaths | null) => {
-        if (key === '/api/commodities') {
-          return { data: [eur] } as SWRResponse;
-        }
-        if (key === '/api/accounts') {
-          return { data: [root, assetAccount, expenseAccount] } as SWRResponse;
-        }
-
-        return { data: undefined } as SWRResponse;
-      });
+    jest.spyOn(apiHook, 'useCommodities').mockReturnValue({ data: [eur] } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: [root, assetAccount, expenseAccount] } as SWRResponse);
   });
 
   afterEach(async () => {
@@ -143,7 +134,7 @@ describe('AccountForm', () => {
     stockAccount.path = 'Assets:Stock';
     mutualAccount.path = 'Assets:Mutual';
 
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       { data: [root, assetAccount, expenseAccount, stockAccount, mutualAccount] } as SWRResponse,
     );
 
@@ -225,7 +216,7 @@ describe('AccountForm', () => {
     }).save();
     bankAccount.path = 'Assets:Bank';
 
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       { data: [root, assetAccount, expenseAccount, incomeAccount, bankAccount] } as SWRResponse,
     );
 

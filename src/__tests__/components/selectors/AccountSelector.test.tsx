@@ -5,20 +5,20 @@ import type { SWRResponse } from 'swr';
 import Selector from '@/components/selectors/Selector';
 import { Account, Commodity } from '@/book/entities';
 import { AccountSelector } from '@/components/selectors';
-import * as apiHook from '@/hooks/useApi';
+import * as apiHook from '@/hooks/api';
 
 jest.mock('@/components/selectors/Selector', () => jest.fn(
   () => <div data-testid="Selector" />,
 ));
 
-jest.mock('@/hooks/useApi', () => ({
+jest.mock('@/hooks/api', () => ({
   __esModule: true,
-  ...jest.requireActual('@/hooks/useApi'),
+  ...jest.requireActual('@/hooks/api'),
 }));
 
 describe('AccountSelector', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'default').mockReturnValue({ data: {} } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: {} } as SWRResponse);
   });
 
   afterEach(() => {
@@ -47,7 +47,7 @@ describe('AccountSelector', () => {
   });
 
   it('passes data as expected', async () => {
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: {
           guid: {
@@ -106,7 +106,7 @@ describe('AccountSelector', () => {
         } as Commodity,
       } as Account,
     ];
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: {
           guid1: options[0],
@@ -145,7 +145,7 @@ describe('AccountSelector', () => {
         } as Commodity,
       } as Account,
     ];
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: {
           guid1: options[0],
@@ -188,7 +188,7 @@ describe('AccountSelector', () => {
         } as Commodity,
       } as Account,
     ];
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: {
           guid1: options[0],
@@ -227,7 +227,7 @@ describe('AccountSelector', () => {
         } as Commodity,
       } as Account,
     ];
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: {
           guid1: options[0],

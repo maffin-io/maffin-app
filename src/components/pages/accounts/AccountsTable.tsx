@@ -1,35 +1,74 @@
 import React from 'react';
+import { DateTime } from 'luxon';
 import { ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
 import { BiCircle, BiSolidRightArrow, BiSolidDownArrow } from 'react-icons/bi';
 import classNames from 'classnames';
 
+import Money from '@/book/Money';
 import Table from '@/components/Table';
-import type { AccountsTree } from '@/types/book';
+import type { AccountsMap } from '@/types/book';
+import { MonthlyTotals } from '@/lib/queries';
+import { Account } from '@/book/entities';
 
 export type AccountsTableProps = {
-  tree: AccountsTree,
+  selectedDate?: DateTime,
+  accounts: AccountsMap,
+  monthlyTotals: MonthlyTotals,
+};
+
+type AccountsTableRow = {
+  account: Account,
+  total: Money,
+  leaves: AccountsTableRow[],
 };
 
 export default function AccountsTable(
   {
-    tree,
+    selectedDate = DateTime.now(),
+    accounts,
+    monthlyTotals,
   }: AccountsTableProps,
 ): JSX.Element {
   return (
-    <Table<AccountsTree>
+    <Table<AccountsTableRow>
       columns={columns}
-      data={tree.children}
+      data={getTreeTotals(accounts.root, accounts, monthlyTotals, selectedDate).leaves}
       initialSort={{ id: 'total', desc: true }}
       showHeader={false}
       showPagination={false}
       tdClassName="p-2"
-      getSubRows={row => row.children}
+      getSubRows={row => row.leaves}
     />
   );
 }
 
-const columns: ColumnDef<AccountsTree>[] = [
+function getTreeTotals(
+  current: Account,
+  accounts: AccountsMap,
+  monthlyTotals: MonthlyTotals,
+  selectedDate: DateTime,
+): AccountsTableRow {
+  const leaves = current.childrenIds.map(
+    childId => getTreeTotals(accounts[childId], accounts, monthlyTotals, selectedDate),
+  );
+
+  return {
+    account: current,
+    total: Object.entries(monthlyTotals[current.guid] || {}).reduce(
+      (total, [monthYear, amount]) => {
+        if (DateTime.fromFormat(monthYear, 'MM/yyyy') <= selectedDate) {
+          return total.add(amount);
+        }
+        return total;
+      },
+      new Money(0, current.commodity?.mnemonic || ''),
+    ),
+    leaves,
+  };
+}
+
+const columns: ColumnDef<AccountsTableRow>[] = [
   {
     accessorKey: 'name',
     id: 'name',
@@ -74,7 +113,7 @@ const columns: ColumnDef<AccountsTree>[] = [
     ),
   },
   {
-    accessorFn: (row: AccountsTree) => row.total.toNumber(),
+    accessorFn: (row: AccountsTableRow) => Math.abs(row.total.toNumber()),
     id: 'total',
     header: '',
     cell: ({ row }) => (

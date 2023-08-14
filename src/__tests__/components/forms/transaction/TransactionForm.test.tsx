@@ -20,7 +20,7 @@ import {
 } from '@/book/entities';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import * as queries from '@/lib/queries';
-import * as apiHook from '@/hooks/useApi';
+import * as apiHook from '@/hooks/api';
 
 jest.mock('swr');
 
@@ -29,9 +29,9 @@ jest.mock('@/lib/queries', () => ({
   ...jest.requireActual('@/lib/queries'),
 }));
 
-jest.mock('@/hooks/useApi', () => ({
+jest.mock('@/hooks/api', () => ({
   __esModule: true,
-  ...jest.requireActual('@/hooks/useApi'),
+  ...jest.requireActual('@/hooks/api'),
 }));
 
 describe('TransactionForm', () => {
@@ -64,7 +64,7 @@ describe('TransactionForm', () => {
     }).save();
 
     jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
-    jest.spyOn(apiHook, 'default').mockReturnValue({ data: [] } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: [] } as SWRResponse);
 
     const root = await Account.create({
       guid: 'root_account_guid',
@@ -132,7 +132,7 @@ describe('TransactionForm', () => {
 
   it('creates transaction, mutates and saves with expected params when both same currency', async () => {
     const user = userEvent.setup();
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [assetAccount, expenseAccount],
       } as SWRResponse,
@@ -235,7 +235,7 @@ describe('TransactionForm', () => {
       .mockResolvedValue({ price: 0.7, currency: '' });
     assetAccount.fk_commodity = sgd;
     await assetAccount.save();
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [assetAccount, expenseAccount],
       } as SWRResponse,
@@ -338,7 +338,7 @@ describe('TransactionForm', () => {
 
   it('refreshes investments key when account is investment', async () => {
     const user = userEvent.setup();
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [assetAccount, expenseAccount],
       } as SWRResponse,
@@ -401,7 +401,7 @@ describe('TransactionForm', () => {
 
   it('updates transaction', async () => {
     const user = userEvent.setup();
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [assetAccount, expenseAccount],
       } as SWRResponse,
@@ -482,7 +482,7 @@ describe('TransactionForm', () => {
 
   it('deletes transaction and splits', async () => {
     const user = userEvent.setup();
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [assetAccount, expenseAccount],
       } as SWRResponse,

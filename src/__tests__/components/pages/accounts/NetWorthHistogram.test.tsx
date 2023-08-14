@@ -6,7 +6,6 @@ import Money from '@/book/Money';
 import { Account } from '@/book/entities';
 import Chart from '@/components/charts/Chart';
 import { NetWorthHistogram } from '@/components/pages/accounts';
-import type { AccountsTree } from '@/types/book';
 
 jest.mock('@/components/charts/Chart', () => jest.fn(
   () => <div data-testid="Chart" />,
@@ -19,10 +18,19 @@ describe('NetWorthHistogram', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
   it('renders with empty tree', () => {
-    render(<NetWorthHistogram tree={{} as AccountsTree} />);
+    render(
+      <NetWorthHistogram
+        tree={{
+          account: { childrenIds: [] },
+          leaves: [],
+        }}
+        monthlyTotals={{}}
+      />,
+    );
 
     expect(Chart).toBeCalledTimes(2);
     expect(Chart).toHaveBeenNthCalledWith(
@@ -178,29 +186,27 @@ describe('NetWorthHistogram', () => {
     render(
       <NetWorthHistogram
         startDate={DateTime.fromISO('2022-09-01')}
+        monthlyTotals={{
+          income: {
+            '11/2022': new Money(-600, 'EUR'),
+            '12/2022': new Money(-400, 'EUR'),
+          },
+          expenses: {
+            '11/2022': new Money(400, 'EUR'),
+            '12/2022': new Money(500, 'EUR'),
+          },
+        }}
         tree={
           {
             account: { guid: 'root' } as Account,
-            total: new Money(0, 'EUR'),
-            monthlyTotals: {},
-            children: [
+            leaves: [
               {
                 account: { guid: 'income', type: 'INCOME', commodity: { mnemonic: 'EUR' } },
-                total: new Money(1000, 'EUR'),
-                monthlyTotals: {
-                  'Nov/22': new Money(600, 'EUR'),
-                  'Dec/22': new Money(400, 'EUR'),
-                },
-                children: [],
+                leaves: [],
               },
               {
                 account: { guid: 'expenses', type: 'EXPENSE' },
-                total: new Money(500, 'EUR'),
-                monthlyTotals: {
-                  'Nov/22': new Money(400, 'EUR'),
-                  'Dec/22': new Money(500, 'EUR'),
-                },
-                children: [],
+                leaves: [],
               },
             ],
           }
@@ -216,7 +222,7 @@ describe('NetWorthHistogram', () => {
         data: [
           {
             x: DateTime.fromISO('2022-10-01'),
-            y: 0,
+            y: -0,
           },
           {
             x: DateTime.fromISO('2022-11-01'),
@@ -228,7 +234,7 @@ describe('NetWorthHistogram', () => {
           },
           {
             x: DateTime.fromISO('2023-01-01'),
-            y: 0,
+            y: -0,
           },
         ],
       },
@@ -260,7 +266,7 @@ describe('NetWorthHistogram', () => {
         data: [
           {
             x: DateTime.fromISO('2022-10-01'),
-            y: 0,
+            y: -0,
           },
           {
             x: DateTime.fromISO('2022-11-01'),
@@ -272,7 +278,7 @@ describe('NetWorthHistogram', () => {
           },
           {
             x: DateTime.fromISO('2023-01-01'),
-            y: 0,
+            y: -0,
           },
         ],
       },
@@ -329,7 +335,16 @@ describe('NetWorthHistogram', () => {
 
   it('selects brush X range with selected date', () => {
     const selectedDate = DateTime.fromISO('2022-01-01');
-    render(<NetWorthHistogram selectedDate={selectedDate} tree={{} as AccountsTree} />);
+    render(
+      <NetWorthHistogram
+        selectedDate={selectedDate}
+        tree={{
+          account: { childrenIds: [] },
+          leaves: [],
+        }}
+        monthlyTotals={{}}
+      />,
+    );
 
     expect((Chart as jest.Mock).mock.calls[1][0].options.chart.selection.xaxis).toEqual({
       min: selectedDate.minus({ months: 3 }).toMillis(),

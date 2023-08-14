@@ -1,11 +1,10 @@
 import React from 'react';
 import { render } from '@testing-library/react';
+import { DateTime } from 'luxon';
 
-import { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import Chart, { ChartProps } from '@/components/charts/Chart';
 import NetWorthPie from '@/components/pages/accounts/NetWorthPie';
-import type { AccountsTree } from '@/types/book';
 
 jest.mock('@/components/charts/Chart', () => jest.fn(
   () => <div data-testid="Chart" />,
@@ -17,11 +16,11 @@ describe('NetWorthPie', () => {
   });
 
   it('creates Chart with no data when no accounts', () => {
-    render(<NetWorthPie tree={{} as AccountsTree} />);
+    render(<NetWorthPie />);
 
     expect(Chart).toBeCalledWith(
       {
-        series: [],
+        series: [0, -0],
         type: 'donut',
         unit: '',
         height: 300,
@@ -77,27 +76,15 @@ describe('NetWorthPie', () => {
   it('computes net worth as expected', () => {
     render(
       <NetWorthPie
-        tree={
-          {
-            account: { guid: 'root' } as Account,
-            total: new Money(0, 'EUR'),
-            monthlyTotals: {},
-            children: [
-              {
-                account: { guid: 'assets', type: 'ASSET', commodity: { mnemonic: 'EUR' } },
-                total: new Money(1000, 'EUR'),
-                monthlyTotals: {},
-                children: [],
-              },
-              {
-                account: { guid: 'liabilities', type: 'LIABILITY' },
-                total: new Money(100, 'EUR'),
-                monthlyTotals: {},
-                children: [],
-              },
-            ],
-          }
-        }
+        assetsSeries={{
+          '01/2023': new Money(500, 'EUR'),
+          '02/2023': new Money(500, 'EUR'),
+        }}
+        liabilitiesSeries={{
+          '01/2023': new Money(-50, 'EUR'),
+          '02/2023': new Money(-50, 'EUR'),
+        }}
+        unit="EUR"
       />,
     );
 
@@ -132,35 +119,45 @@ describe('NetWorthPie', () => {
   it('computes net worth when no liabilities', () => {
     render(
       <NetWorthPie
-        tree={
-          {
-            account: { guid: 'root' } as Account,
-            total: new Money(0, 'EUR'),
-            monthlyTotals: {},
-            children: [
-              {
-                account: { guid: 'assets', type: 'ASSET', commodity: { mnemonic: 'EUR' } },
-                total: new Money(1000, 'EUR'),
-                monthlyTotals: {},
-                children: [],
-              },
-            ],
-          }
-        }
+        assetsSeries={{
+          '01/2023': new Money(500, 'EUR'),
+          '02/2023': new Money(500, 'EUR'),
+        }}
+        unit="EUR"
       />,
     );
 
     const props = (Chart as jest.Mock).mock.calls[0][0] as ChartProps;
-    expect(props.series).toEqual([1000, 0]);
+    expect(props.series).toEqual([1000, -0]);
     expect(props.unit).toEqual('EUR');
     expect(
       props.options?.plotOptions?.pie?.donut?.labels?.total?.formatter?.(
         {
           globals: {
-            series: [1000, 0],
+            series: [1000, -0],
           },
         },
       ),
     ).toEqual('€1,000.00');
+  });
+
+  it('filters by selected date', () => {
+    render(
+      <NetWorthPie
+        selectedDate={DateTime.fromISO('2023-01-01')}
+        assetsSeries={{
+          '01/2023': new Money(500, 'EUR'),
+          '02/2023': new Money(500, 'EUR'),
+        }}
+        liabilitiesSeries={{
+          '01/2023': new Money(-50, 'EUR'),
+          '02/2023': new Money(-50, 'EUR'),
+        }}
+        unit="EUR"
+      />,
+    );
+
+    const props = (Chart as jest.Mock).mock.calls[0][0] as ChartProps;
+    expect(props.series).toEqual([500, 50]);
   });
 });

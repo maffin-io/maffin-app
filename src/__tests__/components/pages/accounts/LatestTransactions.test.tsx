@@ -4,16 +4,16 @@ import { DateTime } from 'luxon';
 import type { SWRResponse } from 'swr';
 
 import { LatestTransactions } from '@/components/pages/accounts';
-import * as apiHook from '@/hooks/useApi';
+import * as apiHook from '@/hooks/api';
 
-jest.mock('@/hooks/useApi', () => ({
+jest.mock('@/hooks/api', () => ({
   __esModule: true,
-  ...jest.requireActual('@/hooks/useApi'),
+  ...jest.requireActual('@/hooks/api'),
 }));
 
 describe('LatestTransactions', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'default').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useLatestTxs').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
   it('renders with empty txs', () => {
@@ -24,7 +24,7 @@ describe('LatestTransactions', () => {
   });
 
   it('renders as expected with txs', () => {
-    jest.spyOn(apiHook, 'default').mockReturnValue({
+    jest.spyOn(apiHook, 'useLatestTxs').mockReturnValue({
       data: [
         {
           description: 'tx 1',

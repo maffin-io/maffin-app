@@ -2,16 +2,25 @@ import { DateTime } from 'luxon';
 import { DataSource } from 'typeorm';
 
 import { toFixed } from '@/helpers/number';
-import { InvestmentAccount } from '../../models';
+import { InvestmentAccount } from '@/book/models';
 import {
   Account,
   Commodity,
   Transaction,
   Split,
   Price,
-} from '../../entities';
-import { PriceDB, PriceDBMap } from '../../prices';
-import Money from '../../Money';
+} from '@/book/entities';
+import { PriceDB, PriceDBMap } from '@/book/prices';
+import Money from '@/book/Money';
+
+jest.mock('@/book/prices', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/book/prices'),
+  PriceDB: {
+    getTodayQuotes: jest.fn(),
+    getHistory: jest.fn(),
+  },
+}));
 
 describe('InvestmentAccount', () => {
   let datasource: DataSource;

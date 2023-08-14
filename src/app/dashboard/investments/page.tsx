@@ -2,9 +2,7 @@
 
 import React from 'react';
 import classNames from 'classnames';
-import type { SWRResponse } from 'swr';
 
-import type { InvestmentAccount } from '@/book/models';
 import {
   WeightsChart,
   DividendChart,
@@ -13,11 +11,11 @@ import {
 import StatisticsWidget from '@/components/StatisticsWidget';
 import { toFixed } from '@/helpers/number';
 import Money from '@/book/Money';
-import { useApi } from '@/hooks';
+import { useInvestments, useMainCurrency } from '@/hooks/api';
 
 export default function InvestmentsPage(): JSX.Element {
-  let { data: investments } = useApi('/api/investments') as SWRResponse<InvestmentAccount[]>;
-  const { data: currency } = useApi('/api/main-currency');
+  let { data: investments } = useInvestments();
+  const { data: currency } = useMainCurrency();
   const mainCurrency = currency?.mnemonic || 'EUR';
 
   investments = investments || [];
@@ -66,7 +64,7 @@ export default function InvestmentsPage(): JSX.Element {
           <div className="grid grid-cols-12">
             <div className="col-span-4">
               <StatisticsWidget
-                className="mx-6"
+                className="ml-6"
                 title="Value/Cost"
                 stats={`${totalValue.format()}`}
                 description={
@@ -77,7 +75,7 @@ export default function InvestmentsPage(): JSX.Element {
 
             <div className="col-span-4">
               <StatisticsWidget
-                className="mx-6"
+                className="ml-6"
                 statsTextClass={classNames({
                   'text-green-500': profitPct >= 0,
                   'text-red-400': profitPct < 0,

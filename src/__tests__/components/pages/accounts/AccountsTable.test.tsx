@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-import AccountsTable from '@/components/AccountsTable';
+import { AccountsTable } from '@/components/pages/accounts';
 import Table from '@/components/Table';
 import { Account } from '@/book/entities';
 import Money from '@/book/Money';
@@ -19,13 +19,8 @@ describe('AccountsTable', () => {
   it('creates empty Table with expected params', async () => {
     const { container } = render(
       <AccountsTable
-        tree={
-          {
-            account: {},
-            total: new Money(0, 'EUR'),
-            children: [],
-          }
-        }
+        accounts={{ root: { childrenIds: [] } }}
+        monthlyTotals={{}}
       />,
     );
 
@@ -63,33 +58,30 @@ describe('AccountsTable', () => {
   });
 
   it('creates table with expected params', async () => {
-    const tree = {
-      account: {
-        guid: 'root',
-        name: 'Root',
-        type: 'ROOT',
-        childrenIds: ['a1'],
-      } as Account,
-      total: new Money(100, 'EUR'),
-      children: [
-        {
-          account: {
+    render(
+      <AccountsTable
+        accounts={{
+          root: {
+            guid: 'root',
+            name: 'Root',
+            type: 'ROOT',
+            childrenIds: ['a1'],
+          } as Account,
+          a1: {
             guid: 'a1',
             name: 'Assets',
-            getTotal: () => new Money(10, 'EUR'),
             commodity: {
               mnemonic: 'EUR',
             },
             type: 'ASSET',
             childrenIds: [] as string[],
-          } as Account,
-          total: new Money(70, 'EUR'),
-          children: [],
-        },
-      ],
-    };
-
-    render(<AccountsTable tree={tree} />);
+          },
+        }}
+        monthlyTotals={{
+          a1: { '01/2023': new Money(100, 'EUR') },
+        }}
+      />,
+    );
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -111,7 +103,21 @@ describe('AccountsTable', () => {
           },
         ],
         // eslint-disable-next-line testing-library/no-node-access
-        data: tree.children,
+        data: [
+          {
+            account: {
+              guid: 'a1',
+              name: 'Assets',
+              type: 'ASSET',
+              commodity: {
+                mnemonic: 'EUR',
+              },
+              childrenIds: [],
+            },
+            leaves: [],
+            total: expect.any(Money),
+          },
+        ],
         initialSort: {
           desc: true,
           id: 'total',
@@ -134,10 +140,15 @@ describe('AccountsTable', () => {
         childrenIds: ['a1'],
       } as Account,
       total: new Money(100, 'EUR'),
-      children: [],
+      leaves: [],
     };
 
-    render(<AccountsTable tree={tree} />);
+    render(
+      <AccountsTable
+        accounts={{ root: { childrenIds: [] } }}
+        monthlyTotals={{}}
+      />,
+    );
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -168,10 +179,16 @@ describe('AccountsTable', () => {
         childrenIds: ['a1'],
       } as Account,
       total: new Money(100, 'EUR'),
+      monthlyTotals: {},
       children: [],
     };
 
-    render(<AccountsTable tree={tree} />);
+    render(
+      <AccountsTable
+        accounts={{ root: { childrenIds: [] } }}
+        monthlyTotals={{}}
+      />,
+    );
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -202,10 +219,16 @@ describe('AccountsTable', () => {
         childrenIds: ['a1'],
       } as Account,
       total: new Money(100, 'EUR'),
+      monthlyTotals: {},
       children: [],
     };
 
-    render(<AccountsTable tree={tree} />);
+    render(
+      <AccountsTable
+        accounts={{ root: { childrenIds: [] } }}
+        monthlyTotals={{}}
+      />,
+    );
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -238,7 +261,12 @@ describe('AccountsTable', () => {
       children: [],
     };
 
-    render(<AccountsTable tree={tree} />);
+    render(
+      <AccountsTable
+        accounts={{ root: { childrenIds: [] } }}
+        monthlyTotals={{}}
+      />,
+    );
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);

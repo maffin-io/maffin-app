@@ -13,3 +13,4 @@ Object.defineProperty(global.self, 'crypto', {
 });
 
 Settings.defaultZone = 'utc';
+Settings.throwOnInvalid = true;

@@ -2,17 +2,11 @@ import { renderHook } from '@testing-library/react';
 import type { SWRResponse } from 'swr';
 
 import useUser from '@/hooks/useUser';
-import * as gapiHooks from '@/hooks/useGapiClient';
-import * as apiHook from '@/hooks/useApi';
+import * as apiHook from '@/hooks/api';
 
-jest.mock('@/hooks/useApi', () => ({
+jest.mock('@/hooks/api', () => ({
   __esModule: true,
-  ...jest.requireActual('@/hooks/useApi'),
-}));
-
-jest.mock('@/hooks/useGapiClient', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/useGapiClient'),
+  ...jest.requireActual('@/hooks/api'),
 }));
 
 jest.mock('next/navigation', () => ({
@@ -25,14 +19,12 @@ describe('useUser', () => {
   let mockRouterPush: jest.Mock;
 
   beforeEach(() => {
-    jest.spyOn(gapiHooks, 'default').mockReturnValue([false]);
-
     mockRouterPush = jest.fn();
     useRouter.mockImplementation(() => ({
       push: mockRouterPush,
     }));
 
-    jest.spyOn(apiHook, 'default').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useUser').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
   afterEach(() => {
@@ -40,23 +32,9 @@ describe('useUser', () => {
     jest.resetAllMocks();
   });
 
-  it('returns empty user if gapi not loaded and doesnt redirect', async () => {
-    const { result } = renderHook(() => useUser());
-
-    expect(mockRouterPush).not.toHaveBeenCalled();
-    expect(result.current.user).toEqual({
-      name: '',
-      email: '',
-      image: '',
-      isLoggedIn: false,
-    });
-    expect(apiHook.default).toBeCalledWith(null);
-  });
-
   it('redirects and resets storage if user and not logged in', async () => {
     const mockStorageSetItem = jest.spyOn(Storage.prototype, 'setItem');
-    jest.spyOn(gapiHooks, 'default').mockReturnValue([true]);
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useUser').mockReturnValue(
       {
         data: {
           name: '',
@@ -76,13 +54,11 @@ describe('useUser', () => {
       image: '',
       isLoggedIn: false,
     });
-    expect(apiHook.default).toBeCalledWith('/api/user');
   });
 
   it('returns user when logged in and doesnt redirect', async () => {
     const mockStorageSetItem = jest.spyOn(Storage.prototype, 'setItem');
-    jest.spyOn(gapiHooks, 'default').mockReturnValue([true]);
-    jest.spyOn(apiHook, 'default').mockReturnValue(
+    jest.spyOn(apiHook, 'useUser').mockReturnValue(
       {
         data: {
           name: 'name',

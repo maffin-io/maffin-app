@@ -4,7 +4,6 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
-import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
 import {
@@ -15,9 +14,8 @@ import {
 import StatisticsWidget from '@/components/StatisticsWidget';
 import { Split } from '@/book/entities';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
-import { useApi } from '@/hooks';
+import { useAccounts, useSplits } from '@/hooks/api';
 import type { Account } from '@/book/entities';
-import type { AccountsMap } from '@/types/book';
 
 export type AccountPageProps = {
   params: {
@@ -27,12 +25,14 @@ export type AccountPageProps = {
 
 export default function AccountPage({ params }: AccountPageProps): JSX.Element {
   const router = useRouter();
-  let { data: accounts } = useApi('/api/accounts') as SWRResponse<AccountsMap>;
+  let { data: accounts } = useAccounts();
+  let { data: splits } = useSplits(params.guid);
 
   // We cant use fallback data to set a default as SWR treats
   // fallback data as stale data which means with immutable we will
   // never refresh the data.
   accounts = accounts || {};
+  splits = splits || [];
 
   if (!Object.keys(accounts).length) {
     return (
@@ -52,12 +52,15 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
     );
   }
 
-  const { splits } = account;
-  const total = account.getTotal();
-  const average = new Money(total.toNumber() / (splits.length && (splits[0].transaction.date.diff(
+  const total = new Money(splits.reduce(
+    (acc, split) => acc + split.quantity,
+    0,
+  ), account.commodity.mnemonic);
+  const numMonths = (splits.length && (splits[0].transaction.date.diff(
     splits[splits.length - 1].transaction.date,
     ['months', 'days'],
-  ).months || 1)) || 0, account.commodity.mnemonic);
+  ).months || 1)) || 1;
+  const average = new Money(total.toNumber() / numMonths, account.commodity.mnemonic);
 
   let totalKeyword = 'have';
   if (account.type === 'EXPENSE') {
@@ -78,7 +81,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
     }
 
     let { quantity } = split;
-    if (accounts?.[split.accountId].type === 'INCOME') {
+    if (accounts?.[split.account.guid].type === 'INCOME') {
       quantity = -quantity;
     }
 
@@ -160,7 +163,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
         </div>
       </div>
       <TransactionsTable
-        splits={account.splits}
+        splits={splits}
         accounts={accounts}
       />
     </>

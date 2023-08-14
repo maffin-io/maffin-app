@@ -1,30 +1,46 @@
 import React from 'react';
+import { DateTime } from 'luxon';
 
+import Money from '@/book/Money';
 import Chart from '@/components/charts/Chart';
-import type { AccountsTree } from '@/types/book';
 import { moneyToString } from '@/helpers/number';
 
 export type NetWorthPieProps = {
-  tree: AccountsTree,
+  assetsSeries?: { [yearMonth: string]: Money },
+  liabilitiesSeries?: { [yearMonth: string]: Money },
+  selectedDate?: DateTime,
+  unit?: string,
 };
 
 export default function NetWorthPie({
-  tree,
+  assetsSeries,
+  liabilitiesSeries,
+  unit = '',
+  selectedDate = DateTime.now(),
 }: NetWorthPieProps): JSX.Element {
   let series: number[] = [];
   let assetsTotal = 0;
   let liabilitiesTotal = 0;
-  let unit = '';
 
-  if ((tree?.children || []).length) {
-    const assetsAccount = tree.children.find(a => a.account.type === 'ASSET');
-    const liabilitiesAccount = tree.children.find(a => a.account.type === 'LIABILITY');
-
-    assetsTotal = assetsAccount?.total.toNumber() || 0;
-    liabilitiesTotal = liabilitiesAccount?.total.toNumber() || 0;
-    unit = assetsAccount?.account.commodity.mnemonic;
-    series = [assetsTotal, liabilitiesTotal];
-  }
+  assetsTotal = Object.entries(assetsSeries || {}).reduce(
+    (total, [monthYear, amount]) => {
+      if (DateTime.fromFormat(monthYear, 'MM/yyyy') <= selectedDate) {
+        return total.add(amount);
+      }
+      return total;
+    },
+    new Money(0, unit),
+  ).toNumber();
+  liabilitiesTotal = Object.entries(liabilitiesSeries || {}).reduce(
+    (total, [monthYear, amount]) => {
+      if (DateTime.fromFormat(monthYear, 'MM/yyyy') <= selectedDate) {
+        return total.add(amount);
+      }
+      return total;
+    },
+    new Money(0, unit),
+  ).toNumber() * -1;
+  series = [assetsTotal, liabilitiesTotal];
 
   return (
     <Chart

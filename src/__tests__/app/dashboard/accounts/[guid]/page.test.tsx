@@ -7,20 +7,19 @@ import {
 } from '@testing-library/react';
 import type { SWRResponse } from 'swr';
 
-import Money from '@/book/Money';
 import AccountPage from '@/app/dashboard/accounts/[guid]/page';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import { Account, Split } from '@/book/entities';
-import * as apiHook from '@/hooks/useApi';
+import * as apiHook from '@/hooks/api';
 import {
   SplitsHistogram,
   TotalLineChart,
   TransactionsTable,
 } from '@/components/pages/account';
 
-jest.mock('@/hooks/useApi', () => ({
+jest.mock('@/hooks/api', () => ({
   __esModule: true,
-  ...jest.requireActual('@/hooks/useApi'),
+  ...jest.requireActual('@/hooks/api'),
 }));
 
 jest.mock('@/components/buttons/TransactionFormButton', () => jest.fn(
@@ -53,7 +52,8 @@ describe('AccountPage', () => {
     useRouter.mockImplementation(() => ({
       push: mockRouterPush,
     }));
-    jest.spyOn(apiHook, 'default').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
   afterEach(() => {
@@ -66,13 +66,11 @@ describe('AccountPage', () => {
     await screen.findByText('Loading...');
     expect(TransactionFormButton).toHaveBeenCalledTimes(0);
     expect(TransactionsTable).toHaveBeenCalledTimes(0);
-    expect(apiHook.default).toBeCalledTimes(1);
-    expect(apiHook.default).toHaveBeenNthCalledWith(1, '/api/accounts');
     expect(container).toMatchSnapshot();
   });
 
   it('returns 404 when account not found', async () => {
-    jest.spyOn(apiHook, 'default')
+    jest.spyOn(apiHook, 'useAccounts')
       .mockReturnValueOnce({ data: [{ guid: 'other' }] } as SWRResponse);
 
     render(<AccountPage params={{ guid: 'guid' }} />);
@@ -91,25 +89,29 @@ describe('AccountPage', () => {
         commodity: {
           mnemonic: 'EUR',
         },
-        getTotal: () => new Money(100, 'EUR'),
-        splits: [
-          {
-            guid: 'split_guid',
-            accountId: 'guid',
-            transaction: {
-              date: DateTime.fromISO('2023-01-01'),
-            },
-            account: {
-              type: 'TYPE',
-            },
-            quantity: 100,
-          } as Split,
-        ],
       } as Account,
     };
+    const splits = [
+      {
+        guid: 'split_guid',
+        transaction: {
+          date: DateTime.fromISO('2023-01-01'),
+          splits: [
+            { guid: 'split_guid' },
+            { guid: 'split_guid_2' },
+          ],
+        },
+        account: {
+          guid: 'guid',
+          type: 'TYPE',
+        },
+        quantity: 100,
+      } as Split,
+    ];
 
-    jest.spyOn(apiHook, 'default')
-      .mockReturnValueOnce({ data: accounts } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValueOnce({ data: accounts } as SWRResponse);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValueOnce({ data: splits } as SWRResponse);
+
     const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
 
     await screen.findByTestId('TransactionsTable');
@@ -130,8 +132,6 @@ describe('AccountPage', () => {
                 },
                 guid: 'guid',
                 path: 'path',
-                splits: expect.any(Array),
-                getTotal: expect.any(Function),
                 type: 'TYPE',
               },
               guid: expect.any(String),
@@ -152,21 +152,23 @@ describe('AccountPage', () => {
             guid: 'guid',
             path: 'path',
             type: 'TYPE',
-            splits: expect.any(Array),
             commodity: {
               mnemonic: 'EUR',
             },
-            getTotal: expect.any(Function),
           },
         },
         splits: [
           {
             guid: 'split_guid',
-            accountId: 'guid',
             transaction: {
               date: DateTime.fromISO('2023-01-01'),
+              splits: [
+                { guid: 'split_guid' },
+                { guid: 'split_guid_2' },
+              ],
             },
             account: {
+              guid: 'guid',
               type: 'TYPE',
             },
             quantity: 100,
@@ -182,11 +184,15 @@ describe('AccountPage', () => {
         splits: [
           {
             guid: 'split_guid',
-            accountId: 'guid',
             transaction: {
               date: DateTime.fromISO('2023-01-01'),
+              splits: [
+                { guid: 'split_guid' },
+                { guid: 'split_guid_2' },
+              ],
             },
             account: {
+              guid: 'guid',
               type: 'TYPE',
             },
             quantity: 100,
@@ -202,11 +208,15 @@ describe('AccountPage', () => {
         splits: [
           {
             guid: 'split_guid',
-            accountId: 'guid',
             transaction: {
               date: DateTime.fromISO('2023-01-01'),
+              splits: [
+                { guid: 'split_guid' },
+                { guid: 'split_guid_2' },
+              ],
             },
             account: {
+              guid: 'guid',
               type: 'TYPE',
             },
             quantity: 100,

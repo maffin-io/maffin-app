@@ -19,7 +19,7 @@ describe('transformers', () => {
     });
 
     it('throws an error if invalid when deserializing', () => {
-      expect(() => instance.from('asd')).toThrow('invalid date:');
+      expect(() => instance.from('asd')).toThrow('Invalid DateTime:');
     });
 
     it('serializes date as expected', () => {
@@ -27,7 +27,7 @@ describe('transformers', () => {
     });
 
     it('throws an error if invalid when serializing', () => {
-      expect(() => instance.to(DateTime.fromISO('asd'))).toThrow('invalid date:');
+      expect(() => instance.to(DateTime.fromISO('asd'))).toThrow('Invalid DateTime:');
     });
   });
 });
