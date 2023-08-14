@@ -32,7 +32,8 @@ export function useCommodities(): SWRResponse<Commodity[]> {
   const key = '/api/commodities';
   return useSWRImmutable(
     key,
-    fetcher(Commodity.find, key),
+    // Needs to be encapsulated in arrow function or it doesnt work properly
+    fetcher(async () => Commodity.find(), key),
   );
 }
 
