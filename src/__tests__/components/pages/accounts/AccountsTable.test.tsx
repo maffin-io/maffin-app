@@ -65,7 +65,7 @@ describe('AccountsTable', () => {
             guid: 'root',
             name: 'Root',
             type: 'ROOT',
-            childrenIds: ['a1'],
+            childrenIds: ['a1', 'a2'],
           } as Account,
           a1: {
             guid: 'a1',
@@ -76,9 +76,19 @@ describe('AccountsTable', () => {
             type: 'ASSET',
             childrenIds: [] as string[],
           },
+          a2: {
+            guid: 'a2',
+            name: 'Salary',
+            commodity: {
+              mnemonic: 'EUR',
+            },
+            type: 'INCOME',
+            childrenIds: [] as string[],
+          },
         }}
         monthlyTotals={{
           a1: { '01/2023': new Money(100, 'EUR') },
+          a2: { '01/2023': new Money(-100, 'EUR') },
         }}
       />,
     );
@@ -102,13 +112,25 @@ describe('AccountsTable', () => {
             cell: expect.any(Function),
           },
         ],
-        // eslint-disable-next-line testing-library/no-node-access
         data: [
           {
             account: {
               guid: 'a1',
               name: 'Assets',
               type: 'ASSET',
+              commodity: {
+                mnemonic: 'EUR',
+              },
+              childrenIds: [],
+            },
+            leaves: [],
+            total: expect.any(Money),
+          },
+          {
+            account: {
+              guid: 'a2',
+              name: 'Salary',
+              type: 'INCOME',
               commodity: {
                 mnemonic: 'EUR',
               },
@@ -129,6 +151,9 @@ describe('AccountsTable', () => {
       },
       {},
     );
+
+    expect((Table as jest.Mock).mock.calls[0][0].data[0].total.toString()).toEqual('100.00 EUR');
+    expect((Table as jest.Mock).mock.calls[0][0].data[1].total.toString()).toEqual('100.00 EUR');
   });
 
   it('renders Name column as expected when expandable and not expandded', async () => {
