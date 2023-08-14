@@ -221,6 +221,10 @@ describe('NetWorthHistogram', () => {
         type: 'column',
         data: [
           {
+            x: DateTime.fromISO('2022-09-01'),
+            y: -0,
+          },
+          {
             x: DateTime.fromISO('2022-10-01'),
             y: -0,
           },
@@ -242,6 +246,10 @@ describe('NetWorthHistogram', () => {
         name: 'Expenses',
         type: 'column',
         data: [
+          {
+            x: DateTime.fromISO('2022-09-01'),
+            y: -0,
+          },
           {
             x: DateTime.fromISO('2022-10-01'),
             y: -0,
@@ -265,6 +273,10 @@ describe('NetWorthHistogram', () => {
         type: 'column',
         data: [
           {
+            x: DateTime.fromISO('2022-09-01'),
+            y: -0,
+          },
+          {
             x: DateTime.fromISO('2022-10-01'),
             y: -0,
           },
@@ -286,6 +298,10 @@ describe('NetWorthHistogram', () => {
         name: 'Net worth',
         type: 'line',
         data: [
+          {
+            x: DateTime.fromISO('2022-09-01'),
+            y: 0,
+          },
           {
             x: DateTime.fromISO('2022-10-01'),
             y: 0,
@@ -312,6 +328,10 @@ describe('NetWorthHistogram', () => {
         name: 'Net worth',
         type: 'line',
         data: [
+          {
+            x: DateTime.fromISO('2022-09-01'),
+            y: 0,
+          },
           {
             x: DateTime.fromISO('2022-10-01'),
             y: 0,
