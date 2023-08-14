@@ -31,7 +31,7 @@
     "sharp": "^0.32.4",
     "simplebar-react": "^3.2.4",
     "sql.js": "^1.8.0",
-    "swr": "^2.2.0",
+    "swr": "^2.2.1",
     "typeorm": "^0.3.17",
     "winston-react": "^1.0.0-RC.0"
   },
