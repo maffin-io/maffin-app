@@ -4,14 +4,16 @@ import {
   render,
   screen,
   fireEvent,
+  waitFor,
 } from '@testing-library/react';
 
-import type { Commodity, Split } from '@/book/entities';
+import { Commodity, Split, Transaction } from '@/book/entities';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import Modal from '@/components/Modal';
 import { DataSourceContext } from '@/hooks';
 import type { DataSourceContextType } from '@/hooks';
+import { DateTime } from 'luxon';
 
 jest.mock('@/components/Modal', () => jest.fn(
   (props: React.PropsWithChildren) => (
@@ -93,7 +95,50 @@ describe('TransactionFormButton', () => {
     );
   });
 
-  it('passes expected onSave to TransactionForm', async () => {
+  it.each(
+    ['update', 'delete'],
+  )('retrieves original Transaction when %s', async (action) => {
+    jest.spyOn(Transaction, 'findOneOrFail').mockResolvedValue({
+      guid: 'guid',
+      date: DateTime.fromISO('2023-01-01'),
+      currency: {
+        mnemonic: 'EUR',
+      },
+    } as Transaction);
+    render(
+      <TransactionFormButton guid="guid" action={action as 'update' | 'delete'} />,
+    );
+
+    const button = await screen.findByRole('button', { name: /add transaction/i });
+    fireEvent.click(button);
+
+    expect(Transaction.findOneOrFail).toHaveBeenCalledWith({
+      where: { guid: 'guid' },
+      relations: { splits: { fk_account: true } },
+    });
+
+    await waitFor(() => {
+      expect(TransactionForm).toHaveBeenLastCalledWith(
+        {
+          action,
+          defaultValues: {
+            guid: 'guid',
+            date: '2023-01-01',
+            currency: {
+              mnemonic: 'EUR',
+            },
+            fk_currency: {
+              mnemonic: 'EUR',
+            },
+          },
+          onSave: expect.any(Function),
+        },
+        {},
+      );
+    });
+  });
+
+  it('passes expected data to TransactionForm', async () => {
     const mockSave = jest.fn();
     const defaultValues = {
       date: '',
@@ -120,6 +165,14 @@ describe('TransactionFormButton', () => {
         setOpen: expect.any(Function),
         title: 'Add transaction',
       }),
+      {},
+    );
+    expect(TransactionForm).toHaveBeenLastCalledWith(
+      {
+        action: 'add',
+        defaultValues,
+        onSave: expect.any(Function),
+      },
       {},
     );
 

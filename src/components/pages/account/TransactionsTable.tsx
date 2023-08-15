@@ -77,6 +77,7 @@ const columns: ColumnDef<Split>[] = [
     cell: ({ row }) => (
       <>
         <TransactionFormButton
+          guid={row.original.transaction.guid}
           action="update"
           defaultValues={
             {
@@ -90,6 +91,7 @@ const columns: ColumnDef<Split>[] = [
           <BiEdit className="flex" />
         </TransactionFormButton>
         <TransactionFormButton
+          guid={row.original.transaction.guid}
           action="delete"
           defaultValues={
             {

@@ -32,6 +32,7 @@ export default async function getSplits(account: string): Promise<Split[]> {
         guid: true,
       },
       fk_transaction: {
+        guid: true,
         date: true,
         description: true,
         splits: {
