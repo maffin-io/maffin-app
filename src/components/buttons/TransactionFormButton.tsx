@@ -5,9 +5,11 @@ import { DataSourceContext } from '@/hooks';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import Modal from '@/components/Modal';
 import type { FormValues } from '@/components/forms/transaction/types';
+import { Commodity, Transaction } from '@/book/entities';
 
 export type TransactionFormButtonProps = {
   action?: 'add' | 'update' | 'delete',
+  guid?: string, // The transaction to update or delete
   defaultValues?: FormValues,
   className?: string,
   children?: React.ReactNode,
@@ -16,6 +18,7 @@ export type TransactionFormButtonProps = {
 export default function TransactionFormButton(
   {
     action = 'add',
+    guid,
     defaultValues,
     children,
     className = 'btn-primary',
@@ -23,6 +26,7 @@ export default function TransactionFormButton(
 ): JSX.Element {
   const { save } = React.useContext(DataSourceContext);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [defaults, setDefaults] = React.useState(defaultValues);
 
   let title = 'Add transaction';
   if (action === 'update') {
@@ -45,13 +49,30 @@ export default function TransactionFormButton(
             save();
             setIsModalOpen(false);
           }}
-          defaultValues={defaultValues}
+          defaultValues={defaults}
         />
       </Modal>
       <button
         type="button"
         className={className}
-        onClick={() => setIsModalOpen(!isModalOpen)}
+        onClick={async () => {
+          if (action === 'update' || action === 'delete') {
+            const tx = await Transaction.findOneOrFail({
+              where: { guid },
+              relations: {
+                splits: {
+                  fk_account: true,
+                },
+              },
+            });
+            setDefaults({
+              ...tx,
+              date: tx.date.toISODate() as string,
+              fk_currency: tx.currency as Commodity,
+            });
+          }
+          setIsModalOpen(!isModalOpen);
+        }}
       >
         {
           children
