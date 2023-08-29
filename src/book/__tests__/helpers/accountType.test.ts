@@ -1,5 +1,11 @@
 import { Account } from '../../entities';
-import { isInvestment, isAsset } from '../../helpers/accountType';
+import {
+  isInvestment,
+  isAsset,
+  isLiability,
+  ASSET_ACCOUNTS,
+  LIABILITY_ACCOUNTS,
+} from '../../helpers/accountType';
 
 describe('isInvestment', () => {
   it.each(
@@ -11,8 +17,16 @@ describe('isInvestment', () => {
 
 describe('isAsset', () => {
   it.each(
-    ['ASSET', 'BANK', 'CASH', 'EQUITY'],
+    ASSET_ACCOUNTS,
   )('returns true for %s', (type) => {
     expect(isAsset({ type } as Account)).toBe(true);
+  });
+});
+
+describe('isLiability', () => {
+  it.each(
+    LIABILITY_ACCOUNTS,
+  )('returns true for %s', (type) => {
+    expect(isLiability({ type } as Account)).toBe(true);
   });
 });
