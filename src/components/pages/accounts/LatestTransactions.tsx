@@ -4,7 +4,7 @@ import Link from 'next/link';
 import classNames from 'classnames';
 
 import { useLatestTxs } from '@/hooks/api';
-import { isAsset } from '@/book/helpers/accountType';
+import { isAsset, isLiability } from '@/book/helpers/accountType';
 import type { Split, Transaction } from '@/book/entities';
 import { moneyToString } from '@/helpers/number';
 
@@ -18,13 +18,13 @@ export default function LatestTransactions(): JSX.Element {
       <p className="mb-4">{title}</p>
       {
         txs.map((tx, index) => {
-          const assetSplit = getAssetSplit(tx);
+          const selectedSplit = getAssetSplit(tx) || getLiabilitySplit(tx);
           return (
             <div key={index} className="text-sm py-3">
               <span className="flex items-center">
                 <div className="mr-2">
                   {
-                    (assetSplit?.quantity || 0) > 0
+                    (selectedSplit?.quantity || 0) > 0
                       ? <BiUpArrowAlt className="text-3xl text-green-300" />
                       : <BiDownArrowAlt className="text-3xl text-red-300" />
                   }
@@ -39,17 +39,20 @@ export default function LatestTransactions(): JSX.Element {
                   <div className="flex items-center">
                     <span
                       className={classNames('', {
-                        'text-green-300': (assetSplit?.quantity || 0) > 0,
-                        'text-red-300': (assetSplit?.quantity || 0) < 0,
+                        'text-green-300': (selectedSplit?.quantity || 0) > 0,
+                        'text-red-300': (selectedSplit?.quantity || 0) < 0,
                       })}
                     >
-                      {moneyToString(assetSplit?.quantity || 0, tx.currency.mnemonic)}
+                      {moneyToString(selectedSplit?.quantity || 0, tx.currency.mnemonic)}
                     </span>
                     <Link
-                      className="ml-auto text-xs badge hover:text-slate-300 bg-cyan-500/20 text-cyan-300"
-                      href={`/dashboard/accounts/${assetSplit?.account?.guid}`}
+                      className={classNames('ml-auto text-xs badge hover:text-slate-300', {
+                        'bg-cyan-500/20 text-cyan-300': selectedSplit?.account && isAsset(selectedSplit.account),
+                        'bg-orange-500/20 text-orange-300': selectedSplit?.account && isLiability(selectedSplit?.account),
+                      })}
+                      href={`/dashboard/accounts/${selectedSplit?.account?.guid}`}
                     >
-                      {assetSplit?.account?.name || '???'}
+                      {selectedSplit?.account?.name || '???'}
                     </Link>
                   </div>
                 </div>
@@ -64,4 +67,8 @@ export default function LatestTransactions(): JSX.Element {
 
 function getAssetSplit(tx: Transaction): Split | undefined {
   return tx.splits.find(split => isAsset(split.account));
+}
+
+function getLiabilitySplit(tx: Transaction): Split | undefined {
+  return tx.splits.find(split => isLiability(split.account));
 }

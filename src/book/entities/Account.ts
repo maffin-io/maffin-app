@@ -11,10 +11,15 @@ import {
   TreeChildren,
 } from 'typeorm';
 
+import {
+  isInvestment,
+  getAllowedSubAccounts,
+  ASSET_ACCOUNTS,
+  LIABILITY_ACCOUNTS,
+} from '@/book/helpers/accountType';
 import type Commodity from './Commodity';
 import type Split from './Split';
 import BaseEntity from './BaseEntity';
-import { isInvestment, getAllowedSubAccounts } from '../helpers/accountType';
 
 /**
  * CREATE TABLE accounts (
@@ -35,7 +40,14 @@ import { isInvestment, getAllowedSubAccounts } from '../helpers/accountType';
 @Entity('accounts')
 @Tree('nested-set')
 export default class Account extends BaseEntity {
-  static TYPES = ['ROOT', 'ASSET', 'BANK', 'CASH', 'EQUITY', 'LIABILITY', 'INCOME', 'EXPENSE', 'MUTUAL', 'STOCK'];
+  static TYPES = [
+    'ROOT',
+    'EQUITY',
+    'INCOME',
+    'EXPENSE',
+    ...ASSET_ACCOUNTS,
+    ...LIABILITY_ACCOUNTS,
+  ];
 
   @Column({
     type: 'text',

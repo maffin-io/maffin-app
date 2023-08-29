@@ -16,6 +16,11 @@ import { Split } from '@/book/entities';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import { useAccounts, useSplits } from '@/hooks/api';
 import type { Account } from '@/book/entities';
+import {
+  isInvestment,
+  isAsset,
+  isLiability,
+} from '@/book/helpers/accountType';
 
 export type AccountPageProps = {
   params: {
@@ -102,9 +107,9 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
             className={classNames('text-xl font-medium badge', {
               'bg-green-500/20 text-green-300': account.type === 'INCOME',
               'bg-red-500/20 text-red-300': account.type === 'EXPENSE',
-              'bg-cyan-500/20 text-cyan-300': ['ASSET', 'BANK'].includes(account.type),
-              'bg-orange-500/20 text-orange-300': account.type === 'LIABILITY',
-              'bg-violet-500/20 text-violet-300': ['STOCK', 'MUTUAL'].includes(account.type),
+              'bg-cyan-500/20 text-cyan-300': isAsset(account),
+              'bg-orange-500/20 text-orange-300': isLiability(account),
+              'bg-violet-500/20 text-violet-300': isInvestment(account),
             })}
           >
             {account.path}

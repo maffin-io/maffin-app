@@ -10,6 +10,11 @@ import Table from '@/components/Table';
 import type { AccountsMap } from '@/types/book';
 import { MonthlyTotals } from '@/lib/queries';
 import { Account } from '@/book/entities';
+import {
+  isInvestment,
+  isAsset,
+  isLiability,
+} from '@/book/helpers/accountType';
 
 export type AccountsTableProps = {
   selectedDate?: DateTime,
@@ -65,7 +70,7 @@ function getTreeTotals(
 
   return {
     account: current,
-    total: ['INCOME', 'LIABILITY'].includes(current.type) ? accountTotal.multiply(-1) : accountTotal,
+    total: current.type === 'INCOME' || isLiability(current) ? accountTotal.multiply(-1) : accountTotal,
     leaves,
   };
 }
@@ -103,9 +108,9 @@ const columns: ColumnDef<AccountsTableRow>[] = [
           className={classNames('badge hover:text-slate-300', {
             'bg-green-500/20 text-green-300': row.original.account.type === 'INCOME',
             'bg-red-500/20 text-red-300': row.original.account.type === 'EXPENSE',
-            'bg-cyan-500/20 text-cyan-300': ['ASSET', 'BANK'].includes(row.original.account.type),
-            'bg-orange-500/20 text-orange-300': row.original.account.type === 'LIABILITY',
-            'bg-violet-500/20 text-violet-300': ['STOCK', 'MUTUAL'].includes(row.original.account.type),
+            'bg-cyan-500/20 text-cyan-300': isAsset(row.original.account),
+            'bg-orange-500/20 text-orange-300': isLiability(row.original.account),
+            'bg-violet-500/20 text-violet-300': isInvestment(row.original.account),
           })}
           href={`/dashboard/accounts/${row.original.account.guid}`}
         >

@@ -1,5 +1,8 @@
 import type { Account } from '@/book/entities';
 
+export const ASSET_ACCOUNTS = ['ASSET', 'BANK', 'CASH', 'STOCK', 'MUTUAL', 'RECEIVABLE'];
+export const LIABILITY_ACCOUNTS = ['LIABILITY', 'CREDIT', 'PAYABLE'];
+
 export function isInvestment(account: Account): boolean {
   if (['STOCK', 'MUTUAL'].includes(account.type)) {
     return true;
@@ -9,7 +12,15 @@ export function isInvestment(account: Account): boolean {
 }
 
 export function isAsset(account: Account): boolean {
-  if (['ASSET', 'BANK', 'CASH', 'EQUITY'].includes(account.type)) {
+  if (ASSET_ACCOUNTS.includes(account.type)) {
+    return true;
+  }
+
+  return false;
+}
+
+export function isLiability(account: Account): boolean {
+  if (LIABILITY_ACCOUNTS.includes(account.type)) {
     return true;
   }
 
@@ -22,7 +33,11 @@ export function getAllowedSubAccounts(type: string): string[] {
   }
 
   if (type === 'ASSET') {
-    return ['ASSET', 'BANK', 'CASH', 'EQUITY', 'STOCK', 'MUTUAL'];
+    return ASSET_ACCOUNTS;
+  }
+
+  if (type === 'LIABILITY') {
+    return LIABILITY_ACCOUNTS;
   }
 
   return [type];
