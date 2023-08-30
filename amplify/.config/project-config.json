@@ -1,7 +1,4 @@
 {
-  "providers": [
-    "awscloudformation"
-  ],
   "projectName": "maffinapp",
   "version": "3.1",
   "frontend": "javascript",
@@ -11,7 +8,10 @@
       "SourceDir": "src",
       "DistributionDir": "build",
       "BuildCommand": "yarn build",
-      "StartCommand": "yarn maffin:start"
+      "StartCommand": "yarn maffin:run"
     }
-  }
+  },
+  "providers": [
+    "awscloudformation"
+  ]
 }

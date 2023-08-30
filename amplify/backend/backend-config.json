@@ -15,7 +15,6 @@
       "service": "API Gateway"
     }
   },
-  "auth": {},
   "function": {
     "stockerlambda": {
       "build": true,
