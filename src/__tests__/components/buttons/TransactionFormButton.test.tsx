@@ -7,7 +7,7 @@ import {
   waitFor,
 } from '@testing-library/react';
 
-import { Commodity, Split, Transaction } from '@/book/entities';
+import { Account, Commodity, Transaction } from '@/book/entities';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import Modal from '@/components/Modal';
@@ -144,15 +144,19 @@ describe('TransactionFormButton', () => {
       date: '',
       description: '',
       fk_currency: {} as Commodity,
-      splits: [
-        { guid: '1', account: { guid: '1' } } as Split,
-        { guid: '2', account: { guid: '2' } } as Split,
-      ],
     };
 
     render(
       <DataSourceContext.Provider value={{ save: mockSave as Function } as DataSourceContextType}>
-        <TransactionFormButton defaultValues={defaultValues} />
+        <TransactionFormButton
+          account={{
+            guid: '1',
+          } as Account}
+          defaultValues={{
+            ...defaultValues,
+            splits: [],
+          }}
+        />
       </DataSourceContext.Provider>,
     );
 
@@ -170,7 +174,20 @@ describe('TransactionFormButton', () => {
     expect(TransactionForm).toHaveBeenLastCalledWith(
       {
         action: 'add',
-        defaultValues,
+        defaultValues: {
+          ...defaultValues,
+          splits: [
+            {
+              action: '',
+              guid: expect.any(String),
+              fk_account: { guid: '1' },
+            },
+            {
+              action: '',
+              guid: expect.any(String),
+            },
+          ],
+        },
         onSave: expect.any(Function),
       },
       {},

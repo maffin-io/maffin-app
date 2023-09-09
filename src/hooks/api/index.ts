@@ -63,14 +63,17 @@ export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
     fetcher(PriceDB.getTodayQuotes, '/api/prices/today'),
   );
 
-  const key = '/api/accounts/monthly-totals';
+  const key = (accounts && todayPrices) ? [
+    '/api/accounts/monthly-totals',
+    // We need to recompute when accounts and prices change
+    Object.keys(accounts),
+    Object.keys(todayPrices.keys),
+  ] : null;
+
   const result = useSWRImmutable(
-    (accounts && todayPrices) ? key : null,
-    fetcher(() => queries.getMonthlyTotals(accounts, todayPrices), key),
+    key,
+    fetcher(() => queries.getMonthlyTotals(accounts, todayPrices), '/api/accounts/monthly-totals'),
   );
-  if (result.error) {
-    throw result.error;
-  }
 
   return result;
 }

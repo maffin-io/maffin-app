@@ -117,30 +117,14 @@ describe('AccountPage', () => {
     await screen.findByTestId('TransactionsTable');
     expect(TransactionFormButton).toHaveBeenLastCalledWith(
       {
+        account: accounts.guid,
         defaultValues: {
           date: DateTime.now().toISODate(),
           description: '',
           fk_currency: {
             mnemonic: 'EUR',
           },
-          splits: [
-            {
-              action: '',
-              fk_account: {
-                commodity: {
-                  mnemonic: 'EUR',
-                },
-                guid: 'guid',
-                path: 'path',
-                type: 'TYPE',
-              },
-              guid: expect.any(String),
-            },
-            {
-              action: '',
-              guid: expect.any(String),
-            },
-          ],
+          splits: [],
         },
       },
       {},

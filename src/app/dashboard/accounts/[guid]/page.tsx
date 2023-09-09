@@ -12,7 +12,6 @@ import {
   TransactionsTable,
 } from '@/components/pages/account';
 import StatisticsWidget from '@/components/StatisticsWidget';
-import { Split } from '@/book/entities';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import { useAccounts, useSplits } from '@/hooks/api';
 import type { Account } from '@/book/entities';
@@ -94,11 +93,6 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
     return true;
   });
 
-  const split1 = new Split();
-  split1.fk_account = account;
-
-  const split2 = new Split();
-
   return (
     <>
       <div className="grid grid-cols-12 items-center pb-4">
@@ -119,11 +113,12 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
         </span>
         <div className="col-span-2 col-end-13 justify-self-end">
           <TransactionFormButton
+            account={account}
             defaultValues={
               {
                 date: DateTime.now().toISODate() as string,
                 description: '',
-                splits: [split1, split2],
+                splits: [],
                 fk_currency: account.commodity,
               }
             }
