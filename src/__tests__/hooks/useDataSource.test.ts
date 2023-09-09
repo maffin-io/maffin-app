@@ -235,7 +235,7 @@ describe('useDataSource', () => {
 
         expect(datasource.sqljsManager.loadDatabase).toBeCalledWith(rawData);
 
-        expect(swr.mutate).toBeCalledWith(expect.any(Function));
+        expect(swr.mutate).toBeCalledWith(expect.any(Function), undefined);
         const mockMutate = swr.mutate as jest.Mock;
         // verify the function we pass behaves as expected
         expect(mockMutate.mock.calls[0][0]('/api/test')).toBe(true);

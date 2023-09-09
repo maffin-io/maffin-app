@@ -13,6 +13,7 @@ jest.mock('@/lib/queries');
 
 jest.mock('@/book/prices', () => ({
   __esModule: true,
+  ...jest.requireActual('@/book/prices'),
   PriceDB: {
     getTodayQuotes: jest.fn(),
   },
@@ -130,7 +131,7 @@ describe('API', () => {
 
   it('calls useSWRImmutable with expected params for useAccountsMonthlyTotals when accounts and prices', () => {
     const accounts = { a: { guid: 'a' } };
-    const todayPrices = {} as PriceDBMap;
+    const todayPrices = new PriceDBMap();
     jest.spyOn(swrImmutable, 'default')
       .mockReturnValueOnce({ data: accounts } as SWRResponse)
       .mockReturnValueOnce({ data: todayPrices } as SWRResponse);
@@ -138,7 +139,7 @@ describe('API', () => {
 
     expect(swrImmutable.default).toHaveBeenNthCalledWith(
       3,
-      '/api/accounts/monthly-totals',
+      ['/api/accounts/monthly-totals', ['a'], []],
       expect.any(Function),
     );
     expect(queries.getMonthlyTotals).toBeCalledWith(accounts, todayPrices);

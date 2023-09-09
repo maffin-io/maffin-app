@@ -73,6 +73,10 @@ export default class PriceDBMap {
     throw new Error(`Price ${from}.${when.toISODate()} not found`);
   }
 
+  get keys(): string[] {
+    return Object.keys(this.map);
+  }
+
   get isEmpty(): boolean {
     return Object.keys(this.map).length === 0;
   }
