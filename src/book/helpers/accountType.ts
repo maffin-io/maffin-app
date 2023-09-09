@@ -29,7 +29,7 @@ export function isLiability(account: Account): boolean {
 
 export function getAllowedSubAccounts(type: string): string[] {
   if (type === 'ROOT') {
-    return ['ASSET', 'EXPENSE', 'INCOME', 'LIABILITY'];
+    return ['ASSET', 'EXPENSE', 'INCOME', 'LIABILITY', 'EQUITY'];
   }
 
   if (type === 'ASSET') {

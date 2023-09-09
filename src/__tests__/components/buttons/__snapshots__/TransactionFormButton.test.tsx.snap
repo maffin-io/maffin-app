@@ -5,6 +5,15 @@ exports[`TransactionFormButton renders as expected by default 1`] = `
   <div
     data-testid="Modal"
   >
+    <button
+      class="float-right"
+      type="button"
+    >
+      X
+    </button>
+    <span>
+      Add transaction
+    </span>
     <div
       data-testid="TransactionForm"
     />

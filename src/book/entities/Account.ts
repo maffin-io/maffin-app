@@ -115,6 +115,27 @@ export default class Account extends BaseEntity {
 
   @OneToMany('Split', (split: Split) => split.fk_account)
     splits!: Split[];
+
+  @Column({
+    type: 'text',
+    length: 2048,
+    nullable: true,
+  })
+  @v.IsOptional()
+  @v.Length(4, 2048)
+    description?: string;
+
+  @Column({
+    default: false,
+  })
+    hidden!: boolean;
+
+  @Column({
+    default: false,
+  })
+    // Placeholders are hierarchical accounts that don't containg
+    // transactions, they are just parents of other accounts
+    placeholder!: boolean;
 }
 
 // https://github.com/typeorm/typeorm/issues/4714

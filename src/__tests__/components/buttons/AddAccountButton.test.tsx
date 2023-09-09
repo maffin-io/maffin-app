@@ -5,14 +5,14 @@ import {
   screen,
   fireEvent,
 } from '@testing-library/react';
+import Modal from 'react-modal';
 
 import AddAccountButton from '@/components/buttons/AddAccountButton';
 import AccountForm from '@/components/forms/account/AccountForm';
-import Modal from '@/components/Modal';
 import { DataSourceContext } from '@/hooks';
 import type { DataSourceContextType } from '@/hooks';
 
-jest.mock('@/components/Modal', () => jest.fn(
+jest.mock('react-modal', () => jest.fn(
   (props: React.PropsWithChildren) => (
     <div data-testid="Modal">
       {props.children}
@@ -34,16 +34,13 @@ describe('AddAccountButton', () => {
     render(<AddAccountButton />);
     expect(Modal).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        open: false,
-        setOpen: expect.any(Function),
-        title: 'Add account',
+        isOpen: false,
+        className: 'relative top-20 mx-auto p-5 w-1/3 shadow-lg rounded-md bg-gunmetal-700',
+        overlayClassName: 'fixed inset-0 bg-white bg-opacity-30 overflow-y-auto h-full w-full z-50',
       }),
       {},
     );
 
-    const { children } = (Modal as jest.Mock).mock.calls[0][0];
-    // @ts-ignore
-    expect(children.type.getMockName()).toEqual('AccountForm');
     expect(AccountForm).toHaveBeenLastCalledWith(
       {
         onSave: expect.any(Function),
@@ -65,9 +62,9 @@ describe('AddAccountButton', () => {
     fireEvent.click(button);
     expect(Modal).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        open: true,
-        setOpen: expect.any(Function),
-        title: 'Add account',
+        isOpen: true,
+        className: 'relative top-20 mx-auto p-5 w-1/3 shadow-lg rounded-md bg-gunmetal-700',
+        overlayClassName: 'fixed inset-0 bg-white bg-opacity-30 overflow-y-auto h-full w-full z-50',
       }),
       {},
     );
@@ -78,9 +75,9 @@ describe('AddAccountButton', () => {
 
     expect(Modal).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        open: false,
-        setOpen: expect.any(Function),
-        title: 'Add account',
+        isOpen: false,
+        className: 'relative top-20 mx-auto p-5 w-1/3 shadow-lg rounded-md bg-gunmetal-700',
+        overlayClassName: 'fixed inset-0 bg-white bg-opacity-30 overflow-y-auto h-full w-full z-50',
       }),
       {},
     );

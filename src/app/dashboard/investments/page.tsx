@@ -15,10 +15,31 @@ import { useInvestments, useMainCurrency } from '@/hooks/api';
 
 export default function InvestmentsPage(): JSX.Element {
   let { data: investments } = useInvestments();
+  const { isLoading } = useInvestments();
   const { data: currency } = useMainCurrency();
   const mainCurrency = currency?.mnemonic || 'EUR';
 
+  if (isLoading) {
+    return (
+      <div className="h-screen">
+        <div className="flex text-sm h-3/4 place-content-center place-items-center">
+          Loading...
+        </div>
+      </div>
+    );
+  }
+
   investments = investments || [];
+
+  if (investments.length === 0) {
+    return (
+      <div className="h-screen">
+        <div className="flex text-sm h-3/4 place-content-center place-items-center">
+          You have no investments yet!
+        </div>
+      </div>
+    );
+  }
 
   const totalValue = investments.reduce(
     (total, investment) => total.add(investment.valueInCurrency),

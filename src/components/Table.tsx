@@ -16,6 +16,7 @@ import { FaSortDown, FaSortUp } from 'react-icons/fa';
 import Pagination from '@/components/Pagination';
 
 export type TableProps<T extends object> = {
+  id: string,
   columns: ColumnDef<T>[],
   data: T[],
   initialSort?: ColumnSort,
@@ -28,6 +29,7 @@ export type TableProps<T extends object> = {
 
 export default function Table<T extends object = {}>(
   {
+    id,
     columns,
     data,
     initialSort,
@@ -63,7 +65,7 @@ export default function Table<T extends object = {}>(
   return (
     <>
       <div className="relative overflow-hidden">
-        <table className="w-full text-sm text-left">
+        <table id={id} className="w-full text-sm text-left">
           {
             showHeader
             && (

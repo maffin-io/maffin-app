@@ -37,7 +37,7 @@ export default async function getMonthlyTotals(
     `);
 
   const monthlyTotals: MonthlyTotals = {};
-  rows.forEach(row => {
+  rows.filter(row => row.accountId in accounts).forEach(row => {
     if (!(row.accountId in monthlyTotals)) {
       monthlyTotals[row.accountId] = {};
     }

@@ -4,6 +4,15 @@ exports[`AddAccountButton opens modal when clicking the button 1`] = `
 <div
   data-testid="Modal"
 >
+  <button
+    class="float-right"
+    type="button"
+  >
+    X
+  </button>
+  <span>
+    Add account
+  </span>
   <div
     data-testid="AccountForm"
   />

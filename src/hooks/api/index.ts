@@ -1,8 +1,8 @@
 import { DateTime } from 'luxon';
-import { SWRResponse } from 'swr';
+import useSWR, { SWRResponse } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
-import { Commodity } from '@/book/entities';
+import { Account, Commodity } from '@/book/entities';
 import { PriceDB, PriceDBMap } from '@/book/prices';
 import { InvestmentAccount } from '@/book/models';
 import * as queries from '@/lib/queries';
@@ -22,6 +22,7 @@ export function useStartDate(): SWRResponse<DateTime> {
 
 export function useMainCurrency(): SWRResponse<Commodity> {
   const key = '/api/main-currency';
+  console.log(`running ${key}`);
   return useSWRImmutable(
     key,
     fetcher(queries.getMainCurrency, key),
@@ -53,6 +54,20 @@ export function useAccounts(): SWRResponse<AccountsMap> {
   );
 }
 
+export function useAccount(name: string): SWRResponse<Account> {
+  const key = `/api/account/${name}`;
+  console.log(`running ${key}`);
+  return useSWRImmutable(
+    key,
+    fetcher(async () => {
+      console.log('lol');
+      const a = await Account.findOneByOrFail({ name });
+      console.log(a);
+      return Account.findOneByOrFail({ name });
+    }, key),
+  );
+}
+
 export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
   const { data: accounts } = useSWRImmutable(
     '/api/accounts',
@@ -63,10 +78,14 @@ export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
     fetcher(PriceDB.getTodayQuotes, '/api/prices/today'),
   );
 
-  const key = '/api/accounts/monthly-totals';
+  const key = (accounts && todayPrices) ? [
+    '/api/accounts/monthly-totals',
+    Object.keys(accounts), // We need to recompute when keys changes
+  ] : null;
+
   const result = useSWRImmutable(
-    (accounts && todayPrices) ? key : null,
-    fetcher(() => queries.getMonthlyTotals(accounts, todayPrices), key),
+    key,
+    fetcher(() => queries.getMonthlyTotals(accounts, todayPrices), '/api/accounts/monthly-totals'),
   );
   if (result.error) {
     throw result.error;

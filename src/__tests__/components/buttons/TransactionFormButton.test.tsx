@@ -6,16 +6,16 @@ import {
   fireEvent,
   waitFor,
 } from '@testing-library/react';
+import Modal from 'react-modal';
 
 import { Commodity, Split, Transaction } from '@/book/entities';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
-import Modal from '@/components/Modal';
 import { DataSourceContext } from '@/hooks';
 import type { DataSourceContextType } from '@/hooks';
 import { DateTime } from 'luxon';
 
-jest.mock('@/components/Modal', () => jest.fn(
+jest.mock('react-modal', () => jest.fn(
   (props: React.PropsWithChildren) => (
     <div data-testid="Modal">
       {props.children}
@@ -52,23 +52,20 @@ describe('TransactionFormButton', () => {
   });
 
   it.each([
-    ['add', 'Add transaction'],
-    ['update', 'Edit transaction'],
-    ['delete', 'Confirm you want to remove this transaction'],
-  ])('renders hidden modal with TransactionForm on mount with action %s', async (action, title) => {
+    'add',
+    'update',
+    'delete',
+  ])('renders hidden modal with TransactionForm on mount with action %s', async (action) => {
     render(<TransactionFormButton action={action as 'add' | 'update' | 'delete'} />);
     expect(Modal).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        open: false,
-        setOpen: expect.any(Function),
-        title,
+        isOpen: false,
+        className: 'relative top-20 mx-auto p-5 w-1/3 shadow-lg rounded-md bg-gunmetal-700',
+        overlayClassName: 'fixed inset-0 bg-white bg-opacity-30 overflow-y-auto h-full w-full z-50',
       }),
       {},
     );
 
-    const { children } = (Modal as jest.Mock).mock.calls[0][0];
-    // @ts-ignore
-    expect(children.type.getMockName()).toEqual('TransactionForm');
     expect(TransactionForm).toHaveBeenLastCalledWith(
       {
         action,
@@ -87,9 +84,9 @@ describe('TransactionFormButton', () => {
 
     expect(Modal).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        open: true,
-        setOpen: expect.any(Function),
-        title: 'Add transaction',
+        isOpen: true,
+        className: 'relative top-20 mx-auto p-5 w-1/3 shadow-lg rounded-md bg-gunmetal-700',
+        overlayClassName: 'fixed inset-0 bg-white bg-opacity-30 overflow-y-auto h-full w-full z-50',
       }),
       {},
     );
@@ -161,9 +158,7 @@ describe('TransactionFormButton', () => {
     fireEvent.click(button);
     expect(Modal).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        open: true,
-        setOpen: expect.any(Function),
-        title: 'Add transaction',
+        isOpen: true,
       }),
       {},
     );
@@ -182,9 +177,7 @@ describe('TransactionFormButton', () => {
 
     expect(Modal).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        open: false,
-        setOpen: expect.any(Function),
-        title: 'Add transaction',
+        isOpen: false,
       }),
       {},
     );

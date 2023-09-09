@@ -1,9 +1,16 @@
 import React from 'react';
+import { DateTime } from 'luxon';
 import { useForm, Controller } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 import { mutate } from 'swr';
 
-import { Account, Commodity } from '@/book/entities';
+import {
+  Account,
+  Commodity,
+  Split,
+  Transaction,
+} from '@/book/entities';
+import { toAmountWithScale } from '@/helpers/number';
 import {
   AccountSelector,
   CommoditySelector,
@@ -15,6 +22,7 @@ const resolver = classValidatorResolver(Account, { validator: { stopAtFirstError
 
 export type AccountFormProps = {
   onSave: Function,
+  defaultValues?: FormValues,
 };
 
 export type FormValues = {
@@ -22,6 +30,7 @@ export type FormValues = {
   parent: Account,
   fk_commodity: Commodity,
   type: string,
+  balance?: number,
 };
 
 export type SplitFieldData = {
@@ -30,18 +39,21 @@ export type SplitFieldData = {
   exchangeRate?: number,
 };
 
-export default function AccountForm({ onSave }: AccountFormProps): JSX.Element {
+export default function AccountForm({ onSave, defaultValues }: AccountFormProps): JSX.Element {
   const form = useForm<FormValues>({
+    defaultValues,
     mode: 'onChange',
     resolver,
   });
   const { errors } = form.formState;
+  console.log(defaultValues);
 
   const parent = form.watch('parent');
   const ignoreTypes = (
     parent
     && Account.TYPES.filter(type => !getAllowedSubAccounts(parent.type).includes(type))
   ) || [];
+  const type = form.watch('type');
 
   return (
     <form onSubmit={form.handleSubmit((data) => onSubmit(data, onSave))}>
@@ -65,11 +77,11 @@ export default function AccountForm({ onSave }: AccountFormProps): JSX.Element {
             <>
               <AccountSelector
                 id="parentInput"
-                showRoot
                 isClearable={false}
                 ignoreAccounts={['STOCK', 'MUTUAL']}
                 placeholder="<parent account>"
                 onChange={field.onChange}
+                defaultValue={defaultValues?.parent}
               />
               <p className="invalid-feedback">{fieldState.error?.message}</p>
             </>
@@ -90,11 +102,24 @@ export default function AccountForm({ onSave }: AccountFormProps): JSX.Element {
                 disabled={!parent}
                 ignoreTypes={ignoreTypes}
                 onChange={field.onChange}
+                defaultValue={(defaultValues?.type && { type: defaultValues.type }) || undefined}
               />
               <p className="invalid-feedback">{fieldState.error?.message}</p>
             </>
           )}
         />
+      </fieldset>
+
+      <fieldset className="text-sm my-5">
+        <label htmlFor="balanceInput" className="inline-block mb-2">Opening balance</label>
+        <input
+          hidden={type !== 'BANK'}
+          id="balanceInput"
+          className="block w-full m-0"
+          {...form.register('balance')}
+          type="number"
+        />
+        <p className="invalid-feedback">{errors.balance?.message}</p>
       </fieldset>
 
       <fieldset className="text-sm my-5">
@@ -108,6 +133,7 @@ export default function AccountForm({ onSave }: AccountFormProps): JSX.Element {
                 id="commodityInput"
                 placeholder="<commodity>"
                 onChange={field.onChange}
+                defaultValue={defaultValues?.fk_commodity}
               />
               <p className="invalid-feedback">{fieldState.error?.message}</p>
             </>
@@ -125,7 +151,40 @@ export default function AccountForm({ onSave }: AccountFormProps): JSX.Element {
 }
 
 async function onSubmit(data: FormValues, onSave: Function) {
-  await Account.create({ ...data }).save();
-  mutate((key: string) => key.startsWith('/api/accounts'));
+  const account = await Account.create({ ...data }).save();
+
+  if (data.balance) {
+    const equityAccount = await Account.findOneByOrFail({
+      type: 'EQUITY',
+      name: `Opening balances - ${account.commodity.mnemonic}`,
+    });
+
+    const { amount, scale } = toAmountWithScale(data.balance);
+    const denom = parseInt('1'.padEnd(scale + 1, '0'), 10);
+
+    await Transaction.create({
+      description: 'Opening balance',
+      fk_currency: data.fk_commodity,
+      splits: [
+        Split.create({
+          fk_account: account,
+          valueNum: amount,
+          valueDenom: denom,
+          quantityNum: amount,
+          quantityDenom: denom,
+        }),
+        Split.create({
+          fk_account: equityAccount,
+          valueNum: -amount,
+          valueDenom: denom,
+          quantityNum: -amount,
+          quantityDenom: denom,
+        }),
+      ],
+      date: DateTime.now(),
+    }).save();
+  }
+
+  mutate('/api/accounts');
   onSave();
 }

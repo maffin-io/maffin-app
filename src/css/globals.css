@@ -52,6 +52,22 @@
     @apply bg-slate-500/20 text-slate-300 inline-block my-1 px-1 py-1 text-xs text-center rounded-md
   }
 
+  .badge.success {
+    @apply bg-green-500/20 text-green-300
+  }
+
+  .badge.warning {
+    @apply bg-orange-500/20 text-orange-300
+  }
+
+  .badge.danger {
+    @apply bg-red-500/20 text-red-300
+  }
+
+  .badge.info {
+    @apply bg-cyan-500/20 text-cyan-300
+  }
+
   .invalid-feedback {
     @apply text-xs mt-1 text-red-400/70
   }

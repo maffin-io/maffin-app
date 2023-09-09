@@ -6,6 +6,7 @@ import Chart from '@/components/charts/Chart';
 import { moneyToString } from '@/helpers/number';
 
 export type NetWorthPieProps = {
+  id: string,
   assetsSeries?: { [yearMonth: string]: Money },
   liabilitiesSeries?: { [yearMonth: string]: Money },
   selectedDate?: DateTime,
@@ -13,6 +14,7 @@ export type NetWorthPieProps = {
 };
 
 export default function NetWorthPie({
+  id,
   assetsSeries,
   liabilitiesSeries,
   unit = '',
@@ -44,6 +46,7 @@ export default function NetWorthPie({
 
   return (
     <Chart
+      id={id}
       type="donut"
       series={series}
       height={300}

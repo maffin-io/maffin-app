@@ -11,6 +11,7 @@ import {
   MonthlyTotalHistogram,
   LatestTransactions,
 } from '@/components/pages/accounts';
+import Onboarding from '@/components/onboarding/Onboarding';
 import DateRangeInput from '@/components/DateRangeInput';
 import * as API from '@/hooks/api';
 import getAccountsTree from '@/lib/getAccountsTree';
@@ -18,11 +19,23 @@ import getAccountsTree from '@/lib/getAccountsTree';
 export default function AccountsPage(): JSX.Element {
   const { data: earliestDate } = API.useStartDate();
   let { data: accounts } = API.useAccounts();
+  const { isLoading } = API.useAccounts();
   let { data: monthlyTotals } = API.useAccountsMonthlyTotals();
 
   const [selectedDate, setSelectedDate] = React.useState(DateTime.now());
 
+  if (isLoading) {
+    return (
+      <div className="h-screen">
+        <div className="flex text-sm h-3/4 place-content-center place-items-center">
+          Loading...
+        </div>
+      </div>
+    );
+  }
+
   accounts = accounts || { root: { childrenIds: [] } };
+
   const tree = getAccountsTree(accounts.root, accounts);
   monthlyTotals = monthlyTotals || {};
 
@@ -51,6 +64,7 @@ export default function AccountsPage(): JSX.Element {
         <div className="grid grid-cols-12 col-span-3">
           <div className="col-span-12 p-4 mr-4 rounded-sm bg-gunmetal-700">
             <NetWorthPie
+              id="networth-pie"
               unit={tree.leaves.find(a => a.account.type === 'ASSET')?.account.commodity.mnemonic}
               assetsSeries={monthlyTotals[tree.leaves.find(a => a.account.type === 'ASSET')?.account.guid]}
               liabilitiesSeries={monthlyTotals[tree.leaves.find(a => a.account.type === 'LIABILITY')?.account.guid]}
@@ -95,6 +109,7 @@ export default function AccountsPage(): JSX.Element {
           </div>
         </div>
       </div>
+      <Onboarding />
     </>
   );
 }
