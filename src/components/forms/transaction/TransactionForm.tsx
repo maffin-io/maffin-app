@@ -107,6 +107,7 @@ export default function TransactionForm({
 }
 
 async function onSubmit(data: FormValues, action: 'add' | 'update' | 'delete', onSave: Function) {
+  console.log(data);
   const transaction = Transaction.create({
     ...data,
     guid: data.guid || undefined,

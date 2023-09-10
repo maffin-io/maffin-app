@@ -978,7 +978,87 @@ describe('InvestmentAccount', () => {
        * EUR but dividends are issued in USD. Regardless, we store the dividend
        * in the currency of the account
        */
-      it('supports dividends in different currency than account\'s currency', async () => {
+      it('asd', async () => {
+        const usd = await Commodity.create({
+          namespace: 'CURRENCY',
+          mnemonic: 'USD',
+        }).save();
+        // The dividend is received in USD although the account's currency is EUR
+        brokerAccount.fk_commodity = usd;
+        await brokerAccount.save();
+
+        const eur = await Commodity.create({
+          namespace: 'CURRENCY',
+          mnemonic: 'EUR',
+        }).save();
+        incomeAccount.fk_commodity = eur;
+        await incomeAccount.save();
+
+        // Ignore the default transaction for simpler test
+        await Split.delete({
+          fk_transaction: tx.guid,
+        });
+        tx.splits = [];
+        await tx.save();
+
+        await Transaction.create({
+          description: 'description',
+          fk_currency: eur,
+          date: DateTime.fromISO('2023-01-02'),
+          splits: [
+            {
+              valueNum: 0,
+              valueDenom: 1,
+              quantityNum: 0,
+              quantityDenom: 1,
+              fk_account: stockAccount,
+            },
+            {
+              valueNum: 176.12,
+              valueDenom: 1,
+              quantityNum: 170,
+              quantityDenom: 1,
+              fk_account: brokerAccount,
+            },
+            {
+              valueNum: -176.12,
+              valueDenom: 1,
+              quantityNum: -176.12,
+              quantityDenom: 1,
+              fk_account: incomeAccount,
+            },
+          ],
+        }).save();
+
+        const account = await Account.findOneOrFail({
+          where: { type: 'STOCK' },
+          relations: {
+            splits: {
+              fk_transaction: {
+                splits: {
+                  fk_account: true,
+                },
+              },
+            },
+          },
+        });
+        const instance = new InvestmentAccount(
+          account,
+          mainCurrency,
+          new PriceDBMap([stockPrice, currencyPrice]),
+        );
+
+        expect(instance.realizedDividends.toString()).toEqual('176.12 USD');
+        expect(instance.realizedDividendsInCurrency.toString()).toEqual('176.12 EUR');
+      });
+
+      /**
+       * There's case though for specific stocks trading in X currency
+       * giving dividends in another currency. Check VHYL which trades in
+       * EUR but dividends are issued in USD. Regardless, we store the dividend
+       * in the currency of the account
+       */
+      it('supports dividend in different currency transaction than account\'s currency', async () => {
         const sgd = await Commodity.create({
           namespace: 'CURRENCY',
           mnemonic: 'SGD',

@@ -80,10 +80,15 @@ export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
 
 export function useInvestments(): SWRResponse<InvestmentAccount[]> {
   const key = '/api/investments';
-  return useSWRImmutable(
+  const result = useSWRImmutable(
     key,
     fetcher(queries.getInvestments, key),
   );
+  if (result.error) {
+    throw new Error(result.error);
+  }
+
+  return result;
 }
 
 export function useSplits(guid: string): SWRResponse<Split[]> {

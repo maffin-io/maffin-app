@@ -279,38 +279,24 @@ export default class InvestmentAccount {
    * transaction.
    */
   _dividend(split: Split): void {
-    split.transaction.splits.forEach(otherSplit => {
-      if (
-        split.guid !== otherSplit.guid
-        && this.currency === otherSplit.account.commodity.mnemonic
-        && otherSplit.quantity > 0
-      ) {
-        const value = new Money(
-          otherSplit.quantity,
-          this.currency,
-        );
+    const originalSplit = split.transaction.splits.find(s => s.value === 0);
+    const incomeSplit = split.transaction.splits.find(s => s.value < 0);
+    const brokerSplit = split.transaction.splits.find(s => s.value > 0);
+    if (!incomeSplit || !brokerSplit) {
+      throw new Error(`Dividend transaction ${split.transaction.guid} is missing required splits`);
+    }
 
-        let valueInCurrency: Money;
-        if (split.transaction.currency.mnemonic === this.mainCurrency) {
-          valueInCurrency = new Money(otherSplit.value, this.mainCurrency);
-        } else {
-          const mainCurrencyPrice = this._priceDBMap.getPrice(
-            split.transaction.currency.mnemonic,
-            this.mainCurrency,
-            split.transaction.date,
-          );
-          valueInCurrency = new Money(
-            otherSplit.value * mainCurrencyPrice.value,
-            this.mainCurrency,
-          );
-        }
+    if (split.transaction.currency.mnemonic === this.mainCurrency) {
+      // We only support receiving dividends to accounts in main currency
+      const valueInCurrency = new Money(Math.abs(incomeSplit.value), this.mainCurrency);
 
-        this.dividends.push({
-          when: split.transaction.date,
-          amount: value,
-          amountInCurrency: valueInCurrency,
-        });
-      }
-    });
+      this.dividends.push({
+        when: split.transaction.date,
+        amount: new Money(brokerSplit.quantity, brokerSplit.account.commodity.mnemonic),
+        amountInCurrency: valueInCurrency,
+      });
+    } else {
+      throw new Error(`Adding dividends to income accounts not in ${this.mainCurrency} is not allowed. tx_guid: ${split.transaction.guid} ${originalSplit?.account.name}`);
+    }
   }
 }
