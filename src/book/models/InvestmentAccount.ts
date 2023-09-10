@@ -279,20 +279,22 @@ export default class InvestmentAccount {
    * transaction.
    */
   _dividend(split: Split): void {
+    let found = false;
     split.transaction.splits.forEach(otherSplit => {
       if (
-        split.guid !== otherSplit.guid
+        !found
+        && split.guid !== otherSplit.guid
         && this.currency === otherSplit.account.commodity.mnemonic
-        && otherSplit.quantity > 0
       ) {
+        found = true;
         const value = new Money(
-          otherSplit.quantity,
+          Math.abs(otherSplit.quantity),
           this.currency,
         );
 
         let valueInCurrency: Money;
         if (split.transaction.currency.mnemonic === this.mainCurrency) {
-          valueInCurrency = new Money(otherSplit.value, this.mainCurrency);
+          valueInCurrency = new Money(Math.abs(otherSplit.value), this.mainCurrency);
         } else {
           const mainCurrencyPrice = this._priceDBMap.getPrice(
             split.transaction.currency.mnemonic,
@@ -300,7 +302,7 @@ export default class InvestmentAccount {
             split.transaction.date,
           );
           valueInCurrency = new Money(
-            otherSplit.value * mainCurrencyPrice.value,
+            Math.abs(otherSplit.value) * mainCurrencyPrice.value,
             this.mainCurrency,
           );
         }
@@ -312,5 +314,8 @@ export default class InvestmentAccount {
         });
       }
     });
+    if (!found) {
+      console.warn(`Did not find a matching split for dividend transaction ${split.transaction.guid}`);
+    }
   }
 }

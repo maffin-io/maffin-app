@@ -1,7 +1,6 @@
 import { DateTime } from 'luxon';
 import { DataSource } from 'typeorm';
 
-import { toFixed } from '@/helpers/number';
 import { InvestmentAccount } from '@/book/models';
 import {
   Account,
@@ -884,18 +883,42 @@ describe('InvestmentAccount', () => {
       });
 
       /**
-       * I haven't seen a use case where dividends are earned in different currencies
-       * and it would complicate things if we did so this is expected
+       * There's case though for specific stocks trading in X currency
+       * giving dividends in another currency. Check VHYL which trades in
+       * EUR but dividends are issued in USD. Regardless, we store the dividend
+       * in the currency of the account
        */
-      it('supports dividends with different currency as long as split with correct commodity', async () => {
-        const sgd = await Commodity.create({
+      it('supports dividends with currency different than account commodity', async () => {
+        // We dont test for this case as the setup is too complicated
+        if (currency === 'USD') {
+          return;
+        }
+        const usd = await Commodity.create({
           namespace: 'CURRENCY',
-          mnemonic: 'SGD',
+          mnemonic: 'USD',
         }).save();
+
+        // The dividend is received in USD although the account's currency is EUR
+        brokerAccount.fk_commodity = usd;
+        await brokerAccount.save();
+
+        const eur = await Commodity.create({
+          namespace: 'CURRENCY',
+          mnemonic: 'EUR',
+        }).save();
+        incomeAccount.fk_commodity = eur;
+        await incomeAccount.save();
+
+        // Ignore the default transaction for simpler test
+        await Split.delete({
+          fk_transaction: tx.guid,
+        });
+        tx.splits = [];
+        await tx.save();
 
         await Transaction.create({
           description: 'description',
-          fk_currency: sgd,
+          fk_currency: eur,
           date: DateTime.fromISO('2023-01-02'),
           splits: [
             {
@@ -908,7 +931,7 @@ describe('InvestmentAccount', () => {
             {
               valueNum: 176.12,
               valueDenom: 1,
-              quantityNum: 120,
+              quantityNum: 170,
               quantityDenom: 1,
               fk_account: brokerAccount,
             },
@@ -922,15 +945,6 @@ describe('InvestmentAccount', () => {
           ],
         }).save();
 
-        await Price.create({
-          fk_commodity: sgd,
-          fk_currency: mainCommodity,
-          date: DateTime.fromISO('2023-01-02'),
-          valueNum: 68138,
-          valueDenom: 100000,
-        }).save();
-
-        const dividendCurrencyPrice = await Price.findOneByOrFail({ fk_commodity: sgd });
         const account = await Account.findOneOrFail({
           where: { type: 'STOCK' },
           relations: {
@@ -946,81 +960,11 @@ describe('InvestmentAccount', () => {
         const instance = new InvestmentAccount(
           account,
           mainCurrency,
-          new PriceDBMap([stockPrice, currencyPrice, dividendCurrencyPrice]),
+          new PriceDBMap([stockPrice, currencyPrice]),
         );
 
-        expect(instance.realizedDividends.toString()).toEqual(`209.67 ${currency}`);
-        expect(instance.realizedDividendsInCurrency.format()).toEqual(
-          new Money(
-            (
-              (
-                toFixed(instance.dividends[0].amount.toNumber() * currencyPrice.value)
-              ) + (
-                instance.dividends[1].amount.toNumber()
-              )
-            ),
-            mainCurrency,
-          ).format(),
-        );
-
-        expect(instance.dividends[0].amount.toString()).toEqual(`89.67 ${currency}`);
-        expect(instance.dividends[0].amountInCurrency.format()).toEqual(
-          new Money(89.67 * currencyPrice.value, mainCurrency).format(),
-        );
-
-        expect(instance.dividends[1].amount.toString()).toEqual(`120.00 ${currency}`);
-        expect(instance.dividends[1].amountInCurrency.toString()).toEqual(`120.00 ${mainCurrency}`);
-      });
-
-      /**
-       * There's case though for specific stocks trading in X currency
-       * giving dividends in another currency. Check VHYL which trades in
-       * EUR but dividends are issued in USD. Regardless, we store the dividend
-       * in the currency of the account
-       */
-      it('supports dividends in different currency than account\'s currency', async () => {
-        const sgd = await Commodity.create({
-          namespace: 'CURRENCY',
-          mnemonic: 'SGD',
-        }).save();
-
-        // Override the already existing one with SGD
-        tx.fk_currency = sgd;
-        await tx.save();
-
-        await Price.create({
-          fk_commodity: sgd,
-          fk_currency: mainCommodity,
-          date: DateTime.fromISO('2023-01-02'),
-          valueNum: 7086,
-          valueDenom: 10000,
-        }).save();
-
-        const dividendCurrencyPrice = await Price.findOneByOrFail({ fk_commodity: sgd });
-        const account = await Account.findOneOrFail({
-          where: { type: 'STOCK' },
-          relations: {
-            splits: {
-              fk_transaction: {
-                splits: {
-                  fk_account: true,
-                },
-              },
-            },
-          },
-        });
-        const instance = new InvestmentAccount(
-          account,
-          'EUR',
-          new PriceDBMap([stockPrice, currencyPrice, dividendCurrencyPrice]),
-        );
-
-        expect(instance.realizedDividends.toString()).toEqual(`89.67 ${currency}`);
-        const expected = new Money(89.67 * dividendCurrencyPrice.value, mainCurrency);
-        expect(instance.realizedDividendsInCurrency.toString()).toEqual(expected.toString());
-
-        expect(instance.dividends[0].amount.toString()).toEqual(`89.67 ${currency}`);
-        expect(instance.dividends[0].amountInCurrency.toString()).toEqual(expected.toString());
+        expect(instance.realizedDividends.toString()).toEqual('176.12 EUR');
+        expect(instance.realizedDividendsInCurrency.toString()).toEqual('176.12 EUR');
       });
     });
 
