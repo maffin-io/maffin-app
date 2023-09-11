@@ -52,4 +52,8 @@ describe('moneyToString', () => {
   it('uses EUR by default if empty currency passed', () => {
     expect(moneyToString(1234567.89, '')).toEqual('€1,234,567.89');
   });
+
+  it('returns as expected when not a currency', () => {
+    expect(moneyToString(1234567.89, 'NVDA')).toEqual('1,234,567.89 NVDA');
+  });
 });

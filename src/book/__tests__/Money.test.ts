@@ -31,9 +31,9 @@ describe('Money', () => {
       expect(money.format()).toEqual('$0.10');
     });
 
-    it('fallbacks when invalid currency', () => {
-      money = new Money(100, 'GOOGL');
-      expect(money.format()).toEqual('100.00 GOOGL');
+    it('works with commodities', () => {
+      money = new Money(100.10, 'GOOGL');
+      expect(money.format()).toEqual('100.1 GOOGL');
     });
   });
 
