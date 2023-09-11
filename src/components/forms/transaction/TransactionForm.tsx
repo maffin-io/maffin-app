@@ -3,6 +3,7 @@ import { DateTime } from 'luxon';
 import { useForm } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 import { mutate } from 'swr';
+import { IsNull } from 'typeorm';
 
 import {
   Split,
@@ -113,11 +114,14 @@ async function onSubmit(data: FormValues, action: 'add' | 'update' | 'delete', o
     date: DateTime.fromISO(data.date),
   });
 
-  if (action === 'add' || action === 'update') {
+  if (action === 'add') {
     await transaction.save();
-  }
-
-  if (action === 'delete') {
+  } else if (action === 'update') {
+    await transaction.save();
+    await Split.delete({
+      fk_transaction: IsNull(),
+    });
+  } else if (action === 'delete') {
     // Not using cascade here because seems it has problems with
     // old data. Deleting splits manually for now
     await Split.remove(transaction.splits);

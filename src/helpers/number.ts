@@ -37,8 +37,12 @@ export function toFixed(n: number, decimals = 2): number {
 }
 
 export function moneyToString(n: number, currency: string): string {
-  return n.toLocaleString(navigator.language, {
-    style: 'currency',
-    currency: currency || 'EUR',
-  });
+  try {
+    return n.toLocaleString(navigator.language, {
+      style: 'currency',
+      currency: currency || 'EUR',
+    });
+  } catch {
+    return `${n.toLocaleString(navigator.language)} ${currency}`;
+  }
 }
