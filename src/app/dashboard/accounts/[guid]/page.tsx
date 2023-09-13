@@ -154,6 +154,13 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
             </div>
           </div>
         </div>
+        <div className="col-span-6 bg-gunmetal-700 rounded-sm mb-6 p-4">
+          <SplitsHistogram
+            currency={account.commodity.mnemonic}
+            accountType={account.type}
+            splits={splits.filter(split => split.quantity !== 0)}
+          />
+        </div>
       </div>
       <TransactionsTable
         splits={splits}

@@ -56,6 +56,25 @@ describe('useUser', () => {
     });
   });
 
+  it('returns empty user when no user yet', async () => {
+    const mockStorageSetItem = jest.spyOn(Storage.prototype, 'setItem');
+    jest.spyOn(apiHook, 'useUser').mockReturnValue(
+      {
+        data: undefined,
+      } as SWRResponse,
+    );
+    const { result } = renderHook(() => useUser());
+
+    expect(mockRouterPush).not.toBeCalled();
+    expect(mockStorageSetItem).not.toBeCalled();
+    expect(result.current.user).toEqual({
+      name: '',
+      email: '',
+      image: '',
+      isLoggedIn: false,
+    });
+  });
+
   it('returns user when logged in and doesnt redirect', async () => {
     const mockStorageSetItem = jest.spyOn(Storage.prototype, 'setItem');
     jest.spyOn(apiHook, 'useUser').mockReturnValue(

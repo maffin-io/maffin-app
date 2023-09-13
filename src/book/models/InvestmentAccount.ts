@@ -280,20 +280,17 @@ export default class InvestmentAccount {
    */
   _dividend(split: Split): void {
     const originalSplit = split.transaction.splits.find(s => s.value === 0);
-    const incomeSplit = split.transaction.splits.find(s => s.value < 0);
     const brokerSplit = split.transaction.splits.find(s => s.value > 0);
-    if (!incomeSplit || !brokerSplit) {
+    if (!brokerSplit) {
       throw new Error(`Dividend transaction ${split.transaction.guid} is missing required splits`);
     }
 
     if (split.transaction.currency.mnemonic === this.mainCurrency) {
-      // We only support receiving dividends to accounts in main currency
-      const valueInCurrency = new Money(Math.abs(incomeSplit.value), this.mainCurrency);
-
       this.dividends.push({
         when: split.transaction.date,
         amount: new Money(brokerSplit.quantity, brokerSplit.account.commodity.mnemonic),
-        amountInCurrency: valueInCurrency,
+        // We only support receiving dividends to accounts in main currency
+        amountInCurrency: new Money(brokerSplit.value, this.mainCurrency),
       });
     } else {
       throw new Error(`Adding dividends to income accounts not in ${this.mainCurrency} is not allowed. tx_guid: ${split.transaction.guid} ${originalSplit?.account.name}`);
