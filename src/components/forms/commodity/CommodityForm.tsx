@@ -4,7 +4,7 @@ import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 import { SingleValue } from 'react-select';
 import { mutate } from 'swr';
 
-import { Account, Commodity } from '@/book/entities';
+import { Commodity } from '@/book/entities';
 import Selector from '@/components/selectors/Selector';
 
 const resolver = classValidatorResolver(Commodity, { validator: { stopAtFirstError: true } });
@@ -40,7 +40,7 @@ export default function CommodityForm({ onSave }: CommodityFormProps): JSX.Eleme
           render={({ field, fieldState }) => (
             <>
               <Selector<{ label: string }>
-                id="commodityOnboarding"
+                id="mnemonicInput"
                 labelAttribute="label"
                 options={BASE_CURRENCIES}
                 onChange={(newValue: SingleValue<{ label: string }> | null) => {
@@ -76,5 +76,5 @@ export default function CommodityForm({ onSave }: CommodityFormProps): JSX.Eleme
 async function onSubmit(data: FormValues, onSave: Function) {
   const mainCommodity = await Commodity.create({ ...data }).save();
   mutate('/api/main-currency', mainCommodity);
-  onSave();
+  await onSave();
 }

@@ -38,23 +38,29 @@ export default async function getMonthlyTotals(
 
   const monthlyTotals: MonthlyTotals = {};
   rows.filter(row => row.accountId in accounts).forEach(row => {
-    if (!(row.accountId in monthlyTotals)) {
-      monthlyTotals[row.accountId] = {};
+    const guid = row.accountId;
+
+    if (!(guid in monthlyTotals)) {
+      monthlyTotals[guid] = {};
     }
 
-    monthlyTotals[row.accountId][row.date] = new Money(
+    monthlyTotals[guid][row.date] = new Money(
       row.total,
-      accounts[row.accountId].commodity.mnemonic,
+      accounts[guid].commodity.mnemonic,
     );
   });
 
-  (accounts.root?.childrenIds || []).map(
-    (childId: string) => aggregateChildrenTotals(
-      accounts[childId],
-      accounts,
-      todayQuotes,
-      monthlyTotals,
-    ),
+  accounts.root?.childrenIds.forEach(
+    (childId: string) => {
+      aggregateChildrenTotals(
+        accounts[childId],
+        accounts,
+        todayQuotes,
+        monthlyTotals,
+      );
+
+      monthlyTotals[accounts[childId].type.toLowerCase()] = monthlyTotals[childId];
+    },
   );
 
   return monthlyTotals;

@@ -124,13 +124,10 @@ async function importBook(storage: BookStorage | null, rawData: Uint8Array) {
   const rawBook = tempDataSource.sqljsManager.exportDatabase();
 
   await DATASOURCE.sqljsManager.loadDatabase(rawBook);
-  mutate((key: string) => {
-    let k = key;
-    if (Array.isArray(key)) {
-      [k] = key;
-    }
-    return k.startsWith('/api');
-  }, undefined);
+  mutate('/api/accounts', undefined);
+  mutate('/api/prices/today', undefined);
+  mutate('/api/monthly-totals', undefined);
+  mutate('/api/start-date', undefined);
   await save(storage);
 }
 

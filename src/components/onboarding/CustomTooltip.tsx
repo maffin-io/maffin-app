@@ -9,7 +9,7 @@ export default function CustomTooltip({
 }: TooltipRenderProps): JSX.Element {
   return (
     <div
-      className="mx-auto w-1/2 bg-gunmetal-700 text-sm p-3 rounded-md"
+      className="mx-auto w-1/2 bg-gunmetal-700 text-sm p-5 rounded-md"
       {...tooltipProps}
     >
       {step.content}

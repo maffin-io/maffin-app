@@ -7,6 +7,7 @@ import { Account } from '@/book/entities';
 export type AccountSelectorProps = {
   placeholder?: string,
   ignoreAccounts?: string[],
+  ignorePlaceholders?: boolean,
   defaultValue?: Account,
   id?: string,
   showRoot?: boolean,
@@ -20,6 +21,7 @@ export default function AccountSelector(
   {
     placeholder,
     ignoreAccounts = [],
+    ignorePlaceholders = false,
     defaultValue,
     id = 'accountSelector',
     showRoot = false,
@@ -36,6 +38,10 @@ export default function AccountSelector(
   options = options.filter(account => !(ignoreAccounts).includes(account.type));
   if (!showRoot) {
     options = options.filter(account => account.type !== 'ROOT');
+  }
+
+  if (ignorePlaceholders) {
+    options = options.filter(account => !account.placeholder);
   }
 
   return (

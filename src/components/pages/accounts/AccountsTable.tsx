@@ -10,6 +10,7 @@ import Money from '@/book/Money';
 import Table from '@/components/Table';
 import type { AccountsMap } from '@/types/book';
 import { MonthlyTotals } from '@/lib/queries';
+import * as API from '@/hooks/api';
 import { Account } from '@/book/entities';
 import {
   isInvestment,
@@ -19,8 +20,7 @@ import {
 
 export type AccountsTableProps = {
   selectedDate?: DateTime,
-  accounts: AccountsMap,
-  monthlyTotals: MonthlyTotals,
+  isExpanded?: boolean,
 };
 
 type AccountsTableRow = {
@@ -32,18 +32,24 @@ type AccountsTableRow = {
 export default function AccountsTable(
   {
     selectedDate = DateTime.now(),
-    accounts,
-    monthlyTotals,
+    isExpanded = false,
   }: AccountsTableProps,
 ): JSX.Element {
+  let { data: accounts } = API.useAccounts();
+  const { data: monthlyTotals } = API.useAccountsMonthlyTotals();
+
+  accounts = accounts || { root: { childrenIds: [] } };
+
+  const tree = getTreeTotals(accounts.root, accounts, monthlyTotals || {}, selectedDate);
   return (
     <Table<AccountsTableRow>
       id="accounts-table"
       columns={columns}
-      data={getTreeTotals(accounts.root, accounts, monthlyTotals, selectedDate).leaves}
+      data={tree.leaves}
       initialSort={{ id: 'total', desc: true }}
       showHeader={false}
       showPagination={false}
+      isExpanded={isExpanded}
       tdClassName="p-2"
       getSubRows={row => row.leaves}
     />

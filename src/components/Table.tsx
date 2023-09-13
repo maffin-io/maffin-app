@@ -9,6 +9,7 @@ import {
   getPaginationRowModel,
   getExpandedRowModel,
   ColumnSort,
+  ExpandedState,
 } from '@tanstack/react-table';
 import classNames from 'classnames';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
@@ -23,6 +24,7 @@ export type TableProps<T extends object> = {
   pageSize?: number,
   showHeader?: boolean,
   showPagination?: boolean,
+  isExpanded?: boolean,
   tdClassName?: string,
   getSubRows?: (originalRow: T, index: number) => T[] | undefined,
 };
@@ -36,6 +38,7 @@ export default function Table<T extends object = {}>(
     pageSize = 10,
     showHeader = true,
     showPagination = true,
+    isExpanded = false,
     tdClassName = 'px-6 py-4',
     getSubRows,
   }: TableProps<T>,
@@ -53,6 +56,7 @@ export default function Table<T extends object = {}>(
         pageSize,
       },
       sorting: (initialSort && [initialSort]) || undefined,
+      expanded: isExpanded as ExpandedState,
     },
   };
 

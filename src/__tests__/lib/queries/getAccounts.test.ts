@@ -34,7 +34,7 @@ describe('getAccounts', () => {
     }).save();
 
     await Account.create({
-      guid: 'assets',
+      guid: 'abcdef',
       name: 'Assets',
       type: 'ASSET',
       fk_commodity: eur,
@@ -42,7 +42,7 @@ describe('getAccounts', () => {
     }).save();
 
     await Account.create({
-      guid: 'expenses',
+      guid: 'ghijk',
       name: 'Expenses',
       type: 'EXPENSE',
       fk_commodity: eur,
@@ -59,7 +59,9 @@ describe('getAccounts', () => {
     const accounts = await getAccounts();
 
     expect(accounts.root.guid).toEqual('a');
-    expect(accounts.assets.guid).toEqual('assets');
-    expect(accounts.expenses.guid).toEqual('expenses');
+    expect(accounts.asset.guid).toEqual('abcdef');
+    expect(accounts.expense.guid).toEqual('ghijk');
+    expect(accounts.abcdef.guid).toEqual('abcdef');
+    expect(accounts.ghijk.guid).toEqual('ghijk');
   });
 });

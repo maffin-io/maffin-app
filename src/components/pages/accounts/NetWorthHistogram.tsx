@@ -2,23 +2,28 @@ import React from 'react';
 import { DateTime, Interval } from 'luxon';
 
 import Chart from '@/components/charts/Chart';
-import type { AccountsTree } from '@/types/book';
 import { moneyToString } from '@/helpers/number';
-import { MonthlyTotals } from '@/lib/queries';
+import * as API from '@/hooks/api';
 
 export type NetWorthHistogramProps = {
   startDate?: DateTime,
   selectedDate?: DateTime,
-  tree: AccountsTree,
-  monthlyTotals: MonthlyTotals
 };
 
 export default function NetWorthHistogram({
   startDate,
   selectedDate = DateTime.now().minus({ months: 3 }),
-  tree,
-  monthlyTotals,
 }: NetWorthHistogramProps): JSX.Element {
+  const { data: monthlyTotals } = API.useAccountsMonthlyTotals();
+  const incomeSeries = {
+    ...monthlyTotals?.income,
+    ...monthlyTotals?.equity, // Opening balances to be taken into account
+  };
+  const expenseSeries = monthlyTotals?.expense;
+
+  const { data: currency } = API.useMainCurrency();
+  const unit = currency?.mnemonic || '';
+
   const now = DateTime.now();
   if (now.diff(selectedDate, ['months']).months < 3) {
     selectedDate = now.minus({ months: 3 });
@@ -65,41 +70,36 @@ export default function NetWorthHistogram({
     },
   ];
 
-  let incomeAccount: AccountsTree | undefined;
-  if ((tree?.leaves || []).length) {
-    incomeAccount = tree.leaves.find(a => a.account.type === 'INCOME');
-    const expensesAccount = tree.leaves.find(a => a.account.type === 'EXPENSE');
-    dates.forEach(date => {
-      const monthYear = (date as DateTime).toFormat('MM/yyyy');
-      const incomeAmount = (
-        monthlyTotals[incomeAccount?.account.guid]?.[monthYear]?.toNumber() || 0
-      );
-      series[0].data.push({
-        y: -incomeAmount,
-        x: date,
-      });
-
-      const expenseAmount = (
-        monthlyTotals[expensesAccount?.account.guid]?.[monthYear]?.toNumber() || 0
-      );
-      series[1].data.push({
-        y: -expenseAmount,
-        x: date,
-      });
-
-      const netProfit = -incomeAmount - expenseAmount;
-      series[2].data.push({
-        y: netProfit,
-        x: date,
-      });
-
-      const previousNetWorth = series[3].data[series[3].data.length - 1]?.y || 0;
-      series[3].data.push({
-        y: previousNetWorth + netProfit,
-        x: date,
-      });
+  dates.forEach(date => {
+    const monthYear = (date as DateTime).toFormat('MM/yyyy');
+    const incomeAmount = (
+      incomeSeries?.[monthYear]?.toNumber() || 0
+    );
+    series[0].data.push({
+      y: -incomeAmount,
+      x: date,
     });
-  }
+
+    const expenseAmount = (
+      expenseSeries?.[monthYear]?.toNumber() || 0
+    );
+    series[1].data.push({
+      y: -expenseAmount,
+      x: date,
+    });
+
+    const netProfit = -incomeAmount - expenseAmount;
+    series[2].data.push({
+      y: netProfit,
+      x: date,
+    });
+
+    const previousNetWorth = series[3].data[series[3].data.length - 1]?.y || 0;
+    series[3].data.push({
+      y: previousNetWorth + netProfit,
+      x: date,
+    });
+  });
 
   return (
     <>
@@ -107,7 +107,7 @@ export default function NetWorthHistogram({
         type="line"
         series={series}
         height={350}
-        unit={incomeAccount?.account.commodity.mnemonic}
+        unit={unit}
         options={{
           chart: {
             id: 'netWorthHistogram',
@@ -148,7 +148,7 @@ export default function NetWorthHistogram({
               labels: {
                 formatter: (val: number) => moneyToString(
                   val,
-                  incomeAccount?.account.commodity.mnemonic,
+                  unit,
                 ),
               },
               forceNiceScale: true,
@@ -159,7 +159,7 @@ export default function NetWorthHistogram({
               labels: {
                 formatter: (val: number) => moneyToString(
                   val,
-                  incomeAccount?.account.commodity.mnemonic,
+                  unit,
                 ),
               },
             },
@@ -169,7 +169,7 @@ export default function NetWorthHistogram({
               labels: {
                 formatter: (val: number) => moneyToString(
                   val,
-                  incomeAccount?.account.commodity.mnemonic,
+                  unit,
                 ),
               },
             },
@@ -183,7 +183,7 @@ export default function NetWorthHistogram({
               labels: {
                 formatter: (val: number) => moneyToString(
                   val,
-                  incomeAccount?.account.commodity.mnemonic,
+                  unit,
                 ),
               },
             },

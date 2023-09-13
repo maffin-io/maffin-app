@@ -4,22 +4,25 @@ import { DateTime } from 'luxon';
 import Money from '@/book/Money';
 import Chart from '@/components/charts/Chart';
 import { moneyToString } from '@/helpers/number';
+import * as API from '@/hooks/api';
 
 export type NetWorthPieProps = {
   id: string,
-  assetsSeries?: { [yearMonth: string]: Money },
-  liabilitiesSeries?: { [yearMonth: string]: Money },
   selectedDate?: DateTime,
-  unit?: string,
 };
 
 export default function NetWorthPie({
   id,
-  assetsSeries,
-  liabilitiesSeries,
-  unit = '',
   selectedDate = DateTime.now(),
 }: NetWorthPieProps): JSX.Element {
+  const { data: accounts } = API.useAccounts();
+  const { data: monthlyTotals } = API.useAccountsMonthlyTotals();
+  const assetsSeries = monthlyTotals?.[accounts?.asset?.guid];
+  const liabilitiesSeries = monthlyTotals?.[accounts?.liability?.guid];
+
+  const { data: currency } = API.useMainCurrency();
+  const unit = currency?.mnemonic || '';
+
   let series: number[] = [];
   let assetsTotal = 0;
   let liabilitiesTotal = 0;

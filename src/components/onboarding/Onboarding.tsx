@@ -1,4 +1,3 @@
-import { useAccount, useMainCurrency } from '@/hooks/api';
 import React from 'react';
 import Joyride, {
   CallBackProps,
@@ -9,14 +8,22 @@ import Joyride, {
 import Image from 'next/image';
 import { mutate } from 'swr';
 
-import { Account, Commodity } from '@/book/entities';
+import { useAccount, useMainCurrency } from '@/hooks/api';
+import { Account, Commodity, Split } from '@/book/entities';
 import AccountForm from '@/components/forms/account/AccountForm';
 import CommodityForm from '@/components/forms/commodity/CommodityForm';
 import CustomTooltip from '@/components/onboarding/CustomTooltip';
 import maffinLogo from '@/assets/images/maffin_logo_sm.png';
+import TransactionForm from '../forms/transaction/TransactionForm';
 
-export default function Onboarding(): JSX.Element {
-  const [run, setRun] = React.useState(true);
+type OnboardingProps = {
+  show?: boolean;
+};
+
+export default function Onboarding({
+  show = false,
+}: OnboardingProps): JSX.Element {
+  const [run, setRun] = React.useState(show);
   const [stepIndex, setStepIndex] = React.useState(0);
 
   async function handleJoyrideCallback(data: CallBackProps) {
@@ -59,14 +66,18 @@ export default function Onboarding(): JSX.Element {
                 <p>
                   Before everything, you need to decide which currency
                   is going to be your main one. This is the currency that will be used to show
-                  reports and calculate totals like net worth.
+                  reports and calculate other things like net worth.
                 </p>
                 <p className="badge info mt-3 text-left">
-                  The main currency cannot be changed later so choose wisely!
+                  The main currency cannot be changed later so make sure you
+                  choose the right one for you!
                 </p>
               </span>
               <CommodityForm
-                onSave={() => setStepIndex(1)}
+                onSave={async () => {
+                  await createInitialAccounts();
+                  setStepIndex(1);
+                }}
               />
             </div>
           ),
@@ -78,7 +89,13 @@ export default function Onboarding(): JSX.Element {
           content: (
             <div>
               <span>
-                Let&apos;s add your first bank account. Set the
+                Let&apos;s add your first
+                {' '}
+                <span className="badge info">
+                  Bank
+                </span>
+                {' '}
+                bank account. Set the
                 {' '}
                 <b>opening balance</b>
                 {' '}
@@ -87,13 +104,13 @@ export default function Onboarding(): JSX.Element {
               </span>
               <AccountForm
                 onSave={() => {
-                  setStepIndex(2)
+                  setStepIndex(2);
                 }}
                 defaultValues={{
                   name: 'My bank account',
-                  parent: useAccount('Assets').data,
+                  parent: useAccount('Assets').data as Account,
                   type: 'BANK',
-                  fk_commodity: useMainCurrency().data,
+                  fk_commodity: useMainCurrency().data as Commodity,
                   balance: 0,
                 }}
               />
@@ -110,13 +127,12 @@ export default function Onboarding(): JSX.Element {
                 widget becomes very useful to navigate through all your accounts.
               </p>
               <p className="mb-2">
-                If you added opening balance for your bank account, you can see that now
-                your &quot;Asset&quot; category is equal to the opening balance.
+                You can see that your bank account is now there with the opening
+                balance you added and that your &quot;Assets&quot; parent account is
+                displaying that amount too.
               </p>
               <p>
-                This is because
-                your bank account is within your &quot;Assets&quot; and here we display the total
-                of your assets.
+                This is because it accumulates the total of the sub accounts.
               </p>
               <div className="flex justify-end">
                 <button
@@ -130,6 +146,76 @@ export default function Onboarding(): JSX.Element {
             </div>
           ),
           target: '#accounts-table',
+        },
+        {
+          content: (
+            <div>
+              <span>
+                Let&apos; now add an
+                {' '}
+                <span className="badge danger">
+                  Expense
+                </span>
+                {' '}
+                account to track your expenses, say for example
+                Groceries. Note that we let you create as many accounts as you want.
+                Each account is like a category and allows you to visualise and report accordingly.
+                Some examples can be things like &quot;Rent&quot;, &quot;Electricity&quot;, etc.
+              </span>
+              <AccountForm
+                onSave={() => {
+                  setStepIndex(4);
+                }}
+                defaultValues={{
+                  name: 'Groceries',
+                  parent: useAccount('Expenses').data as Account,
+                  type: 'EXPENSE',
+                  fk_commodity: useMainCurrency().data as Commodity,
+                  balance: 0,
+                }}
+              />
+            </div>
+          ),
+          placement: 'center',
+          target: '#add-account',
+        },
+        {
+          content: (
+            <div>
+              <span>
+                Now that you have
+                {' '}
+                <span className="badge info">
+                  Bank
+                </span>
+                {' '}
+                and
+                {' '}
+                <span className="badge danger">
+                  Expense
+                </span>
+                {' '}
+                accounts let&apos;s add the first transaction to
+                record a &quot;Groceries&quot; expense.
+              </span>
+              <TransactionForm
+                onSave={() => {
+                  setStepIndex(5);
+                }}
+                defaultValues={{
+                  date: '',
+                  description: '',
+                  splits: [
+                    Split.create(),
+                    Split.create(),
+                  ],
+                  fk_currency: useMainCurrency().data as Commodity,
+                }}
+              />
+            </div>
+          ),
+          placement: 'center',
+          target: '#add-account',
         },
       ]}
       tooltipComponent={CustomTooltip}
@@ -149,27 +235,37 @@ async function createInitialAccounts() {
     type: 'ROOT',
   });
 
-  await Account.insert([
-    Account.create({
+  // We need Assets and Expenses accounts in the next steps of Onboarding so
+  // updating directly to make sure they are available.
+  mutate(
+    '/api/account/Assets',
+    await Account.create({
       name: 'Assets',
       type: 'ASSET',
       description: 'Asset accounts are used for tracking things that are of value and can be used or sold to pay debts.',
       placeholder: true,
       fk_commodity: mainCommodity,
       parent: root,
-    }),
+    }).save(),
+  );
+
+  mutate(
+    '/api/account/Expenses',
+    await Account.create({
+      name: 'Expenses',
+      type: 'EXPENSE',
+      description: 'Any expense such as food, clothing, taxes, etc.',
+      placeholder: true,
+      fk_commodity: mainCommodity,
+      parent: root,
+    }).save(),
+  );
+
+  await Account.insert([
     Account.create({
       name: 'Liabilities',
       type: 'LIABILITY',
       description: 'Liability accounts are used for tracking debts or financial obligations.',
-      placeholder: true,
-      fk_commodity: mainCommodity,
-      parent: root,
-    }),
-    Account.create({
-      name: 'Expenses',
-      type: 'EXPENSE',
-      description: 'Any expense such as food, clothing, taxes, etc.',
       placeholder: true,
       fk_commodity: mainCommodity,
       parent: root,
@@ -204,5 +300,5 @@ async function createInitialAccounts() {
   }).save();
 
   mutate('/api/accounts');
-  mutate('/api/accounts/Assets');
+  // mutate('/api/monthly-totals');
 }

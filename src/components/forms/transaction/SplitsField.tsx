@@ -28,7 +28,7 @@ export default function SplitsField({
   React.useEffect(() => {
     if (
       splits.length === 2
-      && splits[0].account.commodity.guid === splits[1].account?.commodity?.guid
+      && splits[0].account?.commodity?.guid === splits[1].account?.commodity?.guid
     ) {
       form.setValue('splits.1.quantity', -mainSplit.value);
       form.setValue('splits.1.value', -mainSplit.value);
@@ -55,8 +55,8 @@ export default function SplitsField({
                     {
                       (
                         !mainSplit.quantity
-                        || mainSplit.quantity >= 0
-                      ) ? <FaArrowUp /> : <FaArrowDown />
+                        || mainSplit.quantity <= 0
+                      ) ? <FaArrowDown /> : <FaArrowUp />
                     }
                   </div>
                 </div>

@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import useSWR, { SWRResponse } from 'swr';
+import { SWRResponse } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
 import { Account, Commodity } from '@/book/entities';
@@ -22,7 +22,6 @@ export function useStartDate(): SWRResponse<DateTime> {
 
 export function useMainCurrency(): SWRResponse<Commodity> {
   const key = '/api/main-currency';
-  console.log(`running ${key}`);
   return useSWRImmutable(
     key,
     fetcher(queries.getMainCurrency, key),
@@ -34,7 +33,7 @@ export function useCommodities(): SWRResponse<Commodity[]> {
   return useSWRImmutable(
     key,
     // Needs to be encapsulated in arrow function or it doesnt work properly
-    fetcher(async () => Commodity.find(), key),
+    fetcher(() => Commodity.find(), key),
   );
 }
 
@@ -56,16 +55,11 @@ export function useAccounts(): SWRResponse<AccountsMap> {
 
 export function useAccount(name: string): SWRResponse<Account> {
   const key = `/api/account/${name}`;
-  console.log(`running ${key}`);
-  return useSWRImmutable(
+  const result = useSWRImmutable(
     key,
-    fetcher(async () => {
-      console.log('lol');
-      const a = await Account.findOneByOrFail({ name });
-      console.log(a);
-      return Account.findOneByOrFail({ name });
-    }, key),
+    fetcher(() => Account.findOneByOrFail({ name }), key),
   );
+  return result;
 }
 
 export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
@@ -78,16 +72,16 @@ export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
     fetcher(PriceDB.getTodayQuotes, '/api/prices/today'),
   );
 
-  const key = (accounts && todayPrices) ? [
-    '/api/accounts/monthly-totals',
-    // We need to recompute when accounts and prices change
-    Object.keys(accounts),
-    Object.keys(todayPrices.keys),
-  ] : null;
+  // const key = (accounts && todayPrices) ? [
+  //   '/api/monthly-totals',
+  //   // We need to recompute when accounts and prices change
+  //   Object.keys(accounts),
+  //   // Object.keys(todayPrices.keys),
+  // ] : null;
 
   const result = useSWRImmutable(
-    key,
-    fetcher(() => queries.getMonthlyTotals(accounts, todayPrices), '/api/accounts/monthly-totals'),
+    '/api/monthly-totals',
+    fetcher(() => queries.getMonthlyTotals(accounts, todayPrices), '/api/monthly-totals'),
   );
 
   return result;

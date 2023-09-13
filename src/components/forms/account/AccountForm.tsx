@@ -17,6 +17,7 @@ import {
   AccountTypeSelector,
 } from '@/components/selectors';
 import { getAllowedSubAccounts } from '@/book/helpers/accountType';
+import {AccountsMap} from '@/types/book';
 
 const resolver = classValidatorResolver(Account, { validator: { stopAtFirstError: true } });
 
@@ -46,7 +47,6 @@ export default function AccountForm({ onSave, defaultValues }: AccountFormProps)
     resolver,
   });
   const { errors } = form.formState;
-  console.log(defaultValues);
 
   const parent = form.watch('parent');
   const ignoreTypes = (
@@ -110,10 +110,11 @@ export default function AccountForm({ onSave, defaultValues }: AccountFormProps)
         />
       </fieldset>
 
-      <fieldset className="text-sm my-5">
+      <fieldset
+        className={`text-sm my-5 ${type === 'BANK' ? 'visible' : 'hidden'}`}
+      >
         <label htmlFor="balanceInput" className="inline-block mb-2">Opening balance</label>
         <input
-          hidden={type !== 'BANK'}
           id="balanceInput"
           className="block w-full m-0"
           {...form.register('balance')}
@@ -153,6 +154,20 @@ export default function AccountForm({ onSave, defaultValues }: AccountFormProps)
 async function onSubmit(data: FormValues, onSave: Function) {
   const account = await Account.create({ ...data }).save();
 
+  mutate(
+    '/api/accounts',
+    async (accounts: AccountsMap) => {
+      // Reload child and parent relations
+      await account.reload();
+      await accounts[account.parentId].reload();
+      return {
+        ...accounts,
+        [account.guid]: account,
+      };
+    },
+    { revalidate: false },
+  );
+
   if (data.balance) {
     const equityAccount = await Account.findOneByOrFail({
       type: 'EQUITY',
@@ -183,8 +198,10 @@ async function onSubmit(data: FormValues, onSave: Function) {
       ],
       date: DateTime.now(),
     }).save();
+
+    // Opening balances affect net worth
+    mutate('/api/monthly-totals');
   }
 
-  mutate('/api/accounts');
   onSave();
 }
