@@ -6,7 +6,7 @@ import {
   screen,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { DataSource } from 'typeorm';
+import { DataSource, IsNull } from 'typeorm';
 import * as swr from 'swr';
 import type { SWRResponse } from 'swr';
 
@@ -38,6 +38,7 @@ describe('TransactionForm', () => {
   let datasource: DataSource;
   let eur: Commodity;
   let sgd: Commodity;
+  let root: Account;
   let assetAccount: Account;
   let expenseAccount: Account;
 
@@ -66,7 +67,7 @@ describe('TransactionForm', () => {
     jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: [] } as SWRResponse);
 
-    const root = await Account.create({
+    root = await Account.create({
       guid: 'root_account_guid',
       name: 'Root',
       type: 'ROOT',
@@ -478,6 +479,107 @@ describe('TransactionForm', () => {
     const txs = await Transaction.find();
     expect(txs).toHaveLength(1);
     expect(txs[0].description).toEqual('New description');
+  });
+
+  it('updates doesnt leave splits with empty transaction', async () => {
+    const user = userEvent.setup();
+
+    const extraExpenseAccount = await Account.create({
+      guid: 'account_guid_3',
+      name: 'Extra',
+      type: 'EXPENSE',
+      fk_commodity: eur,
+      parent: root,
+    }).save();
+
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+      {
+        data: [assetAccount, expenseAccount, extraExpenseAccount],
+      } as SWRResponse,
+    );
+    const mockSave = jest.fn();
+
+    const { rerender } = render(
+      <TransactionForm
+        action="add"
+        onSave={mockSave}
+        defaultValues={
+          {
+            guid: 'tx_guid',
+            date: DateTime.fromISO('2023-01-01').toISODate() as string,
+            description: 'description',
+            splits: [
+              Split.create({
+                valueNum: -200,
+                valueDenom: 1,
+                quantityNum: -200,
+                quantityDenom: 1,
+                fk_account: assetAccount,
+              }),
+              Split.create({
+                valueNum: 100,
+                valueDenom: 1,
+                quantityNum: 100,
+                quantityDenom: 1,
+                fk_account: expenseAccount,
+              }),
+              Split.create({
+                valueNum: 100,
+                valueDenom: 1,
+                quantityNum: 100,
+                quantityDenom: 1,
+                fk_account: extraExpenseAccount,
+              }),
+            ],
+            fk_currency: assetAccount.commodity,
+          }
+        }
+      />,
+    );
+
+    expect(screen.getByText('Save')).toBeEnabled();
+    await user.click(screen.getByText('Save'));
+
+    const tx = await Transaction.findOneOrFail({
+      where: { description: 'description' },
+      relations: {
+        splits: {
+          fk_transaction: {
+            splits: {
+              fk_account: true,
+            },
+          },
+          fk_account: true,
+        },
+      },
+    });
+
+    rerender(
+      <TransactionForm
+        action="update"
+        onSave={mockSave}
+        defaultValues={
+          {
+            ...tx,
+            date: tx.date.toISODate() as string,
+            fk_currency: tx.currency as Commodity,
+          }
+        }
+      />,
+    );
+
+    await user.click(screen.getByText('X'));
+    const [, q1] = screen.getAllByRole('spinbutton');
+    await user.type(q1, '200');
+
+    await user.click(screen.getByText('Update'));
+
+    const splits = await Split.findBy({
+      fk_transaction: IsNull(),
+    });
+    expect(splits).toHaveLength(0);
+    const txs = await Transaction.find();
+    expect(txs).toHaveLength(1);
   });
 
   it('deletes transaction and splits', async () => {

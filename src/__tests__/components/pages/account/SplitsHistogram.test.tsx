@@ -240,8 +240,6 @@ describe('SplitsHistogram', () => {
           } as Split,
           {
             account: {
-              // This is not very accurate as type is always the same but
-              // this way we test INCOME behavior in this same test
               type: 'ASSET',
               commodity: {
                 mnemonic: 'EUR',
@@ -261,5 +259,28 @@ describe('SplitsHistogram', () => {
     mountedEvent({ hideSeries: mockHideSeries });
     expect(mockHideSeries).toBeCalledTimes(1);
     expect(mockHideSeries).toBeCalledWith('2022');
+  });
+
+  it('works when splits are all in a single year', () => {
+    render(
+      <SplitsHistogram
+        currency="EUR"
+        accountType="EXPENSE"
+        splits={[
+          {
+            account: {
+              type: 'ASSET',
+              commodity: {
+                mnemonic: 'EUR',
+              },
+            },
+            transaction: {
+              date: DateTime.fromISO('2022-01-01'),
+            },
+            quantity: -200,
+          } as Split,
+        ]}
+      />,
+    );
   });
 });

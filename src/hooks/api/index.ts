@@ -80,26 +80,30 @@ export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
 
   const key = (accounts && todayPrices) ? [
     '/api/accounts/monthly-totals',
-    Object.keys(accounts), // We need to recompute when keys changes
+    // We need to recompute when accounts and prices change
+    Object.keys(accounts),
+    Object.keys(todayPrices.keys),
   ] : null;
 
   const result = useSWRImmutable(
     key,
     fetcher(() => queries.getMonthlyTotals(accounts, todayPrices), '/api/accounts/monthly-totals'),
   );
-  if (result.error) {
-    throw result.error;
-  }
 
   return result;
 }
 
 export function useInvestments(): SWRResponse<InvestmentAccount[]> {
   const key = '/api/investments';
-  return useSWRImmutable(
+  const result = useSWRImmutable(
     key,
     fetcher(queries.getInvestments, key),
   );
+  if (result.error) {
+    throw new Error(result.error);
+  }
+
+  return result;
 }
 
 export function useSplits(guid: string): SWRResponse<Split[]> {

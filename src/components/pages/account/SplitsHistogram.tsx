@@ -26,14 +26,10 @@ export default function SplitsHistogram({
 
   if (splits.length) {
     const interval = Interval.fromDateTimes(
-      splits[splits.length - 1].transaction.date,
-      splits[0]?.transaction.date,
+      splits[splits.length - 1].transaction.date.startOf('year'),
+      DateTime.now().endOf('year'),
     );
     const years = interval.splitBy({ year: 1 }).map(d => (d.start as DateTime).year);
-    const currentYear = DateTime.now().year;
-    if (!years.includes(currentYear)) {
-      years.push(DateTime.now().year);
-    }
 
     series = years.map(year => {
       hiddenSeries.push(year.toString());

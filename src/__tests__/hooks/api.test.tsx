@@ -7,12 +7,13 @@ import * as API from '@/hooks/api';
 import * as queries from '@/lib/queries';
 import * as gapiHooks from '@/hooks/useGapiClient';
 import * as getUserModule from '@/lib/getUser';
-import { SWRResponse } from 'swr';
+import { BareFetcher, SWRResponse } from 'swr';
 
 jest.mock('@/lib/queries');
 
 jest.mock('@/book/prices', () => ({
   __esModule: true,
+  ...jest.requireActual('@/book/prices'),
   PriceDB: {
     getTodayQuotes: jest.fn(),
   },
@@ -25,10 +26,7 @@ jest.mock('@/lib/getUser', () => ({
 
 jest.mock('swr/immutable', () => ({
   __esModule: true,
-  default: jest.fn((key, f: Function) => ({
-    data: f(key),
-    error: undefined,
-  })),
+  ...jest.requireActual('swr/immutable'),
 }));
 
 jest.mock('@/hooks/useGapiClient', () => ({
@@ -41,6 +39,12 @@ describe('API', () => {
     jest.spyOn(Commodity, 'find').mockImplementation();
     jest.spyOn(PriceDB, 'getTodayQuotes').mockImplementation();
     jest.spyOn(getUserModule, 'default').mockImplementation();
+    jest.spyOn(swrImmutable, 'default').mockImplementation(
+      jest.fn((key, f: BareFetcher | null) => ({
+        data: f && f(key),
+        error: undefined,
+      } as SWRResponse)),
+    );
   });
 
   afterEach(() => {
@@ -65,6 +69,14 @@ describe('API', () => {
     );
 
     expect(f).toBeCalledTimes(1);
+  });
+
+  it.each([
+    'useInvestments',
+  ])('propagates error for %s', (name) => {
+    jest.spyOn(swrImmutable, 'default').mockReturnValue({ error: 'error' } as SWRResponse);
+    // @ts-ignore
+    renderHook(() => expect(() => API[name]()).toThrow('error'));
   });
 
   it('calls useSWRImmutable with expected params for useSplits', () => {
@@ -130,7 +142,7 @@ describe('API', () => {
 
   it('calls useSWRImmutable with expected params for useAccountsMonthlyTotals when accounts and prices', () => {
     const accounts = { a: { guid: 'a' } };
-    const todayPrices = {} as PriceDBMap;
+    const todayPrices = new PriceDBMap();
     jest.spyOn(swrImmutable, 'default')
       .mockReturnValueOnce({ data: accounts } as SWRResponse)
       .mockReturnValueOnce({ data: todayPrices } as SWRResponse);
@@ -138,7 +150,7 @@ describe('API', () => {
 
     expect(swrImmutable.default).toHaveBeenNthCalledWith(
       3,
-      '/api/accounts/monthly-totals',
+      ['/api/accounts/monthly-totals', ['a'], []],
       expect.any(Function),
     );
     expect(queries.getMonthlyTotals).toBeCalledWith(accounts, todayPrices);

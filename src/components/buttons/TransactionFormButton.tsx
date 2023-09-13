@@ -5,11 +5,17 @@ import { BiPlusCircle } from 'react-icons/bi';
 import { DataSourceContext } from '@/hooks';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import type { FormValues } from '@/components/forms/transaction/types';
-import { Commodity, Transaction } from '@/book/entities';
+import {
+  Account,
+  Commodity,
+  Split,
+  Transaction,
+} from '@/book/entities';
 
 export type TransactionFormButtonProps = {
   action?: 'add' | 'update' | 'delete',
   guid?: string, // The transaction to update or delete
+  account?: Account, // Account to populate for the main split
   defaultValues?: FormValues,
   className?: string,
   children?: React.ReactNode,
@@ -19,6 +25,7 @@ export default function TransactionFormButton(
   {
     action = 'add',
     guid,
+    account,
     defaultValues,
     children,
     className = 'btn-primary',
@@ -64,7 +71,18 @@ export default function TransactionFormButton(
         type="button"
         className={className}
         onClick={async () => {
-          if (action === 'update' || action === 'delete') {
+          if (action === 'add') {
+            const split1 = new Split();
+            if (account) {
+              split1.fk_account = account;
+            }
+
+            const split2 = new Split();
+            setDefaults({
+              ...defaultValues,
+              splits: [split1, split2],
+            } as FormValues);
+          } else if (action === 'update' || action === 'delete') {
             const tx = await Transaction.findOneOrFail({
               where: { guid },
               relations: {
