@@ -31,6 +31,10 @@ jest.mock('@/layout/Topbar', () => jest.fn(
   () => <div data-testid="Topbar" />,
 ));
 
+jest.mock('react-modal', () => ({
+  setAppElement: jest.fn(),
+}));
+
 describe('DashboardLayout', () => {
   beforeEach(() => {
     jest.spyOn(userHooks, 'default').mockReturnValue({

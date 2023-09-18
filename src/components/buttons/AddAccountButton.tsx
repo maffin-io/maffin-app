@@ -1,5 +1,5 @@
 import React from 'react';
-import Modal from '@/components/Modal';
+import Modal from 'react-modal';
 import { BiPlusCircle } from 'react-icons/bi';
 
 import { DataSourceContext } from '@/hooks';
@@ -12,10 +12,18 @@ export default function AddAccountButton(): JSX.Element {
   return (
     <>
       <Modal
-        title="Add account"
-        open={isModalOpen}
-        setOpen={setIsModalOpen}
+        isOpen={isModalOpen}
+        overlayClassName="fixed inset-0 bg-white bg-opacity-30 overflow-y-auto h-full w-full z-50"
+        className="relative top-20 mx-auto p-5 w-1/3 shadow-lg rounded-md bg-gunmetal-700"
       >
+        <button
+          type="button"
+          className="float-right"
+          onClick={() => setIsModalOpen(false)}
+        >
+          X
+        </button>
+        <span>Add account</span>
         <AccountForm
           onSave={() => {
             save();
@@ -24,6 +32,7 @@ export default function AddAccountButton(): JSX.Element {
         />
       </Modal>
       <button
+        id="add-account"
         type="button"
         className="btn-primary"
         onClick={() => setIsModalOpen(!isModalOpen)}

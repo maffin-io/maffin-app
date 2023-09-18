@@ -1,9 +1,9 @@
 import React from 'react';
 import { BiPlusCircle } from 'react-icons/bi';
+import Modal from 'react-modal';
 
 import { DataSourceContext } from '@/hooks';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
-import Modal from '@/components/Modal';
 import type { FormValues } from '@/components/forms/transaction/types';
 import {
   Account,
@@ -46,10 +46,18 @@ export default function TransactionFormButton(
   return (
     <>
       <Modal
-        title={title}
-        open={isModalOpen}
-        setOpen={setIsModalOpen}
+        isOpen={isModalOpen}
+        overlayClassName="fixed inset-0 bg-white bg-opacity-30 overflow-y-auto h-full w-full z-50"
+        className="relative top-20 mx-auto p-5 w-1/3 shadow-lg rounded-md bg-gunmetal-700"
       >
+        <button
+          type="button"
+          className="float-right"
+          onClick={() => setIsModalOpen(false)}
+        >
+          X
+        </button>
+        <span>{title}</span>
         <TransactionForm
           action={action}
           onSave={() => {
@@ -60,6 +68,7 @@ export default function TransactionFormButton(
         />
       </Modal>
       <button
+        id="add-tx"
         type="button"
         className={className}
         onClick={async () => {
