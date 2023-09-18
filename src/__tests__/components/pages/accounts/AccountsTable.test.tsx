@@ -70,6 +70,7 @@ describe('AccountsTable', () => {
           a1: {
             guid: 'a1',
             name: 'Assets',
+            description: 'description',
             commodity: {
               mnemonic: 'EUR',
             },
@@ -118,6 +119,7 @@ describe('AccountsTable', () => {
               guid: 'a1',
               name: 'Assets',
               type: 'ASSET',
+              description: 'description',
               commodity: {
                 mnemonic: 'EUR',
               },

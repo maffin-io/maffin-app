@@ -225,9 +225,10 @@ describe('TransactionForm', () => {
     });
     expect(tx.guid.length).toEqual(31);
     expect(mockSave).toHaveBeenCalledTimes(1);
-    expect(swr.mutate).toBeCalledTimes(2);
+    expect(swr.mutate).toBeCalledTimes(3);
     expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/account_guid_1');
     expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/splits/account_guid_2');
+    expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/txs/latest');
   });
 
   it('creates transaction with expected params with different currency', async () => {
@@ -394,10 +395,11 @@ describe('TransactionForm', () => {
     expect(screen.getByText('Save')).toBeEnabled();
     await user.click(screen.getByText('Save'));
 
-    expect(swr.mutate).toBeCalledTimes(3);
+    expect(swr.mutate).toBeCalledTimes(4);
     expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/account_guid_1');
     expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/investments');
     expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/splits/stock_account');
+    expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/txs/latest');
   });
 
   it('updates transaction', async () => {

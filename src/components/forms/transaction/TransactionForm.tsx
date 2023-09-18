@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 import { mutate } from 'swr';
 import { IsNull } from 'typeorm';
+import { Tooltip } from 'react-tooltip';
 
 import {
   Split,
@@ -63,6 +64,27 @@ export default function TransactionForm({
 
       <fieldset className="text-sm my-5">
         <label htmlFor="descriptionInput" className="inline-block mb-2">Description</label>
+        <span
+          className="badge"
+          data-tooltip-id="description-help"
+        >
+          ?
+        </span>
+        <Tooltip
+          id="description-help"
+          className="bg-cyan-600 w-1/3 text-white rounded-lg p-2"
+          disableStyleInjection
+        >
+          <p className="mb-2">
+            Add a meaningful description to your transaction. The description is shown in the
+            list of transactions in the account detail page.
+          </p>
+          <p>
+            It helps to set the same description
+            for similar transactions. For example, for a Groceries transaction, you can set
+            &quot;Supermarket&quot; to all of them.
+          </p>
+        </Tooltip>
         <input
           id="descriptionInput"
           disabled={disabled}
@@ -134,5 +156,7 @@ async function onSubmit(data: FormValues, action: 'add' | 'update' | 'delete', o
     }
     mutate(`/api/splits/${split.account.guid}`);
   });
+
+  mutate('/api/txs/latest');
   onSave();
 }
