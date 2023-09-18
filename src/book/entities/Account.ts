@@ -115,6 +115,15 @@ export default class Account extends BaseEntity {
 
   @OneToMany('Split', (split: Split) => split.fk_account)
     splits!: Split[];
+
+  @Column({
+    type: 'text',
+    length: 2048,
+    nullable: true,
+  })
+  @v.IsOptional()
+  @v.Length(4, 2048)
+    description?: string;
 }
 
 // https://github.com/typeorm/typeorm/issues/4714

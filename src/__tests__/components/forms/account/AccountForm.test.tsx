@@ -182,6 +182,7 @@ describe('AccountForm', () => {
       type: 'ASSET',
       fk_commodity: eur,
       childrenIds: [],
+      description: null,
       parentId: assetAccount.guid,
       path: 'Assets:TestAccount',
     });

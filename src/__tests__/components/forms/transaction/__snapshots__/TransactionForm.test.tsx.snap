@@ -31,6 +31,12 @@ exports[`TransactionForm renders as expected with action add 1`] = `
       >
         Description
       </label>
+      <span
+        class="badge"
+        data-tooltip-id="description-help"
+      >
+        ?
+      </span>
       <input
         class="block w-full m-0"
         id="descriptionInput"
@@ -431,6 +437,12 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
       >
         Description
       </label>
+      <span
+        class="badge"
+        data-tooltip-id="description-help"
+      >
+        ?
+      </span>
       <input
         class="block w-full m-0"
         disabled=""
@@ -817,6 +829,12 @@ exports[`TransactionForm renders as expected with action update 1`] = `
       >
         Description
       </label>
+      <span
+        class="badge"
+        data-tooltip-id="description-help"
+      >
+        ?
+      </span>
       <input
         class="block w-full m-0"
         id="descriptionInput"

@@ -4,6 +4,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
 import { BiCircle, BiSolidRightArrow, BiSolidDownArrow } from 'react-icons/bi';
 import classNames from 'classnames';
+import { Tooltip } from 'react-tooltip';
 
 import Money from '@/book/Money';
 import Table from '@/components/Table';
@@ -116,6 +117,19 @@ const columns: ColumnDef<AccountsTableRow>[] = [
         >
           {row.original.account.name}
         </Link>
+
+        {
+          row.original.account.description
+          && (
+            <Tooltip
+              id={row.original.account.guid}
+              className="bg-cyan-600 text-white rounded-lg p-2"
+              disableStyleInjection
+            >
+              {row.original.account.description}
+            </Tooltip>
+          )
+        }
       </div>
     ),
   },

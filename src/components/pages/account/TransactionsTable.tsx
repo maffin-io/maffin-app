@@ -4,10 +4,10 @@ import classNames from 'classnames';
 import Link from 'next/link';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { BiEdit, BiXCircle } from 'react-icons/bi';
+import { Tooltip } from 'react-tooltip';
 
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import Table from '@/components/Table';
-import Tooltip from '@/components/Tooltip';
 import Money from '@/book/Money';
 import {
   Account,
@@ -44,13 +44,15 @@ const columns: ColumnDef<Split>[] = [
     enableSorting: false,
     accessorFn: (row: Split) => row.transaction.date.toMillis(),
     cell: ({ row }) => (
-      <Tooltip
-        text={row.original.transaction.guid}
-      >
-        <span>
+      <>
+        <span
+          data-tooltip-id={row.original.transaction.guid}
+          data-tooltip-content={row.original.transaction.guid}
+        >
           {row.original.transaction.date.toISODate()}
         </span>
-      </Tooltip>
+        <Tooltip id={row.original.transaction.guid} />
+      </>
     ),
   },
   {
