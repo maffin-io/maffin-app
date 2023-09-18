@@ -1,12 +1,15 @@
 'use client';
 
 import React from 'react';
+import Modal from 'react-modal';
 
 import { useDataSource, DataSourceContext } from '@/hooks';
 import useUser from '@/hooks/useUser';
 import Footer from '@/layout/Footer';
 import LeftSidebar from '@/layout/LeftSidebar';
 import Topbar from '@/layout/Topbar';
+
+Modal.setAppElement('#modals');
 
 export default function DashboardLayout({
   children,

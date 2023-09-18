@@ -37,6 +37,7 @@ export default function RootLayout({
       <body className="bg-gunmetal-800" data-leftbar-compact-mode="condensed">
         <noscript>You need to enable JavaScript to run this app.</noscript>
         {children}
+        <div id="modals" />
       </body>
     </html>
   );
