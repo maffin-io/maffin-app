@@ -125,7 +125,7 @@
     "@types/luxon": "^3.3.2",
     "@types/node": "^20.6.1",
     "@types/pako": "^2.0.0",
-    "@types/react": "^18.2.21",
+    "@types/react": "^18.2.22",
     "@types/react-dom": "^18.2.7",
     "@types/react-modal": "^3.16.0",
     "@types/react-router-dom": "^5.3.3",
