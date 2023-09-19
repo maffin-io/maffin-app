@@ -1,19 +1,20 @@
 import React from 'react';
 
 import Chart from '@/components/charts/Chart';
-import type { InvestmentAccount } from '@/book/models';
 import Money from '@/book/Money';
 import { toFixed, moneyToString } from '@/helpers/number';
+import * as API from '@/hooks/api';
 
 export type WeightsChartProps = {
-  investments: InvestmentAccount[],
   totalValue: Money,
 };
 
 export default function WeightsChart({
-  investments,
   totalValue,
 }: WeightsChartProps): JSX.Element {
+  let { data: investments } = API.useInvestments();
+  investments = investments || [];
+
   const data: { [ticker: string]: {
     x: string,
     y: number,

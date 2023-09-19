@@ -6,7 +6,7 @@ import {
 } from '@testing-library/react';
 import type { LinkProps } from 'next/link';
 import { BiEdit, BiXCircle } from 'react-icons/bi';
-import type { AccountsMap } from '@/types/book';
+import type { SWRResponse } from 'swr';
 
 import {
   Account,
@@ -17,6 +17,8 @@ import {
 import Table from '@/components/Table';
 import { TransactionsTable } from '@/components/pages/account';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
+import type { AccountsMap } from '@/types/book';
+import * as apiHook from '@/hooks/api';
 
 jest.mock('next/link', () => jest.fn(
   (
@@ -38,6 +40,11 @@ jest.mock('@/components/buttons/TransactionFormButton', () => jest.fn(
     </div>
   ),
 ));
+
+jest.mock('@/hooks/api', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/api'),
+}));
 
 describe('TransactionsTable', () => {
   let eur: Commodity;
@@ -104,17 +111,69 @@ describe('TransactionsTable', () => {
         } as Account,
       } as Split,
     ];
+
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: accounts } as SWRResponse);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: splits1 } as SWRResponse);
   });
 
   afterEach(async () => {
     jest.clearAllMocks();
   });
 
+  it('creates empty Table with expected params', async () => {
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as SWRResponse);
+
+    render(<TransactionsTable account={accounts.account_guid_1} />);
+
+    await screen.findByTestId('Table');
+    expect(Table).toHaveBeenLastCalledWith(
+      {
+        columns: [
+          {
+            header: 'Date',
+            id: 'date',
+            enableSorting: false,
+            accessorFn: expect.any(Function),
+            cell: expect.any(Function),
+          },
+          {
+            header: 'Description',
+            enableSorting: false,
+            accessorFn: expect.any(Function),
+          },
+          {
+            header: 'From/To',
+            enableSorting: false,
+            cell: expect.any(Function),
+          },
+          {
+            accessorKey: 'value',
+            header: 'Amount',
+            enableSorting: false,
+            cell: expect.any(Function),
+          },
+          {
+            header: 'Total',
+            enableSorting: false,
+            cell: expect.any(Function),
+          },
+          {
+            header: 'Actions',
+            enableSorting: false,
+            cell: expect.any(Function),
+          },
+        ],
+        data: [],
+      },
+      {},
+    );
+  });
+
   it('creates Table with expected params', async () => {
     render(
       <TransactionsTable
-        splits={splits1}
-        accounts={accounts}
+        account={accounts.account_guid_1}
       />,
     );
 
@@ -161,12 +220,7 @@ describe('TransactionsTable', () => {
   });
 
   it('renders Date column as expected', async () => {
-    render(
-      <TransactionsTable
-        splits={splits1}
-        accounts={accounts}
-      />,
-    );
+    render(<TransactionsTable account={accounts.account_guid_1} />);
 
     await screen.findByTestId('Table');
     const dateCol = TableMock.mock.calls[0][0].columns[0];
@@ -190,12 +244,7 @@ describe('TransactionsTable', () => {
   });
 
   it('renders FromTo column as expected', async () => {
-    render(
-      <TransactionsTable
-        splits={splits1}
-        accounts={accounts}
-      />,
-    );
+    render(<TransactionsTable account={accounts.account_guid_1} />);
 
     await screen.findByTestId('Table');
     const fromToCol = TableMock.mock.calls[0][0].columns[2];
@@ -214,12 +263,7 @@ describe('TransactionsTable', () => {
   });
 
   it('renders Amount column as expected', async () => {
-    render(
-      <TransactionsTable
-        splits={splits1}
-        accounts={accounts}
-      />,
-    );
+    render(<TransactionsTable account={accounts.account_guid_1} />);
 
     await screen.findByTestId('Table');
     const amountCol = TableMock.mock.calls[0][0].columns[3];
@@ -251,8 +295,7 @@ describe('TransactionsTable', () => {
   it('renders Total column as expected', async () => {
     render(
       <TransactionsTable
-        splits={splits1}
-        accounts={accounts}
+        account={accounts.account_guid_1}
       />,
     );
 
@@ -291,8 +334,7 @@ describe('TransactionsTable', () => {
   it('renders Actions column as expected', async () => {
     render(
       <TransactionsTable
-        splits={splits1}
-        accounts={accounts}
+        account={accounts.account_guid_1}
       />,
     );
 

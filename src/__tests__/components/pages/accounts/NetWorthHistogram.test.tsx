@@ -1,19 +1,26 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { DateTime } from 'luxon';
+import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
-import { Account } from '@/book/entities';
 import Chart from '@/components/charts/Chart';
 import { NetWorthHistogram } from '@/components/pages/accounts';
+import * as apiHook from '@/hooks/api';
 
 jest.mock('@/components/charts/Chart', () => jest.fn(
   () => <div data-testid="Chart" />,
 ));
 
+jest.mock('@/hooks/api', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/api'),
+}));
+
 describe('NetWorthHistogram', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02'));
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
   afterEach(() => {
@@ -21,15 +28,9 @@ describe('NetWorthHistogram', () => {
     jest.resetAllMocks();
   });
 
-  it('renders with empty tree', () => {
+  it('renders with no data', () => {
     render(
-      <NetWorthHistogram
-        tree={{
-          account: { childrenIds: [] },
-          leaves: [],
-        }}
-        monthlyTotals={{}}
-      />,
+      <NetWorthHistogram />,
     );
 
     expect(Chart).toBeCalledTimes(2);
@@ -38,6 +39,7 @@ describe('NetWorthHistogram', () => {
       {
         height: 350,
         type: 'line',
+        unit: '',
         series: [
           {
             data: [],
@@ -182,35 +184,28 @@ describe('NetWorthHistogram', () => {
     );
   });
 
-  it('generates series from tree as expected', () => {
-    render(
-      <NetWorthHistogram
-        startDate={DateTime.fromISO('2022-09-01')}
-        monthlyTotals={{
+  it('generates series from data as expected', () => {
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+      {
+        data: {
           income: {
             '11/2022': new Money(-600, 'EUR'),
             '12/2022': new Money(-400, 'EUR'),
           },
-          expenses: {
+          equity: {
+            '11/2022': new Money(-200, 'EUR'),
+          },
+          expense: {
             '11/2022': new Money(400, 'EUR'),
             '12/2022': new Money(500, 'EUR'),
           },
-        }}
-        tree={
-          {
-            account: { guid: 'root' } as Account,
-            leaves: [
-              {
-                account: { guid: 'income', type: 'INCOME', commodity: { mnemonic: 'EUR' } },
-                leaves: [],
-              },
-              {
-                account: { guid: 'expenses', type: 'EXPENSE' },
-                leaves: [],
-              },
-            ],
-          }
-        }
+        },
+      } as SWRResponse,
+    );
+
+    render(
+      <NetWorthHistogram
+        startDate={DateTime.fromISO('2022-09-01')}
       />,
     );
 
@@ -230,7 +225,7 @@ describe('NetWorthHistogram', () => {
           },
           {
             x: DateTime.fromISO('2022-11-01'),
-            y: 600,
+            y: 800,
           },
           {
             x: DateTime.fromISO('2022-12-01'),
@@ -282,7 +277,7 @@ describe('NetWorthHistogram', () => {
           },
           {
             x: DateTime.fromISO('2022-11-01'),
-            y: 200,
+            y: 400,
           },
           {
             x: DateTime.fromISO('2022-12-01'),
@@ -308,15 +303,15 @@ describe('NetWorthHistogram', () => {
           },
           {
             x: DateTime.fromISO('2022-11-01'),
-            y: 200,
+            y: 400,
           },
           {
             x: DateTime.fromISO('2022-12-01'),
-            y: 100,
+            y: 300,
           },
           {
             x: DateTime.fromISO('2023-01-01'),
-            y: 100,
+            y: 300,
           },
         ],
       },
@@ -338,15 +333,15 @@ describe('NetWorthHistogram', () => {
           },
           {
             x: DateTime.fromISO('2022-11-01'),
-            y: 200,
+            y: 400,
           },
           {
             x: DateTime.fromISO('2022-12-01'),
-            y: 100,
+            y: 300,
           },
           {
             x: DateTime.fromISO('2023-01-01'),
-            y: 100,
+            y: 300,
           },
         ],
       },
@@ -358,11 +353,6 @@ describe('NetWorthHistogram', () => {
     render(
       <NetWorthHistogram
         selectedDate={selectedDate}
-        tree={{
-          account: { childrenIds: [] },
-          leaves: [],
-        }}
-        monthlyTotals={{}}
       />,
     );
 

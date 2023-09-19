@@ -56,7 +56,6 @@ describe('AccountsPage', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02'));
     jest.spyOn(apiHook, 'useStartDate').mockReturnValue({ data: undefined } as SWRResponse);
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue({ data: undefined } as SWRResponse);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
@@ -64,7 +63,14 @@ describe('AccountsPage', () => {
     jest.clearAllMocks();
   });
 
-  it('passes empty data to components when loading when not ready', async () => {
+  it('shows loading when loading data', async () => {
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ isLoading: true } as SWRResponse);
+    render(<AccountsPage />);
+
+    await screen.findByText('Loading...');
+  });
+
+  it('passes empty data to components when no data ready', async () => {
     const date = DateTime.fromISO('2022-01-01');
     jest.spyOn(apiHook, 'useStartDate').mockReturnValueOnce({ data: date } as SWRResponse);
     const { container } = render(<AccountsPage />);
@@ -75,12 +81,6 @@ describe('AccountsPage', () => {
     await screen.findByTestId('AccountsTable');
     expect(AccountsTable).toHaveBeenLastCalledWith(
       {
-        accounts: {
-          root: {
-            childrenIds: [],
-          },
-        },
-        monthlyTotals: {},
         selectedDate: DateTime.fromISO('2023-01-02'),
       },
       {},
@@ -103,9 +103,6 @@ describe('AccountsPage', () => {
     await screen.findByTestId('NetWorthPie');
     expect(NetWorthPie).toHaveBeenLastCalledWith(
       {
-        assetSeries: undefined,
-        liabilitiesSeries: undefined,
-        unit: undefined,
         selectedDate: DateTime.fromISO('2023-01-02'),
       },
       {},
@@ -114,11 +111,6 @@ describe('AccountsPage', () => {
     await screen.findByTestId('NetWorthHistogram');
     expect(NetWorthHistogram).toHaveBeenLastCalledWith(
       {
-        monthlyTotals: {},
-        tree: {
-          account: { childrenIds: [] },
-          leaves: [],
-        },
         selectedDate: DateTime.fromISO('2023-01-02'),
         startDate: DateTime.fromISO('2022-01-01'),
       },
@@ -131,8 +123,7 @@ describe('AccountsPage', () => {
       1,
       {
         title: 'Income',
-        tree: undefined,
-        monthlyTotals: {},
+        accounts: undefined,
         selectedDate: DateTime.fromISO('2023-01-02'),
       },
       {},
@@ -141,8 +132,7 @@ describe('AccountsPage', () => {
       2,
       {
         title: 'Expenses',
-        tree: undefined,
-        monthlyTotals: {},
+        accounts: undefined,
         selectedDate: DateTime.fromISO('2023-01-02'),
       },
       {},
@@ -160,27 +150,9 @@ describe('AccountsPage', () => {
         guid: 'root',
         name: 'Root',
         type: 'ROOT',
-        childrenIds: ['a1', 'a3', 'a5'],
+        childrenIds: ['a3', 'a5'],
       } as Account,
-      a1: {
-        guid: 'a1',
-        name: 'Assets',
-        commodity: {
-          mnemonic: 'EUR',
-        },
-        type: 'ASSET',
-        childrenIds: ['a2'],
-      } as Account,
-      a2: {
-        guid: 'a2',
-        name: 'Bank',
-        commodity: {
-          mnemonic: 'USD',
-        },
-        type: 'BANK',
-        childrenIds: [] as string[],
-      } as Account,
-      a3: {
+      expense: {
         guid: 'a3',
         name: 'Expenses',
         commodity: {
@@ -198,7 +170,7 @@ describe('AccountsPage', () => {
         type: 'EXPENSE',
         childrenIds: [] as string[],
       } as Account,
-      a5: {
+      income: {
         guid: 'a5',
         name: 'Income',
         commodity: {
@@ -218,91 +190,22 @@ describe('AccountsPage', () => {
       } as Account,
     };
 
-    const monthlyTotals = {
-      a1: {
-        '01/2023': 703,
-        '02/2023': 303,
-      },
-      a2: {
-        '01/2023': 700,
-        '02/2023': 300,
-      },
-      a3: {
-        '01/2023': 1400,
-        '02/2023': 600,
-      },
-      a4: {
-        '01/2023': 700,
-        '02/2023': 300,
-      },
-      a5: {
-        '01/2023': -2000,
-        '02/2023': -2000,
-      },
-      a6: {
-        '01/2023': -1000,
-        '02/2023': -1000,
-      },
-    };
-
     const date = DateTime.fromISO('2022-01-01');
     jest.spyOn(apiHook, 'useStartDate').mockReturnValueOnce({ data: date } as SWRResponse);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValueOnce({ data: accounts } as SWRResponse);
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValueOnce({
-      data: monthlyTotals,
-    } as SWRResponse);
 
     render(<AccountsPage />);
 
-    const expectedTree = {
-      account: accounts.root,
-      leaves: [
-        {
-          account: accounts.a1,
-          leaves: [
-            {
-              account: accounts.a2,
-              leaves: [],
-            },
-          ],
-        },
-        {
-          account: accounts.a3,
-          leaves: [
-            {
-              account: accounts.a4,
-              leaves: [],
-            },
-          ],
-        },
-        {
-          account: accounts.a5,
-          leaves: [
-            {
-              account: accounts.a6,
-              leaves: [],
-            },
-          ],
-        },
-      ],
-    };
     await screen.findByTestId('AccountsTable');
     expect(AccountsTable).toBeCalledTimes(1);
     expect(AccountsTable).toHaveBeenLastCalledWith({
-      accounts,
-      monthlyTotals,
       selectedDate: DateTime.now(),
     }, {});
     expect(NetWorthPie).toHaveBeenLastCalledWith({
-      assetsSeries: monthlyTotals.a1,
-      liabilitiesSeries: undefined,
       selectedDate: DateTime.now(),
-      unit: 'EUR',
     }, {});
     expect(NetWorthHistogram).toHaveBeenLastCalledWith(
       {
-        tree: expectedTree,
-        monthlyTotals,
         startDate: date,
         selectedDate: DateTime.fromISO('2023-01-02'),
       },
@@ -312,9 +215,8 @@ describe('AccountsPage', () => {
       1,
       {
         title: 'Income',
-        tree: expectedTree.leaves[2],
-        monthlyTotals,
         selectedDate: DateTime.fromISO('2023-01-02'),
+        accounts: [accounts.a6],
       },
       {},
     );
@@ -322,9 +224,8 @@ describe('AccountsPage', () => {
       2,
       {
         title: 'Expenses',
-        tree: expectedTree.leaves[1],
-        monthlyTotals,
         selectedDate: DateTime.fromISO('2023-01-02'),
+        accounts: [accounts.a4],
       },
       {},
     );

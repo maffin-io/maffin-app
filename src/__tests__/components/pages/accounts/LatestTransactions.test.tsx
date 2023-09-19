@@ -18,8 +18,6 @@ describe('LatestTransactions', () => {
 
   it('renders with empty txs', () => {
     const { container } = render(<LatestTransactions />);
-
-    screen.getByText('You have no movements yet...');
     expect(container).toMatchSnapshot();
   });
 

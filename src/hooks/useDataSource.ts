@@ -134,7 +134,6 @@ async function importBook(storage: BookStorage | null, rawData: Uint8Array) {
   await save(storage);
 }
 
-// TODO: Need to mutate the accounts SWR key so Root is shown!
 async function createEmptyBook() {
   const rootAccount = Account.create({
     guid: 'rootAccount',

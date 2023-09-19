@@ -1,16 +1,23 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 import { render, screen } from '@testing-library/react';
+import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
 import { InvestmentAccount } from '@/book/models';
 import Chart from '@/components/charts/Chart';
-import DividendChart from '@/components/pages/investments/DividendChart';
+import { DividendChart } from '@/components/pages/investments';
+import * as apiHook from '@/hooks/api';
 
 jest.mock('@/components/charts/Chart', () => jest.fn(
   () => <div data-testid="Chart" />,
 ));
 const ChartMock = Chart as jest.MockedFunction<typeof Chart>;
+
+jest.mock('@/hooks/api', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/api'),
+}));
 
 const mockChartExec = jest.fn();
 Object.defineProperty(global.self, 'ApexCharts', {
@@ -20,56 +27,60 @@ Object.defineProperty(global.self, 'ApexCharts', {
 });
 
 describe('DividendChart', () => {
+  beforeEach(() => {
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as SWRResponse);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('shows loading when no data', () => {
-    render(<DividendChart investments={[]} />);
+    render(<DividendChart />);
 
     screen.getByText('Loading...');
   });
 
   it('renders as expected with data', () => {
-    const { container } = render(
-      <DividendChart
-        investments={
-          [
-            {
-              mainCurrency: 'EUR',
-              account: {
-                name: 'Account1',
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue(
+      {
+        data: [
+          {
+            mainCurrency: 'EUR',
+            account: {
+              name: 'Account1',
+            },
+            dividends: [
+              {
+                when: DateTime.fromISO('2023-01-01'),
+                amountInCurrency: new Money(100, 'EUR'),
               },
-              dividends: [
-                {
-                  when: DateTime.fromISO('2023-01-01'),
-                  amountInCurrency: new Money(100, 'EUR'),
-                },
-                {
-                  when: DateTime.fromISO('2023-05-01'),
-                  amountInCurrency: new Money(130, 'EUR'),
-                },
-              ],
-            } as InvestmentAccount,
-            {
-              account: {
-                name: 'Account2',
+              {
+                when: DateTime.fromISO('2023-05-01'),
+                amountInCurrency: new Money(130, 'EUR'),
               },
-              dividends: [
-                {
-                  when: DateTime.fromISO('2022-02-02'),
-                  amountInCurrency: new Money(150, 'EUR'),
-                },
-                {
-                  when: DateTime.fromISO('2023-05-20'),
-                  amountInCurrency: new Money(130, 'EUR'),
-                },
-              ],
-            } as InvestmentAccount,
-          ]
-        }
-      />,
+            ],
+          } as InvestmentAccount,
+          {
+            account: {
+              name: 'Account2',
+            },
+            dividends: [
+              {
+                when: DateTime.fromISO('2022-02-02'),
+                amountInCurrency: new Money(150, 'EUR'),
+              },
+              {
+                when: DateTime.fromISO('2023-05-20'),
+                amountInCurrency: new Money(130, 'EUR'),
+              },
+            ],
+          } as InvestmentAccount,
+        ],
+      } as SWRResponse,
     );
+
+    const { container } = render(<DividendChart />);
 
     expect(Chart).toHaveBeenNthCalledWith(
       1,
@@ -197,30 +208,30 @@ describe('DividendChart', () => {
   });
 
   it('recalculates monthly series on datapoint selection', () => {
-    render(
-      <DividendChart
-        investments={
-          [
-            {
-              mainCurrency: 'EUR',
-              account: {
-                name: 'Account1',
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue(
+      {
+        data: [
+          {
+            mainCurrency: 'EUR',
+            account: {
+              name: 'Account1',
+            },
+            dividends: [
+              {
+                when: DateTime.fromISO('2022-01-01'),
+                amountInCurrency: new Money(100, 'EUR'),
               },
-              dividends: [
-                {
-                  when: DateTime.fromISO('2022-01-01'),
-                  amountInCurrency: new Money(100, 'EUR'),
-                },
-                {
-                  when: DateTime.fromISO('2023-01-01'),
-                  amountInCurrency: new Money(130, 'EUR'),
-                },
-              ],
-            } as InvestmentAccount,
-          ]
-        }
-      />,
+              {
+                when: DateTime.fromISO('2023-01-01'),
+                amountInCurrency: new Money(130, 'EUR'),
+              },
+            ],
+          } as InvestmentAccount,
+        ],
+      } as SWRResponse,
     );
+
+    render(<DividendChart />);
 
     const dataPointSelection = (
       ChartMock.mock.calls[0][0].options?.chart?.events?.dataPointSelection as Function
@@ -307,30 +318,30 @@ describe('DividendChart', () => {
   });
 
   it('recalculates monthly with dividend on same ticker/month', () => {
-    render(
-      <DividendChart
-        investments={
-          [
-            {
-              mainCurrency: 'EUR',
-              account: {
-                name: 'Account1',
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue(
+      {
+        data: [
+          {
+            mainCurrency: 'EUR',
+            account: {
+              name: 'Account1',
+            },
+            dividends: [
+              {
+                when: DateTime.fromISO('2023-01-01'),
+                amountInCurrency: new Money(100, 'EUR'),
               },
-              dividends: [
-                {
-                  when: DateTime.fromISO('2023-01-01'),
-                  amountInCurrency: new Money(100, 'EUR'),
-                },
-                {
-                  when: DateTime.fromISO('2023-01-20'),
-                  amountInCurrency: new Money(130, 'EUR'),
-                },
-              ],
-            } as InvestmentAccount,
-          ]
-        }
-      />,
+              {
+                when: DateTime.fromISO('2023-01-20'),
+                amountInCurrency: new Money(130, 'EUR'),
+              },
+            ],
+          } as InvestmentAccount,
+        ],
+      } as SWRResponse,
     );
+
+    render(<DividendChart />);
 
     const dataPointSelection = (
       ChartMock.mock.calls[0][0].options?.chart?.events?.dataPointSelection as Function

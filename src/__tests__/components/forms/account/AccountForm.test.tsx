@@ -188,8 +188,7 @@ describe('AccountForm', () => {
     });
     expect(mockSave).toHaveBeenCalledTimes(1);
     expect(swr.mutate).toBeCalledTimes(1);
-    expect((swr.mutate as jest.Mock).mock.calls[0][0]('/api/accounts')).toBe(true);
-    expect((swr.mutate as jest.Mock).mock.calls[0][0]('/api/splits')).toBe(false);
+    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/accounts');
   });
 
   it.each([

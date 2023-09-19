@@ -46,62 +46,16 @@ describe('InvestmentsPage', () => {
     jest.clearAllMocks();
   });
 
-  it('renders while loading data', () => {
-    const { container } = render(<InvestmentsPage />);
+  it('shows loading when loading data', async () => {
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ isLoading: true } as SWRResponse);
+    render(<InvestmentsPage />);
 
-    expect(WeightsChart).toHaveBeenLastCalledWith(
-      {
-        investments: [],
-        totalValue: expect.any(Money),
-      },
-      {},
-    );
-    expect(WeightsChartMock.mock.calls[0][0].totalValue.toString()).toEqual('0.00 EUR');
-    expect(StatisticsWidget).toHaveBeenNthCalledWith(
-      1,
-      {
-        className: 'ml-6',
-        title: 'Value/Cost',
-        stats: '€0.00',
-        description: '€0.00 total invested',
-      },
-      {},
-    );
-    expect(StatisticsWidget).toHaveBeenNthCalledWith(
-      2,
-      {
-        className: 'ml-6',
-        title: 'Unrealized Profit',
-        stats: '€0.00 (NaN%)',
-        description: '€0.00 (NaN%) with dividends',
-        statsTextClass: '',
-      },
-      {},
-    );
-    expect(StatisticsWidget).toHaveBeenNthCalledWith(
-      3,
-      {
-        className: 'mx-6',
-        title: 'Realized',
-        stats: '€0.00',
-        description: '€0.00 from dividends',
-        statsTextClass: 'text-green-500',
-      },
-      {},
-    );
-    expect(DividendChart).toHaveBeenLastCalledWith(
-      {
-        investments: [],
-      },
-      {},
-    );
-    expect(InvestmentsTable).toHaveBeenLastCalledWith(
-      {
-        investments: [],
-      },
-      {},
-    );
-    expect(container).toMatchSnapshot();
+    await screen.findByText('Loading...');
+  });
+
+  it('renders while loading data', async () => {
+    render(<InvestmentsPage />);
+    await screen.findByText('You have no investments yet!');
   });
 
   it('renders with data', async () => {
@@ -128,7 +82,6 @@ describe('InvestmentsPage', () => {
     await screen.findByTestId('InvestmentsTable');
     expect(WeightsChart).toHaveBeenCalledWith(
       {
-        investments: [investment1],
         totalValue: expect.any(Money),
       },
       {},
@@ -168,15 +121,11 @@ describe('InvestmentsPage', () => {
       {},
     );
     expect(DividendChart).toHaveBeenLastCalledWith(
-      {
-        investments: [investment1],
-      },
+      {},
       {},
     );
     expect(InvestmentsTable).toHaveBeenLastCalledWith(
-      {
-        investments: [investment1],
-      },
+      {},
       {},
     );
     expect(container).toMatchSnapshot();
@@ -206,7 +155,6 @@ describe('InvestmentsPage', () => {
     await screen.findByTestId('InvestmentsTable');
     expect(WeightsChart).toHaveBeenLastCalledWith(
       {
-        investments: [investment1],
         totalValue: expect.any(Money),
       },
       {},
@@ -246,47 +194,13 @@ describe('InvestmentsPage', () => {
       {},
     );
     expect(DividendChart).toHaveBeenLastCalledWith(
-      {
-        investments: [investment1],
-      },
+      {},
       {},
     );
     expect(InvestmentsTable).toHaveBeenLastCalledWith(
-      {
-        investments: [investment1],
-      },
+      {},
       {},
     );
     expect(container).toMatchSnapshot();
-  });
-
-  it('doesnt pass empty positions to investments table', async () => {
-    const mainCurrency = {
-      mnemonic: 'EUR',
-      guid: 'eur',
-      namespace: 'CURRENCY',
-    } as Commodity;
-
-    const investment1 = {
-      account: { name: 'Investment' },
-      quantity: new Money(0, 'TICKER'),
-      valueInCurrency: new Money(0, 'EUR'),
-      costInCurrency: new Money(0, 'EUR'),
-      realizedProfitInCurrency: new Money(10, 'EUR'),
-      realizedDividendsInCurrency: new Money(5, 'EUR'),
-    } as InvestmentAccount;
-
-    jest.spyOn(apiHook, 'useInvestments').mockReturnValueOnce({ data: [investment1] } as SWRResponse);
-    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValueOnce({ data: mainCurrency } as SWRResponse);
-
-    render(<InvestmentsPage />);
-
-    await screen.findByTestId('InvestmentsTable');
-    expect(InvestmentsTable).toHaveBeenLastCalledWith(
-      {
-        investments: [],
-      },
-      {},
-    );
   });
 });

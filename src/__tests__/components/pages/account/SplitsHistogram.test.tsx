@@ -1,17 +1,28 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 import { render } from '@testing-library/react';
+import type { SWRResponse } from 'swr';
 
-import type { Split } from '@/book/entities';
+import type { Account, Split } from '@/book/entities';
 import Chart from '@/components/charts/Chart';
 import SplitsHistogram from '@/components/pages/account/SplitsHistogram';
+import * as apiHook from '@/hooks/api';
 
 jest.mock('@/components/charts/Chart', () => jest.fn(
   () => <div data-testid="Chart" />,
 ));
 const ChartMock = Chart as jest.MockedFunction<typeof Chart>;
 
+jest.mock('@/hooks/api', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/api'),
+}));
+
 describe('SplitsHistogram', () => {
+  beforeEach(() => {
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as SWRResponse);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -19,9 +30,14 @@ describe('SplitsHistogram', () => {
   it('creates Chart with expected params', () => {
     render(
       <SplitsHistogram
-        splits={[]}
-        currency="EUR"
-        accountType="EXPENSE"
+        account={
+          {
+            guid: 'guid',
+            commodity: {
+              mnemonic: 'EUR',
+            },
+          } as Account
+        }
       />,
     );
 
@@ -54,11 +70,9 @@ describe('SplitsHistogram', () => {
   it('builds series accumulating values', () => {
     // note that splits are received ordered already. Without order, it will compute
     // wrongly
-    render(
-      <SplitsHistogram
-        currency="EUR"
-        accountType="EXPENSE"
-        splits={[
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue(
+      {
+        data: [
           {
             account: {
               type: 'ASSET',
@@ -83,7 +97,21 @@ describe('SplitsHistogram', () => {
             },
             quantity: -200,
           } as Split,
-        ]}
+        ],
+      } as SWRResponse,
+    );
+
+    render(
+      <SplitsHistogram
+        account={
+          {
+            guid: 'guid',
+            commodity: {
+              mnemonic: 'EUR',
+            },
+            type: 'EXPENSE',
+          } as Account
+        }
       />,
     );
 
@@ -221,11 +249,9 @@ describe('SplitsHistogram', () => {
   });
 
   it('hides all series except last', () => {
-    render(
-      <SplitsHistogram
-        currency="EUR"
-        accountType="EXPENSE"
-        splits={[
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue(
+      {
+        data: [
           {
             account: {
               type: 'ASSET',
@@ -250,7 +276,21 @@ describe('SplitsHistogram', () => {
             },
             quantity: -200,
           } as Split,
-        ]}
+        ],
+      } as SWRResponse,
+    );
+
+    render(
+      <SplitsHistogram
+        account={
+          {
+            guid: 'guid',
+            commodity: {
+              mnemonic: 'EUR',
+            },
+            type: 'EXPENSE',
+          } as Account
+        }
       />,
     );
 
@@ -262,11 +302,9 @@ describe('SplitsHistogram', () => {
   });
 
   it('works when splits are all in a single year', () => {
-    render(
-      <SplitsHistogram
-        currency="EUR"
-        accountType="EXPENSE"
-        splits={[
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue(
+      {
+        data: [
           {
             account: {
               type: 'ASSET',
@@ -279,7 +317,21 @@ describe('SplitsHistogram', () => {
             },
             quantity: -200,
           } as Split,
-        ]}
+        ],
+      } as SWRResponse,
+    );
+
+    render(
+      <SplitsHistogram
+        account={
+          {
+            guid: 'guid',
+            commodity: {
+              mnemonic: 'EUR',
+            },
+            type: 'EXPENSE',
+          } as Account
+        }
       />,
     );
   });

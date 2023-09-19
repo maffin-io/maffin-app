@@ -5,14 +5,12 @@ import Money from '@/book/Money';
 import type { InvestmentAccount } from '@/book/models';
 import { currencyToSymbol } from '@/book/helpers';
 import Chart from '@/components/charts/Chart';
+import * as API from '@/hooks/api';
 
-export type DividendChartProps = {
-  investments: InvestmentAccount[],
-};
+export default function DividendChart(): JSX.Element {
+  let { data: investments } = API.useInvestments();
+  investments = investments || [];
 
-export default function DividendChart({
-  investments,
-}: DividendChartProps): JSX.Element {
   if (!investments.length) {
     return (
       <span>Loading...</span>

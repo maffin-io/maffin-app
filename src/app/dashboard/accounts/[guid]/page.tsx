@@ -146,26 +146,15 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
               />
             </div>
             <div className="col-span-12 bg-gunmetal-700 rounded-sm my-6 mr-6">
-              <TotalLineChart
-                currency={account.commodity.mnemonic}
-                accountType={account.type}
-                splits={splits}
-              />
+              <TotalLineChart account={account} />
             </div>
           </div>
         </div>
         <div className="col-span-6 bg-gunmetal-700 rounded-sm mb-6 p-4">
-          <SplitsHistogram
-            currency={account.commodity.mnemonic}
-            accountType={account.type}
-            splits={splits.filter(split => split.quantity !== 0)}
-          />
+          <SplitsHistogram account={account} />
         </div>
       </div>
-      <TransactionsTable
-        splits={splits}
-        accounts={accounts}
-      />
+      <TransactionsTable account={account} />
     </>
   );
 }

@@ -48,13 +48,17 @@ export default async function getMonthlyTotals(
     );
   });
 
-  (accounts.root?.childrenIds || []).map(
-    (childId: string) => aggregateChildrenTotals(
-      accounts[childId],
-      accounts,
-      todayQuotes,
-      monthlyTotals,
-    ),
+  accounts.root?.childrenIds.forEach(
+    (childId: string) => {
+      aggregateChildrenTotals(
+        accounts[childId],
+        accounts,
+        todayQuotes,
+        monthlyTotals,
+      );
+
+      monthlyTotals[accounts[childId].type.toLowerCase()] = monthlyTotals[childId];
+    },
   );
 
   return monthlyTotals;
