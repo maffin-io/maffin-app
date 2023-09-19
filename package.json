@@ -13,7 +13,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "classnames": "^2.3.1",
-    "dayjs": "^1.11.9",
+    "dayjs": "^1.11.10",
     "dinero.js": "^2.0.0-alpha.14",
     "lodash.debounce": "^4.0.8",
     "luxon": "^3.4.3",
