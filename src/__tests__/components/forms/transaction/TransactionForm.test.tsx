@@ -228,8 +228,10 @@ describe('TransactionForm', () => {
     expect(swr.mutate).toBeCalledTimes(4);
     expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/account_guid_1');
     expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/splits/account_guid_2');
-    expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/monthly-totals');
+    expect(swr.mutate).toHaveBeenNthCalledWith(3, expect.any(Function));
     expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/txs/latest');
+
+    expect((swr.mutate as jest.Mock).mock.calls[2][0]('/api/monthly-totals?ids=a,b')).toBe(true);
   });
 
   it('creates transaction with expected params with different currency', async () => {
@@ -400,8 +402,10 @@ describe('TransactionForm', () => {
     expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/account_guid_1');
     expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/investments');
     expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/splits/stock_account');
-    expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/monthly-totals');
+    expect(swr.mutate).toHaveBeenNthCalledWith(4, expect.any(Function));
     expect(swr.mutate).toHaveBeenNthCalledWith(5, '/api/txs/latest');
+
+    expect((swr.mutate as jest.Mock).mock.calls[3][0]('/api/monthly-totals?ids=a,b')).toBe(true);
   });
 
   it('updates transaction', async () => {
