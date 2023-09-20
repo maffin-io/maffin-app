@@ -6,14 +6,14 @@ import { toFixed, moneyToString } from '@/helpers/number';
 import Table from '@/components/Table';
 import type { InvestmentAccount } from '@/book/models';
 import { currencyToSymbol } from '@/book/helpers';
+import * as API from '@/hooks/api';
 
-export type InvestmentsTableProps = {
-  investments: InvestmentAccount[],
-};
+export default function InvestmentsTable(): JSX.Element {
+  let { data: investments } = API.useInvestments();
+  investments = (investments || []).filter(
+    investment => investment.quantity.toNumber() > 0,
+  );
 
-export default function InvestmentsTable(
-  { investments }: InvestmentsTableProps,
-): JSX.Element {
   let currency = '';
   if (investments.length) {
     currency = investments[0].mainCurrency;

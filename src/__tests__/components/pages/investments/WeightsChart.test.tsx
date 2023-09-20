@@ -1,5 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
+import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
 import { Account } from '@/book/entities';
@@ -7,18 +8,28 @@ import { QuoteInfo } from '@/book/types';
 import { InvestmentAccount } from '@/book/models';
 import WeightsChart from '@/components/pages/investments/WeightsChart';
 import Chart from '@/components/charts/Chart';
+import * as apiHook from '@/hooks/api';
 
 jest.mock('@/components/charts/Chart', () => jest.fn(
   () => <div data-testid="Chart" />,
 ));
 
+jest.mock('@/hooks/api', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/api'),
+}));
+
 describe('WeightsChart', () => {
+  beforeEach(() => {
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as SWRResponse);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('creates treemap with empty data', () => {
-    render(<WeightsChart investments={[]} totalValue={new Money(0, 'EUR')} />);
+    render(<WeightsChart totalValue={new Money(0, 'EUR')} />);
 
     expect(Chart).toHaveBeenCalledWith(
       {
@@ -53,9 +64,9 @@ describe('WeightsChart', () => {
   });
 
   it('creates treemap with data as expected', () => {
-    render(
-      <WeightsChart
-        investments={[
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue(
+      {
+        data: [
           {
             quoteInfo: {
               changePct: -5,
@@ -83,10 +94,11 @@ describe('WeightsChart', () => {
               name: 'i3',
             } as Account,
           } as InvestmentAccount,
-        ]}
-        totalValue={new Money(600, 'EUR')}
-      />,
+        ],
+      } as SWRResponse,
     );
+
+    render(<WeightsChart totalValue={new Money(600, 'EUR')} />);
 
     expect(Chart).toHaveBeenCalledWith(
       {

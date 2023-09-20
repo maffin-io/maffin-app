@@ -131,81 +131,19 @@ describe('AccountPage', () => {
     );
     expect(TransactionsTable).toHaveBeenLastCalledWith(
       {
-        accounts: {
-          guid: {
-            guid: 'guid',
-            path: 'path',
-            type: 'TYPE',
-            commodity: {
-              mnemonic: 'EUR',
-            },
-          },
-        },
-        splits: [
-          {
-            guid: 'split_guid',
-            transaction: {
-              date: DateTime.fromISO('2023-01-01'),
-              splits: [
-                { guid: 'split_guid' },
-                { guid: 'split_guid_2' },
-              ],
-            },
-            account: {
-              guid: 'guid',
-              type: 'TYPE',
-            },
-            quantity: 100,
-          },
-        ],
+        account: accounts.guid,
       },
       {},
     );
     expect(SplitsHistogram).toHaveBeenLastCalledWith(
       {
-        accountType: 'TYPE',
-        currency: 'EUR',
-        splits: [
-          {
-            guid: 'split_guid',
-            transaction: {
-              date: DateTime.fromISO('2023-01-01'),
-              splits: [
-                { guid: 'split_guid' },
-                { guid: 'split_guid_2' },
-              ],
-            },
-            account: {
-              guid: 'guid',
-              type: 'TYPE',
-            },
-            quantity: 100,
-          },
-        ],
+        account: accounts.guid,
       },
       {},
     );
     expect(TotalLineChart).toHaveBeenLastCalledWith(
       {
-        accountType: 'TYPE',
-        currency: 'EUR',
-        splits: [
-          {
-            guid: 'split_guid',
-            transaction: {
-              date: DateTime.fromISO('2023-01-01'),
-              splits: [
-                { guid: 'split_guid' },
-                { guid: 'split_guid_2' },
-              ],
-            },
-            account: {
-              guid: 'guid',
-              type: 'TYPE',
-            },
-            quantity: 100,
-          },
-        ],
+        account: accounts.guid,
       },
       {},
     );

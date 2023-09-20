@@ -157,6 +157,7 @@ async function onSubmit(data: FormValues, action: 'add' | 'update' | 'delete', o
     mutate(`/api/splits/${split.account.guid}`);
   });
 
+  mutate('/api/monthly-totals');
   mutate('/api/txs/latest');
   onSave();
 }

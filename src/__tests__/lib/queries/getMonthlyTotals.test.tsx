@@ -40,7 +40,7 @@ describe('getMonthlyTotals', () => {
     }).save();
 
     assetAccount = await Account.create({
-      guid: 'assets',
+      guid: 'abcdef',
       name: 'Assets',
       type: 'ASSET',
       fk_commodity: eur,
@@ -49,7 +49,7 @@ describe('getMonthlyTotals', () => {
     await assetAccount.reload();
 
     expensesAccount = await Account.create({
-      guid: 'expenses',
+      guid: 'ghijk',
       name: 'Expenses',
       type: 'EXPENSE',
       fk_commodity: eur,
@@ -116,17 +116,22 @@ describe('getMonthlyTotals', () => {
     }).save();
     const monthlyTotals = await getMonthlyTotals(
       {
+        root,
         [assetAccount.guid]: assetAccount,
         [expensesAccount.guid]: expensesAccount,
       },
       {} as PriceDBMap,
     );
 
-    expect(monthlyTotals.assets['01/2023'].toString()).toEqual('-200.00 EUR');
-    expect(monthlyTotals.assets['02/2022'].toString()).toEqual('-400.00 EUR');
+    expect(monthlyTotals.asset['01/2023'].toString()).toEqual('-200.00 EUR');
+    expect(monthlyTotals.asset['02/2022'].toString()).toEqual('-400.00 EUR');
+    expect(monthlyTotals.abcdef['01/2023'].toString()).toEqual('-200.00 EUR');
+    expect(monthlyTotals.abcdef['02/2022'].toString()).toEqual('-400.00 EUR');
 
-    expect(monthlyTotals.expenses['01/2023'].toString()).toEqual('200.00 EUR');
-    expect(monthlyTotals.expenses['02/2022'].toString()).toEqual('400.00 EUR');
+    expect(monthlyTotals.expense['01/2023'].toString()).toEqual('200.00 EUR');
+    expect(monthlyTotals.expense['02/2022'].toString()).toEqual('400.00 EUR');
+    expect(monthlyTotals.ghijk['01/2023'].toString()).toEqual('200.00 EUR');
+    expect(monthlyTotals.ghijk['02/2022'].toString()).toEqual('400.00 EUR');
   });
 
   it('aggregates children totals into parent', async () => {
@@ -193,9 +198,9 @@ describe('getMonthlyTotals', () => {
       {} as PriceDBMap,
     );
 
-    expect(monthlyTotals.assets['01/2023'].toString()).toEqual('-600.00 EUR');
+    expect(monthlyTotals.asset['01/2023'].toString()).toEqual('-600.00 EUR');
     expect(monthlyTotals.bank['01/2023'].toString()).toEqual('-200.00 EUR');
-    expect(monthlyTotals.expenses['01/2023'].toString()).toEqual('600.00 EUR');
+    expect(monthlyTotals.expense['01/2023'].toString()).toEqual('600.00 EUR');
   });
 
   it('converts children totals when different currency', async () => {
@@ -273,9 +278,9 @@ describe('getMonthlyTotals', () => {
     );
 
     // 400 EUR + 100USD * 0.98
-    expect(monthlyTotals.assets['01/2023'].toString()).toEqual('-498.00 EUR');
+    expect(monthlyTotals.asset['01/2023'].toString()).toEqual('-498.00 EUR');
     expect(monthlyTotals.bank['01/2023'].toString()).toEqual('-100.00 USD');
-    expect(monthlyTotals.expenses['01/2023'].toString()).toEqual('498.00 EUR');
+    expect(monthlyTotals.expense['01/2023'].toString()).toEqual('498.00 EUR');
   });
 
   /**
@@ -283,17 +288,22 @@ describe('getMonthlyTotals', () => {
    * account of STOCK/MUTUAL accounts as expected. We buy 2 GOOGL stocks for 50 USD each
    * from the assets account (USD). Our investments account is in EUR so we want to check that:
    *   - We have 2 GOOGL stocks in our stocks account
-   *   - We have -100 USD in the assets account
    *   - We have +98 EUR in the investments account
+   *   - We have -100 USD in the broker account
+   *   - We have 0 EUR in the assets account
    */
   it('converts children totals when investment', async () => {
-    const stock = await Commodity.create({
-      namespace: 'NASDAQ',
-      mnemonic: 'GOOGL',
-    }).save();
     const usd = await Commodity.create({
       namespace: 'CURRENCY',
       mnemonic: 'USD',
+    }).save();
+
+    const brokerAccount = await Account.create({
+      guid: 'broker',
+      name: 'Broker',
+      type: 'BANK',
+      fk_commodity: usd,
+      parent: assetAccount,
     }).save();
 
     const investmentsAccount = await Account.create({
@@ -301,9 +311,13 @@ describe('getMonthlyTotals', () => {
       name: 'Investments',
       type: 'ASSET',
       fk_commodity: eur,
-      parent: root,
+      parent: assetAccount,
     }).save();
 
+    const stock = await Commodity.create({
+      namespace: 'NASDAQ',
+      mnemonic: 'GOOGL',
+    }).save();
     const stockAccount = await Account.create({
       guid: 'googl',
       name: 'GOOGL',
@@ -312,9 +326,8 @@ describe('getMonthlyTotals', () => {
       parent: investmentsAccount,
     }).save();
     await root.reload();
-    assetAccount.fk_commodity = usd;
-    await assetAccount.save();
     await assetAccount.reload();
+    await brokerAccount.reload();
     await stockAccount.reload();
     await investmentsAccount.reload();
 
@@ -328,7 +341,7 @@ describe('getMonthlyTotals', () => {
           valueDenom: 1,
           quantityNum: -100,
           quantityDenom: 1,
-          fk_account: assetAccount,
+          fk_account: brokerAccount,
         }),
         Split.create({
           valueNum: 100,
@@ -344,6 +357,7 @@ describe('getMonthlyTotals', () => {
       {
         root,
         [assetAccount.guid]: assetAccount,
+        [brokerAccount.guid]: brokerAccount,
         [expensesAccount.guid]: expensesAccount,
         [investmentsAccount.guid]: investmentsAccount,
         [stockAccount.guid]: stockAccount,
@@ -370,7 +384,8 @@ describe('getMonthlyTotals', () => {
 
     expect(monthlyTotals.googl['01/2023'].toString()).toEqual('2.00 GOOGL');
     expect(monthlyTotals.investments['01/2023'].toString()).toEqual('98.00 EUR');
-    expect(monthlyTotals.assets['01/2023'].toString()).toEqual('-100.00 USD');
+    expect(monthlyTotals.broker['01/2023'].toString()).toEqual('-100.00 USD');
+    expect(monthlyTotals.asset['01/2023'].toString()).toEqual('0.00 EUR');
   });
 
   it('ignores account months with 0', async () => {

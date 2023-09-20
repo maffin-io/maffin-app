@@ -13,18 +13,25 @@ import {
 } from '@/components/pages/accounts';
 import DateRangeInput from '@/components/DateRangeInput';
 import * as API from '@/hooks/api';
-import getAccountsTree from '@/lib/getAccountsTree';
 
 export default function AccountsPage(): JSX.Element {
   const { data: earliestDate } = API.useStartDate();
   let { data: accounts } = API.useAccounts();
-  let { data: monthlyTotals } = API.useAccountsMonthlyTotals();
+  const { isLoading } = API.useAccounts();
 
   const [selectedDate, setSelectedDate] = React.useState(DateTime.now());
 
+  if (isLoading) {
+    return (
+      <div className="h-screen">
+        <div className="flex text-sm h-3/4 place-content-center place-items-center">
+          Loading...
+        </div>
+      </div>
+    );
+  }
+
   accounts = accounts || { root: { childrenIds: [] } };
-  const tree = getAccountsTree(accounts.root, accounts);
-  monthlyTotals = monthlyTotals || {};
 
   return (
     <>
@@ -51,27 +58,20 @@ export default function AccountsPage(): JSX.Element {
         <div className="grid grid-cols-12 col-span-3">
           <div className="col-span-12 p-4 mr-4 rounded-sm bg-gunmetal-700">
             <NetWorthPie
-              unit={tree.leaves.find(a => a.account.type === 'ASSET')?.account.commodity.mnemonic}
-              assetsSeries={monthlyTotals[tree.leaves.find(a => a.account.type === 'ASSET')?.account.guid]}
-              liabilitiesSeries={monthlyTotals[tree.leaves.find(a => a.account.type === 'LIABILITY')?.account.guid]}
               selectedDate={selectedDate}
             />
           </div>
           <div className="col-span-12 p-4 mr-4 rounded-sm bg-gunmetal-700">
             <AccountsTable
               selectedDate={selectedDate}
-              accounts={accounts}
-              monthlyTotals={monthlyTotals}
             />
           </div>
         </div>
         <div className="grid grid-cols-12 items-start items-top col-span-9">
           <div className="col-span-9 p-4 mb-4 mr-4 rounded-sm bg-gunmetal-700">
             <NetWorthHistogram
-              tree={tree}
               startDate={earliestDate}
               selectedDate={selectedDate}
-              monthlyTotals={monthlyTotals}
             />
           </div>
           <div className="col-span-3 p-4 mb-4 mr-4 rounded-sm bg-gunmetal-700">
@@ -79,18 +79,16 @@ export default function AccountsPage(): JSX.Element {
           </div>
           <div className="col-span-6 p-4 mr-4 rounded-sm bg-gunmetal-700">
             <MonthlyTotalHistogram
+              accounts={accounts?.income?.childrenIds.map((guid: string) => accounts?.[guid])}
               title="Income"
-              tree={tree.leaves.find(a => a.account.type === 'INCOME')}
               selectedDate={selectedDate}
-              monthlyTotals={monthlyTotals}
             />
           </div>
           <div className="col-span-6 p-4 mr-4 rounded-sm bg-gunmetal-700">
             <MonthlyTotalHistogram
+              accounts={accounts?.expense?.childrenIds.map((guid: string) => accounts?.[guid])}
               title="Expenses"
-              tree={tree.leaves.find(a => a.account.type === 'EXPENSE')}
               selectedDate={selectedDate}
-              monthlyTotals={monthlyTotals}
             />
           </div>
         </div>

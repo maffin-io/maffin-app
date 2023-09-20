@@ -1,21 +1,34 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { DateTime } from 'luxon';
+import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
 import Chart, { ChartProps } from '@/components/charts/Chart';
-import NetWorthPie from '@/components/pages/accounts/NetWorthPie';
+import { NetWorthPie } from '@/components/pages/accounts';
+import * as apiHook from '@/hooks/api';
 
 jest.mock('@/components/charts/Chart', () => jest.fn(
   () => <div data-testid="Chart" />,
 ));
 
+jest.mock('@/hooks/api', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/api'),
+}));
+
 describe('NetWorthPie', () => {
+  beforeEach(() => {
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue({ data: undefined } as SWRResponse);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('creates Chart with no data when no accounts', () => {
+  it('creates Chart with no data when no data', () => {
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as SWRResponse);
     render(<NetWorthPie />);
 
     expect(Chart).toBeCalledWith(
@@ -74,19 +87,27 @@ describe('NetWorthPie', () => {
   });
 
   it('computes net worth as expected', () => {
-    render(
-      <NetWorthPie
-        assetsSeries={{
-          '01/2023': new Money(500, 'EUR'),
-          '02/2023': new Money(500, 'EUR'),
-        }}
-        liabilitiesSeries={{
-          '01/2023': new Money(-50, 'EUR'),
-          '02/2023': new Money(-50, 'EUR'),
-        }}
-        unit="EUR"
-      />,
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+      {
+        data: {
+          asset: {
+            '01/2023': new Money(500, 'EUR'),
+            '02/2023': new Money(500, 'EUR'),
+          },
+          // To check we don't add equity to the calculations as
+          // equity transactions go to assets
+          equity: {
+            '11/2022': new Money(-200, 'EUR'),
+          },
+          liability: {
+            '01/2023': new Money(-50, 'EUR'),
+            '02/2023': new Money(-50, 'EUR'),
+          },
+        },
+      } as SWRResponse,
     );
+
+    render(<NetWorthPie />);
 
     const props = (Chart as jest.Mock).mock.calls[0][0] as ChartProps;
     expect(props.series).toEqual([1000, 100]);
@@ -117,15 +138,18 @@ describe('NetWorthPie', () => {
   });
 
   it('computes net worth when no liabilities', () => {
-    render(
-      <NetWorthPie
-        assetsSeries={{
-          '01/2023': new Money(500, 'EUR'),
-          '02/2023': new Money(500, 'EUR'),
-        }}
-        unit="EUR"
-      />,
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+      {
+        data: {
+          asset: {
+            '01/2023': new Money(500, 'EUR'),
+            '02/2023': new Money(500, 'EUR'),
+          },
+        },
+      } as SWRResponse,
     );
+
+    render(<NetWorthPie />);
 
     const props = (Chart as jest.Mock).mock.calls[0][0] as ChartProps;
     expect(props.series).toEqual([1000, -0]);
@@ -142,18 +166,24 @@ describe('NetWorthPie', () => {
   });
 
   it('filters by selected date', () => {
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+      {
+        data: {
+          asset: {
+            '01/2023': new Money(500, 'EUR'),
+            '02/2023': new Money(500, 'EUR'),
+          },
+          liability: {
+            '01/2023': new Money(-50, 'EUR'),
+            '02/2023': new Money(-50, 'EUR'),
+          },
+        },
+      } as SWRResponse,
+    );
+
     render(
       <NetWorthPie
         selectedDate={DateTime.fromISO('2023-01-01')}
-        assetsSeries={{
-          '01/2023': new Money(500, 'EUR'),
-          '02/2023': new Money(500, 'EUR'),
-        }}
-        liabilitiesSeries={{
-          '01/2023': new Money(-50, 'EUR'),
-          '02/2023': new Money(-50, 'EUR'),
-        }}
-        unit="EUR"
       />,
     );
 

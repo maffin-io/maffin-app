@@ -1,28 +1,35 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import type { SWRResponse } from 'swr';
 
 import { AccountsTable } from '@/components/pages/accounts';
 import Table from '@/components/Table';
 import { Account } from '@/book/entities';
 import Money from '@/book/Money';
+import * as apiHook from '@/hooks/api';
 
 jest.mock('@/components/Table', () => jest.fn(
   () => <div data-testid="Table" />,
 ));
 const TableMock = Table as jest.MockedFunction<typeof Table>;
 
+jest.mock('@/hooks/api', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/api'),
+}));
+
 describe('AccountsTable', () => {
+  beforeEach(() => {
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue({ data: undefined } as SWRResponse);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('creates empty Table with expected params', async () => {
-    const { container } = render(
-      <AccountsTable
-        accounts={{ root: { childrenIds: [] } }}
-        monthlyTotals={{}}
-      />,
-    );
+    const { container } = render(<AccountsTable />);
 
     await screen.findByTestId('Table');
     expect(Table).toHaveBeenLastCalledWith(
@@ -58,9 +65,9 @@ describe('AccountsTable', () => {
   });
 
   it('creates table with expected params', async () => {
-    render(
-      <AccountsTable
-        accounts={{
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+      {
+        data: {
           root: {
             guid: 'root',
             name: 'Root',
@@ -86,13 +93,23 @@ describe('AccountsTable', () => {
             type: 'INCOME',
             childrenIds: [] as string[],
           },
-        }}
-        monthlyTotals={{
-          a1: { '01/2023': new Money(100, 'EUR') },
-          a2: { '01/2023': new Money(-100, 'EUR') },
-        }}
-      />,
+        },
+      } as SWRResponse,
     );
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+      {
+        data: {
+          a1: {
+            '01/2023': new Money(100, 'EUR'),
+          },
+          a2: {
+            '01/2023': new Money(-100, 'EUR'),
+          },
+        },
+      } as SWRResponse,
+    );
+
+    render(<AccountsTable />);
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -159,23 +176,7 @@ describe('AccountsTable', () => {
   });
 
   it('renders Name column as expected when expandable and not expandded', async () => {
-    const tree = {
-      account: {
-        guid: 'assets',
-        name: 'Assets',
-        type: 'ASSET',
-        childrenIds: ['a1'],
-      } as Account,
-      total: new Money(100, 'EUR'),
-      leaves: [],
-    };
-
-    render(
-      <AccountsTable
-        accounts={{ root: { childrenIds: [] } }}
-        monthlyTotals={{}}
-      />,
-    );
+    render(<AccountsTable />);
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -186,7 +187,16 @@ describe('AccountsTable', () => {
       // @ts-ignore
       nameCol.cell({
         row: {
-          original: tree,
+          original: {
+            account: {
+              guid: 'assets',
+              name: 'Assets',
+              type: 'ASSET',
+              childrenIds: ['a1'],
+            } as Account,
+            total: new Money(100, 'EUR'),
+            leaves: [],
+          },
           getCanExpand: () => true,
           getIsExpanded: () => false,
         },
@@ -198,24 +208,7 @@ describe('AccountsTable', () => {
   });
 
   it('renders Name column as expected when expandable and expanded', async () => {
-    const tree = {
-      account: {
-        guid: 'assets',
-        name: 'Assets',
-        type: 'ASSET',
-        childrenIds: ['a1'],
-      } as Account,
-      total: new Money(100, 'EUR'),
-      monthlyTotals: {},
-      children: [],
-    };
-
-    render(
-      <AccountsTable
-        accounts={{ root: { childrenIds: [] } }}
-        monthlyTotals={{}}
-      />,
-    );
+    render(<AccountsTable />);
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -226,7 +219,17 @@ describe('AccountsTable', () => {
       // @ts-ignore
       nameCol.cell({
         row: {
-          original: tree,
+          original: {
+            account: {
+              guid: 'assets',
+              name: 'Assets',
+              type: 'ASSET',
+              childrenIds: ['a1'],
+            } as Account,
+            total: new Money(100, 'EUR'),
+            monthlyTotals: {},
+            children: [],
+          },
           getCanExpand: () => true,
           getIsExpanded: () => true,
         },
@@ -238,24 +241,7 @@ describe('AccountsTable', () => {
   });
 
   it('renders Name column as expected when not expandable', async () => {
-    const tree = {
-      account: {
-        guid: 'assets',
-        name: 'Assets',
-        type: 'ASSET',
-        childrenIds: ['a1'],
-      } as Account,
-      total: new Money(100, 'EUR'),
-      monthlyTotals: {},
-      children: [],
-    };
-
-    render(
-      <AccountsTable
-        accounts={{ root: { childrenIds: [] } }}
-        monthlyTotals={{}}
-      />,
-    );
+    render(<AccountsTable />);
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -266,7 +252,17 @@ describe('AccountsTable', () => {
       // @ts-ignore
       nameCol.cell({
         row: {
-          original: tree,
+          original: {
+            account: {
+              guid: 'assets',
+              name: 'Assets',
+              type: 'ASSET',
+              childrenIds: ['a1'],
+            } as Account,
+            total: new Money(100, 'EUR'),
+            monthlyTotals: {},
+            children: [],
+          },
           getCanExpand: () => false,
         },
       }),
@@ -277,23 +273,7 @@ describe('AccountsTable', () => {
   });
 
   it('renders Total column as expected', async () => {
-    const tree = {
-      account: {
-        guid: 'assets',
-        name: 'Assets',
-        type: 'ASSET',
-        childrenIds: ['a1'],
-      } as Account,
-      total: new Money(10, 'EUR'),
-      children: [],
-    };
-
-    render(
-      <AccountsTable
-        accounts={{ root: { childrenIds: [] } }}
-        monthlyTotals={{}}
-      />,
-    );
+    render(<AccountsTable />);
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -309,7 +289,16 @@ describe('AccountsTable', () => {
       // @ts-ignore
       totalCol.cell({
         row: {
-          original: tree,
+          original: {
+            account: {
+              guid: 'assets',
+              name: 'Assets',
+              type: 'ASSET',
+              childrenIds: ['a1'],
+            } as Account,
+            total: new Money(10, 'EUR'),
+            children: [],
+          },
         },
       }),
     );

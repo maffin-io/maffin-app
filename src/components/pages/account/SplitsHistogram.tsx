@@ -2,19 +2,19 @@ import React from 'react';
 import { Interval, DateTime } from 'luxon';
 
 import Chart from '@/components/charts/Chart';
-import { Split } from '@/book/entities';
+import * as API from '@/hooks/api';
+import type { Account } from '@/book/entities';
 
 export type SplitsHistogramProps = {
-  splits: Split[],
-  accountType: string,
-  currency: string,
+  account: Account,
 };
 
 export default function SplitsHistogram({
-  splits,
-  accountType,
-  currency,
+  account,
 }: SplitsHistogramProps): JSX.Element {
+  let { data: splits } = API.useSplits(account.guid);
+  splits = splits || [];
+
   const hiddenSeries: string[] = [];
   let series: {
     name: string,
@@ -50,7 +50,7 @@ export default function SplitsHistogram({
     splits.forEach(split => {
       const { month, year } = split.transaction.date;
       let { quantity } = split;
-      if (accountType === 'INCOME') {
+      if (account.type === 'INCOME') {
         quantity = -quantity;
       }
 
@@ -63,7 +63,7 @@ export default function SplitsHistogram({
     <Chart
       type="bar"
       series={series}
-      unit={currency}
+      unit={account.commodity.mnemonic}
       options={{
         title: {
           text: 'Movements per month',

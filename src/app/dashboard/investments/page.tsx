@@ -11,14 +11,35 @@ import {
 import StatisticsWidget from '@/components/StatisticsWidget';
 import { toFixed } from '@/helpers/number';
 import Money from '@/book/Money';
-import { useInvestments, useMainCurrency } from '@/hooks/api';
+import * as API from '@/hooks/api';
 
 export default function InvestmentsPage(): JSX.Element {
-  let { data: investments } = useInvestments();
-  const { data: currency } = useMainCurrency();
+  let { data: investments } = API.useInvestments();
+  const { isLoading } = API.useInvestments();
+  const { data: currency } = API.useMainCurrency();
   const mainCurrency = currency?.mnemonic || 'EUR';
 
+  if (isLoading) {
+    return (
+      <div className="h-screen">
+        <div className="flex text-sm h-3/4 place-content-center place-items-center">
+          Loading...
+        </div>
+      </div>
+    );
+  }
+
   investments = investments || [];
+
+  if (investments.length === 0) {
+    return (
+      <div className="h-screen">
+        <div className="flex text-sm h-3/4 place-content-center place-items-center">
+          You have no investments yet!
+        </div>
+      </div>
+    );
+  }
 
   const totalValue = investments.reduce(
     (total, investment) => total.add(investment.valueInCurrency),
@@ -54,10 +75,7 @@ export default function InvestmentsPage(): JSX.Element {
 
       <div className="grid grid-cols-12">
         <div className="col-span-4">
-          <WeightsChart
-            investments={investments}
-            totalValue={totalValue}
-          />
+          <WeightsChart totalValue={totalValue} />
         </div>
 
         <div className="col-span-8">
@@ -103,18 +121,12 @@ export default function InvestmentsPage(): JSX.Element {
               />
             </div>
           </div>
-          <DividendChart
-            investments={investments}
-          />
+          <DividendChart />
         </div>
       </div>
 
       <div className="py-4">
-        <InvestmentsTable
-          investments={investments.filter(
-            investment => investment.quantity.toNumber() > 0,
-          )}
-        />
+        <InvestmentsTable />
       </div>
     </>
   );

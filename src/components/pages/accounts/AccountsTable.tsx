@@ -16,11 +16,10 @@ import {
   isAsset,
   isLiability,
 } from '@/book/helpers/accountType';
+import * as API from '@/hooks/api';
 
 export type AccountsTableProps = {
   selectedDate?: DateTime,
-  accounts: AccountsMap,
-  monthlyTotals: MonthlyTotals,
 };
 
 type AccountsTableRow = {
@@ -32,14 +31,19 @@ type AccountsTableRow = {
 export default function AccountsTable(
   {
     selectedDate = DateTime.now(),
-    accounts,
-    monthlyTotals,
   }: AccountsTableProps,
 ): JSX.Element {
+  let { data: accounts } = API.useAccounts();
+  const { data: monthlyTotals } = API.useAccountsMonthlyTotals();
+
+  accounts = accounts || { root: { childrenIds: [] } };
+
+  const tree = getTreeTotals(accounts.root, accounts, monthlyTotals || {}, selectedDate);
+
   return (
     <Table<AccountsTableRow>
       columns={columns}
-      data={getTreeTotals(accounts.root, accounts, monthlyTotals, selectedDate).leaves}
+      data={tree.leaves}
       initialSort={{ id: 'total', desc: true }}
       showHeader={false}
       showPagination={false}

@@ -15,16 +15,21 @@ import {
   Split,
 } from '@/book/entities';
 import type { AccountsMap } from '@/types/book';
+import * as API from '@/hooks/api';
 
 export type TransactionsTableProps = {
-  splits: Split[],
-  accounts: AccountsMap,
+  account: Account,
 };
 
 export default function TransactionsTable({
-  splits,
-  accounts,
+  account,
 }: TransactionsTableProps): JSX.Element {
+  let { data: accounts } = API.useAccounts();
+  let { data: splits } = API.useSplits(account.guid);
+
+  accounts = accounts || { root: { childrenIds: [] } };
+  splits = splits || [];
+
   columns[2].cell = FromToAccountPartial(accounts);
   columns[3].cell = AmountPartial(accounts[splits[0]?.account.guid]);
   columns[4].cell = TotalPartial(accounts);

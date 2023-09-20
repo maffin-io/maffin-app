@@ -2,23 +2,25 @@ import React from 'react';
 import { DateTime, Interval } from 'luxon';
 
 import Chart from '@/components/charts/Chart';
-import type { AccountsTree } from '@/types/book';
-import { MonthlyTotals } from '@/lib/queries';
+import type { Account } from '@/book/entities';
+import * as API from '@/hooks/api';
 
 export type MonthlyTotalHistogramProps = {
   title: string,
   selectedDate?: DateTime,
-  tree?: AccountsTree,
-  monthlyTotals: MonthlyTotals,
+  accounts: Account[],
 };
 
 export default function MonthlyTotalHistogram({
   title,
   selectedDate = DateTime.now().minus({ months: 4 }),
-  tree,
-  monthlyTotals,
+  accounts = [],
 }: MonthlyTotalHistogramProps): JSX.Element {
+  const { data: monthlyTotals } = API.useAccountsMonthlyTotals();
   const now = DateTime.now();
+
+  const { data: currency } = API.useMainCurrency();
+  const unit = currency?.mnemonic || '';
 
   if (now.diff(selectedDate, ['months']).months < 4) {
     selectedDate = now.minus({ months: 4 });
@@ -35,14 +37,14 @@ export default function MonthlyTotalHistogram({
     data: { x: number, y: number }[],
   }[] = [];
 
-  if (tree) {
-    tree.leaves.forEach(leaf => {
+  if (accounts.length && monthlyTotals) {
+    accounts.forEach(account => {
       series.push({
-        name: leaf.account.name,
+        name: account.name,
         data: dates.map(date => ({
-          y: tree.account.type === 'INCOME'
-            ? (monthlyTotals[leaf.account.guid]?.[date.toFormat('MM/yyyy')]?.toNumber() || 0) * -1
-            : monthlyTotals[leaf.account.guid]?.[date.toFormat('MM/yyyy')]?.toNumber() || 0,
+          y: account.type === 'INCOME'
+            ? (monthlyTotals[account.guid]?.[date.toFormat('MM/yyyy')]?.toNumber() || 0) * -1
+            : monthlyTotals[account.guid]?.[date.toFormat('MM/yyyy')]?.toNumber() || 0,
           x: date.startOf('month').plus({ days: 1 }).toMillis(),
         })),
       });
@@ -54,7 +56,7 @@ export default function MonthlyTotalHistogram({
       type="bar"
       series={series.filter(serie => !serie.data.every(n => n.y === 0))}
       height={300}
-      unit={tree?.account.commodity.mnemonic}
+      unit={unit}
       options={{
         chart: {
           stacked: true,

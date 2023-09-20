@@ -1,21 +1,30 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { DateTime } from 'luxon';
+import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
 import { Account } from '@/book/entities';
 import Chart from '@/components/charts/Chart';
 import { MonthlyTotalHistogram } from '@/components/pages/accounts';
+import * as apiHook from '@/hooks/api';
 
 jest.mock('@/components/charts/Chart', () => jest.fn(
   () => <div data-testid="Chart" />,
 ));
+
+jest.mock('@/hooks/api', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/api'),
+}));
 
 describe('MonthlyTotalHistogram', () => {
   const now = DateTime.fromISO('2023-01-02');
 
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(now);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
   afterEach(() => {
@@ -23,11 +32,12 @@ describe('MonthlyTotalHistogram', () => {
   });
 
   it('renders with empty tree', () => {
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as SWRResponse);
+
     render(
       <MonthlyTotalHistogram
         title="Title"
-        tree={undefined}
-        monthlyTotals={{}}
+        accounts={[]}
       />,
     );
 
@@ -35,7 +45,7 @@ describe('MonthlyTotalHistogram', () => {
       {
         height: 300,
         type: 'bar',
-        unit: undefined,
+        unit: '',
         series: [],
         options: {
           chart: {
@@ -68,39 +78,32 @@ describe('MonthlyTotalHistogram', () => {
 
   // Checks that X range is computed as -8 months to now when
   // not selected date is passed
-  it.each(
-    [undefined, now.minus({ months: 3 })],
-  )('selects default date now - 8 months', (date) => {
+  it.each([
+    undefined,
+    now.minus({ months: 3 }),
+  ])('selects default date now - 8 months', (date) => {
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+      {
+        data: {
+          salary: {
+            '11/2022': new Money(-1000, 'EUR'),
+            '12/2022': new Money(-1000, 'EUR'),
+          },
+        },
+      } as SWRResponse,
+    );
+
     render(
       <MonthlyTotalHistogram
         title="Title"
         selectedDate={date}
-        tree={
+        accounts={[
           {
-            account: {
-              guid: 'Income',
-              type: 'INCOME',
-              commodity: { mnemonic: 'EUR' },
-            } as Account,
-            leaves: [
-              {
-                account: {
-                  guid: 'Salary',
-                  name: 'Salary',
-                  type: 'INCOME',
-                  commodity: { mnemonic: 'EUR' },
-                },
-                leaves: [],
-              },
-            ],
-          }
-        }
-        monthlyTotals={{
-          Salary: {
-            '11/2022': new Money(-1000, 'EUR'),
-            '12/2022': new Money(-1000, 'EUR'),
-          },
-        }}
+            guid: 'salary',
+            name: 'Salary',
+            type: 'INCOME',
+          } as Account,
+        ]}
       />,
     );
 
@@ -114,37 +117,29 @@ describe('MonthlyTotalHistogram', () => {
   });
 
   it('selects date range of 8 months in the past', () => {
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+      {
+        data: {
+          salary: {
+            '11/2021': new Money(-1000, 'EUR'),
+            '12/2021': new Money(-1000, 'EUR'),
+          },
+        },
+      } as SWRResponse,
+    );
+
     const selectedDate = now.minus({ years: 1 });
     render(
       <MonthlyTotalHistogram
         title="Title"
         selectedDate={selectedDate}
-        tree={
+        accounts={[
           {
-            account: {
-              guid: 'Income',
-              type: 'INCOME',
-              commodity: { mnemonic: 'EUR' },
-            } as Account,
-            leaves: [
-              {
-                account: {
-                  guid: 'Salary',
-                  name: 'Salary',
-                  type: 'INCOME',
-                  commodity: { mnemonic: 'EUR' },
-                },
-                leaves: [],
-              },
-            ],
-          }
-        }
-        monthlyTotals={{
-          Salary: {
-            '11/2021': new Money(-1000, 'EUR'),
-            '12/2021': new Money(-1000, 'EUR'),
-          },
-        }}
+            guid: 'salary',
+            name: 'Salary',
+            type: 'INCOME',
+          } as Account,
+        ]}
       />,
     );
 
@@ -158,48 +153,36 @@ describe('MonthlyTotalHistogram', () => {
   });
 
   it('generates series from tree as expected', () => {
-    render(
-      <MonthlyTotalHistogram
-        title="Title"
-        tree={
-          {
-            account: {
-              guid: 'Income',
-              type: 'INCOME',
-              commodity: { mnemonic: 'EUR' },
-            } as Account,
-            leaves: [
-              {
-                account: {
-                  guid: 'Salary',
-                  name: 'Salary',
-                  type: 'INCOME',
-                  commodity: { mnemonic: 'EUR' },
-                },
-                leaves: [],
-              },
-              {
-                account: {
-                  guid: 'Dividends',
-                  name: 'Dividends',
-                  type: 'INCOME',
-                  commodity: { mnemonic: 'EUR' },
-                },
-                leaves: [],
-              },
-            ],
-          }
-        }
-        monthlyTotals={{
-          Salary: {
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+      {
+        data: {
+          salary: {
             '11/2022': new Money(-1000, 'EUR'),
             '12/2022': new Money(-1000, 'EUR'),
           },
-          Dividends: {
+          dividends: {
             '11/2022': new Money(-150, 'EUR'),
             '12/2022': new Money(-50, 'EUR'),
           },
-        }}
+        },
+      } as SWRResponse,
+    );
+
+    render(
+      <MonthlyTotalHistogram
+        title="Title"
+        accounts={[
+          {
+            guid: 'salary',
+            name: 'Salary',
+            type: 'INCOME',
+          } as Account,
+          {
+            guid: 'dividends',
+            name: 'Dividends',
+            type: 'INCOME',
+          } as Account,
+        ]}
       />,
     );
 

@@ -126,6 +126,6 @@ export default function AccountForm({ onSave }: AccountFormProps): JSX.Element {
 
 async function onSubmit(data: FormValues, onSave: Function) {
   await Account.create({ ...data }).save();
-  mutate((key: string) => key.startsWith('/api/accounts'));
+  mutate('/api/accounts');
   onSave();
 }

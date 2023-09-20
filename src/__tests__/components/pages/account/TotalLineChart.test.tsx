@@ -1,16 +1,27 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 import { render } from '@testing-library/react';
+import type { SWRResponse } from 'swr';
 
-import type { Split } from '@/book/entities';
+import type { Account, Split } from '@/book/entities';
 import Chart from '@/components/charts/Chart';
 import TotalLineChart from '@/components/pages/account/TotalLineChart';
+import * as apiHook from '@/hooks/api';
 
 jest.mock('@/components/charts/Chart', () => jest.fn(
   () => <div data-testid="Chart" />,
 ));
 
+jest.mock('@/hooks/api', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/api'),
+}));
+
 describe('TotalLineChart', () => {
+  beforeEach(() => {
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as SWRResponse);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -18,9 +29,14 @@ describe('TotalLineChart', () => {
   it('creates Chart with expected params', () => {
     render(
       <TotalLineChart
-        splits={[]}
-        currency="EUR"
-        accountType="EXPENSE"
+        account={
+          {
+            guid: 'guid',
+            commodity: {
+              mnemonic: 'EUR',
+            },
+          } as Account
+        }
       />,
     );
 
@@ -48,11 +64,9 @@ describe('TotalLineChart', () => {
   it('builds series accumulating values', () => {
     // note that splits are received ordered already. Without order, it will compute
     // wrongly
-    render(
-      <TotalLineChart
-        currency="EUR"
-        accountType="EXPENSE"
-        splits={[
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue(
+      {
+        data: [
           {
             transaction: {
               date: DateTime.fromISO('2023-01-02'),
@@ -65,7 +79,20 @@ describe('TotalLineChart', () => {
             },
             quantity: 200,
           } as Split,
-        ]}
+        ],
+      } as SWRResponse,
+    );
+
+    render(
+      <TotalLineChart
+        account={
+          {
+            guid: 'guid',
+            commodity: {
+              mnemonic: 'EUR',
+            },
+          } as Account
+        }
       />,
     );
 
@@ -106,11 +133,9 @@ describe('TotalLineChart', () => {
   it('builds series accumulating values with INCOME', () => {
     // note that splits are received ordered already. Without order, it will compute
     // wrongly
-    render(
-      <TotalLineChart
-        currency="EUR"
-        accountType="INCOME"
-        splits={[
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue(
+      {
+        data: [
           {
             transaction: {
               date: DateTime.fromISO('2023-01-02'),
@@ -123,7 +148,21 @@ describe('TotalLineChart', () => {
             },
             quantity: -200,
           } as Split,
-        ]}
+        ],
+      } as SWRResponse,
+    );
+
+    render(
+      <TotalLineChart
+        account={
+          {
+            guid: 'guid',
+            type: 'INCOME',
+            commodity: {
+              mnemonic: 'EUR',
+            },
+          } as Account
+        }
       />,
     );
 
