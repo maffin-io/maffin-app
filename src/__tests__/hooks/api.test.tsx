@@ -150,7 +150,7 @@ describe('API', () => {
 
     expect(swrImmutable.default).toHaveBeenNthCalledWith(
       3,
-      ['/api/accounts/monthly-totals', ['a'], []],
+      '/api/monthly-totals?ids=a',
       expect.any(Function),
     );
     expect(queries.getMonthlyTotals).toBeCalledWith(accounts, todayPrices);

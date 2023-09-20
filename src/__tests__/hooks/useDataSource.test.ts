@@ -239,6 +239,7 @@ describe('useDataSource', () => {
         const mockMutate = swr.mutate as jest.Mock;
         // verify the function we pass behaves as expected
         expect(mockMutate.mock.calls[0][0]('/api/test')).toBe(true);
+        expect(mockMutate.mock.calls[0][0]('/api/asd/asd')).toBe(true);
         expect(mockMutate.mock.calls[0][0]('/state')).toBe(false);
 
         expect(swr.mutate).toHaveBeenNthCalledWith(
