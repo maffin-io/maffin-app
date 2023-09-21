@@ -236,6 +236,26 @@ exports[`AccountForm renders as expected 1`] = `
     </fieldset>
     <fieldset
       class="text-sm my-5"
+      hidden=""
+    >
+      <label
+        class="inline-block mb-2"
+        for="balanceInput"
+      >
+        Opening balance
+      </label>
+      <input
+        class="block w-full m-0"
+        id="balanceInput"
+        name="balance"
+        type="number"
+      />
+      <p
+        class="invalid-feedback"
+      />
+    </fieldset>
+    <fieldset
+      class="text-sm my-5"
     >
       <label
         class="inline-block mb-2"

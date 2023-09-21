@@ -3,6 +3,7 @@ import {
   isInvestment,
   isAsset,
   isLiability,
+  getAllowedSubAccounts,
   ASSET_ACCOUNTS,
   LIABILITY_ACCOUNTS,
 } from '../../helpers/accountType';
@@ -28,5 +29,17 @@ describe('isLiability', () => {
     LIABILITY_ACCOUNTS,
   )('returns true for %s', (type) => {
     expect(isLiability({ type } as Account)).toBe(true);
+  });
+});
+
+describe('getAllowedSubAccounts', () => {
+  it.each([
+    ['ROOT', ['ASSET', 'EXPENSE', 'INCOME', 'LIABILITY', 'EQUITY']],
+    ['ASSET', ['ASSET', 'BANK', 'CASH', 'STOCK', 'MUTUAL', 'RECEIVABLE']],
+    ['LIABILITY', ['LIABILITY', 'CREDIT', 'PAYABLE']],
+    ['INCOME', ['INCOME']],
+    ['EXPENSE', ['EXPENSE']],
+  ])('returns expected subaccounts for %s', (type, expected) => {
+    expect(getAllowedSubAccounts(type)).toEqual(expected);
   });
 });

@@ -5,7 +5,7 @@ import { mutate } from 'swr';
 import pako from 'pako';
 
 import useBookStorage from '@/hooks/useBookStorage';
-import type BookStorage from '@/apis/BookStorage';
+import { importBook as importGnucashBook } from '@/lib/gnucash';
 import {
   Account,
   Book,
@@ -14,6 +14,7 @@ import {
   Split,
   Transaction,
 } from '@/book/entities';
+import type BookStorage from '@/apis/BookStorage';
 
 export type DataSourceContextType = {
   datasource: DataSource | null,
@@ -101,29 +102,10 @@ async function importBook(storage: BookStorage | null, rawData: Uint8Array) {
   } catch (err) {
     parsedData = rawData;
   }
-  const tempDataSource = new DataSource({
-    type: 'sqljs',
-    synchronize: true,
-    database: parsedData,
-    logging: false,
-    entities: [Account, Book, Commodity, Price, Split, Transaction],
-  });
-  await tempDataSource.initialize();
 
-  const accounts = await Account.find();
-  setAccountPaths(accounts.find(a => a.type === 'ROOT') as Account, accounts);
-  await Promise.all(accounts.map(account => Account.update(
-    {
-      guid: account.guid,
-    },
-    {
-      path: account.path,
-    },
-  )));
-
-  const rawBook = tempDataSource.sqljsManager.exportDatabase();
-
+  const rawBook = await importGnucashBook(parsedData);
   await DATASOURCE.sqljsManager.loadDatabase(rawBook);
+
   mutate((key: string) => key.startsWith('/api'), undefined);
   await save(storage);
 }
@@ -143,18 +125,4 @@ async function createEmptyBook() {
     },
     ['guid'],
   );
-}
-
-function setAccountPaths(current: Account, accounts: Account[]) {
-  const parent = accounts.find(a => a.guid === current.parentId);
-  if (!parent || parent.type === 'ROOT') {
-    current.path = current.name;
-  } else {
-    current.path = `${parent.path}:${current.name}`;
-  }
-
-  current.childrenIds.forEach(childId => {
-    const account = accounts.find(a => a.guid === childId) as Account;
-    setAccountPaths(account, accounts);
-  });
 }

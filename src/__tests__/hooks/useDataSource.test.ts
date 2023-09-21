@@ -6,6 +6,7 @@ import * as swr from 'swr';
 import { Account, Book } from '@/book/entities';
 import useDataSource from '@/hooks/useDataSource';
 import * as storageHooks from '@/hooks/useBookStorage';
+import * as gnucash from '@/lib/gnucash';
 import BookStorage from '@/apis/BookStorage';
 
 jest.mock('swr');
@@ -13,6 +14,11 @@ jest.mock('swr');
 jest.mock('@/hooks/useBookStorage', () => ({
   __esModule: true,
   ...jest.requireActual('@/hooks/useBookStorage'),
+}));
+
+jest.mock('@/lib/gnucash', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/lib/gnucash'),
 }));
 
 jest.mock('typeorm', () => ({
@@ -212,16 +218,7 @@ describe('useDataSource', () => {
 
     describe('importBook', () => {
       beforeEach(() => {
-        jest.spyOn(Account, 'update').mockImplementation();
-        jest.spyOn(Account, 'find').mockResolvedValue([
-          {
-            guid: 'root',
-            name: 'Root',
-            path: '',
-            type: 'ROOT',
-            childrenIds: [] as string[],
-          } as Account,
-        ]);
+        jest.spyOn(gnucash, 'importBook').mockResolvedValue(new Uint8Array([44, 55]));
       });
 
       it('loads datasource database, mutates and saves', async () => {
@@ -233,7 +230,8 @@ describe('useDataSource', () => {
         const rawData = new Uint8Array([22, 33]);
         await result.current.importBook(rawData);
 
-        expect(datasource.sqljsManager.loadDatabase).toBeCalledWith(rawData);
+        expect(gnucash.importBook).toHaveBeenCalledWith(rawData);
+        expect(datasource.sqljsManager.loadDatabase).toBeCalledWith(new Uint8Array([44, 55]));
 
         expect(swr.mutate).toBeCalledWith(expect.any(Function), undefined);
         const mockMutate = swr.mutate as jest.Mock;
@@ -254,58 +252,9 @@ describe('useDataSource', () => {
           false,
           { revalidate: false },
         );
-        expect(datasource.sqljsManager.exportDatabase).toBeCalledWith();
 
         const mockStorage = (storageHooks.default as jest.Mock).mock.results[0].value.storage;
         expect(mockStorage.save).toBeCalledWith(new Uint8Array([22, 33]));
-      });
-
-      it('sets accounts paths', async () => {
-        const { result } = renderHook(() => useDataSource());
-
-        await waitFor(() => expect(result.current.isLoaded).toBe(true));
-
-        const rawData = new Uint8Array([22, 33]);
-
-        jest.spyOn(Account, 'update').mockImplementation();
-        jest.spyOn(Account, 'find').mockResolvedValue([
-          {
-            guid: 'root',
-            name: 'Root',
-            path: '',
-            type: 'ROOT',
-            childrenIds: ['1'],
-          } as Account,
-          {
-            guid: '1',
-            name: 'Expenses',
-            path: '',
-            parentId: 'root',
-            childrenIds: ['2'],
-          } as Account,
-          {
-            guid: '2',
-            name: 'Utilities',
-            path: '',
-            parentId: '1',
-            childrenIds: ['3'],
-          } as Account,
-          {
-            guid: '3',
-            name: 'Water',
-            path: '',
-            parentId: '2',
-            childrenIds: [] as string[],
-          } as Account,
-        ]);
-
-        await result.current.importBook(rawData);
-
-        expect(Account.update).toBeCalledTimes(4);
-        expect(Account.update).toHaveBeenNthCalledWith(1, { guid: 'root' }, { path: 'Root' });
-        expect(Account.update).toHaveBeenNthCalledWith(2, { guid: '1' }, { path: 'Expenses' });
-        expect(Account.update).toHaveBeenNthCalledWith(3, { guid: '2' }, { path: 'Expenses:Utilities' });
-        expect(Account.update).toHaveBeenNthCalledWith(4, { guid: '3' }, { path: 'Expenses:Utilities:Water' });
       });
     });
   });
