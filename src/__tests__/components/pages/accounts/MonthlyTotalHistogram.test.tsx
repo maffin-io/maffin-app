@@ -5,12 +5,12 @@ import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
 import { Account } from '@/book/entities';
-import Chart from '@/components/charts/Chart';
+import Bar from '@/components/charts/Bar';
 import { MonthlyTotalHistogram } from '@/components/pages/accounts';
 import * as apiHook from '@/hooks/api';
 
-jest.mock('@/components/charts/Chart', () => jest.fn(
-  () => <div data-testid="Chart" />,
+jest.mock('@/components/charts/Bar', () => jest.fn(
+  () => <div data-testid="Bar" />,
 ));
 
 jest.mock('@/hooks/api', () => ({
@@ -31,7 +31,7 @@ describe('MonthlyTotalHistogram', () => {
     jest.clearAllMocks();
   });
 
-  it('renders with empty tree', () => {
+  it('creates Bar with no data', () => {
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as SWRResponse);
 
     render(
@@ -41,35 +41,82 @@ describe('MonthlyTotalHistogram', () => {
       />,
     );
 
-    expect(Chart).toBeCalledWith(
+    expect(Bar).toBeCalledWith(
       {
-        height: 300,
-        type: 'bar',
-        unit: '',
-        series: [],
-        options: {
-          chart: {
-            stacked: true,
-          },
-          colors: [
-            '#2E93fA',
-            '#66DA26',
-            '#546E7A',
-            '#E91E63',
-            '#FF9800',
-            '#9C27B0',
-            '#00BCD4',
-            '#4CAF50',
-            '#FF5722',
-            '#FFC107',
+        data: {
+          datasets: [],
+          labels: [
+            DateTime.fromISO('2022-06-01').startOf('day'),
+            DateTime.fromISO('2022-07-01').startOf('day'),
+            DateTime.fromISO('2022-08-01').startOf('day'),
+            DateTime.fromISO('2022-09-01').startOf('day'),
+            DateTime.fromISO('2022-10-01').startOf('day'),
+            DateTime.fromISO('2022-11-01').startOf('day'),
+            DateTime.fromISO('2022-12-01').startOf('day'),
+            DateTime.fromISO('2023-01-01').startOf('day'),
           ],
-          plotOptions: {
-            bar: {
-              columnWidth: '60%',
+        },
+        options: {
+          hover: {
+            mode: 'dataset',
+            intersect: true,
+          },
+          scales: {
+            x: {
+              type: 'time',
+              stacked: true,
+              time: {
+                unit: 'month',
+                displayFormats: {
+                  month: 'MMM-yy',
+                },
+              },
+              grid: {
+                display: false,
+              },
+              ticks: {
+                align: 'center',
+              },
+            },
+            y: {
+              border: {
+                display: false,
+              },
+              stacked: true,
+              ticks: {
+                maxTicksLimit: 5,
+                callback: expect.any(Function),
+              },
             },
           },
-          title: { text: 'Title' },
-          xaxis: { type: 'datetime' },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Title',
+              align: 'start',
+              padding: {
+                top: 0,
+                bottom: 30,
+              },
+              font: {
+                size: 18,
+              },
+            },
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 12,
+              },
+            },
+            tooltip: {
+              displayColors: false,
+              backgroundColor: expect.any(Function),
+              callbacks: {
+                title: expect.any(Function),
+                label: expect.any(Function),
+              },
+            },
+          },
         },
       },
       {},
@@ -107,13 +154,24 @@ describe('MonthlyTotalHistogram', () => {
       />,
     );
 
-    const { series } = (Chart as jest.Mock).mock.calls[0][0];
-    expect(
-      series[0].data[0].x,
-    ).toEqual(now.minus({ months: 7 }).startOf('month').plus({ days: 1 }).toMillis());
-    expect(
-      series[0].data[series[0].data.length - 1].x,
-    ).toEqual(now.startOf('month').plus({ days: 1 }).toMillis());
+    expect(Bar).toBeCalledWith(
+      expect.objectContaining({
+        data: {
+          datasets: expect.any(Array),
+          labels: [
+            now.minus({ months: 7 }).startOf('month'),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            now.startOf('month'),
+          ],
+        },
+      }),
+      {},
+    );
   });
 
   it('selects date range of 8 months in the past', () => {
@@ -143,16 +201,27 @@ describe('MonthlyTotalHistogram', () => {
       />,
     );
 
-    const { series } = (Chart as jest.Mock).mock.calls[0][0];
-    expect(
-      series[0].data[0].x,
-    ).toEqual(selectedDate.minus({ months: 3 }).startOf('month').plus({ days: 1 }).toMillis());
-    expect(
-      series[0].data[series[0].data.length - 1].x,
-    ).toEqual(selectedDate.plus({ months: 4 }).startOf('month').plus({ days: 1 }).toMillis());
+    expect(Bar).toBeCalledWith(
+      expect.objectContaining({
+        data: {
+          datasets: expect.any(Array),
+          labels: [
+            selectedDate.minus({ months: 3 }).startOf('month'),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            selectedDate.plus({ months: 4 }).startOf('month'),
+          ],
+        },
+      }),
+      {},
+    );
   });
 
-  it('generates series from tree as expected', () => {
+  it('generates data as expected', () => {
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
       {
         data: {
@@ -186,83 +255,23 @@ describe('MonthlyTotalHistogram', () => {
       />,
     );
 
-    const { series, unit } = (Chart as jest.Mock).mock.calls[0][0];
-    expect(unit).toEqual('EUR');
-    expect(series).toEqual([
-      {
-        name: 'Salary',
-        data: [
-          {
-            x: now.minus({ months: 7 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: -0,
-          },
-          {
-            x: now.minus({ months: 6 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: -0,
-          },
-          {
-            x: now.minus({ months: 5 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: -0,
-          },
-          {
-            x: now.minus({ months: 4 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: -0,
-          },
-          {
-            x: now.minus({ months: 3 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: -0,
-          },
-          {
-            x: now.minus({ months: 2 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: 1000,
-          },
-          {
-            x: now.minus({ months: 1 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: 1000,
-          },
-          {
-            x: now.startOf('month').plus({ days: 1 }).toMillis(),
-            y: -0,
-          },
-        ],
-      },
-      {
-        name: 'Dividends',
-        data: [
-          {
-            x: now.minus({ months: 7 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: -0,
-          },
-          {
-            x: now.minus({ months: 6 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: -0,
-          },
-          {
-            x: now.minus({ months: 5 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: -0,
-          },
-          {
-            x: now.minus({ months: 4 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: -0,
-          },
-          {
-            x: now.minus({ months: 3 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: -0,
-          },
-          {
-            x: now.minus({ months: 2 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: 150,
-          },
-          {
-            x: now.minus({ months: 1 }).startOf('month').plus({ days: 1 }).toMillis(),
-            y: 50,
-          },
-          {
-            x: now.startOf('month').plus({ days: 1 }).toMillis(),
-            y: -0,
-          },
-        ],
-      },
-    ]);
+    expect(Bar).toBeCalledWith(
+      expect.objectContaining({
+        data: {
+          datasets: [
+            {
+              data: [-0, -0, -0, -0, -0, 1000, 1000, -0],
+              label: 'Salary',
+            },
+            {
+              data: [-0, -0, -0, -0, -0, 150, 50, -0],
+              label: 'Dividends',
+            },
+          ],
+          labels: expect.any(Array),
+        },
+      }),
+      {},
+    );
   });
 });

@@ -145,13 +145,15 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
                 description="in this account"
               />
             </div>
-            <div className="col-span-12 bg-gunmetal-700 rounded-sm my-6 mr-6">
+            <div className="col-span-12 bg-gunmetal-700 rounded-sm p-6 my-6 mr-6">
               <TotalLineChart account={account} />
             </div>
           </div>
         </div>
         <div className="col-span-6 bg-gunmetal-700 rounded-sm mb-6 p-4">
-          <SplitsHistogram account={account} />
+          <div className="flex h-full items-center">
+            <SplitsHistogram account={account} />
+          </div>
         </div>
       </div>
       <TransactionsTable account={account} />

@@ -7,17 +7,17 @@ import { Account } from '@/book/entities';
 import { QuoteInfo } from '@/book/types';
 import { InvestmentAccount } from '@/book/models';
 import WeightsChart from '@/components/pages/investments/WeightsChart';
-import Chart from '@/components/charts/Chart';
+import Tree from '@/components/charts/Tree';
 import * as apiHook from '@/hooks/api';
-
-jest.mock('@/components/charts/Chart', () => jest.fn(
-  () => <div data-testid="Chart" />,
-));
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
   ...jest.requireActual('@/hooks/api'),
 }));
+
+jest.mock('@/components/charts/Tree', () => jest.fn(
+  () => <div data-testid="Tree" />,
+));
 
 describe('WeightsChart', () => {
   beforeEach(() => {
@@ -28,33 +28,40 @@ describe('WeightsChart', () => {
     jest.clearAllMocks();
   });
 
-  it('creates treemap with empty data', () => {
+  it('creates treemap with no data', () => {
     render(<WeightsChart totalValue={new Money(0, 'EUR')} />);
 
-    expect(Chart).toHaveBeenCalledWith(
+    expect(Tree).toHaveBeenCalledWith(
       {
-        series: [{ data: [] }],
-        type: 'treemap',
-        height: 650,
+        height: '660',
+        data: {
+          datasets: [
+            {
+              backgroundColor: expect.any(Function),
+              borderWidth: 0,
+              data: [],
+              key: 'value',
+              spacing: 0.25,
+              tree: [],
+            },
+          ],
+        },
         options: {
-          dataLabels: {
-            enabled: true,
-            formatter: expect.any(Function),
-            style: {
-              fontSize: '12px',
-            },
-          },
-          plotOptions: {
-            treemap: {
-              colorScale: {
-                ranges: [],
-              },
-              useFillColorAsStroke: true,
-            },
-          },
-          tooltip: {
-            y: {
+          maintainAspectRatio: false,
+          plugins: {
+            datalabels: {
+              color: 'white',
+              font: expect.any(Function),
               formatter: expect.any(Function),
+              textAlign: 'center',
+            },
+            tooltip: {
+              backgroundColor: expect.any(Function),
+              callbacks: {
+                label: expect.any(Function),
+                title: expect.any(Function),
+              },
+              displayColors: false,
             },
           },
         },
@@ -100,77 +107,40 @@ describe('WeightsChart', () => {
 
     render(<WeightsChart totalValue={new Money(600, 'EUR')} />);
 
-    expect(Chart).toHaveBeenCalledWith(
-      {
-        height: 650,
-        series: [
-          {
-            data: [
-              {
-                color: '#d12b2b',
-                pct: 16.67,
-                today: '-5%',
-                x: 'i1',
-                y: 100,
-              },
-              {
-                color: '#52b12c',
-                pct: 50,
-                today: '+5%',
-                x: 'i2',
-                y: 300,
-              },
-              {
-                color: '#a4d690',
-                pct: 33.33,
-                today: '+1%',
-                x: 'i3',
-                y: 200,
-              },
-            ],
-          },
-        ],
-        type: 'treemap',
-        options: {
-          dataLabels: {
-            enabled: true,
-            formatter: expect.any(Function),
-            style: {
-              fontSize: '12px',
-            },
-          },
-          plotOptions: {
-            treemap: {
-              colorScale: {
-                ranges: [
-                  {
-                    color: '#d12b2b',
-                    from: 100,
-                    to: 100,
-                  },
-                  {
-                    color: '#52b12c',
-                    from: 300,
-                    to: 300,
-                  },
-                  {
-                    color: '#a4d690',
-                    from: 200,
-                    to: 200,
-                  },
-
-                ],
-              },
-              useFillColorAsStroke: true,
-            },
-          },
-          tooltip: {
-            y: {
-              formatter: expect.any(Function),
-            },
-          },
+    expect(Tree).toBeCalledWith(
+      expect.objectContaining({
+        data: {
+          datasets: [
+            expect.objectContaining({
+              data: [],
+              key: 'value',
+              tree: [
+                {
+                  color: '#d12b2b',
+                  pct: 16.67,
+                  today: '-5%',
+                  ticker: 'i1',
+                  value: 100,
+                },
+                {
+                  color: '#52b12c',
+                  pct: 50,
+                  today: '+5%',
+                  ticker: 'i2',
+                  value: 300,
+                },
+                {
+                  color: '#a4d690',
+                  pct: 33.33,
+                  today: '+1%',
+                  ticker: 'i3',
+                  value: 200,
+                },
+              ],
+            }),
+          ],
         },
-      },
+      }),
       {},
     );
   });

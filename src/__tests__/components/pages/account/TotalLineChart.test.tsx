@@ -4,12 +4,12 @@ import { render } from '@testing-library/react';
 import type { SWRResponse } from 'swr';
 
 import type { Account, Split } from '@/book/entities';
-import Chart from '@/components/charts/Chart';
+import Line from '@/components/charts/Line';
 import TotalLineChart from '@/components/pages/account/TotalLineChart';
 import * as apiHook from '@/hooks/api';
 
-jest.mock('@/components/charts/Chart', () => jest.fn(
-  () => <div data-testid="Chart" />,
+jest.mock('@/components/charts/Line', () => jest.fn(
+  () => <div data-testid="Line" />,
 ));
 
 jest.mock('@/hooks/api', () => ({
@@ -26,7 +26,7 @@ describe('TotalLineChart', () => {
     jest.clearAllMocks();
   });
 
-  it('creates Chart with expected params', () => {
+  it('creates Line with no data', () => {
     render(
       <TotalLineChart
         account={
@@ -40,20 +40,58 @@ describe('TotalLineChart', () => {
       />,
     );
 
-    expect(Chart).toBeCalledWith(
+    expect(Line).toBeCalledWith(
       {
-        height: 255,
-        series: [{ data: [] }],
-        type: 'line',
-        unit: 'EUR',
+        height: '255px',
+        data: {
+          datasets: [
+            {
+              data: [],
+              pointStyle: false,
+            },
+          ],
+        },
         options: {
-          chart: {
-            zoom: {
-              enabled: false,
+          maintainAspectRatio: false,
+          plugins: {
+            datalabels: {
+              display: false,
+            },
+            legend: {
+              display: false,
+            },
+            tooltip: {
+              backgroundColor: '#323b44',
+              callbacks: {
+                label: expect.any(Function),
+              },
             },
           },
-          xaxis: {
-            type: 'datetime',
+          scales: {
+            x: {
+              grid: {
+                display: false,
+              },
+              time: {
+                round: 'day',
+                unit: 'day',
+                tooltipFormat: 'dd MMMM yyyy',
+              },
+              type: 'time',
+            },
+            y: {
+              border: {
+                display: false,
+              },
+              ticks: {
+                callback: expect.any(Function),
+                maxTicksLimit: 10,
+              },
+              title: {
+                display: true,
+                text: 'Equity over time',
+              },
+            },
           },
         },
       },
@@ -96,36 +134,26 @@ describe('TotalLineChart', () => {
       />,
     );
 
-    expect(Chart).toBeCalledWith(
-      {
-        height: 255,
-        series: [
-          {
-            data: [
-              {
-                x: 1672531200000,
-                y: 200,
-              },
-              {
-                x: 1672617600000,
-                y: 300,
-              },
-            ],
-          },
-        ],
-        type: 'line',
-        unit: 'EUR',
-        options: {
-          chart: {
-            zoom: {
-              enabled: false,
+    expect(Line).toBeCalledWith(
+      expect.objectContaining({
+        data: {
+          datasets: [
+            {
+              data: [
+                {
+                  x: 1672531200000,
+                  y: 200,
+                },
+                {
+                  x: 1672617600000,
+                  y: 300,
+                },
+              ],
+              pointStyle: false,
             },
-          },
-          xaxis: {
-            type: 'datetime',
-          },
+          ],
         },
-      },
+      }),
       {},
     );
   });
@@ -166,36 +194,26 @@ describe('TotalLineChart', () => {
       />,
     );
 
-    expect(Chart).toBeCalledWith(
-      {
-        height: 255,
-        series: [
-          {
-            data: [
-              {
-                x: 1672531200000,
-                y: 200,
-              },
-              {
-                x: 1672617600000,
-                y: 300,
-              },
-            ],
-          },
-        ],
-        type: 'line',
-        unit: 'EUR',
-        options: {
-          chart: {
-            zoom: {
-              enabled: false,
+    expect(Line).toBeCalledWith(
+      expect.objectContaining({
+        data: {
+          datasets: [
+            {
+              data: [
+                {
+                  x: 1672531200000,
+                  y: 200,
+                },
+                {
+                  x: 1672617600000,
+                  y: 300,
+                },
+              ],
+              pointStyle: false,
             },
-          },
-          xaxis: {
-            type: 'datetime',
-          },
+          ],
         },
-      },
+      }),
       {},
     );
   });

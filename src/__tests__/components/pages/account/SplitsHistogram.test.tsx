@@ -4,14 +4,13 @@ import { render } from '@testing-library/react';
 import type { SWRResponse } from 'swr';
 
 import type { Account, Split } from '@/book/entities';
-import Chart from '@/components/charts/Chart';
+import Bar from '@/components/charts/Bar';
 import SplitsHistogram from '@/components/pages/account/SplitsHistogram';
 import * as apiHook from '@/hooks/api';
 
-jest.mock('@/components/charts/Chart', () => jest.fn(
-  () => <div data-testid="Chart" />,
+jest.mock('@/components/charts/Bar', () => jest.fn(
+  () => <div data-testid="Bar" />,
 ));
-const ChartMock = Chart as jest.MockedFunction<typeof Chart>;
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
@@ -27,7 +26,7 @@ describe('SplitsHistogram', () => {
     jest.clearAllMocks();
   });
 
-  it('creates Chart with expected params', () => {
+  it('creates Bar with no data', () => {
     render(
       <SplitsHistogram
         account={
@@ -41,24 +40,68 @@ describe('SplitsHistogram', () => {
       />,
     );
 
-    expect(Chart).toBeCalledWith(
+    expect(Bar).toBeCalledWith(
       {
-        series: [],
-        type: 'bar',
-        unit: 'EUR',
+        data: {
+          datasets: [],
+          labels: [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun',
+            'Jul',
+            'Aug',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dec',
+          ],
+        },
         options: {
-          title: {
-            text: 'Movements per month',
-          },
-          chart: {
-            events: {
-              mounted: expect.any(Function),
+          plugins: {
+            datalabels: {
+              display: false,
+            },
+            legend: {
+              labels: {
+                boxWidth: 12,
+              },
+              position: 'bottom',
+            },
+            title: {
+              align: 'start',
+              display: true,
+              font: {
+                size: 16,
+              },
+              padding: {
+                bottom: 30,
+              },
+              text: 'Monthly movements',
+            },
+            tooltip: {
+              backgroundColor: '#323b44',
+              callbacks: {
+                label: expect.any(Function),
+              },
             },
           },
-          plotOptions: {
-            bar: {
-              columnWidth: '70%',
-              horizontal: false,
+          scales: {
+            x: {
+              grid: {
+                display: false,
+              },
+            },
+            y: {
+              border: {
+                display: false,
+              },
+              ticks: {
+                callback: expect.any(Function),
+                maxTicksLimit: 10,
+              },
             },
           },
         },
@@ -115,190 +158,25 @@ describe('SplitsHistogram', () => {
       />,
     );
 
-    expect(Chart).toBeCalledWith(
-      {
-        series: [
-          {
-            data: [
-              {
-                x: 'Jan',
-                y: -200,
-              },
-              {
-                x: 'Feb',
-                y: 0,
-              },
-              {
-                x: 'Mar',
-                y: 0,
-              },
-              {
-                x: 'Apr',
-                y: 0,
-              },
-              {
-                x: 'May',
-                y: 0,
-              },
-              {
-                x: 'Jun',
-                y: 0,
-              },
-              {
-                x: 'Jul',
-                y: 0,
-              },
-              {
-                x: 'Aug',
-                y: 0,
-              },
-              {
-                x: 'Sep',
-                y: 0,
-              },
-              {
-                x: 'Oct',
-                y: 0,
-              },
-              {
-                x: 'Nov',
-                y: 0,
-              },
-              {
-                x: 'Dec',
-                y: 0,
-              },
-            ],
-            name: '2022',
-          },
-          {
-            data: [
-              {
-                x: 'Jan',
-                y: 100,
-              },
-              {
-                x: 'Feb',
-                y: 0,
-              },
-              {
-                x: 'Mar',
-                y: 0,
-              },
-              {
-                x: 'Apr',
-                y: 0,
-              },
-              {
-                x: 'May',
-                y: 0,
-              },
-              {
-                x: 'Jun',
-                y: 0,
-              },
-              {
-                x: 'Jul',
-                y: 0,
-              },
-              {
-                x: 'Aug',
-                y: 0,
-              },
-              {
-                x: 'Sep',
-                y: 0,
-              },
-              {
-                x: 'Oct',
-                y: 0,
-              },
-              {
-                x: 'Nov',
-                y: 0,
-              },
-              {
-                x: 'Dec',
-                y: 0,
-              },
-            ],
-            name: '2023',
-          },
-        ],
-        type: 'bar',
-        unit: 'EUR',
-        options: {
-          title: {
-            text: 'Movements per month',
-          },
-          chart: {
-            events: {
-              mounted: expect.any(Function),
+    expect(Bar).toBeCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          datasets: [
+            {
+              data: [-200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              label: '2022',
+              hidden: true,
             },
-          },
-          plotOptions: {
-            bar: {
-              columnWidth: '70%',
-              horizontal: false,
+            {
+              data: [100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              label: '2023',
+              hidden: false,
             },
-          },
-        },
-      },
+          ],
+        }),
+      }),
       {},
     );
-  });
-
-  it('hides all series except last', () => {
-    jest.spyOn(apiHook, 'useSplits').mockReturnValue(
-      {
-        data: [
-          {
-            account: {
-              type: 'ASSET',
-              commodity: {
-                mnemonic: 'EUR',
-              },
-            },
-            transaction: {
-              date: DateTime.fromISO('2023-01-02'),
-            },
-            quantity: 100,
-          } as Split,
-          {
-            account: {
-              type: 'ASSET',
-              commodity: {
-                mnemonic: 'EUR',
-              },
-            },
-            transaction: {
-              date: DateTime.fromISO('2022-01-01'),
-            },
-            quantity: -200,
-          } as Split,
-        ],
-      } as SWRResponse,
-    );
-
-    render(
-      <SplitsHistogram
-        account={
-          {
-            guid: 'guid',
-            commodity: {
-              mnemonic: 'EUR',
-            },
-            type: 'EXPENSE',
-          } as Account
-        }
-      />,
-    );
-
-    const mountedEvent = ChartMock.mock.calls[0][0].options?.chart?.events?.mounted as Function;
-    const mockHideSeries = jest.fn();
-    mountedEvent({ hideSeries: mockHideSeries });
-    expect(mockHideSeries).toBeCalledTimes(1);
-    expect(mockHideSeries).toBeCalledWith('2022');
   });
 
   it('works when splits are all in a single year', () => {

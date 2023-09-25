@@ -1,9 +1,11 @@
 import React from 'react';
 import { DateTime, Interval } from 'luxon';
+import type { ChartDataset } from 'chart.js';
 
-import Chart from '@/components/charts/Chart';
+import Bar from '@/components/charts/Bar';
 import type { Account } from '@/book/entities';
 import * as API from '@/hooks/api';
+import { moneyToString } from '@/helpers/number';
 
 export type MonthlyTotalHistogramProps = {
   title: string,
@@ -30,58 +32,91 @@ export default function MonthlyTotalHistogram({
     selectedDate.plus({ months: 4 }),
   );
 
-  const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).plus({ month: 1 }).endOf('month'));
+  const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).plus({ month: 1 }).startOf('month'));
 
-  const series: {
-    name: string,
-    data: { x: number, y: number }[],
-  }[] = [];
+  const datasets: ChartDataset<'bar'>[] = [];
 
   if (accounts.length && monthlyTotals) {
     accounts.forEach(account => {
-      series.push({
-        name: account.name,
-        data: dates.map(date => ({
-          y: account.type === 'INCOME'
-            ? (monthlyTotals[account.guid]?.[date.toFormat('MM/yyyy')]?.toNumber() || 0) * -1
-            : monthlyTotals[account.guid]?.[date.toFormat('MM/yyyy')]?.toNumber() || 0,
-          x: date.startOf('month').plus({ days: 1 }).toMillis(),
-        })),
-      });
+      const data = dates.map(date => (
+        account.type === 'INCOME'
+          ? (monthlyTotals[account.guid]?.[date.toFormat('MM/yyyy')]?.toNumber() || 0) * -1
+          : monthlyTotals[account.guid]?.[date.toFormat('MM/yyyy')]?.toNumber() || 0
+      ));
+      if (!data.every(v => v === 0)) {
+        datasets.push({
+          label: account.name,
+          data,
+        });
+      }
     });
   }
 
   return (
-    <Chart
-      type="bar"
-      series={series.filter(serie => !serie.data.every(n => n.y === 0))}
-      height={300}
-      unit={unit}
+    <Bar
+      data={{
+        labels: dates,
+        datasets,
+      }}
       options={{
-        chart: {
-          stacked: true,
+        hover: {
+          mode: 'dataset',
+          intersect: true,
         },
-        colors: [
-          '#2E93fA',
-          '#66DA26',
-          '#546E7A',
-          '#E91E63',
-          '#FF9800',
-          '#9C27B0',
-          '#00BCD4',
-          '#4CAF50',
-          '#FF5722',
-          '#FFC107',
-        ],
-        title: {
-          text: title,
+        scales: {
+          x: {
+            type: 'time',
+            stacked: true,
+            time: {
+              unit: 'month',
+              displayFormats: {
+                month: 'MMM-yy',
+              },
+            },
+            grid: {
+              display: false,
+            },
+            ticks: {
+              align: 'center',
+            },
+          },
+          y: {
+            border: {
+              display: false,
+            },
+            stacked: true,
+            ticks: {
+              maxTicksLimit: 5,
+              callback: (value) => moneyToString(value as number, unit),
+            },
+          },
         },
-        xaxis: {
-          type: 'datetime',
-        },
-        plotOptions: {
-          bar: {
-            columnWidth: '60%',
+        plugins: {
+          title: {
+            display: true,
+            text: title,
+            align: 'start',
+            padding: {
+              top: 0,
+              bottom: 30,
+            },
+            font: {
+              size: 18,
+            },
+          },
+          legend: {
+            position: 'bottom',
+            labels: {
+              boxWidth: 12,
+            },
+          },
+          tooltip: {
+            displayColors: false,
+            backgroundColor: (tooltipItem) => tooltipItem.tooltip.labelColors[0].backgroundColor,
+            callbacks: {
+              title: () => '',
+              label: (ctx) => `${ctx.dataset.label}: ${moneyToString(Number(ctx.raw), unit)}`,
+            },
           },
         },
       }}

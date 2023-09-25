@@ -8,10 +8,7 @@ exports[`DividendChart renders as expected with data 1`] = `
     <span
       class="text-lg"
     >
-      
-          Dividends in
-          €
-        
+      Dividends
     </span>
     <div
       class="grid grid-cols-12"
@@ -24,7 +21,7 @@ exports[`DividendChart renders as expected with data 1`] = `
           id="chart-year"
         >
           <div
-            data-testid="Chart"
+            data-testid="Bar"
           />
         </div>
       </div>
@@ -32,10 +29,11 @@ exports[`DividendChart renders as expected with data 1`] = `
         class="col-span-8"
       >
         <div
-          id="chart-monthly"
+          class="text-slate-300"
+          id="chart-year"
         >
           <div
-            data-testid="Chart"
+            data-testid="Bar"
           />
         </div>
       </div>

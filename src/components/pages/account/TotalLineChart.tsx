@@ -1,8 +1,8 @@
 import React from 'react';
-import { ApexOptions } from 'apexcharts';
 
-import Chart from '@/components/charts/Chart';
+import Line from '@/components/charts/Line';
 import * as API from '@/hooks/api';
+import { moneyToString } from '@/helpers/number';
 import type { Account } from '@/book/entities';
 
 export type TotalLineChartProps = {
@@ -15,9 +15,8 @@ export default function TotalLineChart({
   let { data: splits } = API.useSplits(account.guid);
   splits = splits || [];
 
-  const series: ApexOptions['series'] = [{ data: [] }];
-
   let totalAggregate = 0;
+  const data: { x: number, y: number }[] = [];
   splits.slice().reverse().forEach(split => {
     let { quantity } = split;
     if (account.type === 'INCOME') {
@@ -25,26 +24,64 @@ export default function TotalLineChart({
     }
     totalAggregate += quantity;
 
-    (series[0].data as { x: number, y: number }[]).push({
+    data.push({
       x: split.transaction.date.toMillis(),
       y: totalAggregate,
     });
   });
 
   return (
-    <Chart
-      type="line"
-      series={series}
-      unit={account.commodity.mnemonic}
-      height={255}
+    <Line
+      height="255px"
+      data={{
+        datasets: [
+          {
+            data,
+            pointStyle: false,
+          },
+        ],
+      }}
       options={{
-        chart: {
-          zoom: {
-            enabled: false,
+        maintainAspectRatio: false,
+        plugins: {
+          datalabels: {
+            display: false,
+          },
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            backgroundColor: '#323b44',
+            callbacks: {
+              label: (ctx) => `${moneyToString(Number(ctx.parsed.y), account.commodity.mnemonic)}`,
+            },
           },
         },
-        xaxis: {
-          type: 'datetime',
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'day',
+              round: 'day',
+              tooltipFormat: 'dd MMMM yyyy',
+            },
+            grid: {
+              display: false,
+            },
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Equity over time',
+            },
+            border: {
+              display: false,
+            },
+            ticks: {
+              maxTicksLimit: 10,
+              callback: (value) => moneyToString(value as number, account.commodity.mnemonic),
+            },
+          },
         },
       }}
     />

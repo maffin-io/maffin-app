@@ -4,12 +4,12 @@ import { DateTime } from 'luxon';
 import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
-import Chart, { ChartProps } from '@/components/charts/Chart';
+import Pie from '@/components/charts/Pie';
 import { NetWorthPie } from '@/components/pages/accounts';
 import * as apiHook from '@/hooks/api';
 
-jest.mock('@/components/charts/Chart', () => jest.fn(
-  () => <div data-testid="Chart" />,
+jest.mock('@/components/charts/Pie', () => jest.fn(
+  () => <div data-testid="Pie" />,
 ));
 
 jest.mock('@/hooks/api', () => ({
@@ -27,58 +27,45 @@ describe('NetWorthPie', () => {
     jest.clearAllMocks();
   });
 
-  it('creates Chart with no data when no data', () => {
+  it('creates Pie with no data when no data', () => {
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as SWRResponse);
     render(<NetWorthPie />);
 
-    expect(Chart).toBeCalledWith(
+    expect(Pie).toBeCalledWith(
       {
-        series: [0, -0],
-        type: 'donut',
-        unit: '',
-        height: 300,
-        options: {
-          colors: ['#06B6D4', '#F97316'],
-          dataLabels: {
-            enabled: true,
-            formatter: expect.any(Function),
-          },
-          grid: {
-            padding: {
-              bottom: -110,
+        data: {
+          datasets: [
+            {
+              backgroundColor: ['#06B6D4', '#F97316'],
+              data: [0, -0],
             },
-          },
+          ],
           labels: ['Assets', 'Liabilities'],
-          plotOptions: {
-            pie: {
-              donut: {
-                labels: {
-                  show: true,
-                  total: {
-                    formatter: expect.any(Function),
-                    label: 'Net worth',
-                    show: true,
-                    showAlways: true,
-                  },
-                },
+        },
+        options: {
+          aspectRatio: 1.5,
+          circumference: 180,
+          cutout: '65%',
+          layout: {
+            padding: 40,
+          },
+          rotation: -90,
+          plugins: {
+            datalabels: {
+              borderRadius: 2,
+              color: '#DDDDDD',
+              font: {
+                family: 'Intervariable',
+                size: 14,
+                weight: 300,
               },
-              endAngle: 90,
-              offsetY: 10,
-              startAngle: -90,
+              formatter: expect.any(Function),
+              padding: 6,
+              textAlign: 'center',
             },
-          },
-          legend: {
-            show: false,
-          },
-          states: {
-            hover: {
-              filter: {
-                type: 'none',
-              },
+            tooltip: {
+              enabled: false,
             },
-          },
-          tooltip: {
-            enabled: false,
           },
         },
       },
@@ -109,32 +96,20 @@ describe('NetWorthPie', () => {
 
     render(<NetWorthPie />);
 
-    const props = (Chart as jest.Mock).mock.calls[0][0] as ChartProps;
-    expect(props.series).toEqual([1000, 100]);
-    expect(props.unit).toEqual('EUR');
-    expect(
-      props.options?.plotOptions?.pie?.donut?.labels?.total?.formatter?.(
-        {
-          globals: {
-            series: [1000, 100],
-          },
-        },
-      ),
-    ).toEqual('€900.00');
-    expect(
-      props.options?.dataLabels?.formatter?.(
-        0,
-        {
-          w: {
-            globals: {
-              series: [1000, 100],
-              labels: ['Name'],
+    expect(Pie).toBeCalledWith(
+      expect.objectContaining({
+        data: {
+          datasets: [
+            {
+              backgroundColor: ['#06B6D4', '#F97316'],
+              data: [1000, 100],
             },
-          },
-          seriesIndex: 0,
+          ],
+          labels: ['Assets', 'Liabilities'],
         },
-      ),
-    ).toEqual(['Name', '€1,000.00']);
+      }),
+      {},
+    );
   });
 
   it('computes net worth when no liabilities', () => {
@@ -151,18 +126,20 @@ describe('NetWorthPie', () => {
 
     render(<NetWorthPie />);
 
-    const props = (Chart as jest.Mock).mock.calls[0][0] as ChartProps;
-    expect(props.series).toEqual([1000, -0]);
-    expect(props.unit).toEqual('EUR');
-    expect(
-      props.options?.plotOptions?.pie?.donut?.labels?.total?.formatter?.(
-        {
-          globals: {
-            series: [1000, -0],
-          },
+    expect(Pie).toBeCalledWith(
+      expect.objectContaining({
+        data: {
+          datasets: [
+            {
+              backgroundColor: ['#06B6D4', '#F97316'],
+              data: [1000, -0],
+            },
+          ],
+          labels: ['Assets', 'Liabilities'],
         },
-      ),
-    ).toEqual('€1,000.00');
+      }),
+      {},
+    );
   });
 
   it('filters by selected date', () => {
@@ -187,7 +164,19 @@ describe('NetWorthPie', () => {
       />,
     );
 
-    const props = (Chart as jest.Mock).mock.calls[0][0] as ChartProps;
-    expect(props.series).toEqual([500, 50]);
+    expect(Pie).toBeCalledWith(
+      expect.objectContaining({
+        data: {
+          datasets: [
+            {
+              backgroundColor: ['#06B6D4', '#F97316'],
+              data: [500, 50],
+            },
+          ],
+          labels: ['Assets', 'Liabilities'],
+        },
+      }),
+      {},
+    );
   });
 });
