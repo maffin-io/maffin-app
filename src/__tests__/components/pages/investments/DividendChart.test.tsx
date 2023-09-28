@@ -1,33 +1,29 @@
 import React from 'react';
 import { DateTime } from 'luxon';
-import { render, screen } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
 import { InvestmentAccount } from '@/book/models';
-import Chart from '@/components/charts/Chart';
+import Bar from '@/components/charts/Bar';
 import { DividendChart } from '@/components/pages/investments';
 import * as apiHook from '@/hooks/api';
 
-jest.mock('@/components/charts/Chart', () => jest.fn(
-  () => <div data-testid="Chart" />,
+jest.mock('@/components/charts/Bar', () => jest.fn(
+  () => <div data-testid="Bar" />,
 ));
-const ChartMock = Chart as jest.MockedFunction<typeof Chart>;
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
   ...jest.requireActual('@/hooks/api'),
 }));
 
-const mockChartExec = jest.fn();
-Object.defineProperty(global.self, 'ApexCharts', {
-  value: {
-    exec: (arg1: string, arg2: string, arg3: object) => mockChartExec(arg1, arg2, arg3),
-  },
-});
-
 describe('DividendChart', () => {
+  const now = DateTime.fromISO('2023-01-02');
+
   beforeEach(() => {
+    jest.spyOn(DateTime, 'now').mockReturnValue(now);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as SWRResponse);
     jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
@@ -35,10 +31,126 @@ describe('DividendChart', () => {
     jest.clearAllMocks();
   });
 
-  it('shows loading when no data', () => {
-    render(<DividendChart />);
+  it('creates Bar with no data', () => {
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as SWRResponse);
 
-    screen.getByText('Loading...');
+    render(
+      <DividendChart />,
+    );
+
+    expect(Bar).toBeCalledTimes(2);
+    expect(Bar).toHaveBeenNthCalledWith(
+      1,
+      {
+        height: '400',
+        data: {
+          datasets: [
+            {
+              backgroundColor: 'rgba(34, 197, 94, 0.2)',
+              data: [0],
+              hoverBackgroundColor: 'rgba(34, 197, 94, 0.5)',
+            },
+          ],
+          labels: [2023],
+        },
+        options: {
+          onClick: expect.any(Function),
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          plugins: {
+            datalabels: {
+              display: false,
+            },
+            legend: {
+              display: false,
+            },
+            tooltip: {
+              displayColors: false,
+              backgroundColor: expect.any(Function),
+              callbacks: {
+                title: expect.any(Function),
+                label: expect.any(Function),
+              },
+            },
+          },
+          scales: {
+            x: {
+              grid: {
+                drawOnChartArea: false,
+              },
+              border: {
+                display: false,
+              },
+            },
+            y: {
+              border: {
+                display: false,
+              },
+              grid: {
+                display: false,
+              },
+            },
+          },
+        },
+      },
+      {},
+    );
+
+    expect(Bar).toHaveBeenNthCalledWith(
+      2,
+      {
+        height: '400',
+        data: {
+          datasets: [],
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        },
+        options: {
+          hover: {
+            mode: 'dataset',
+            intersect: true,
+          },
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              stacked: true,
+              grid: {
+                display: false,
+              },
+            },
+            y: {
+              border: {
+                display: false,
+              },
+              stacked: true,
+              ticks: {
+                maxTicksLimit: 5,
+                callback: expect.any(Function),
+              },
+            },
+          },
+          plugins: {
+            datalabels: {
+              display: false,
+            },
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 12,
+              },
+            },
+            tooltip: {
+              displayColors: false,
+              backgroundColor: expect.any(Function),
+              callbacks: {
+                title: expect.any(Function),
+                label: expect.any(Function),
+              },
+            },
+          },
+        },
+      },
+      {},
+    );
   });
 
   it('renders as expected with data', () => {
@@ -82,132 +194,44 @@ describe('DividendChart', () => {
 
     const { container } = render(<DividendChart />);
 
-    expect(Chart).toHaveBeenNthCalledWith(
+    expect(Bar).toHaveBeenNthCalledWith(
       1,
-      {
-        series: [
-          {
-            name: 'Total dividends',
-            data: [
-              {
-                dividends: [
-                  [],
-                  [{ amount: 150, ticker: 'Account2' }],
-                  [],
-                  [],
-                  [],
-                  [],
-                  [],
-                  [],
-                  [],
-                  [],
-                  [],
-                  [],
-                ],
-                x: '2022',
-                y: 150,
-              },
-              {
-                dividends: [
-                  [{ amount: 100, ticker: 'Account1' }],
-                  [],
-                  [],
-                  [],
-                  [
-                    { amount: 130, ticker: 'Account1' },
-                    { amount: 130, ticker: 'Account2' },
-                  ],
-                  [],
-                  [],
-                  [],
-                  [],
-                  [],
-                  [],
-                  [],
-                ],
-                x: '2023',
-                y: 360,
-              },
-            ],
-          },
-        ],
-        type: 'bar',
-        unit: 'EUR',
-        options: {
-          legend: {
-            show: false,
-          },
-          chart: {
-            events: {
-              dataPointSelection: expect.any(Function),
-            },
-          },
-          plotOptions: {
-            bar: {
-              barHeight: '55%',
-              horizontal: true,
-            },
-          },
+      expect.objectContaining({
+        data: {
+          datasets: [
+            expect.objectContaining({
+              data: [150, 360],
+            }),
+          ],
+          labels: [2022, 2023],
         },
-      },
+      }),
       {},
     );
 
-    expect(Chart).toHaveBeenNthCalledWith(
+    expect(Bar).toHaveBeenNthCalledWith(
       2,
-      {
-        type: 'bar',
-        unit: 'EUR',
-        series: [
-          {
-            name: 'Account1',
-            data: [
-              { y: 100, x: 'Jan' },
-              { y: 0, x: 'Feb' },
-              { y: 0, x: 'Mar' },
-              { y: 0, x: 'Apr' },
-              { y: 130, x: 'May' },
-              { y: 0, x: 'Jun' },
-              { y: 0, x: 'Jul' },
-              { y: 0, x: 'Aug' },
-              { y: 0, x: 'Sep' },
-              { y: 0, x: 'Oct' },
-              { y: 0, x: 'Nov' },
-              { y: 0, x: 'Dec' },
-            ],
-          },
-          {
-            name: 'Account2',
-            data: [
-              { y: 0, x: 'Jan' },
-              { y: 0, x: 'Feb' },
-              { y: 0, x: 'Mar' },
-              { y: 0, x: 'Apr' },
-              { y: 130, x: 'May' },
-              { y: 0, x: 'Jun' },
-              { y: 0, x: 'Jul' },
-              { y: 0, x: 'Aug' },
-              { y: 0, x: 'Sep' },
-              { y: 0, x: 'Oct' },
-              { y: 0, x: 'Nov' },
-              { y: 0, x: 'Dec' },
-            ],
-          },
-        ],
-        options: {
-          chart: {
-            id: 'barMonthly',
-            stacked: true,
-          },
-        },
-      },
+      expect.objectContaining({
+        data: expect.objectContaining({
+          datasets: [
+            expect.objectContaining({
+              label: 'Account1',
+              data: [100, 0, 0, 0, 130, 0, 0, 0, 0, 0, 0, 0],
+            }),
+            expect.objectContaining({
+              label: 'Account2',
+              data: [0, 0, 0, 0, 130, 0, 0, 0, 0, 0, 0, 0],
+            }),
+          ],
+        }),
+      }),
       {},
     );
 
     expect(container).toMatchSnapshot();
   });
 
-  it('recalculates monthly series on datapoint selection', () => {
+  it('recalculates monthly dataset on datapoint selection', () => {
     jest.spyOn(apiHook, 'useInvestments').mockReturnValue(
       {
         data: [
@@ -233,87 +257,46 @@ describe('DividendChart', () => {
 
     render(<DividendChart />);
 
-    const dataPointSelection = (
-      ChartMock.mock.calls[0][0].options?.chart?.events?.dataPointSelection as Function
+    act(() => {
+      (Bar as jest.Mock).mock.calls[0][0].options.onClick(
+        {},
+        [{ index: 0 }],
+        {
+          data: {
+            labels: [2022, 2023],
+          },
+        },
+      );
+    });
+
+    expect(Bar).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        data: expect.objectContaining({
+          datasets: [
+            expect.objectContaining({
+              label: 'Account1',
+              data: [130, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            }),
+          ],
+        }),
+      }),
+      {},
     );
 
-    const mockChart = {
-      w: {
-        globals: {
-          selectedDataPoints: [[0]],
-        },
-        config: {
-          series: [
-            {
-              name: 'Total dividends',
-              data: [
-                {
-                  dividends: [
-                    [{ amount: 100, ticker: 'Account1' }],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                  ],
-                  x: '2022',
-                  y: 100,
-                },
-                {
-                  dividends: [
-                    [{ amount: 130, ticker: 'Account1' }],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                  ],
-                  x: '2023',
-                  y: 130,
-                },
-              ],
-            },
+    expect(Bar).toHaveBeenNthCalledWith(
+      4,
+      expect.objectContaining({
+        data: expect.objectContaining({
+          datasets: [
+            expect.objectContaining({
+              label: 'Account1',
+              data: [100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            }),
           ],
-        },
-      },
-    };
-    dataPointSelection(jest.fn(), mockChart);
-    expect(mockChartExec).toBeCalledWith(
-      'barMonthly',
-      'updateOptions',
-      {
-        series: [
-          {
-            name: 'Account1',
-            data: [
-              { y: 100, x: 'Jan' },
-              { y: 0, x: 'Feb' },
-              { y: 0, x: 'Mar' },
-              { y: 0, x: 'Apr' },
-              { y: 0, x: 'May' },
-              { y: 0, x: 'Jun' },
-              { y: 0, x: 'Jul' },
-              { y: 0, x: 'Aug' },
-              { y: 0, x: 'Sep' },
-              { y: 0, x: 'Oct' },
-              { y: 0, x: 'Nov' },
-              { y: 0, x: 'Dec' },
-            ],
-          },
-        ],
-      },
+        }),
+      }),
+      {},
     );
   });
 
@@ -343,72 +326,19 @@ describe('DividendChart', () => {
 
     render(<DividendChart />);
 
-    const dataPointSelection = (
-      ChartMock.mock.calls[0][0].options?.chart?.events?.dataPointSelection as Function
-    );
-
-    const mockChart = {
-      w: {
-        globals: {
-          selectedDataPoints: [[0]],
-        },
-        config: {
-          series: [
-            {
-              name: 'Total dividends',
-              data: [
-                {
-                  dividends: [
-                    [
-                      { amount: 100, ticker: 'Account1' },
-                      { amount: 130, ticker: 'Account1' },
-                    ],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                  ],
-                  x: '2023',
-                  y: 230,
-                },
-              ],
-            },
+    expect(Bar).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        data: expect.objectContaining({
+          datasets: [
+            expect.objectContaining({
+              label: 'Account1',
+              data: [230, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            }),
           ],
-        },
-      },
-    };
-    dataPointSelection(jest.fn(), mockChart);
-    expect(mockChartExec).toBeCalledWith(
-      'barMonthly',
-      'updateOptions',
-      {
-        series: [
-          {
-            name: 'Account1',
-            data: [
-              { y: 230, x: 'Jan' },
-              { y: 0, x: 'Feb' },
-              { y: 0, x: 'Mar' },
-              { y: 0, x: 'Apr' },
-              { y: 0, x: 'May' },
-              { y: 0, x: 'Jun' },
-              { y: 0, x: 'Jul' },
-              { y: 0, x: 'Aug' },
-              { y: 0, x: 'Sep' },
-              { y: 0, x: 'Oct' },
-              { y: 0, x: 'Nov' },
-              { y: 0, x: 'Dec' },
-            ],
-          },
-        ],
-      },
+        }),
+      }),
+      {},
     );
   });
 });

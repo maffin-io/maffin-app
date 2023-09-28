@@ -4,12 +4,12 @@ import { DateTime } from 'luxon';
 import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
-import Chart from '@/components/charts/Chart';
+import Bar from '@/components/charts/Bar';
 import { NetWorthHistogram } from '@/components/pages/accounts';
 import * as apiHook from '@/hooks/api';
 
-jest.mock('@/components/charts/Chart', () => jest.fn(
-  () => <div data-testid="Chart" />,
+jest.mock('@/components/charts/Bar', () => jest.fn(
+  () => <div data-testid="Bar" />,
 ));
 
 jest.mock('@/hooks/api', () => ({
@@ -33,150 +33,115 @@ describe('NetWorthHistogram', () => {
       <NetWorthHistogram />,
     );
 
-    expect(Chart).toBeCalledTimes(2);
-    expect(Chart).toHaveBeenNthCalledWith(
-      1,
+    expect(Bar).toBeCalledWith(
       {
-        height: 350,
-        type: 'line',
-        unit: '',
-        series: [
-          {
-            data: [],
-            type: 'column',
-            name: 'Income',
-          },
-          {
-            data: [],
-            type: 'column',
-            name: 'Expenses',
-          },
-          {
-            data: [],
-            type: 'column',
-            name: 'Net profit',
-          },
-          {
-            data: [],
-            type: 'line',
-            name: 'Net worth',
-          },
-        ],
-        options: {
-          chart: {
-            id: 'netWorthHistogram',
-          },
-          xaxis: {
-            type: 'datetime',
-            crosshairs: {
-              show: true,
-              width: 'barWidth',
-              opacity: 0.1,
-              stroke: {
-                width: 0,
-              },
-            },
-          },
-          colors: ['#22C55E', '#EF4444', '#06B6D4', '#06B6D4'],
-          plotOptions: {
-            bar: {
-              columnWidth: '70%',
-            },
-          },
-          markers: {
-            size: 2,
-            strokeColors: '#06B6D4',
-          },
-          legend: {
-            position: 'top',
-            onItemClick: {
-              toggleDataSeries: false,
-            },
-          },
-          yaxis: [
+        data: {
+          datasets: [
             {
-              seriesName: 'Income',
-              title: {
-                text: 'Net profit',
-              },
-              labels: {
-                formatter: expect.any(Function),
-              },
-              forceNiceScale: true,
+              backgroundColor: '#06B6D4',
+              borderColor: '#06B6D4',
+              data: [],
+              label: 'Net worth',
+              pointHoverRadius: 10,
+              pointRadius: 5,
+              pointStyle: 'rectRounded',
+              showLine: false,
+              type: 'line',
+              yAxisID: 'y1',
             },
             {
-              seriesName: 'Income',
-              show: false,
-              labels: {
-                formatter: expect.any(Function),
-              },
+              backgroundColor: '#22C55E',
+              data: [],
+              label: 'Income',
             },
             {
-              seriesName: 'Income',
-              show: false,
-              labels: {
-                formatter: expect.any(Function),
-              },
+              backgroundColor: '#EF4444',
+              data: [],
+              label: 'Expenses',
             },
             {
-              opposite: true,
-              seriesName: 'Net worth',
-              title: {
-                text: 'Net worth',
-              },
-              forceNiceScale: true,
-              labels: {
-                formatter: expect.any(Function),
-              },
+              backgroundColor: '#06B6D4',
+              data: [],
+              label: 'Net profit',
             },
           ],
+          labels: [],
         },
-      },
-      {},
-    );
-
-    expect(Chart).toHaveBeenNthCalledWith(
-      2,
-      {
-        height: 100,
-        type: 'line',
-        series: [
-          {
-            data: [],
-            name: 'Net worth',
-            type: 'line',
-          },
-        ],
         options: {
-          chart: {
-            brush: {
-              enabled: true,
-              target: 'netWorthHistogram',
+          interaction: {
+            mode: 'index',
+          },
+          plugins: {
+            legend: {
+              labels: {
+                boxHeight: 8,
+                boxWidth: 8,
+                pointStyle: 'circle',
+                usePointStyle: true,
+              },
+              position: 'top',
             },
-            selection: {
-              enabled: true,
-              xaxis: {
-                min: DateTime.now().minus({ months: 6 }).toMillis(),
-                max: DateTime.now().toMillis(),
-              },
-              fill: {
-                color: '#888',
-                opacity: 0.4,
-              },
-              stroke: {
-                color: '#0D47A1',
+            tooltip: {
+              backgroundColor: '#323b44',
+              callbacks: {
+                label: expect.any(Function),
+                labelColor: expect.any(Function),
               },
             },
           },
-          colors: ['#06B6D4'],
-          grid: {
-            show: false,
-          },
-          xaxis: {
-            type: 'datetime',
-          },
-          yaxis: {
-            show: false,
+          scales: {
+            x: {
+              grid: {
+                display: false,
+              },
+              max: DateTime.now().startOf('month').toMillis(),
+              min: DateTime.now().minus({ months: 8 }).startOf('month').toMillis(),
+              ticks: {
+                align: 'center',
+              },
+              time: {
+                displayFormats: {
+                  month: 'MMM-yy',
+                },
+                tooltipFormat: 'MMMM yyyy',
+                unit: 'month',
+              },
+              type: 'time',
+            },
+            y: {
+              border: {
+                display: false,
+              },
+              position: 'left',
+              ticks: {
+                callback: expect.any(Function),
+                maxTicksLimit: 10,
+              },
+              title: {
+                display: true,
+                text: 'Monthly net profit',
+              },
+            },
+            y1: {
+              border: {
+                display: false,
+              },
+              display: true,
+              grid: {
+                display: false,
+                drawOnChartArea: false,
+              },
+              position: 'right',
+              ticks: {
+                callback: expect.any(Function),
+                maxTicksLimit: 10,
+              },
+              title: {
+                display: true,
+                text: 'Accumulated net worth',
+              },
+              type: 'linear',
+            },
           },
         },
       },
@@ -184,7 +149,7 @@ describe('NetWorthHistogram', () => {
     );
   });
 
-  it('generates series from data as expected', () => {
+  it('generates datasets as expected', () => {
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
       {
         data: {
@@ -209,156 +174,37 @@ describe('NetWorthHistogram', () => {
       />,
     );
 
-    const mainSeries = (Chart as jest.Mock).mock.calls[0][0].series;
-    expect(mainSeries).toEqual([
-      {
-        name: 'Income',
-        type: 'column',
-        data: [
-          {
-            x: DateTime.fromISO('2022-09-01'),
-            y: -0,
-          },
-          {
-            x: DateTime.fromISO('2022-10-01'),
-            y: -0,
-          },
-          {
-            x: DateTime.fromISO('2022-11-01'),
-            y: 800,
-          },
-          {
-            x: DateTime.fromISO('2022-12-01'),
-            y: 400,
-          },
-          {
-            x: DateTime.fromISO('2023-01-01'),
-            y: -0,
-          },
-        ],
-      },
-      {
-        name: 'Expenses',
-        type: 'column',
-        data: [
-          {
-            x: DateTime.fromISO('2022-09-01'),
-            y: -0,
-          },
-          {
-            x: DateTime.fromISO('2022-10-01'),
-            y: -0,
-          },
-          {
-            x: DateTime.fromISO('2022-11-01'),
-            y: -400,
-          },
-          {
-            x: DateTime.fromISO('2022-12-01'),
-            y: -500,
-          },
-          {
-            x: DateTime.fromISO('2023-01-01'),
-            y: -0,
-          },
-        ],
-      },
-      {
-        name: 'Net profit',
-        type: 'column',
-        data: [
-          {
-            x: DateTime.fromISO('2022-09-01'),
-            y: -0,
-          },
-          {
-            x: DateTime.fromISO('2022-10-01'),
-            y: -0,
-          },
-          {
-            x: DateTime.fromISO('2022-11-01'),
-            y: 400,
-          },
-          {
-            x: DateTime.fromISO('2022-12-01'),
-            y: -100,
-          },
-          {
-            x: DateTime.fromISO('2023-01-01'),
-            y: -0,
-          },
-        ],
-      },
-      {
-        name: 'Net worth',
-        type: 'line',
-        data: [
-          {
-            x: DateTime.fromISO('2022-09-01'),
-            y: 0,
-          },
-          {
-            x: DateTime.fromISO('2022-10-01'),
-            y: 0,
-          },
-          {
-            x: DateTime.fromISO('2022-11-01'),
-            y: 400,
-          },
-          {
-            x: DateTime.fromISO('2022-12-01'),
-            y: 300,
-          },
-          {
-            x: DateTime.fromISO('2023-01-01'),
-            y: 300,
-          },
-        ],
-      },
-    ]);
-
-    const brushSeries = (Chart as jest.Mock).mock.calls[1][0].series;
-    expect(brushSeries).toEqual([
-      {
-        name: 'Net worth',
-        type: 'line',
-        data: [
-          {
-            x: DateTime.fromISO('2022-09-01'),
-            y: 0,
-          },
-          {
-            x: DateTime.fromISO('2022-10-01'),
-            y: 0,
-          },
-          {
-            x: DateTime.fromISO('2022-11-01'),
-            y: 400,
-          },
-          {
-            x: DateTime.fromISO('2022-12-01'),
-            y: 300,
-          },
-          {
-            x: DateTime.fromISO('2023-01-01'),
-            y: 300,
-          },
-        ],
-      },
-    ]);
-  });
-
-  it('selects brush X range with selected date', () => {
-    const selectedDate = DateTime.fromISO('2022-01-01');
-    render(
-      <NetWorthHistogram
-        selectedDate={selectedDate}
-      />,
+    expect(Bar).toBeCalledWith(
+      expect.objectContaining({
+        data: {
+          datasets: [
+            expect.objectContaining({
+              data: [0, 0, 400, 300, 300],
+              label: 'Net worth',
+            }),
+            expect.objectContaining({
+              data: [-0, -0, 800, 400, -0],
+              label: 'Income',
+            }),
+            expect.objectContaining({
+              data: [-0, -0, -400, -500, -0],
+              label: 'Expenses',
+            }),
+            expect.objectContaining({
+              data: [-0, -0, 400, -100, -0],
+              label: 'Net profit',
+            }),
+          ],
+          labels: [
+            DateTime.fromISO('2022-09-01'),
+            DateTime.fromISO('2022-10-01'),
+            DateTime.fromISO('2022-11-01'),
+            DateTime.fromISO('2022-12-01'),
+            DateTime.fromISO('2023-01-01'),
+          ],
+        },
+      }),
+      {},
     );
-
-    expect((Chart as jest.Mock).mock.calls[1][0].options.chart.selection.xaxis).toEqual({
-      min: selectedDate.minus({ months: 3 }).toMillis(),
-      max: selectedDate.plus({ months: 3 }).toMillis(),
-    });
   });
 });

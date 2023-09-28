@@ -67,12 +67,14 @@ export default function AccountsPage(): JSX.Element {
             />
           </div>
         </div>
-        <div className="grid grid-cols-12 items-start items-top col-span-9">
-          <div className="col-span-9 p-4 mb-4 mr-4 rounded-sm bg-gunmetal-700">
-            <NetWorthHistogram
-              startDate={earliestDate}
-              selectedDate={selectedDate}
-            />
+        <div className="grid grid-cols-12 col-span-9">
+          <div className="col-span-9 p-4 mb-4 h-100 mr-4 rounded-sm bg-gunmetal-700">
+            <div className="flex h-full items-center">
+              <NetWorthHistogram
+                startDate={earliestDate}
+                selectedDate={selectedDate}
+              />
+            </div>
           </div>
           <div className="col-span-3 p-4 mb-4 mr-4 rounded-sm bg-gunmetal-700">
             <LatestTransactions />

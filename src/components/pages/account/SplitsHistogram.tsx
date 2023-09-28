@@ -1,7 +1,9 @@
 import React from 'react';
 import { Interval, DateTime } from 'luxon';
+import type { ChartDataset } from 'chart.js';
+import { moneyToString } from '@/helpers/number';
 
-import Chart from '@/components/charts/Chart';
+import Bar from '@/components/charts/Bar';
 import * as API from '@/hooks/api';
 import type { Account } from '@/book/entities';
 
@@ -15,14 +17,7 @@ export default function SplitsHistogram({
   let { data: splits } = API.useSplits(account.guid);
   splits = splits || [];
 
-  const hiddenSeries: string[] = [];
-  let series: {
-    name: string,
-    data: {
-      x: string,
-      y: number,
-    }[],
-  }[] = [];
+  let datasets: ChartDataset<'bar'>[] = [];
 
   if (splits.length) {
     const interval = Interval.fromDateTimes(
@@ -31,21 +26,11 @@ export default function SplitsHistogram({
     );
     const years = interval.splitBy({ year: 1 }).map(d => (d.start as DateTime).year);
 
-    series = years.map(year => {
-      hiddenSeries.push(year.toString());
-      const yearInterval = Interval.fromDateTimes(
-        DateTime.utc(year).startOf('year'),
-        DateTime.utc(year).endOf('year'),
-      );
-      return {
-        name: year.toString(),
-        data: yearInterval.splitBy({ month: 1 }).map(d => ({
-          x: (d.start as DateTime).toFormat('MMM'),
-          y: 0,
-        })),
-      };
-    });
-    hiddenSeries.pop();
+    datasets = years.map((year, i) => ({
+      label: year.toString(),
+      hidden: i !== years.length - 1,
+      data: new Array(12).fill(0),
+    }));
 
     splits.forEach(split => {
       const { month, year } = split.transaction.date;
@@ -54,36 +39,60 @@ export default function SplitsHistogram({
         quantity = -quantity;
       }
 
-      const yearSeries = series[years.indexOf(year)];
-      yearSeries.data[month - 1].y += quantity;
+      const yearSeries = datasets[years.indexOf(year)];
+      yearSeries.data[month - 1] = yearSeries.data[month - 1] as number + quantity;
     });
   }
 
   return (
-    <Chart
-      type="bar"
-      series={series}
-      unit={account.commodity.mnemonic}
+    <Bar
+      data={{
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        datasets,
+      }}
       options={{
-        title: {
-          text: 'Movements per month',
-        },
-        plotOptions: {
-          bar: {
-            horizontal: false,
-            columnWidth: '70%',
+        plugins: {
+          title: {
+            display: true,
+            text: 'Monthly movements',
+            align: 'start',
+            padding: {
+              bottom: 30,
+            },
+            font: {
+              size: 16,
+            },
+          },
+          datalabels: {
+            display: false,
+          },
+          legend: {
+            position: 'bottom',
+            labels: {
+              boxWidth: 12,
+            },
+          },
+          tooltip: {
+            backgroundColor: '#323b44',
+            callbacks: {
+              label: (ctx) => `${moneyToString(Number(ctx.parsed.y), account.commodity.mnemonic)}`,
+            },
           },
         },
-        chart: {
-          events: {
-            mounted: (chart) => hiddenSeries.forEach(name => {
-              try {
-                chart.hideSeries(name);
-              } catch {
-                // this fails sometimes for some reason but still renders
-                // as expected. Adding the catch to protect against that.
-              }
-            }),
+        scales: {
+          x: {
+            grid: {
+              display: false,
+            },
+          },
+          y: {
+            border: {
+              display: false,
+            },
+            ticks: {
+              maxTicksLimit: 10,
+              callback: (value) => moneyToString(value as number, account.commodity.mnemonic),
+            },
           },
         },
       }}

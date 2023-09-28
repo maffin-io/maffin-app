@@ -3,12 +3,12 @@
 exports[`InvestmentsPage renders with data 1`] = `
 <div>
   <span
-    class="text-xl font-medium pb-4"
+    class="text-xl font-medium"
   >
     Your Investments
   </span>
   <div
-    class="grid grid-cols-12"
+    class="grid grid-cols-12 mt-4"
   >
     <div
       class="col-span-4"
@@ -63,12 +63,12 @@ exports[`InvestmentsPage renders with data 1`] = `
 exports[`InvestmentsPage renders with different mainCurrency 1`] = `
 <div>
   <span
-    class="text-xl font-medium pb-4"
+    class="text-xl font-medium"
   >
     Your Investments
   </span>
   <div
-    class="grid grid-cols-12"
+    class="grid grid-cols-12 mt-4"
   >
     <div
       class="col-span-4"

@@ -69,11 +69,11 @@ export default function InvestmentsPage(): JSX.Element {
 
   return (
     <>
-      <span className="text-xl font-medium pb-4">
+      <span className="text-xl font-medium">
         Your Investments
       </span>
 
-      <div className="grid grid-cols-12">
+      <div className="grid grid-cols-12 mt-4">
         <div className="col-span-4">
           <WeightsChart totalValue={totalValue} />
         </div>
