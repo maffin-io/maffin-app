@@ -1,10 +1,23 @@
 import React from 'react';
 import { DateTime, Interval } from 'luxon';
 import type { ChartDataset } from 'chart.js';
+import {
+  Chart as C,
+  LineElement,
+  LineController,
+} from 'chart.js';
 
 import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
 import * as API from '@/hooks/api';
+
+// We are using Bar chart here but one of the axis uses Line so
+// we have to register here or otherwise we get an error.
+// It's a bit hacky but this way we still have tree-shaking.
+C.register(
+  LineElement,
+  LineController,
+);
 
 export type NetWorthHistogramProps = {
   startDate?: DateTime,
