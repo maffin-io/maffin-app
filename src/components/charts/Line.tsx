@@ -3,6 +3,7 @@ import {
   Chart as C,
   ChartOptions,
   LineElement,
+  LineController,
   PointElement,
 } from 'chart.js';
 import ChartJS from '@/components/charts/ChartJS';
@@ -11,6 +12,7 @@ import type { ChartProps } from 'react-chartjs-2';
 C.register(
   LineElement,
   PointElement,
+  LineController,
 );
 
 export const OPTIONS: ChartOptions<'line'> = {};
