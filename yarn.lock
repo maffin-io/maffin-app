@@ -3943,10 +3943,10 @@
     "@types/history" "^4.7.11"
     "@types/react" "*"
 
-"@types/react-table@^7.7.15":
-  version "7.7.15"
-  resolved "https://registry.yarnpkg.com/@types/react-table/-/react-table-7.7.15.tgz#e9a093a5f2be4fff5ccb41f1aec9516b520ed9b3"
-  integrity sha512-tlXKCeq4gk2xT2lB+Hbp/dO5yYZ899HwQOAp/3o3hKw8wp7ngNpdB90BNWE6kWCm5K2KzmEsHnYoJheSS5SVjg==
+"@types/react-table@^7.7.16":
+  version "7.7.16"
+  resolved "https://registry.yarnpkg.com/@types/react-table/-/react-table-7.7.16.tgz#e143e2c0fa2dcac739fcc8055e58f5a7a9c0e5fb"
+  integrity sha512-khfVwkNkvFnQV+Dx5Z/4jeMWIi+qytR8/Hl89fMPQ3aGiIgVlnghwdnyrq45UVSU+9wTqQFL0kUmIk4MGaM20Q==
   dependencies:
     "@types/react" "*"
 
@@ -3964,16 +3964,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*":
-  version "18.2.5"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.2.5.tgz#f9403e1113b12b53f7edcdd9a900c10dd4b49a59"
-  integrity sha512-RuoMedzJ5AOh23Dvws13LU9jpZHIc/k90AgmK7CecAYeWmSr3553L4u5rk4sWAPBuQosfT7HmTfG4Rg5o4nGEA==
-  dependencies:
-    "@types/prop-types" "*"
-    "@types/scheduler" "*"
-    csstype "^3.0.2"
-
-"@types/react@18.2.21":
+"@types/react@*", "@types/react@18.2.21":
   version "18.2.21"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.2.21.tgz#774c37fd01b522d0b91aed04811b58e4e0514ed9"
   integrity sha512-neFKG/sBAwGxHgXiIxnbm3/AAVQ/cMRS93hvBpg8xYRbeQSPVABp9U2bRnPf0iI4+Ucdv3plSxKK+3CW2ENJxA==
