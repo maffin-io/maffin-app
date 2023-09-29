@@ -1,4 +1,4 @@
-import type { Commodity, Split } from '@/book/entities';
+import type { Account, Commodity, Split } from '@/book/entities';
 
 export type FormValues = {
   guid?: string,
@@ -6,4 +6,5 @@ export type FormValues = {
   description: string,
   splits: Split[],
   fk_currency: Commodity,
+  exchangeRates?: { [key: string]: number },
 };

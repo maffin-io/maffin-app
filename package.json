@@ -19,7 +19,6 @@
     "classnames": "^2.3.1",
     "dayjs": "^1.11.10",
     "dinero.js": "^2.0.0-alpha.14",
-    "lodash.debounce": "^4.0.8",
     "luxon": "^3.4.3",
     "next": "^13.5.3",
     "pako": "^2.1.0",

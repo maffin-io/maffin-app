@@ -41,59 +41,42 @@ export default function SplitsField({
   return (
     <>
       {
-        fields.map((item, index) => (
-          <fieldset className="grid grid-cols-12" key={item.id}>
-            {
-              index === 1
-              && (
-                <div className="col-span-12 py-3 text-lg font-thin justify-self-center">
-                  <div
-                    className={classNames('p-2 rounded-full', {
-                      'bg-green-500/20 text-green-300': mainSplit.quantity >= 0,
-                      'bg-red-500/20 text-red-300': mainSplit.quantity < 0,
-                    })}
-                  >
-                    {
-                      (
-                        !mainSplit.quantity
-                        || mainSplit.quantity <= 0
-                      ) ? <FaArrowDown /> : <FaArrowUp />
-                    }
+        fields.slice(1).map((item, index) => {
+          index += 1;
+          return (
+            <fieldset className="grid grid-cols-12" key={item.id}>
+              <div className="col-span-11">
+                <SplitField
+                  index={index}
+                  form={form}
+                  disabled={disabled}
+                />
+              </div>
+              {(
+                index !== 1
+                && (
+                  <div className="col-span-1">
+                    <button
+                      type="button"
+                      className="btn-primary rounded-sm"
+                      onClick={() => remove(index)}
+                    >
+                      X
+                    </button>
                   </div>
-                </div>
-              )
-            }
-            <div className="col-span-11">
-              <SplitField
-                index={index}
-                form={form}
-                disabled={disabled}
-              />
-            </div>
-            {(
-              index !== 0
-              && index !== 1
-              && (
-                <div className="col-span-1">
-                  <button
-                    type="button"
-                    className="btn-primary rounded-sm"
-                    onClick={() => remove(index)}
-                  >
-                    X
-                  </button>
-                </div>
-              )
-            )}
-          </fieldset>
-        ))
+                )
+              )}
+            </fieldset>
+          );
+        })
       }
       <p className="invalid-feedback">{form.formState.errors.splits?.message}</p>
+
       {
         !disabled
         && (
           <button
-            className="link m-3"
+            className="link"
             type="button"
             onClick={() => (
               append(Split.create({
@@ -102,7 +85,7 @@ export default function SplitsField({
               }))
             )}
           >
-            Add split
+            Add record
           </button>
         )
       }

@@ -10,7 +10,7 @@
   }
 
   input, select {
-    @apply bg-gunmetal-800 rounded-md border-none my-3 p-2;
+    @apply bg-gunmetal-800 rounded-md border-none my-3 p-2 focus:outline-none;
   }
 
   input:disabled, select:disabled, button:disabled {
