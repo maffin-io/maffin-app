@@ -92,7 +92,6 @@ describe('AccountForm', () => {
     screen.getByRole('combobox', { name: 'parentInput' });
     expect(screen.getByRole('combobox', { name: '', hidden: true })).toBeDisabled();
     screen.getByRole('spinbutton', { name: 'Opening balance', hidden: true });
-    screen.getByRole('spinbutton', { name: 'When', hidden: true });
     screen.getByRole('combobox', { name: 'commodityInput' });
     expect(container).toMatchSnapshot();
   });

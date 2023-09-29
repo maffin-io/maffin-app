@@ -235,24 +235,59 @@ exports[`AccountForm renders as expected 1`] = `
       />
     </fieldset>
     <fieldset
-      class="text-sm my-5"
-      hidden=""
+      class="grid grid-cols-12 text-sm my-5 hidden"
     >
-      <label
-        class="inline-block mb-2"
-        for="balanceInput"
+      <div
+        class="col-span-6"
       >
-        Opening balance
-      </label>
-      <input
-        class="block w-full m-0"
-        id="balanceInput"
-        name="balance"
-        type="number"
-      />
-      <p
-        class="invalid-feedback"
-      />
+        <label
+          class="inline-block mb-2"
+          for="balanceInput"
+        >
+          Opening balance
+        </label>
+        <span
+          class="badge"
+          data-tooltip-id="balance-help"
+        >
+          ?
+        </span>
+        <input
+          class="block w-full h-[38px] m-0 rounded-r-none"
+          id="balanceInput"
+          name="balance"
+          type="number"
+        />
+        <p
+          class="invalid-feedback"
+        />
+      </div>
+      <div
+        class="col-span-6"
+      >
+        <label
+          class="inline-block mb-2"
+          for="dateInput"
+        >
+          When
+        </label>
+        <span
+          class="badge"
+          data-tooltip-id="date-help"
+        >
+          ?
+        </span>
+        <input
+          class="block w-full m-0 rounded-l-none"
+          id="dateInput"
+          name="balanceDate"
+          type="date"
+          value="2023-09-29"
+        />
+        <p
+          class="invalid-feedback"
+        />
+      </div>
     </fieldset>
     <fieldset
       class="text-sm my-5"

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Chart from '@/components/charts/Chart';
+import Tree from '@/components/charts/Tree';
 import Money from '@/book/Money';
 import { toFixed, moneyToString } from '@/helpers/number';
 import * as API from '@/hooks/api';
@@ -15,9 +15,12 @@ export default function WeightsChart({
   let { data: investments } = API.useInvestments();
   investments = investments || [];
 
+  const { data: currency } = API.useMainCurrency();
+  const unit = currency?.mnemonic || '';
+
   const data: { [ticker: string]: {
-    x: string,
-    y: number,
+    ticker: string,
+    value: number,
     today: string,
     pct: number,
     color: string,
@@ -41,8 +44,8 @@ export default function WeightsChart({
 
     if (investmentValueInCurrency > 0) {
       data[investment.account.name] = {
-        x: investment.account.name,
-        y: toFixed(investmentValueInCurrency),
+        ticker: investment.account.name,
+        value: toFixed(investmentValueInCurrency),
         today: (
           toFixed(todayChangePct) > 0 ? `+${toFixed(todayChangePct)}%` : `${toFixed(todayChangePct)}%`
         ),
@@ -52,43 +55,74 @@ export default function WeightsChart({
     }
   });
 
-  const series = [
-    {
-      data: Object.values(data),
-    },
-  ];
-
   return (
-    <Chart
-      type="treemap"
-      series={series}
-      height={650}
-      options={{
-        dataLabels: {
-          enabled: true,
-          style: {
-            fontSize: '12px',
-          },
-          // @ts-ignore
-          formatter: (text: string) => `${text}: ${data[text].today}`,
-        },
-        plotOptions: {
-          treemap: {
-            useFillColorAsStroke: true,
-            colorScale: {
-              ranges: Object.values(data).map(each => ({
-                from: each.y,
-                to: each.y,
-                color: each.color,
-              })),
+    <Tree
+      height="660"
+      data={{
+        datasets: [
+          {
+            tree: Object.values(data),
+            data: [],
+            key: 'value',
+            borderWidth: 0,
+            spacing: 0.25,
+            backgroundColor: (ctx) => {
+              if (ctx.type !== 'data') {
+                return 'transparent';
+              }
+              // extracted from https://chartjs-chart-treemap.pages.dev/samples/labelsFontsAndColors.html
+              // @ts-ignore
+              return `${ctx.raw._data.color}CC`;
             },
           },
-        },
-        tooltip: {
-          y: {
-            formatter: (val: number, { dataPointIndex, w }) => (
-              `${moneyToString(val, totalValue.currency)} (${data[w.globals.categoryLabels[dataPointIndex]].pct}%)`
-            ),
+        ],
+      }}
+      options={{
+        maintainAspectRatio: false,
+        plugins: {
+          tooltip: {
+            displayColors: false,
+            backgroundColor: (
+              tooltipItem,
+            ) => tooltipItem.tooltip.labelColors[0].backgroundColor,
+            callbacks: {
+              title: (tooltipItems) => {
+                if (tooltipItems.length) {
+                  const ctx = tooltipItems[0];
+                  // @ts-ignore
+                  const raw = ctx.dataset.data[ctx.dataIndex]?._data;
+                  return raw.ticker;
+                }
+                return '';
+              },
+              // @ts-ignore
+              label: (ctx) => `${moneyToString(Number(ctx.raw._data.value), unit)} (${ctx.raw._data.pct}%)`,
+            },
+          },
+          datalabels: {
+            color: 'white',
+            textAlign: 'center',
+            font: (ctx) => {
+              // @ts-ignore
+              const raw = ctx.dataset.data[ctx.dataIndex]?._data;
+              let size = 10;
+              if (raw.pct > 20) {
+                size = 12;
+              }
+              if (raw.pct < 1) {
+                size = 6;
+              }
+              return {
+                size,
+                weight: 400,
+                family: 'Intervariable',
+              };
+            },
+            formatter: (_, ctx) => {
+              // @ts-ignore
+              const raw = ctx.dataset.data[ctx.dataIndex]?._data;
+              return [raw.ticker, raw.today];
+            },
           },
         },
       }}

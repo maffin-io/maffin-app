@@ -111,8 +111,7 @@ export default function AccountForm({ onSave }: AccountFormProps): JSX.Element {
       </fieldset>
 
       <fieldset
-        hidden={type !== 'BANK'}
-        className="grid grid-cols-12 text-sm my-5"
+        className={`grid grid-cols-12 text-sm my-5 ${type === 'BANK' ? 'visible' : 'hidden'}`}
       >
         <div
           className="col-span-6"

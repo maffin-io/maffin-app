@@ -1,9 +1,23 @@
 import React from 'react';
 import { DateTime, Interval } from 'luxon';
+import type { ChartDataset } from 'chart.js';
+import {
+  Chart as C,
+  LineElement,
+  LineController,
+} from 'chart.js';
 
-import Chart from '@/components/charts/Chart';
+import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
 import * as API from '@/hooks/api';
+
+// We are using Bar chart here but one of the axis uses Line so
+// we have to register here or otherwise we get an error.
+// It's a bit hacky but this way we still have tree-shaking.
+C.register(
+  LineElement,
+  LineController,
+);
 
 export type NetWorthHistogramProps = {
   startDate?: DateTime,
@@ -29,211 +43,156 @@ export default function NetWorthHistogram({
   const unit = currency?.mnemonic || '';
 
   const now = DateTime.now();
-  if (now.diff(selectedDate, ['months']).months < 3) {
-    selectedDate = now.minus({ months: 3 });
-  }
-  const brushInterval = Interval.fromDateTimes(
-    selectedDate.minus({ months: 3 }),
-    selectedDate.plus({ months: 3 }),
-  );
   const interval = Interval.fromDateTimes(
     startDate?.minus({ month: 1 }) || now,
     now,
   );
-  const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).plus({ month: 1 }));
+  const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).plus({ month: 1 }).startOf('month'));
   dates.pop();
 
-  // Seems apexcharts types are not correct so need to define manually
-  const series: {
-    name: string,
-    type: string,
-    data: {
-      x: DateTime,
-      y: number,
-    }[],
-  }[] = [
+  const datasets: ChartDataset<'bar'>[] = [
     {
-      name: 'Income',
-      type: 'column',
-      data: [],
-    },
-    {
-      name: 'Expenses',
-      type: 'column',
-      data: [],
-    },
-    {
-      name: 'Net profit',
-      type: 'column',
-      data: [],
-    },
-    {
-      name: 'Net worth',
+      label: 'Net worth',
+      // @ts-ignore
       type: 'line',
       data: [],
+      backgroundColor: '#06B6D4',
+      borderColor: '#06B6D4',
+      yAxisID: 'y1',
+      showLine: false,
+      pointStyle: 'rectRounded',
+      pointRadius: 5,
+      pointHoverRadius: 10,
+    },
+    {
+      label: 'Income',
+      data: [],
+      backgroundColor: '#22C55E',
+    },
+    {
+      label: 'Expenses',
+      data: [],
+      backgroundColor: '#EF4444',
+    },
+    {
+      label: 'Net profit',
+      data: [],
+      backgroundColor: '#06B6D4',
     },
   ];
 
   dates.forEach(date => {
     const monthYear = (date as DateTime).toFormat('MM/yyyy');
-    const incomeAmount = (
-      incomeSeries?.[monthYear]?.toNumber() || 0
-    );
-    series[0].data.push({
-      y: -incomeAmount,
-      x: date,
-    });
-
-    const expenseAmount = (
-      expenseSeries?.[monthYear]?.toNumber() || 0
-    );
-    series[1].data.push({
-      y: -expenseAmount,
-      x: date,
-    });
-
+    const incomeAmount = (incomeSeries?.[monthYear]?.toNumber() || 0);
+    const expenseAmount = (expenseSeries?.[monthYear]?.toNumber() || 0);
     const netProfit = -incomeAmount - expenseAmount;
-    series[2].data.push({
-      y: netProfit,
-      x: date,
-    });
+    const previousNetWorth = datasets[0].data[datasets[0].data.length - 1] || 0;
 
-    const previousNetWorth = series[3].data[series[3].data.length - 1]?.y || 0;
-    series[3].data.push({
-      y: previousNetWorth + netProfit,
-      x: date,
-    });
+    datasets[1].data.push(-incomeAmount);
+    datasets[2].data.push(-expenseAmount);
+    datasets[3].data.push(netProfit);
+    datasets[0].data.push(previousNetWorth as number + netProfit);
   });
+
+  if (now.diff(selectedDate, ['months']).months < 4) {
+    selectedDate = now.minus({ months: 4 });
+  }
+  const zoomInterval = Interval.fromDateTimes(
+    selectedDate.minus({ months: 4 }).startOf('month'),
+    selectedDate.plus({ months: 4 }).startOf('month'),
+  );
 
   return (
     <>
-      <Chart
-        type="line"
-        series={series}
-        height={350}
-        unit={unit}
+      <Bar
+        data={{
+          labels: dates,
+          datasets,
+        }}
         options={{
-          chart: {
-            id: 'netWorthHistogram',
+          interaction: {
+            mode: 'index',
           },
-          xaxis: {
-            type: 'datetime',
-            crosshairs: {
-              show: true,
-              width: 'barWidth',
-              opacity: 0.1,
-              stroke: {
-                width: 0,
+          scales: {
+            x: {
+              min: zoomInterval.start?.toMillis(),
+              max: zoomInterval.end?.toMillis(),
+              type: 'time',
+              time: {
+                unit: 'month',
+                tooltipFormat: 'MMMM yyyy',
+                displayFormats: {
+                  month: 'MMM-yy',
+                },
+              },
+              grid: {
+                display: false,
+              },
+              ticks: {
+                align: 'center',
               },
             },
-          },
-          colors: ['#22C55E', '#EF4444', '#06B6D4', '#06B6D4'],
-          plotOptions: {
-            bar: {
-              columnWidth: '70%',
-            },
-          },
-          markers: {
-            size: 2,
-            strokeColors: '#06B6D4',
-          },
-          legend: {
-            position: 'top',
-            onItemClick: {
-              toggleDataSeries: false,
-            },
-          },
-          yaxis: [
-            {
-              seriesName: 'Income',
+            y: {
               title: {
-                text: 'Net profit',
+                display: true,
+                text: 'Monthly net profit',
               },
-              labels: {
-                formatter: (val: number) => moneyToString(
-                  val,
-                  unit,
-                ),
+              position: 'left',
+              border: {
+                display: false,
               },
-              forceNiceScale: true,
-            },
-            {
-              seriesName: 'Income',
-              show: false,
-              labels: {
-                formatter: (val: number) => moneyToString(
-                  val,
-                  unit,
-                ),
+              ticks: {
+                maxTicksLimit: 10,
+                callback: (value) => moneyToString(value as number, unit),
               },
             },
-            {
-              seriesName: 'Income',
-              show: false,
-              labels: {
-                formatter: (val: number) => moneyToString(
-                  val,
-                  unit,
-                ),
-              },
-            },
-            {
-              opposite: true,
-              seriesName: 'Net worth',
+            y1: {
               title: {
-                text: 'Net worth',
+                display: true,
+                text: 'Accumulated net worth',
               },
-              forceNiceScale: true,
-              labels: {
-                formatter: (val: number) => moneyToString(
-                  val,
-                  unit,
-                ),
+              type: 'linear',
+              display: true,
+              position: 'right',
+              border: {
+                display: false,
+              },
+              grid: {
+                drawOnChartArea: false, // only want the grid lines for one axis to show up
+                display: false,
+              },
+              ticks: {
+                maxTicksLimit: 10,
+                callback: (value) => moneyToString(value as number, unit),
               },
             },
-          ],
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                usePointStyle: true,
+                pointStyle: 'circle',
+                boxHeight: 8,
+                boxWidth: 8,
+              },
+            },
+            tooltip: {
+              backgroundColor: '#323b44',
+              callbacks: {
+                label: (ctx) => `${ctx.dataset.label}: ${moneyToString(Number(ctx.raw), unit)}`,
+                labelColor: (ctx) => ({
+                  borderColor: '#323b44',
+                  backgroundColor: ctx.dataset.backgroundColor as string,
+                  borderWidth: 3,
+                  borderRadius: 2,
+                }),
+              },
+            },
+          },
         }}
       />
-
-      <Chart
-        height={100}
-        type="line"
-        series={[series[3]]}
-        options={
-          {
-            chart: {
-              brush: {
-                enabled: true,
-                target: 'netWorthHistogram',
-              },
-              selection: {
-                enabled: true,
-                xaxis: {
-                  min: (brushInterval.start as DateTime).toMillis(),
-                  max: (brushInterval.end as DateTime).toMillis(),
-                },
-                fill: {
-                  color: '#888',
-                  opacity: 0.4,
-                },
-                stroke: {
-                  color: '#0D47A1',
-                },
-              },
-            },
-            colors: ['#06B6D4'],
-            grid: {
-              show: false,
-            },
-            xaxis: {
-              type: 'datetime',
-            },
-            yaxis: {
-              show: false,
-            },
-          }
-        }
-      />
+      <span />
     </>
   );
 }
