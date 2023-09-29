@@ -31,6 +31,7 @@ describe('ChartJS', () => {
           datasets: [],
         },
         options: {
+          animation: false,
           responsive: true,
           font: {
             family: 'Intervariable',
@@ -76,6 +77,7 @@ describe('ChartJS', () => {
           datasets: [],
         },
         options: {
+          animation: false,
           responsive: true,
           font: {
             family: 'Intervariable',

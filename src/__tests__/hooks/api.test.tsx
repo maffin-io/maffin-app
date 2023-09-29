@@ -91,56 +91,7 @@ describe('API', () => {
     expect(queries.getSplits).toBeCalledWith('guid');
   });
 
-  it('calls useSWRImmutable with null key for useAccountsMonthlyTotals when no accounts', () => {
-    jest.spyOn(swrImmutable, 'default').mockReturnValueOnce({ data: undefined } as SWRResponse);
-    renderHook(() => API.useAccountsMonthlyTotals());
-
-    expect(swrImmutable.default).toHaveBeenNthCalledWith(
-      1,
-      '/api/accounts',
-      expect.any(Function),
-    );
-
-    expect(swrImmutable.default).toHaveBeenNthCalledWith(
-      2,
-      '/api/prices/today',
-      expect.any(Function),
-    );
-
-    expect(swrImmutable.default).toHaveBeenNthCalledWith(
-      3,
-      null,
-      expect.any(Function),
-    );
-  });
-
-  it('calls useSWRImmutable with null key for useAccountsMonthlyTotals when no prices', () => {
-    const accounts = { a: { guid: 'a' } };
-    jest.spyOn(swrImmutable, 'default')
-      .mockReturnValueOnce({ data: accounts } as SWRResponse)
-      .mockReturnValueOnce({ data: undefined } as SWRResponse);
-    renderHook(() => API.useAccountsMonthlyTotals());
-
-    expect(swrImmutable.default).toHaveBeenNthCalledWith(
-      1,
-      '/api/accounts',
-      expect.any(Function),
-    );
-
-    expect(swrImmutable.default).toHaveBeenNthCalledWith(
-      2,
-      '/api/prices/today',
-      expect.any(Function),
-    );
-
-    expect(swrImmutable.default).toHaveBeenNthCalledWith(
-      3,
-      null,
-      expect.any(Function),
-    );
-  });
-
-  it('calls useSWRImmutable with expected params for useAccountsMonthlyTotals when accounts and prices', () => {
+  it('calls useSWRImmutable with expected params for useAccountsMonthlyTotals', () => {
     const accounts = { a: { guid: 'a' } };
     const todayPrices = new PriceDBMap();
     jest.spyOn(swrImmutable, 'default')
@@ -150,7 +101,7 @@ describe('API', () => {
 
     expect(swrImmutable.default).toHaveBeenNthCalledWith(
       3,
-      '/api/monthly-totals?ids=a',
+      '/api/monthly-totals',
       expect.any(Function),
     );
     expect(queries.getMonthlyTotals).toBeCalledWith(accounts, todayPrices);

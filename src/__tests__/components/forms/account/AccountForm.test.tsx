@@ -1,4 +1,5 @@
 import React from 'react';
+import { DateTime } from 'luxon';
 import {
   render,
   screen,
@@ -88,9 +89,10 @@ describe('AccountForm', () => {
     );
 
     await screen.findByLabelText('Name');
-    expect(screen.getByRole('combobox', { name: 'parentInput' })).not.toBeNull();
-    expect(screen.queryByRole('combobox', { name: 'typeInput' })).toBeNull();
-    expect(screen.getByRole('combobox', { name: 'commodityInput' })).not.toBeNull();
+    screen.getByRole('combobox', { name: 'parentInput' });
+    expect(screen.getByRole('combobox', { name: '', hidden: true })).toBeDisabled();
+    screen.getByRole('spinbutton', { name: 'Opening balance', hidden: true });
+    screen.getByRole('combobox', { name: 'commodityInput' });
     expect(container).toMatchSnapshot();
   });
 
@@ -188,7 +190,96 @@ describe('AccountForm', () => {
     });
     expect(mockSave).toHaveBeenCalledTimes(1);
     expect(swr.mutate).toBeCalledTimes(1);
-    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/accounts');
+    expect(swr.mutate).toHaveBeenNthCalledWith(
+      1,
+      '/api/accounts',
+      expect.any(Function),
+      { revalidate: false },
+    );
+
+    expect(
+      await (swr.mutate as jest.Mock).mock.calls[0][1]({
+        [assetAccount.guid]: Account,
+      }),
+    ).toEqual({
+      [assetAccount.guid]: await Account.findOneByOrFail({ guid: assetAccount.guid }),
+      [account.guid]: account,
+    });
+  });
+
+  it('creates bank account with opening balance', async () => {
+    const user = userEvent.setup();
+    const mockSave = jest.fn();
+
+    render(
+      <AccountForm
+        onSave={mockSave}
+      />,
+    );
+
+    await user.type(screen.getByLabelText('Name'), 'TestAccount');
+
+    await user.click(screen.getByRole('combobox', { name: 'parentInput' }));
+    await user.click(screen.getByText('Assets'));
+
+    await user.click(screen.getByRole('combobox', { name: 'typeInput' }));
+    await user.click(screen.getByText('BANK'));
+
+    await user.type(screen.getByLabelText('Opening balance'), '1000');
+    await user.clear(screen.getByLabelText('When'));
+    await user.type(screen.getByLabelText('When'), '2023-01-01');
+
+    await user.click(screen.getByRole('combobox', { name: 'commodityInput' }));
+    await user.click(screen.getByText('EUR'));
+
+    expect(screen.getByText('Save')).not.toBeDisabled();
+    await user.click(screen.getByText('Save'));
+
+    const account = await Account.findOneByOrFail({ name: 'TestAccount' });
+    expect(account).toEqual({
+      guid: expect.any(String),
+      name: 'TestAccount',
+      type: 'BANK',
+      fk_commodity: eur,
+      childrenIds: [],
+      description: null,
+      parentId: assetAccount.guid,
+      path: 'Assets:TestAccount',
+    });
+
+    const txs = await Transaction.find();
+    expect(txs).toHaveLength(1);
+    expect(txs[0]).toMatchObject({
+      guid: expect.any(String),
+      description: 'Opening balance',
+      fk_currency: {
+        mnemonic: 'EUR',
+      },
+      date: DateTime.fromISO('2023-01-01'),
+    });
+
+    const equity = await Account.findOneByOrFail({ name: 'Opening balances - EUR' });
+    const splits = await Split.find();
+    expect(splits).toEqual([
+      {
+        accountId: account.guid,
+        action: '',
+        guid: expect.any(String),
+        quantityDenom: 1,
+        quantityNum: 1000,
+        valueDenom: 1,
+        valueNum: 1000,
+      },
+      {
+        accountId: equity.guid,
+        action: '',
+        guid: expect.any(String),
+        quantityDenom: 1,
+        quantityNum: -1000,
+        valueDenom: 1,
+        valueNum: -1000,
+      },
+    ]);
   });
 
   it.each([

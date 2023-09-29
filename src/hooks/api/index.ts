@@ -63,17 +63,10 @@ export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
     fetcher(PriceDB.getTodayQuotes, '/api/prices/today'),
   );
 
-  // This makes sure that every time new accounts appear we recalculate
-  // the monthly totals.
-  //
-  // Not only this but re-using the same key has super poor performance
-  // for some reason
-  const key = (accounts && todayPrices)
-    ? `/api/monthly-totals?ids=${Object.keys(accounts).join(',')}` : null;
-
+  const key = '/api/monthly-totals';
   const result = useSWRImmutable(
     key,
-    fetcher(() => queries.getMonthlyTotals(accounts, todayPrices), '/api/monthly-totals'),
+    fetcher(() => queries.getMonthlyTotals(accounts, todayPrices), key),
   );
 
   return result;
