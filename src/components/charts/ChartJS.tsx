@@ -43,6 +43,7 @@ export default function ChartJS<T extends keyof ChartTypeRegistry>({
   // @ts-ignore
   const OPTIONS: ChartOptions<T> = {
     responsive: true,
+    animation: false,
     font: {
       family: 'Intervariable',
       size: 14,

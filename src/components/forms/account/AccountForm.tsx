@@ -269,7 +269,7 @@ async function onSubmit(data: FormValues, onSave: Function) {
     }).save();
 
     // Opening balances affect net worth
-    mutate('/api/monthly-totals');
+    mutate('/api/monthly-totals', undefined);
   }
   onSave();
 }
