@@ -7,6 +7,7 @@ import {
   render,
   screen,
 } from '@testing-library/react';
+import type { SWRResponse } from 'swr';
 
 import {
   Account,
@@ -15,7 +16,19 @@ import {
   Transaction,
 } from '@/book/entities';
 import SplitsField from '@/components/forms/transaction/SplitsField';
+import * as queries from '@/lib/queries';
+import * as apiHook from '@/hooks/api';
 import type { FormValues } from '@/components/forms/transaction/types';
+
+jest.mock('@/lib/queries', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/lib/queries'),
+}));
+
+jest.mock('@/hooks/api', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/api'),
+}));
 
 describe('SplitsField', () => {
   let datasource: DataSource;
@@ -34,10 +47,9 @@ describe('SplitsField', () => {
     await datasource.destroy();
   });
 
-  it('renders SplitField', async () => {
+  it('renders with default values', async () => {
     const { container } = render(<FormWrapper />);
 
-    await screen.findByRole('combobox', { name: 'splits.0.account' });
     await screen.findByRole('combobox', { name: 'splits.1.account' });
     expect(screen.getAllByRole('spinbutton', { hidden: true })).toHaveLength(4);
     screen.getByText('Add split');
@@ -45,11 +57,50 @@ describe('SplitsField', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('renders renders as expected when disabled', async () => {
+  it('renders as expected when disabled', async () => {
     render(<FormWrapper disabled />);
 
-    expect(await screen.findByLabelText('splits.0.account')).toBeDisabled();
+    expect(await screen.findByLabelText('splits.1.account')).toBeDisabled();
     expect(screen.queryByText('Add split')).toBeNull();
+  });
+
+  it('autocompletes value and quantity for split2 when only 2 splits', async () => {
+    const user = userEvent.setup();
+    const eur = {
+      guid: 'eur',
+      mnemonic: 'EUR',
+    } as Commodity;
+    jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
+
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+      {
+        data: [
+          {
+            guid: 'account_guid_1',
+            path: 'path1',
+            type: 'ASSET',
+            commodity: eur,
+          } as Account,
+        ],
+      } as SWRResponse,
+    );
+
+    render(<FormWrapper />);
+
+    const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
+    expect(q0).toBeEnabled();
+
+    await user.type(q0, '100');
+    const v0 = screen.getByRole('spinbutton', { name: '', hidden: true });
+    await waitFor(() => expect(v0).toHaveValue(100));
+
+    await user.click(screen.getByLabelText('splits.1.account'));
+    await user.click(screen.getByText('path1'));
+
+    const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
+    const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value', hidden: true });
+    await waitFor(() => expect(v1).toHaveValue(-100));
+    await waitFor(() => expect(q1).toHaveValue(-100));
   });
 
   it('can remove for N > 2 split fields', async () => {
@@ -58,7 +109,6 @@ describe('SplitsField', () => {
 
     await user.click(screen.getByText('Add split'));
 
-    screen.getByRole('combobox', { name: 'splits.0.account' });
     screen.getByRole('combobox', { name: 'splits.1.account' });
     screen.getByRole('combobox', { name: 'splits.2.account' });
     expect(screen.getAllByRole('spinbutton', { hidden: true })).toHaveLength(6);
@@ -66,59 +116,32 @@ describe('SplitsField', () => {
     const removeButton = screen.getByText('X', { selector: 'button' });
     await user.click(removeButton);
 
-    expect(screen.getAllByRole('combobox')).toHaveLength(2);
+    expect(screen.getAllByRole('combobox')).toHaveLength(1);
     expect(screen.getAllByRole('spinbutton', { hidden: true })).toHaveLength(4);
-  });
-
-  it('sets quantity for split2 when two splits with same currency', async () => {
-    const user = userEvent.setup();
-    render(<FormWrapper />);
-    await user.type(screen.getByTestId('date'), '2023-01-01');
-
-    const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
-    expect(q0).toBeEnabled();
-
-    await user.type(q0, '100');
-    const v0 = screen.getByRole('spinbutton', { name: 'splits.0.value', hidden: true });
-    await waitFor(() => expect(v0).toHaveValue(100));
-
-    const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
-    const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value', hidden: true });
-    await waitFor(() => expect(q1).toHaveValue(-100));
-    await waitFor(() => expect(v1).toHaveValue(-100));
   });
 });
 
 function FormWrapper({ disabled = false }: { disabled?: boolean }): JSX.Element {
+  const account = {
+    guid: 'account_guid_1',
+    path: 'path1',
+    type: 'ASSET',
+    commodity: {
+      guid: 'eur',
+      mnemonic: 'EUR',
+    } as Commodity,
+  } as Account;
+
   const form = useForm<FormValues>({
     defaultValues: {
       splits: [
         {
           value: 0,
           quantity: 0,
-          account: {
-            guid: 'account_guid_1',
-            path: 'path1',
-            type: 'ASSET',
-            commodity: {
-              guid: 'eur',
-              mnemonic: 'EUR',
-            } as Commodity,
-          } as Account,
+          fk_account: account,
+          account,
         },
-        {
-          value: 0,
-          quantity: 0,
-          account: {
-            guid: 'account_guid_2',
-            path: 'path2',
-            type: 'EXPENSE',
-            commodity: {
-              guid: 'eur',
-              mnemonic: 'EUR',
-            } as Commodity,
-          } as Account,
-        },
+        {},
       ],
       fk_currency: {
         guid: 'eur',

@@ -3,7 +3,6 @@ import {
   BiCalendar,
   BiUpArrowAlt,
   BiDownArrowAlt,
-  BiPlusCircle,
 } from 'react-icons/bi';
 import Link from 'next/link';
 import classNames from 'classnames';
@@ -12,7 +11,6 @@ import { useLatestTxs } from '@/hooks/api';
 import { isAsset, isLiability } from '@/book/helpers/accountType';
 import type { Split, Transaction } from '@/book/entities';
 import { moneyToString } from '@/helpers/number';
-import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 
 export default function LatestTransactions(): JSX.Element {
   let { data: txs } = useLatestTxs();
@@ -20,12 +18,6 @@ export default function LatestTransactions(): JSX.Element {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <p className="text-md">Latest transactions</p>
-        <TransactionFormButton>
-          <BiPlusCircle />
-        </TransactionFormButton>
-      </div>
       {
         (
           txs.length

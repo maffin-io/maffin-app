@@ -19,7 +19,7 @@ const resolver = classValidatorResolver(Transaction, { validator: { stopAtFirstE
 export type TransactionFormProps = {
   action?: 'add' | 'update' | 'delete',
   onSave: Function,
-  defaultValues?: FormValues,
+  defaultValues: FormValues,
 };
 
 export default function TransactionForm({
@@ -97,7 +97,6 @@ export default function TransactionForm({
       </fieldset>
 
       <fieldset className="text-sm my-5">
-        <label className="inline-block mb-2">Splits</label>
         <SplitsField
           disabled={disabled}
           form={form}
@@ -157,7 +156,7 @@ async function onSubmit(data: FormValues, action: 'add' | 'update' | 'delete', o
     mutate(`/api/splits/${split.account.guid}`);
   });
 
-  mutate((key: string) => key.startsWith('/api/monthly-totals'));
+  mutate('/api/monthly-totals');
   mutate('/api/txs/latest');
   onSave();
 }

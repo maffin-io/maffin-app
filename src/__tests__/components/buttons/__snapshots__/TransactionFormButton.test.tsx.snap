@@ -12,7 +12,7 @@ exports[`TransactionFormButton renders as expected by default 1`] = `
       X
     </button>
     <span>
-      Add transaction
+      Add transaction to account
     </span>
     <div
       data-testid="TransactionForm"

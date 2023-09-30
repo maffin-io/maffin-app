@@ -16,6 +16,7 @@ import type Commodity from './Commodity';
 import Split from './Split';
 import BaseEntity from './BaseEntity';
 import { DateTimeTransformer } from './transformers';
+import Money from '../Money';
 
 /**
  * https://wiki.gnucash.org/wiki/SQL#Tables
@@ -109,7 +110,8 @@ function CheckSplitsBalance(validationOptions?: v.ValidationOptions) {
             (acc, split) => acc + (split.value || 0),
             0,
           );
-          return `splits total must equal to 0 (now is ${toFixed(total, 2)})`;
+          const money = new Money(total, tx.currency.mnemonic);
+          return `Your transaction has an imbalance of ${money.format()}. Make sure the amounts you've specified in your records equal to the total amount of your transaction!`;
         },
       },
     });

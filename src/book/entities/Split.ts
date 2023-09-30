@@ -171,11 +171,11 @@ function CheckValueSymbol(validationOptions?: v.ValidationOptions) {
           const split = args.object as Split;
 
           if (split.account.type === 'INCOME') {
-            return 'INCOME split must be negative';
+            return 'This is an INCOME transaction so your Amount field should be positive!';
           }
 
           if (split.account.type === 'EXPENSE') {
-            return 'EXPENSE split must be positive';
+            return 'This is an EXPENSE transaction so your Amount field should be negative!';
           }
 
           return '';

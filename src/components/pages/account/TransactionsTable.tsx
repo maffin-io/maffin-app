@@ -56,7 +56,7 @@ const columns: ColumnDef<Split>[] = [
         >
           {row.original.transaction.date.toISODate()}
         </span>
-        <Tooltip id={row.original.transaction.guid} />
+        <Tooltip clickable id={row.original.transaction.guid} />
       </>
     ),
   },
