@@ -25,6 +25,9 @@ module.exports = {
       fontFamily: {
         sans: ['InterVariable', ...defaultTheme.fontFamily.sans],
       },
+      gridTemplateColumns: {
+        '13': 'repeat(13, minmax(0, 1fr))'
+      },
       colors: {
         gunmetal: {
           50: '#f3f4f5',

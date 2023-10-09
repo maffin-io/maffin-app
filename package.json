@@ -47,7 +47,7 @@
     "maffin:build": "next build",
     "maffin:test": "jest --watchAll=false",
     "maffin:lint": "yarn eslint . --ext .js,.jsx,.ts,.tsx",
-    "stocker:start": "node amplify/backend/function/stockerlambda/src/local.js",
+    "stocker:dev": "node amplify/backend/function/stockerlambda/src/local.js",
     "stocker:install": "cd amplify/backend/function/stockerlambda/src/ && yarn && cd -",
     "stocker:lint": "cd amplify/backend/function/stockerlambda/src/ && yarn eslint --ext .js && cd -",
     "stocker:test": "cd amplify/backend/function/stockerlambda/src/ && yarn jest --coverage && cd -",

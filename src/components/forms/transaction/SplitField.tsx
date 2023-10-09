@@ -2,7 +2,6 @@ import React from 'react';
 import { DateTime } from 'luxon';
 import { Controller } from 'react-hook-form';
 import type { UseFormReturn } from 'react-hook-form';
-import debounce from 'lodash.debounce';
 
 import { isInvestment } from '@/book/helpers/accountType';
 import { getMainCurrency } from '@/lib/queries';
@@ -24,36 +23,58 @@ export default function SplitField({
   form,
   disabled = false,
 }: SplitFieldProps): JSX.Element {
-  const splits = form.watch('splits');
+  const [exchangeRate, setExchangeRate] = React.useState(1);
   const account = form.watch(`splits.${index}.fk_account`) as Account;
-  const date = form.watch('date');
   const txCurrency = form.watch('fk_currency');
+  const date = form.watch('date');
 
-  const disableValueInputs = !date || !splits.every(split => !!split.account) || disabled;
   const showValueField = account && account.commodity.guid !== txCurrency?.guid;
+  const value = form.watch(`splits.${index}.value`);
 
-  async function onQuantityChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const q = Number(e.target.value);
-    let rate = 1;
-    if (showValueField && q !== 0) {
-      rate = await getExchangeRate(
+  React.useEffect(() => {
+    let isCancelled = false;
+
+    async function fetchRate() {
+      const rate = await getExchangeRate(
         account,
         txCurrency,
         DateTime.fromISO(date),
       );
+      if (!isCancelled) {
+        setExchangeRate(rate);
+      }
     }
-    // @ts-ignore
-    form.setValue(`splits.${index}.value`, toFixed(q * rate, 2));
 
-    // validate splits as a whole
+    if (
+      account
+      && date
+      && form.formState.isDirty
+    ) {
+      fetchRate();
+    }
+
+    return () => {
+      // This is to avoid race conditions for when both txCurrency and account
+      // change at the same time. The problem is that sometimes the second
+      // request is faster than the first and then the exchange rate
+      // is wrongly set. I don't have a better idea on how to fix this for now
+      isCancelled = true;
+    };
+  }, [account, txCurrency, date, disabled, form.formState.isDirty, index]);
+
+  React.useEffect(() => {
+    if (value && form.formState.isDirty) {
+      form.setValue(
+        `splits.${index}.quantity`,
+        toFixed(value / exchangeRate, 2),
+      );
+    }
     form.trigger('splits');
-  }
-
-  const debouncedOnQuantityChange = debounce(onQuantityChange, 350);
+  }, [value, exchangeRate, form, form.formState.isDirty, index]);
 
   return (
-    <fieldset className="grid grid-cols-12" key={`splits.${index}`}>
-      <div className={`col-span-${showValueField ? 8 : 9}`}>
+    <fieldset className="grid grid-cols-13" key={`splits.${index}`}>
+      <div className={`col-span-${showValueField ? 7 : 9}`}>
         <Controller
           control={form.control}
           name={`splits.${index}.fk_account`}
@@ -67,15 +88,18 @@ export default function SplitField({
                 onChange={async (newValue: Account) => {
                   field.onChange(newValue);
                   const mainCurrency = await getMainCurrency();
-                  let currency: Commodity = splits[0].account.commodity;
+                  const splits = form.getValues('splits');
 
-                  splits.forEach(split => {
-                    if (split.account && split.account.commodity.guid === mainCurrency.guid) {
-                      currency = mainCurrency;
+                  if (txCurrency.guid !== mainCurrency.guid) {
+                    if (splits.some(
+                      split => split.fk_account.commodity.guid === mainCurrency?.guid,
+                    )) {
+                      form.setValue('fk_currency', mainCurrency);
+                    } else {
+                      form.setValue('fk_currency', splits[0].account.commodity);
                     }
-                  });
+                  }
 
-                  form.setValue('fk_currency', currency);
                   form.trigger('splits');
                 }}
                 defaultValue={account}
@@ -86,56 +110,55 @@ export default function SplitField({
         />
       </div>
 
-      <div className={`col-span-${showValueField ? 2 : 3}`}>
-        <span
-          className="absolute px-1 py-2"
-        >
-          {currencyToSymbol(account?.commodity?.mnemonic || '').slice(0, 3)}
-        </span>
-        <input
-          {...form.register(
-            `splits.${index}.quantity`,
-            {
-              valueAsNumber: true,
-            },
-          )}
-          aria-label={`splits.${index}.quantity`}
-          disabled={disableValueInputs}
-          className="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
-          type="number"
-          step="0.001"
-          onChange={(e) => {
-            const q = e.target.value;
-            // Need the ignore to allow users to enter - symbol
-            // @ts-ignore
-            form.setValue(`splits.${index}.quantity`, q);
-            debouncedOnQuantityChange(e);
-          }}
-        />
+      <div className={`col-span-${showValueField ? 3 : 4}`}>
+        <div className="flex items-center rounded-md bg-gunmetal-800">
+          <input
+            {...form.register(
+              `splits.${index}.quantity`,
+              {
+                valueAsNumber: true,
+              },
+            )}
+            aria-label={`splits.${index}.quantity`}
+            className="w-full text-right bg-gunmetal-800 border-none rounded-sm m-0"
+            type="number"
+            step="0.001"
+            disabled={disabled}
+            onChange={(e) => {
+              if (account.commodity.guid === txCurrency.guid) {
+                const quantity = Number(e.target.value);
+                form.setValue(`splits.${index}.value`, toFixed(quantity * exchangeRate, 2));
+              }
+            }}
+          />
+          <span className="pr-2">
+            {currencyToSymbol(account?.commodity?.mnemonic || '').slice(0, 3)}
+          </span>
+        </div>
       </div>
 
       <div
         hidden={!showValueField}
-        className="col-span-2"
+        className="col-span-3"
       >
-        <span
-          className="absolute px-1 py-2"
-        >
-          {currencyToSymbol(txCurrency?.mnemonic || '')}
-        </span>
-        <input
-          {...form.register(
-            `splits.${index}.value`,
-            {
-              valueAsNumber: true,
-            },
-          )}
-          aria-label={`splits.${index}.value`}
-          disabled={disableValueInputs}
-          className="w-full pl-4 text-right bg-gunmetal-800 border-none rounded-sm m-0"
-          type="number"
-          step="0.001"
-        />
+        <div className="flex items-center rounded-md bg-gunmetal-800">
+          <input
+            {...form.register(
+              `splits.${index}.value`,
+              {
+                valueAsNumber: true,
+              },
+            )}
+            aria-label={`splits.${index}.value`}
+            className="w-full text-right bg-gunmetal-800 border-none rounded-sm m-0"
+            type="number"
+            step="0.001"
+            disabled={disabled}
+          />
+          <span className="pr-2">
+            {currencyToSymbol(txCurrency?.mnemonic || '')}
+          </span>
+        </div>
       </div>
     </fieldset>
   );
@@ -153,14 +176,28 @@ async function getExchangeRate(
   to: Commodity,
   when: DateTime,
 ): Promise<number> {
+  if (account.commodity.mnemonic === to.mnemonic) {
+    return 1;
+  }
   let ticker = `${account.commodity.mnemonic}${to.mnemonic}=X`;
 
   if (isInvestment(account)) {
     ticker = account.commodity.mnemonic;
   }
 
+  if (to.namespace !== 'CURRENCY') {
+    ticker = to.mnemonic;
+  }
+
   const rate = await new Stocker().getPrice(ticker, when);
+
   // TODO: We should check somewhere that the txCurrency is the same
   // as the stocks' currency to avoid price discrepancies.
+  if (to.namespace !== 'CURRENCY') {
+    if (rate.currency !== account.commodity.mnemonic) {
+      throw new Error('The commodity of the account doesnt match the currency of the stock');
+    }
+    rate.price = 1 / rate.price;
+  }
   return rate.price;
 }

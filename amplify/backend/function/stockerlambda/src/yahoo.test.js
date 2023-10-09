@@ -276,6 +276,15 @@ describe('getPrice', () => {
     );
   });
 
+  it('queries for previous day when on Sunday', async () => {
+    await yh.getPrice('ticker', 1696089600);
+
+    expect(mockAxiosGet).toHaveBeenNthCalledWith(
+      1,
+      'https://query2.finance.yahoo.com/v8/finance/chart/ticker?period1=1695945600&period2=1696031999&interval=1d',
+    );
+  });
+
   it('fails gracefully when no quote data', async () => {
     mockAxiosGet.mockImplementation(() => Promise.resolve({
       data: {

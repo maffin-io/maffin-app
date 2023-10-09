@@ -35,7 +35,12 @@ describe('TransactionFormButton', () => {
 
   it('renders as expected by default', async () => {
     const { container } = render(
-      <TransactionFormButton />,
+      <TransactionFormButton
+        account={{
+          guid: '1',
+          name: 'account',
+        } as Account}
+      />,
     );
 
     expect(container).toMatchSnapshot();
@@ -43,7 +48,12 @@ describe('TransactionFormButton', () => {
 
   it('can pass children to render alternative button text', async () => {
     render(
-      <TransactionFormButton>
+      <TransactionFormButton
+        account={{
+          guid: '1',
+          name: 'account',
+        } as Account}
+      >
         <span>Update</span>
       </TransactionFormButton>,
     );
@@ -56,7 +66,15 @@ describe('TransactionFormButton', () => {
     'update',
     'delete',
   ])('renders hidden modal with TransactionForm on mount with action %s', async (action) => {
-    render(<TransactionFormButton action={action as 'add' | 'update' | 'delete'} />);
+    render(
+      <TransactionFormButton
+        account={{
+          guid: '1',
+          name: 'account',
+        } as Account}
+        action={action as 'add' | 'update' | 'delete'}
+      />,
+    );
     expect(Modal).toHaveBeenLastCalledWith(
       expect.objectContaining({
         isOpen: false,
@@ -75,7 +93,14 @@ describe('TransactionFormButton', () => {
   });
 
   it('opens modal when clicking the button', async () => {
-    render(<TransactionFormButton />);
+    render(
+      <TransactionFormButton
+        account={{
+          guid: '1',
+          name: 'account',
+        } as Account}
+      />,
+    );
 
     const button = await screen.findByRole('button', { name: /add transaction/i });
     fireEvent.click(button);
@@ -90,7 +115,12 @@ describe('TransactionFormButton', () => {
 
   it('closes modal when clicking the X button', async () => {
     render(
-      <TransactionFormButton />,
+      <TransactionFormButton
+        account={{
+          guid: '1',
+          name: 'account',
+        } as Account}
+      />,
     );
 
     const button = await screen.findByRole('button', { name: /add transaction/i });
@@ -126,7 +156,10 @@ describe('TransactionFormButton', () => {
       },
     } as Transaction);
     render(
-      <TransactionFormButton guid="guid" action={action as 'update' | 'delete'} />,
+      <TransactionFormButton
+        guid="guid"
+        action={action as 'update' | 'delete'}
+      />,
     );
 
     const button = await screen.findByRole('button', { name: /add transaction/i });

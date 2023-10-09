@@ -52,7 +52,12 @@ async function getLiveSummary(ticker) {
 }
 
 async function getPrice(ticker, when) {
-  const end = luxon.DateTime.fromSeconds(when, {zone: 'utc'}).endOf('day');
+  let date = luxon.DateTime.fromSeconds(when, { zone: 'utc' });
+  // Yahoo api returns an error when we query price for Sunday
+  if (date.weekday === 6) {
+    date = date.minus({ days: 1 });
+  }
+  const end = date.endOf('day');
   const start = end.startOf('day');
 
   if (ticker === 'SGDCAD=X') {

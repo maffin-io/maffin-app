@@ -282,7 +282,7 @@ exports[`AccountForm renders as expected 1`] = `
           id="dateInput"
           name="balanceDate"
           type="date"
-          value="2023-09-29"
+          value="2023-01-30"
         />
         <p
           class="invalid-feedback"

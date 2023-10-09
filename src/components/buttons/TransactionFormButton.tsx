@@ -16,7 +16,7 @@ export type TransactionFormButtonProps = {
   action?: 'add' | 'update' | 'delete',
   guid?: string, // The transaction to update or delete
   account?: Account, // Account to populate for the main split
-  defaultValues?: FormValues,
+  defaultValues: FormValues,
   className?: string,
   children?: React.ReactNode,
 };
@@ -35,7 +35,7 @@ export default function TransactionFormButton(
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [defaults, setDefaults] = React.useState(defaultValues);
 
-  let title = 'Add transaction';
+  let title = `Add transaction to ${account?.name}`;
   if (action === 'update') {
     title = 'Edit transaction';
   }
@@ -78,10 +78,9 @@ export default function TransactionFormButton(
               split1.fk_account = account;
             }
 
-            const split2 = new Split();
             setDefaults({
               ...defaultValues,
-              splits: [split1, split2],
+              splits: [split1, new Split()],
             } as FormValues);
           } else if (action === 'update' || action === 'delete') {
             const tx = await Transaction.findOneOrFail({

@@ -4,37 +4,6 @@ exports[`LatestTransactions renders as expected with txs 1`] = `
 <div>
   <div>
     <div
-      class="flex items-center justify-between"
-    >
-      <p
-        class="text-md"
-      >
-        Latest transactions
-      </p>
-      <button
-        class="btn-primary"
-        id="add-tx"
-        type="button"
-      >
-        <svg
-          fill="currentColor"
-          height="1em"
-          stroke="currentColor"
-          stroke-width="0"
-          viewBox="0 0 24 24"
-          width="1em"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4z"
-          />
-          <path
-            d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"
-          />
-        </svg>
-      </button>
-    </div>
-    <div
       class="text-sm py-3"
     >
       <span
@@ -179,37 +148,6 @@ exports[`LatestTransactions renders as expected with txs 1`] = `
 exports[`LatestTransactions renders with empty txs 1`] = `
 <div>
   <div>
-    <div
-      class="flex items-center justify-between"
-    >
-      <p
-        class="text-md"
-      >
-        Latest transactions
-      </p>
-      <button
-        class="btn-primary"
-        id="add-tx"
-        type="button"
-      >
-        <svg
-          fill="currentColor"
-          height="1em"
-          stroke="currentColor"
-          stroke-width="0"
-          viewBox="0 0 24 24"
-          width="1em"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4z"
-          />
-          <path
-            d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"
-          />
-        </svg>
-      </button>
-    </div>
     0
   </div>
 </div>

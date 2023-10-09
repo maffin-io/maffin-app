@@ -6,4 +6,5 @@ export type FormValues = {
   description: string,
   splits: Split[],
   fk_currency: Commodity,
+  exchangeRate?: { [key: string]: number },
 };

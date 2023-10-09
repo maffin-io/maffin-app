@@ -35,6 +35,7 @@ describe('AccountForm', () => {
   let expenseAccount: Account;
 
   beforeEach(async () => {
+    jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-30'));
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
