@@ -11,6 +11,7 @@ import type { SWRResponse } from 'swr';
 
 import Stocker from '@/apis/Stocker';
 import type { Account, Commodity } from '@/book/entities';
+import { Split } from '@/book/entities';
 import SplitField from '@/components/forms/transaction/SplitField';
 import { toFixed } from '@/helpers/number';
 import type { FormValues } from '@/components/forms/transaction/types';
@@ -273,6 +274,66 @@ describe('SplitField', () => {
     expect(mockGetPrice).toHaveBeenLastCalledWith('GOOGL', DateTime.fromISO('2023-01-01'));
   });
 
+  it('selects CURRENCY as tx currency when investment', async () => {
+    const user = userEvent.setup();
+    jest.spyOn(Stocker.prototype, 'getPrice')
+      .mockResolvedValueOnce({ price: 100, currency: 'USD' });
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+      {
+        data: [
+          {
+            name: 'path1',
+            guid: 'account_guid_1',
+            path: 'path1',
+            type: 'ASSET',
+            commodity: {
+              guid: 'usd',
+              mnemonic: 'USD',
+              namespace: 'CURRENCY',
+            } as Commodity,
+          } as Account,
+        ],
+      } as SWRResponse,
+    );
+
+    const account = {
+      name: 'GOOGL',
+      guid: 'account_guid_3',
+      path: 'googl',
+      type: 'STOCK',
+      commodity: {
+        guid: 'googl',
+        mnemonic: 'GOOGL',
+        namespace: 'STOCK',
+      },
+    };
+
+    render(
+      <FormWrapper
+        defaults={{
+          fk_currency: { mnemonic: 'GOOGL' } as Commodity,
+          splits: [
+            {
+              quantity: 50,
+              value: 100,
+              fk_account: account,
+              account,
+            },
+            new Split(),
+          ],
+        } as FormValues}
+      />,
+    );
+
+    await user.click(screen.getByLabelText('splits.1.account'));
+    await user.click(screen.getByText('path1'));
+
+    expect(screen.getByLabelText('splits.1.quantity')).toBeVisible();
+    // if value is not visible on the split, it means the tx currency
+    // is the same as the split's account
+    await waitFor(() => expect(screen.getByLabelText('splits.1.value')).not.toBeVisible());
+  });
+
   it('recalculates quantity from value when date changes', async () => {
     const user = userEvent.setup();
     const mockGetPrice = jest.spyOn(Stocker.prototype, 'getPrice')
@@ -393,6 +454,7 @@ function FormWrapper(
     commodity: {
       guid: 'eur',
       mnemonic: 'EUR',
+      namespace: 'CURRENCY',
     } as Commodity,
   } as Account;
 
