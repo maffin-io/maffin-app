@@ -719,7 +719,7 @@ describe('TransactionForm', () => {
           {
             guid: 'tx_guid',
             date: DateTime.fromISO('2023-01-01').toISODate() as string,
-            description: 'Buy STOCK',
+            description: 'Split STOCK',
             splits: [
               {
                 // This is hacky but because we rely on destructured objects
@@ -763,6 +763,9 @@ describe('TransactionForm', () => {
     await waitFor(() => expect(v1).toHaveValue(-100));
     await waitFor(() => expect(q1).toHaveValue(-9000));
 
+    const v0 = screen.getByLabelText('splits.0.value');
+    user.clear(v0);
+    await user.type(v0, '0');
     user.clear(q1);
     // Set the quantity for asset account to 0 to reflect the new shares
     // cost nothing
@@ -772,7 +775,7 @@ describe('TransactionForm', () => {
     await user.click(screen.getByText('Save'));
 
     const tx = await Transaction.findOneOrFail({
-      where: { description: 'Buy STOCK' },
+      where: { description: 'Split STOCK' },
       relations: {
         splits: {
           fk_account: true,
@@ -783,8 +786,8 @@ describe('TransactionForm', () => {
     expect(tx).toMatchObject({
       guid: expect.any(String),
       date: DateTime.fromISO('2023-01-01'),
-      description: 'Buy STOCK',
-      fk_currency: stockCommodity,
+      description: 'Split STOCK',
+      fk_currency: sgd,
       splits: [
         {
           guid: expect.any(String),
@@ -794,7 +797,7 @@ describe('TransactionForm', () => {
           },
           quantityNum: 100,
           quantityDenom: 1,
-          valueNum: 100,
+          valueNum: 0,
           valueDenom: 1,
         },
         {
@@ -805,7 +808,7 @@ describe('TransactionForm', () => {
           },
           quantityNum: 0,
           quantityDenom: 1,
-          valueNum: -100,
+          valueNum: 0,
           valueDenom: 1,
         },
       ],
