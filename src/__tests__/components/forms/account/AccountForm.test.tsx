@@ -3,6 +3,7 @@ import { DateTime } from 'luxon';
 import {
   render,
   screen,
+  waitFor,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DataSource } from 'typeorm';
@@ -97,6 +98,25 @@ describe('AccountForm', () => {
     expect(container).toMatchSnapshot();
   });
 
+  it('renders with defaults as expected', async () => {
+    render(
+      <AccountForm
+        defaultValues={{
+          name: 'Test account',
+          parent: assetAccount,
+          type: 'BANK',
+          fk_commodity: eur,
+        }}
+        onSave={() => {}}
+      />,
+    );
+
+    await waitFor(() => expect(screen.getByLabelText('Name')).toHaveValue('Test account'));
+    screen.getByText('Assets');
+    screen.getByText('BANK');
+    screen.getByText('EUR');
+  });
+
   it('button is disabled when form not valid', async () => {
     render(
       <AccountForm
@@ -188,24 +208,12 @@ describe('AccountForm', () => {
       description: null,
       parentId: assetAccount.guid,
       path: 'Assets:TestAccount',
+      placeholder: false,
+      hidden: false,
     });
     expect(mockSave).toHaveBeenCalledTimes(1);
     expect(swr.mutate).toBeCalledTimes(1);
-    expect(swr.mutate).toHaveBeenNthCalledWith(
-      1,
-      '/api/accounts',
-      expect.any(Function),
-      { revalidate: false },
-    );
-
-    expect(
-      await (swr.mutate as jest.Mock).mock.calls[0][1]({
-        [assetAccount.guid]: Account,
-      }),
-    ).toEqual({
-      [assetAccount.guid]: await Account.findOneByOrFail({ guid: assetAccount.guid }),
-      [account.guid]: account,
-    });
+    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/accounts');
   });
 
   it('creates bank account with opening balance', async () => {
@@ -246,6 +254,8 @@ describe('AccountForm', () => {
       description: null,
       parentId: assetAccount.guid,
       path: 'Assets:TestAccount',
+      placeholder: false,
+      hidden: false,
     });
 
     const txs = await Transaction.find();

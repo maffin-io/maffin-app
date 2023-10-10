@@ -1,20 +1,16 @@
 import React from 'react';
-import Joyride, {
-  CallBackProps,
-  EVENTS,
-  ACTIONS,
-  STATUS,
-} from 'react-joyride';
+import Joyride from 'react-joyride';
 import Image from 'next/image';
 import { mutate } from 'swr';
 
-import { useAccount, useMainCurrency } from '@/hooks/api';
+import { useMainCurrency } from '@/hooks/api';
 import { Account, Commodity, Split } from '@/book/entities';
 import AccountForm from '@/components/forms/account/AccountForm';
 import CommodityForm from '@/components/forms/commodity/CommodityForm';
 import CustomTooltip from '@/components/onboarding/CustomTooltip';
 import maffinLogo from '@/assets/images/maffin_logo_sm.png';
-import TransactionForm from '../forms/transaction/TransactionForm';
+import { DataSourceContext } from '@/hooks';
+import TransactionForm from '@/components/forms/transaction/TransactionForm';
 
 type OnboardingProps = {
   show?: boolean;
@@ -23,30 +19,16 @@ type OnboardingProps = {
 export default function Onboarding({
   show = false,
 }: OnboardingProps): JSX.Element {
-  const [run, setRun] = React.useState(show);
+  const { save } = React.useContext(DataSourceContext);
+  const [run] = React.useState(show);
   const [stepIndex, setStepIndex] = React.useState(0);
-
-  async function handleJoyrideCallback(data: CallBackProps) {
-    const {
-      action,
-      index,
-      status,
-      type,
-    } = data;
-
-    if (([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND] as string[]).includes(type)) {
-      setStepIndex(index + (action === ACTIONS.PREV ? -1 : 1));
-    } else if (([STATUS.FINISHED, STATUS.SKIPPED] as string[]).includes(status)) {
-      setRun(false);
-    }
-  }
+  const [accounts, setAccounts] = React.useState<{ [key: string]: Account }>({});
 
   return (
     <Joyride
       continuous
       run={run}
       stepIndex={stepIndex}
-      callback={(data) => handleJoyrideCallback(data)}
       disableOverlayClose
       disableCloseOnEsc
       steps={[
@@ -54,7 +36,7 @@ export default function Onboarding({
           content: (
             <div>
               <span
-                className="text-left"
+                className="text-left leading-relaxed"
               >
                 <p>
                   Welcome! I&apos;m Maffin and I will help you navigate through the first steps
@@ -74,8 +56,13 @@ export default function Onboarding({
                 </p>
               </span>
               <CommodityForm
-                onSave={async () => {
-                  await createInitialAccounts();
+                onSave={async (commodity: Commodity) => {
+                  mutate(
+                    '/api/main-currency',
+                    commodity,
+                  );
+                  await createInitialAccounts(setAccounts);
+                  save();
                   setStepIndex(1);
                 }}
               />
@@ -87,7 +74,7 @@ export default function Onboarding({
         },
         {
           content: (
-            <div>
+            <div className="text-left leading-relaxed">
               <span>
                 Let&apos;s add your first
                 {' '}
@@ -103,12 +90,16 @@ export default function Onboarding({
                 set it to the amount you had in the bank at that time (you can change this later).
               </span>
               <AccountForm
-                onSave={() => {
+                onSave={(account: Account) => {
+                  setAccounts({
+                    ...accounts,
+                    bank: account,
+                  });
                   setStepIndex(2);
                 }}
                 defaultValues={{
                   name: 'My bank account',
-                  parent: useAccount('Assets').data as Account,
+                  parent: accounts.type_asset as Account,
                   type: 'BANK',
                   fk_commodity: useMainCurrency().data as Commodity,
                   balance: 0,
@@ -121,7 +112,7 @@ export default function Onboarding({
         },
         {
           content: (
-            <div>
+            <div className="text-left leading-relaxed">
               <p className="mb-2">
                 This represents your accounts tree. Once you add more accounts, this
                 widget becomes very useful to navigate through all your accounts.
@@ -149,7 +140,7 @@ export default function Onboarding({
         },
         {
           content: (
-            <div>
+            <div className="text-left leading-relaxed">
               <span>
                 Let&apos; now add an
                 {' '}
@@ -163,12 +154,16 @@ export default function Onboarding({
                 Some examples can be things like &quot;Rent&quot;, &quot;Electricity&quot;, etc.
               </span>
               <AccountForm
-                onSave={() => {
+                onSave={(account: Account) => {
+                  setAccounts({
+                    ...accounts,
+                    expense: account,
+                  });
                   setStepIndex(4);
                 }}
                 defaultValues={{
                   name: 'Groceries',
-                  parent: useAccount('Expenses').data as Account,
+                  parent: accounts.type_expense as Account,
                   type: 'EXPENSE',
                   fk_commodity: useMainCurrency().data as Commodity,
                   balance: 0,
@@ -181,7 +176,7 @@ export default function Onboarding({
         },
         {
           content: (
-            <div>
+            <div className="text-left leading-relaxed">
               <span>
                 Now that you have
                 {' '}
@@ -200,18 +195,65 @@ export default function Onboarding({
               </span>
               <TransactionForm
                 onSave={() => {
+                  save();
                   setStepIndex(5);
                 }}
                 defaultValues={{
                   date: '',
-                  description: '',
+                  description: 'Grocery shopping',
                   splits: [
-                    Split.create(),
-                    Split.create(),
+                    Split.create({
+                      fk_account: accounts.bank as Account,
+                      quantityNum: -30,
+                      quantityDenom: 1,
+                      valueNum: -30,
+                      valueDenom: 1,
+                    }),
+                    Split.create({
+                      fk_account: accounts.expense as Account,
+                      quantityNum: 30,
+                      quantityDenom: 1,
+                      valueNum: 30,
+                      valueDenom: 1,
+                    }),
                   ],
                   fk_currency: useMainCurrency().data as Commodity,
                 }}
               />
+            </div>
+          ),
+          placement: 'center',
+          target: '#add-account',
+        },
+        {
+          content: (
+            <div className="text-left leading-relaxed">
+              <span>
+                <p>
+                  Good job! From here onwards you just need to keep adding
+                  transactions and accounts to reflect your financial life as you need.
+                </p>
+                <p className="mt-3">
+                  Every time you do changes, they are auto saved and uploaded to
+                  your Google Drive which is where the data lives.
+                </p>
+                <div className="flex py-3 justify-center">
+                  <Image src={maffinLogo} alt="logo" height="45" />
+                </div>
+                <p className="badge warning mt-3">
+                  You own your data which means you have to be careful. Do not
+                  delete the maffin.io folder from your Google drive!
+                </p>
+              </span>
+              <div className="flex justify-center mt-5">
+                <button
+                  type="button"
+                  className="btn-primary"
+                  onClick={() => setStepIndex(6)}
+                >
+                  Agreed!
+                </button>
+              </div>
             </div>
           ),
           placement: 'center',
@@ -229,17 +271,15 @@ export default function Onboarding({
   );
 }
 
-async function createInitialAccounts() {
+async function createInitialAccounts(setAccounts: Function) {
   const mainCommodity = await Commodity.findOneByOrFail({ namespace: 'CURRENCY' });
   const root = await Account.findOneByOrFail({
     type: 'ROOT',
   });
 
-  // We need Assets and Expenses accounts in the next steps of Onboarding so
-  // updating directly to make sure they are available.
-  mutate(
-    '/api/account/Assets',
-    await Account.create({
+  // Preload needed accounts for tutorial
+  setAccounts({
+    type_asset: await Account.create({
       name: 'Assets',
       type: 'ASSET',
       description: 'Asset accounts are used for tracking things that are of value and can be used or sold to pay debts.',
@@ -247,48 +287,45 @@ async function createInitialAccounts() {
       fk_commodity: mainCommodity,
       parent: root,
     }).save(),
-  );
-
-  mutate(
-    '/api/account/Expenses',
-    await Account.create({
+    type_expense: await Account.create({
       name: 'Expenses',
       type: 'EXPENSE',
       description: 'Any expense such as food, clothing, taxes, etc.',
       placeholder: true,
       fk_commodity: mainCommodity,
       parent: root,
+      children: [],
     }).save(),
-  );
+  });
 
-  await Account.insert([
-    Account.create({
-      name: 'Liabilities',
-      type: 'LIABILITY',
-      description: 'Liability accounts are used for tracking debts or financial obligations.',
-      placeholder: true,
-      fk_commodity: mainCommodity,
-      parent: root,
-    }),
-    Account.create({
-      name: 'Income',
-      type: 'INCOME',
-      description: 'Any income received from sources such as salary, interest, dividends, etc.',
-      placeholder: true,
-      fk_commodity: mainCommodity,
-      parent: root,
-    }),
-    Account.create({
-      name: 'Equity',
-      type: 'EQUITY',
-      description: 'Equity accounts are used to store the opening balances when you create new accounts',
-      placeholder: true,
-      fk_commodity: mainCommodity,
-      parent: root,
-    }),
-  ]);
+  const liabilitiesAccount = Account.create({
+    name: 'Liabilities',
+    type: 'LIABILITY',
+    description: 'Liability accounts are used for tracking debts or financial obligations.',
+    placeholder: true,
+    fk_commodity: mainCommodity,
+    parent: root,
+  });
 
-  const equityAccount = await Account.findOneByOrFail({ type: 'EQUITY' });
+  const incomeAccount = Account.create({
+    name: 'Income',
+    type: 'INCOME',
+    description: 'Any income received from sources such as salary, interest, dividends, etc.',
+    placeholder: true,
+    fk_commodity: mainCommodity,
+    parent: root,
+  });
+
+  const equityAccount = Account.create({
+    name: 'Equity',
+    type: 'EQUITY',
+    description: 'Equity accounts are used to store the opening balances when you create new accounts',
+    placeholder: true,
+    fk_commodity: mainCommodity,
+    parent: root,
+  });
+
+  await Account.insert([liabilitiesAccount, incomeAccount, equityAccount]);
 
   await Account.create({
     name: `Opening balances - ${mainCommodity.mnemonic}`,
@@ -296,9 +333,8 @@ async function createInitialAccounts() {
     description: `Opening balances for ${mainCommodity.mnemonic} accounts`,
     placeholder: false,
     fk_commodity: mainCommodity,
-    parent: equityAccount,
+    parent: await Account.findOneByOrFail({ type: 'EQUITY' }),
   }).save();
 
   mutate('/api/accounts');
-  // mutate('/api/monthly-totals');
 }

@@ -129,6 +129,7 @@ describe('TransactionsTable', () => {
     await screen.findByTestId('Table');
     expect(Table).toHaveBeenLastCalledWith(
       {
+        id: 'transactions-table',
         columns: [
           {
             header: 'Date',
@@ -180,6 +181,7 @@ describe('TransactionsTable', () => {
     await screen.findByTestId('Table');
 
     expect(Table).toHaveBeenLastCalledWith({
+      id: 'transactions-table',
       columns: [
         {
           header: 'Date',

@@ -3,6 +3,9 @@
 exports[`LatestTransactions renders as expected with txs 1`] = `
 <div>
   <div>
+    <p>
+      Latest transactions
+    </p>
     <div
       class="text-sm py-3"
     >
@@ -148,6 +151,9 @@ exports[`LatestTransactions renders as expected with txs 1`] = `
 exports[`LatestTransactions renders with empty txs 1`] = `
 <div>
   <div>
+    <p>
+      Latest transactions
+    </p>
     0
   </div>
 </div>

@@ -24,6 +24,7 @@ export default function InvestmentsTable(): JSX.Element {
 
   return (
     <Table<InvestmentAccount>
+      id="investments-table"
       columns={columns}
       data={investments}
       initialSort={{ id: 'unrealizedProfit', desc: true }}

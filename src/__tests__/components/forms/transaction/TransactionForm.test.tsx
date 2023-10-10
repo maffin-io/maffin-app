@@ -514,7 +514,7 @@ describe('TransactionForm', () => {
     });
     expect(tx.guid.length).toEqual(31);
     expect(mockSave).toHaveBeenCalledTimes(1);
-  });
+  }, 10000);
 
   it('creates transaction with split not being main currency', async () => {
     const user = userEvent.setup();

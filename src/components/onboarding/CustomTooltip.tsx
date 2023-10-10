@@ -1,7 +1,5 @@
 import React from 'react';
-import Joyride, {
-  TooltipRenderProps,
-} from 'react-joyride';
+import { TooltipRenderProps } from 'react-joyride';
 
 export default function CustomTooltip({
   step,

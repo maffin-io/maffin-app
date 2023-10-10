@@ -124,6 +124,18 @@ export default class Account extends BaseEntity {
   @v.IsOptional()
   @v.Length(4, 2048)
     description?: string;
+
+  @Column({
+    default: false,
+  })
+    hidden!: boolean;
+
+  @Column({
+    default: false,
+  })
+    // Placeholders are hierarchical accounts that don't containg
+    // transactions, they are just parents of other accounts
+    placeholder!: boolean;
 }
 
 // https://github.com/typeorm/typeorm/issues/4714

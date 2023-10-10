@@ -34,6 +34,7 @@ describe('AccountsTable', () => {
     await screen.findByTestId('Table');
     expect(Table).toHaveBeenLastCalledWith(
       {
+        id: 'accounts-table',
         columns: [
           {
             header: '',
@@ -54,6 +55,7 @@ describe('AccountsTable', () => {
           desc: true,
           id: 'total',
         },
+        isExpanded: false,
         showHeader: false,
         showPagination: false,
         tdClassName: 'p-2',
@@ -83,6 +85,7 @@ describe('AccountsTable', () => {
             },
             type: 'ASSET',
             childrenIds: [] as string[],
+            placeholder: true,
           },
           a2: {
             guid: 'a2',
@@ -115,6 +118,7 @@ describe('AccountsTable', () => {
     expect(Table).toBeCalledTimes(1);
     expect(Table).toHaveBeenLastCalledWith(
       {
+        id: 'accounts-table',
         columns: [
           {
             header: '',
@@ -141,6 +145,7 @@ describe('AccountsTable', () => {
                 mnemonic: 'EUR',
               },
               childrenIds: [],
+              placeholder: true,
             },
             leaves: [],
             total: expect.any(Money),
@@ -163,6 +168,7 @@ describe('AccountsTable', () => {
           desc: true,
           id: 'total',
         },
+        isExpanded: false,
         showHeader: false,
         showPagination: false,
         tdClassName: 'p-2',
@@ -258,6 +264,7 @@ describe('AccountsTable', () => {
               name: 'Assets',
               type: 'ASSET',
               childrenIds: ['a1'],
+              placeholder: true,
             } as Account,
             total: new Money(100, 'EUR'),
             monthlyTotals: {},
