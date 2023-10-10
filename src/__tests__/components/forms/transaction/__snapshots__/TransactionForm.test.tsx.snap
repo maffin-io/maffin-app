@@ -458,6 +458,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                   class="css-1f43avz-a11yText-A11yText"
                 />
                 <div
+                  aria-disabled="true"
                   class="opacity-50 !h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none css-16xfy0z-control"
                 >
                   <svg

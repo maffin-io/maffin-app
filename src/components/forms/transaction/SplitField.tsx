@@ -95,8 +95,10 @@ export default function SplitField({
                       split => split.fk_account.commodity.guid === mainCurrency?.guid,
                     )) {
                       form.setValue('fk_currency', mainCurrency);
-                    } else {
+                    } else if (splits[0].account.commodity.namespace === 'CURRENCY') {
                       form.setValue('fk_currency', splits[0].account.commodity);
+                    } else {
+                      form.setValue('fk_currency', splits[1].account.commodity);
                     }
                   }
 
@@ -191,8 +193,6 @@ async function getExchangeRate(
 
   const rate = await new Stocker().getPrice(ticker, when);
 
-  // TODO: We should check somewhere that the txCurrency is the same
-  // as the stocks' currency to avoid price discrepancies.
   if (to.namespace !== 'CURRENCY') {
     if (rate.currency !== account.commodity.mnemonic) {
       throw new Error('The commodity of the account doesnt match the currency of the stock');
