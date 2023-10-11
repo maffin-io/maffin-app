@@ -8,6 +8,6 @@ import { Transaction } from '@/book/entities';
 export default async function getEarliestDate(): Promise<DateTime> {
   const dates = await Transaction.query('SELECT MIN(post_date) as date FROM transactions;');
   return (
-    dates.length && DateTime.fromSQL(dates[0].date)
+    dates.length && dates[0].date && DateTime.fromSQL(dates[0].date)
   ) || DateTime.now().startOf('year');
 }

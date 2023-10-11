@@ -10,6 +10,7 @@ import type { Account } from '@/book/entities';
 import AccountsPage from '@/app/dashboard/accounts/page';
 import AddAccountButton from '@/components/buttons/AddAccountButton';
 import DateRangeInput from '@/components/DateRangeInput';
+import Onboarding from '@/components/onboarding/Onboarding';
 import {
   AccountsTable,
   NetWorthPie,
@@ -52,6 +53,10 @@ jest.mock('@/components/pages/accounts/LatestTransactions', () => jest.fn(
   () => <div data-testid="LatestTransactions" />,
 ));
 
+jest.mock('@/components/onboarding/Onboarding', () => jest.fn(
+  () => <div data-testid="Onboarding" />,
+));
+
 describe('AccountsPage', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02'));
@@ -70,7 +75,7 @@ describe('AccountsPage', () => {
     await screen.findByText('Loading...');
   });
 
-  it('passes empty data to components when no data ready', async () => {
+  it('shows onboarding when no data', async () => {
     const date = DateTime.fromISO('2022-01-01');
     jest.spyOn(apiHook, 'useStartDate').mockReturnValueOnce({ data: date } as SWRResponse);
     const { container } = render(<AccountsPage />);
@@ -78,10 +83,19 @@ describe('AccountsPage', () => {
     await screen.findByTestId('AddAccountButton');
     expect(AddAccountButton).toHaveBeenLastCalledWith({}, {});
 
+    await screen.findByTestId('Onboarding');
+    expect(Onboarding).toHaveBeenLastCalledWith(
+      {
+        show: true,
+      },
+      {},
+    );
+
     await screen.findByTestId('AccountsTable');
     expect(AccountsTable).toHaveBeenLastCalledWith(
       {
         selectedDate: DateTime.fromISO('2023-01-02'),
+        isExpanded: true,
       },
       {},
     );
@@ -152,7 +166,7 @@ describe('AccountsPage', () => {
         type: 'ROOT',
         childrenIds: ['a3', 'a5'],
       } as Account,
-      expense: {
+      type_expense: {
         guid: 'a3',
         name: 'Expenses',
         commodity: {
@@ -170,7 +184,7 @@ describe('AccountsPage', () => {
         type: 'EXPENSE',
         childrenIds: [] as string[],
       } as Account,
-      income: {
+      type_income: {
         guid: 'a5',
         name: 'Income',
         commodity: {
@@ -196,9 +210,18 @@ describe('AccountsPage', () => {
 
     render(<AccountsPage />);
 
+    await screen.findByTestId('Onboarding');
+    expect(Onboarding).toHaveBeenLastCalledWith(
+      {
+        show: false,
+      },
+      {},
+    );
+
     await screen.findByTestId('AccountsTable');
     expect(AccountsTable).toBeCalledTimes(1);
     expect(AccountsTable).toHaveBeenLastCalledWith({
+      isExpanded: false,
       selectedDate: DateTime.now(),
     }, {});
     expect(NetWorthPie).toHaveBeenLastCalledWith({

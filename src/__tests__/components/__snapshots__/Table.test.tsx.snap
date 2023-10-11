@@ -7,6 +7,7 @@ exports[`Table renders headers with empty data 1`] = `
   >
     <table
       class="w-full text-sm text-left"
+      id="table"
     >
       <thead
         class="bg-gunmetal-700 text-slate-300"

@@ -20,6 +20,7 @@ import * as API from '@/hooks/api';
 
 export type AccountsTableProps = {
   selectedDate?: DateTime,
+  isExpanded?: boolean,
 };
 
 type AccountsTableRow = {
@@ -31,6 +32,7 @@ type AccountsTableRow = {
 export default function AccountsTable(
   {
     selectedDate = DateTime.now(),
+    isExpanded = false,
   }: AccountsTableProps,
 ): JSX.Element {
   let { data: accounts } = API.useAccounts();
@@ -42,6 +44,7 @@ export default function AccountsTable(
 
   return (
     <Table<AccountsTableRow>
+      id="accounts-table"
       columns={columns}
       data={tree.leaves}
       initialSort={{ id: 'total', desc: true }}
@@ -49,6 +52,7 @@ export default function AccountsTable(
       showPagination={false}
       tdClassName="p-2"
       getSubRows={row => row.leaves}
+      isExpanded={isExpanded}
     />
   );
 }
@@ -109,18 +113,39 @@ const columns: ColumnDef<AccountsTableRow>[] = [
             <BiCircle className="mr-1 text-xs opacity-20" />
           </button>
         )}
-        <Link
-          className={classNames('badge hover:text-slate-300', {
-            'bg-green-500/20 text-green-300': row.original.account.type === 'INCOME',
-            'bg-red-500/20 text-red-300': row.original.account.type === 'EXPENSE',
-            'bg-cyan-500/20 text-cyan-300': isAsset(row.original.account),
-            'bg-orange-500/20 text-orange-300': isLiability(row.original.account),
-            'bg-violet-500/20 text-violet-300': isInvestment(row.original.account),
-          })}
-          href={`/dashboard/accounts/${row.original.account.guid}`}
-        >
-          {row.original.account.name}
-        </Link>
+        {
+          (
+            row.original.account.placeholder
+            && (
+              <span
+                data-tooltip-id={row.original.account.guid}
+                className={classNames('badge cursor-default', {
+                  success: row.original.account.type === 'INCOME',
+                  danger: row.original.account.type === 'EXPENSE',
+                  info: isAsset(row.original.account),
+                  warning: isLiability(row.original.account),
+                  'bg-violet-500/20 text-violet-300': isInvestment(row.original.account),
+                })}
+              >
+                {row.original.account.name}
+              </span>
+            )
+          ) || (
+            <Link
+              data-tooltip-id={row.original.account.guid}
+              className={classNames('badge hover:text-slate-300', {
+                success: row.original.account.type === 'INCOME',
+                danger: row.original.account.type === 'EXPENSE',
+                info: isAsset(row.original.account),
+                warning: isLiability(row.original.account),
+                'bg-violet-500/20 text-violet-300': isInvestment(row.original.account),
+              })}
+              href={`/dashboard/accounts/${row.original.account.guid}`}
+            >
+              {row.original.account.name}
+            </Link>
+          )
+        }
 
         {
           row.original.account.description

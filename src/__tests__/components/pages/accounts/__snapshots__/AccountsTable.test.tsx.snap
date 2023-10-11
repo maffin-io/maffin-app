@@ -32,7 +32,8 @@ exports[`AccountsTable renders Name column as expected when expandable and expan
       </svg>
     </button>
     <a
-      class="badge hover:text-slate-300 bg-cyan-500/20 text-cyan-300"
+      class="badge hover:text-slate-300 info"
+      data-tooltip-id="assets"
       href="/dashboard/accounts/assets"
     >
       Assets
@@ -65,7 +66,8 @@ exports[`AccountsTable renders Name column as expected when expandable and not e
       </svg>
     </button>
     <a
-      class="badge hover:text-slate-300 bg-cyan-500/20 text-cyan-300"
+      class="badge hover:text-slate-300 info"
+      data-tooltip-id="assets"
       href="/dashboard/accounts/assets"
     >
       Assets
@@ -98,12 +100,12 @@ exports[`AccountsTable renders Name column as expected when not expandable 1`] =
         />
       </svg>
     </button>
-    <a
-      class="badge hover:text-slate-300 bg-cyan-500/20 text-cyan-300"
-      href="/dashboard/accounts/assets"
+    <span
+      class="badge cursor-default info"
+      data-tooltip-id="assets"
     >
       Assets
-    </a>
+    </span>
   </div>
 </div>
 `;

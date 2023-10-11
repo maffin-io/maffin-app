@@ -12,6 +12,7 @@ import {
   LatestTransactions,
 } from '@/components/pages/accounts';
 import DateRangeInput from '@/components/DateRangeInput';
+import Onboarding from '@/components/onboarding/Onboarding';
 import * as API from '@/hooks/api';
 
 export default function AccountsPage(): JSX.Element {
@@ -32,9 +33,11 @@ export default function AccountsPage(): JSX.Element {
   }
 
   accounts = accounts || { root: { childrenIds: [] } };
+  const showOnboarding = Object.keys(accounts).length === 1;
 
   return (
     <>
+      <Onboarding show={showOnboarding} />
       <div className="flex items-center">
         <span className="text-xl font-medium">
           Your finances
@@ -64,6 +67,7 @@ export default function AccountsPage(): JSX.Element {
           <div className="col-span-12 p-4 mr-4 rounded-sm bg-gunmetal-700">
             <AccountsTable
               selectedDate={selectedDate}
+              isExpanded={showOnboarding}
             />
           </div>
         </div>
@@ -81,14 +85,14 @@ export default function AccountsPage(): JSX.Element {
           </div>
           <div className="col-span-6 p-4 mr-4 rounded-sm bg-gunmetal-700">
             <MonthlyTotalHistogram
-              accounts={accounts?.income?.childrenIds.map((guid: string) => accounts?.[guid])}
+              accounts={accounts?.type_income?.childrenIds.map((guid: string) => accounts?.[guid])}
               title="Income"
               selectedDate={selectedDate}
             />
           </div>
           <div className="col-span-6 p-4 mr-4 rounded-sm bg-gunmetal-700">
             <MonthlyTotalHistogram
-              accounts={accounts?.expense?.childrenIds.map((guid: string) => accounts?.[guid])}
+              accounts={accounts?.type_expense?.childrenIds.map((guid: string) => accounts?.[guid])}
               title="Expenses"
               selectedDate={selectedDate}
             />

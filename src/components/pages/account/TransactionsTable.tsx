@@ -36,6 +36,7 @@ export default function TransactionsTable({
 
   return (
     <Table<Split>
+      id="transactions-table"
       columns={columns}
       data={splits}
     />

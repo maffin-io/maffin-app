@@ -1,7 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AccountsPage passes empty data to components when no data ready 1`] = `
+exports[`AccountsPage shows onboarding when no data 1`] = `
 <div>
+  <div
+    data-testid="Onboarding"
+  />
   <div
     class="flex items-center"
   >

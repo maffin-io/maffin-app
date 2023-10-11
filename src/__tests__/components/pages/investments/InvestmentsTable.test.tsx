@@ -26,6 +26,7 @@ describe('InvestmentsTable', () => {
     await screen.findByTestId('Table');
     expect(Table).toHaveBeenLastCalledWith(
       {
+        id: 'investments-table',
         columns: [
           {
             accessorFn: expect.any(Function),

@@ -25,6 +25,7 @@ const resolver = classValidatorResolver(Account, { validator: { stopAtFirstError
 
 export type AccountFormProps = {
   onSave: Function,
+  defaultValues?: FormValues,
 };
 
 export type FormValues = {
@@ -42,8 +43,9 @@ export type SplitFieldData = {
   exchangeRate?: number,
 };
 
-export default function AccountForm({ onSave }: AccountFormProps): JSX.Element {
+export default function AccountForm({ defaultValues, onSave }: AccountFormProps): JSX.Element {
   const form = useForm<FormValues>({
+    defaultValues,
     mode: 'onChange',
     resolver,
   });
@@ -81,8 +83,10 @@ export default function AccountForm({ onSave }: AccountFormProps): JSX.Element {
                 showRoot
                 isClearable={false}
                 ignoreAccounts={['STOCK', 'MUTUAL']}
+                ignorePlaceholders={false}
                 placeholder="<parent account>"
                 onChange={field.onChange}
+                defaultValue={defaultValues?.parent}
               />
               <p className="invalid-feedback">{fieldState.error?.message}</p>
             </>
@@ -103,6 +107,7 @@ export default function AccountForm({ onSave }: AccountFormProps): JSX.Element {
                 disabled={!parent}
                 ignoreTypes={ignoreTypes}
                 onChange={field.onChange}
+                defaultValue={(defaultValues?.type && { type: defaultValues.type }) || undefined}
               />
               <p className="invalid-feedback">{fieldState.error?.message}</p>
             </>
@@ -182,6 +187,7 @@ export default function AccountForm({ onSave }: AccountFormProps): JSX.Element {
                 id="commodityInput"
                 placeholder="<commodity>"
                 onChange={field.onChange}
+                defaultValue={defaultValues?.fk_commodity}
               />
               <p className="invalid-feedback">{fieldState.error?.message}</p>
             </>
@@ -201,21 +207,7 @@ export default function AccountForm({ onSave }: AccountFormProps): JSX.Element {
 async function onSubmit(data: FormValues, onSave: Function) {
   const account = await Account.create({ ...data }).save();
 
-  mutate(
-    '/api/accounts',
-    async (accounts: AccountsMap) => {
-      const [child, parent] = await Promise.all([
-        Account.findOneByOrFail({ guid: account.guid }),
-        Account.findOneByOrFail({ guid: account.parent.guid }),
-      ]);
-      return {
-        ...accounts,
-        [child.guid]: child,
-        [parent.guid]: parent,
-      };
-    },
-    { revalidate: false },
-  );
+  mutate('/api/accounts');
 
   if (data.balance) {
     let equityAccount = await Account.findOneBy({
@@ -271,5 +263,5 @@ async function onSubmit(data: FormValues, onSave: Function) {
     // Opening balances affect net worth
     mutate('/api/monthly-totals', undefined);
   }
-  onSave();
+  onSave(account);
 }

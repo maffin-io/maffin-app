@@ -7,6 +7,7 @@ import { Account } from '@/book/entities';
 export type AccountSelectorProps = {
   placeholder?: string,
   ignoreAccounts?: string[],
+  ignorePlaceholders?: boolean,
   defaultValue?: Account,
   id?: string,
   showRoot?: boolean,
@@ -20,6 +21,7 @@ export default function AccountSelector(
   {
     placeholder,
     ignoreAccounts = [],
+    ignorePlaceholders = true,
     defaultValue,
     id = 'accountSelector',
     showRoot = false,
@@ -32,10 +34,22 @@ export default function AccountSelector(
   let { data: accounts } = useAccounts();
 
   accounts = accounts || {};
-  let options = Object.values(accounts);
-  options = options.filter(account => !(ignoreAccounts).includes(account.type));
+  let options: Account[] = [];
+
+  // Filter out duplicates that can be accessed via `type_`
+  Object.entries(accounts).forEach(([key, account]) => {
+    if (!key.startsWith('type_')) {
+      options.push(account);
+    }
+  });
+
+  options = options.filter(account => account && !(ignoreAccounts).includes(account.type));
   if (!showRoot) {
     options = options.filter(account => account.type !== 'ROOT');
+  }
+
+  if (ignorePlaceholders) {
+    options = options.filter(account => !account.placeholder);
   }
 
   return (

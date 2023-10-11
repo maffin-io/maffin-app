@@ -41,6 +41,7 @@ describe('Table', () => {
   it('renders headers with empty data', () => {
     const { container } = render(
       <Table<TestDataType>
+        id="table"
         columns={columns}
         data={[]}
       />,
@@ -54,6 +55,7 @@ describe('Table', () => {
   it('displays data', () => {
     render(
       <Table<TestDataType>
+        id="table"
         columns={columns}
         data={[
           {
@@ -82,6 +84,7 @@ describe('Table', () => {
   it('can sort', async () => {
     render(
       <Table<TestDataType>
+        id="table"
         columns={columns}
         data={[
           {
@@ -113,6 +116,7 @@ describe('Table', () => {
   it('can provide default sort', async () => {
     render(
       <Table<TestDataType>
+        id="table"
         columns={columns}
         data={[
           {

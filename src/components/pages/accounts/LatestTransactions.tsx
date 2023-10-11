@@ -18,6 +18,9 @@ export default function LatestTransactions(): JSX.Element {
 
   return (
     <div>
+      <p>
+        Latest transactions
+      </p>
       {
         (
           txs.length

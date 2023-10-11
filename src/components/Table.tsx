@@ -9,6 +9,7 @@ import {
   getPaginationRowModel,
   getExpandedRowModel,
   ColumnSort,
+  ExpandedState,
 } from '@tanstack/react-table';
 import classNames from 'classnames';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
@@ -16,6 +17,7 @@ import { FaSortDown, FaSortUp } from 'react-icons/fa';
 import Pagination from '@/components/Pagination';
 
 export type TableProps<T extends object> = {
+  id: string,
   columns: ColumnDef<T>[],
   data: T[],
   initialSort?: ColumnSort,
@@ -24,10 +26,12 @@ export type TableProps<T extends object> = {
   showPagination?: boolean,
   tdClassName?: string,
   getSubRows?: (originalRow: T, index: number) => T[] | undefined,
+  isExpanded?: boolean,
 };
 
 export default function Table<T extends object = {}>(
   {
+    id,
     columns,
     data,
     initialSort,
@@ -36,6 +40,7 @@ export default function Table<T extends object = {}>(
     showPagination = true,
     tdClassName = 'px-6 py-4',
     getSubRows,
+    isExpanded = false,
   }: TableProps<T>,
 ): JSX.Element {
   const tableConfig: TableOptions<T> = {
@@ -51,6 +56,7 @@ export default function Table<T extends object = {}>(
         pageSize,
       },
       sorting: (initialSort && [initialSort]) || undefined,
+      expanded: isExpanded as ExpandedState,
     },
   };
 
@@ -63,7 +69,7 @@ export default function Table<T extends object = {}>(
   return (
     <>
       <div className="relative overflow-hidden">
-        <table className="w-full text-sm text-left">
+        <table id={id} className="w-full text-sm text-left">
           {
             showHeader
             && (
