@@ -46,6 +46,7 @@ describe('MonthlyTotalHistogram', () => {
         data: {
           datasets: [],
           labels: [
+            DateTime.fromISO('2022-05-01').startOf('day'),
             DateTime.fromISO('2022-06-01').startOf('day'),
             DateTime.fromISO('2022-07-01').startOf('day'),
             DateTime.fromISO('2022-08-01').startOf('day'),
@@ -128,7 +129,7 @@ describe('MonthlyTotalHistogram', () => {
   it.each([
     undefined,
     now.minus({ months: 3 }),
-  ])('selects default date now - 8 months', (date) => {
+  ])('selects default date now - 9 months', (date) => {
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
       {
         data: {
@@ -159,7 +160,8 @@ describe('MonthlyTotalHistogram', () => {
         data: {
           datasets: expect.any(Array),
           labels: [
-            now.minus({ months: 7 }).startOf('month'),
+            now.minus({ months: 8 }).startOf('month'),
+            expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
@@ -174,7 +176,7 @@ describe('MonthlyTotalHistogram', () => {
     );
   });
 
-  it('selects date range of 8 months in the past', () => {
+  it('selects date range of 9 months in the past', () => {
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
       {
         data: {
@@ -206,7 +208,8 @@ describe('MonthlyTotalHistogram', () => {
         data: {
           datasets: expect.any(Array),
           labels: [
-            selectedDate.minus({ months: 3 }).startOf('month'),
+            selectedDate.minus({ months: 4 }).startOf('month'),
+            expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
@@ -260,11 +263,11 @@ describe('MonthlyTotalHistogram', () => {
         data: {
           datasets: [
             {
-              data: [-0, -0, -0, -0, -0, 1000, 1000, -0],
+              data: [-0, -0, -0, -0, -0, -0, 1000, 1000, -0],
               label: 'Salary',
             },
             {
-              data: [-0, -0, -0, -0, -0, 150, 50, -0],
+              data: [-0, -0, -0, -0, -0, -0, 150, 50, -0],
               label: 'Dividends',
             },
           ],

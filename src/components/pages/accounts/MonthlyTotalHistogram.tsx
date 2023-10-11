@@ -28,7 +28,7 @@ export default function MonthlyTotalHistogram({
     selectedDate = now.minus({ months: 4 });
   }
   const interval = Interval.fromDateTimes(
-    selectedDate.minus({ months: 4 }),
+    selectedDate.minus({ months: 5 }),
     selectedDate.plus({ months: 4 }),
   );
 
