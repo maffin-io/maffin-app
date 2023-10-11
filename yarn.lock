@@ -8362,10 +8362,10 @@ react-is@^18.0.0:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-18.2.0.tgz#199431eeaaa2e09f86427efbb4f1473edb47609b"
   integrity sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==
 
-react-joyride@^2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/react-joyride/-/react-joyride-2.6.0.tgz#948855088ff6989ffeeff55279ddcd2909b92226"
-  integrity sha512-en+IEPEq3AGJ2lO8WQE5iTzrwPfg39tlPf+jE8M0ZkDIy6SomckoRp2EQCZTehC8FkjP8FOXqaJuSKOKjwW2Cg==
+react-joyride@^2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/react-joyride/-/react-joyride-2.6.1.tgz#e84a1cd28acc5084acb27d84e1abdc7b7cb1e270"
+  integrity sha512-JgGxWcg3fhQx3DrSTfC7nBmexH1N1UTy8hKi+U5QAObo+ZqACi3/X62RWbauZDxloshCNX2c6Zpui14+6NYeow==
   dependencies:
     "@gilbarbara/deep-equal" "^0.2.0"
     "@gilbarbara/helpers" "^0.8.6"
