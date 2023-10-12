@@ -44,18 +44,11 @@ describe('getMainCurrency', () => {
     await datasource.destroy();
   });
 
-  it('returns the currency with most expenses/income accounts', async () => {
+  it('returns currency of root ASSET account', async () => {
     await Account.create({
       name: 'TICKER',
       type: 'EXPENSE',
-      fk_commodity: eur,
-      parent: rootAccount,
-    }).save();
-
-    await Account.create({
-      name: 'TICKER',
-      type: 'INCOME',
-      fk_commodity: eur,
+      fk_commodity: usd,
       parent: rootAccount,
     }).save();
 
@@ -66,10 +59,10 @@ describe('getMainCurrency', () => {
       parent: rootAccount,
     }).save();
 
-    await Account.create({
+    const assetRoot = await Account.create({
       name: 'TICKER',
       type: 'ASSET',
-      fk_commodity: usd,
+      fk_commodity: eur,
       parent: rootAccount,
     }).save();
 
@@ -77,14 +70,7 @@ describe('getMainCurrency', () => {
       name: 'TICKER',
       type: 'ASSET',
       fk_commodity: usd,
-      parent: rootAccount,
-    }).save();
-
-    await Account.create({
-      name: 'TICKER',
-      type: 'ASSET',
-      fk_commodity: usd,
-      parent: rootAccount,
+      parent: assetRoot,
     }).save();
 
     const currency = await getMainCurrency();
@@ -92,7 +78,7 @@ describe('getMainCurrency', () => {
     expect(currency).toEqual(eur);
   });
 
-  it('throws error when no main currency', async () => {
-    await expect(getMainCurrency()).rejects.toThrow('Not enough accounts');
+  it('throws error when no asset account', async () => {
+    await expect(getMainCurrency()).rejects.toThrow('Could not find any entity');
   });
 });

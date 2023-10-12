@@ -8,6 +8,8 @@ import useDataSource from '@/hooks/useDataSource';
 import * as storageHooks from '@/hooks/useBookStorage';
 import * as gnucash from '@/lib/gnucash';
 import BookStorage from '@/apis/BookStorage';
+import { PriceDB } from '@/book/prices';
+import * as queries from '@/lib/queries';
 
 jest.mock('swr');
 
@@ -19,6 +21,19 @@ jest.mock('@/hooks/useBookStorage', () => ({
 jest.mock('@/lib/gnucash', () => ({
   __esModule: true,
   ...jest.requireActual('@/lib/gnucash'),
+}));
+
+jest.mock('@/lib/queries', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/lib/queries'),
+}));
+
+jest.mock('@/book/prices', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/book/prices'),
+  PriceDB: {
+    getTodayQuotes: jest.fn(),
+  },
 }));
 
 jest.mock('typeorm', () => ({
@@ -49,6 +64,16 @@ jest.mock('sql.js', () => ({
 describe('useDataSource', () => {
   beforeEach(() => {
     jest.spyOn(storageHooks, 'default').mockReturnValue({ storage: null });
+    jest.spyOn(queries, 'getAccounts').mockResolvedValue({
+      type_asset: {
+        type: 'ASSET',
+        commodity: {
+          mnemonic: 'EUR',
+        },
+      },
+    });
+    jest.spyOn(queries, 'getMonthlyTotals').mockImplementation();
+    jest.spyOn(PriceDB, 'getTodayQuotes').mockImplementation();
   });
 
   afterEach(() => {
@@ -103,6 +128,38 @@ describe('useDataSource', () => {
     expect(datasource.initialize).toBeCalledTimes(1);
     expect(datasource.sqljsManager.loadDatabase).toBeCalledTimes(1);
     expect(datasource.sqljsManager.loadDatabase).toHaveBeenCalledWith(rawBook);
+  });
+
+  it('preloads data', async () => {
+    const rawBook = new Uint8Array([21, 31]);
+    const mockStorageGet = jest.fn().mockResolvedValue(rawBook) as typeof BookStorage.prototype.get;
+    jest.spyOn(storageHooks, 'default').mockReturnValue({
+      storage: {
+        get: mockStorageGet,
+      } as BookStorage,
+    });
+
+    const { result } = renderHook(() => useDataSource());
+
+    await waitFor(() => expect(result.current.isLoaded).toBe(true));
+
+    expect(result.current).toMatchObject({
+      datasource: {
+        isInitialized: true,
+      },
+      isLoaded: true,
+    });
+
+    expect(swr.mutate).toHaveBeenNthCalledWith(
+      1,
+      '/api/main-currency',
+      { mnemonic: 'EUR' },
+    );
+    expect(swr.mutate).toHaveBeenNthCalledWith(
+      2,
+      '/api/monthly-totals',
+      expect.any(Function),
+    );
   });
 
   it('creates empty book when no data from storage', async () => {
@@ -198,13 +255,13 @@ describe('useDataSource', () => {
 
         await result.current.save();
         expect(swr.mutate).toHaveBeenNthCalledWith(
-          1,
+          3,
           '/state/save',
           true,
           { revalidate: false },
         );
         expect(swr.mutate).toHaveBeenNthCalledWith(
-          2,
+          4,
           '/state/save',
           false,
           { revalidate: false },
@@ -236,18 +293,41 @@ describe('useDataSource', () => {
         expect(swr.mutate).toBeCalledWith(expect.any(Function), undefined);
         const mockMutate = swr.mutate as jest.Mock;
         // verify the function we pass behaves as expected
-        expect(mockMutate.mock.calls[0][0]('/api/test')).toBe(true);
-        expect(mockMutate.mock.calls[0][0]('/api/asd/asd')).toBe(true);
-        expect(mockMutate.mock.calls[0][0]('/state')).toBe(false);
+        expect(mockMutate.mock.calls[2][0]('/api/test')).toBe(true);
+        expect(mockMutate.mock.calls[2][0]('/api/asd/asd')).toBe(true);
+        expect(mockMutate.mock.calls[2][0]('/state')).toBe(false);
 
+        // First happens when we load the hook
+        expect(swr.mutate).toHaveBeenNthCalledWith(
+          1,
+          '/api/main-currency',
+          { mnemonic: 'EUR' },
+        );
         expect(swr.mutate).toHaveBeenNthCalledWith(
           2,
+          '/api/monthly-totals',
+          expect.any(Function),
+        );
+
+        // Second happens when we run import (we have to reset with new values)
+        expect(swr.mutate).toHaveBeenNthCalledWith(
+          4,
+          '/api/main-currency',
+          { mnemonic: 'EUR' },
+        );
+        expect(swr.mutate).toHaveBeenNthCalledWith(
+          5,
+          '/api/monthly-totals',
+          expect.any(Function),
+        );
+        expect(swr.mutate).toHaveBeenNthCalledWith(
+          6,
           '/state/save',
           true,
           { revalidate: false },
         );
         expect(swr.mutate).toHaveBeenNthCalledWith(
-          3,
+          7,
           '/state/save',
           false,
           { revalidate: false },
