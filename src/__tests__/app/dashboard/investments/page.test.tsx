@@ -91,7 +91,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       1,
       {
-        className: 'ml-6',
+        className: 'mr-2',
         title: 'Value/Cost',
         stats: '€5.00',
         description: '€4.00 total invested',
@@ -101,22 +101,22 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       2,
       {
-        className: 'ml-6',
+        className: 'mr-2',
         title: 'Unrealized Profit',
         stats: '€1.00 (25%)',
         description: '€6.00 (150%) with dividends',
-        statsTextClass: 'text-green-500',
+        statsTextClass: 'amount-positive',
       },
       {},
     );
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       3,
       {
-        className: 'mx-6',
+        className: 'mr-2',
         title: 'Realized',
         stats: '€15.00',
         description: '€5.00 from dividends',
-        statsTextClass: 'text-green-500',
+        statsTextClass: 'amount-positive',
       },
       {},
     );
@@ -164,7 +164,7 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       1,
       {
-        className: 'ml-6',
+        className: 'mr-2',
         title: 'Value/Cost',
         stats: '$5.00',
         description: '$4.00 total invested',
@@ -174,22 +174,22 @@ describe('InvestmentsPage', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       2,
       {
-        className: 'ml-6',
+        className: 'mr-2',
         title: 'Unrealized Profit',
         stats: '$1.00 (25%)',
         description: '$6.00 (150%) with dividends',
-        statsTextClass: 'text-green-500',
+        statsTextClass: 'amount-positive',
       },
       {},
     );
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       3,
       {
-        className: 'mx-6',
+        className: 'mr-2',
         title: 'Realized',
         stats: '$15.00',
         description: '$5.00 from dividends',
-        statsTextClass: 'text-green-500',
+        statsTextClass: 'amount-positive',
       },
       {},
     );

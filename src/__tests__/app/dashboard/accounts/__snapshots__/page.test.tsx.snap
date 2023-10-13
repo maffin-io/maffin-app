@@ -6,12 +6,12 @@ exports[`AccountsPage shows onboarding when no data 1`] = `
     data-testid="Onboarding"
   />
   <div
-    class="flex items-center"
+    class="header"
   >
     <span
-      class="text-xl font-medium"
+      class="title"
     >
-      Your finances
+      Dashboard
     </span>
     <span
       class="ml-auto mr-3"
@@ -27,56 +27,52 @@ exports[`AccountsPage shows onboarding when no data 1`] = `
     </div>
   </div>
   <div
-    class="grid grid-cols-12 items-start items-top pb-4"
+    class="grid grid-cols-12 items-start items-top"
   >
     <div
       class="grid grid-cols-12 col-span-3"
     >
       <div
-        class="col-span-12 p-4 mr-4 rounded-sm bg-gunmetal-700"
+        class="card col-span-12 mb-0 rounded-b-none"
       >
         <div
           data-testid="NetWorthPie"
         />
-      </div>
-      <div
-        class="col-span-12 p-4 mr-4 rounded-sm bg-gunmetal-700"
-      >
         <div
-          data-testid="AccountsTable"
-        />
+          class="mt-4"
+        >
+          <div
+            data-testid="AccountsTable"
+          />
+        </div>
       </div>
     </div>
     <div
       class="grid grid-cols-12 col-span-9"
     >
       <div
-        class="col-span-9 p-4 mb-4 h-100 mr-4 rounded-sm bg-gunmetal-700"
+        class="card col-span-9"
       >
         <div
-          class="flex h-full items-center"
-        >
-          <div
-            data-testid="NetWorthHistogram"
-          />
-        </div>
+          data-testid="NetWorthHistogram"
+        />
       </div>
       <div
-        class="col-span-3 p-4 mb-4 mr-4 rounded-sm bg-gunmetal-700"
+        class="card col-span-3"
       >
         <div
           data-testid="LatestTransactions"
         />
       </div>
       <div
-        class="col-span-6 p-4 mr-4 rounded-sm bg-gunmetal-700"
+        class="card col-span-6"
       >
         <div
           data-testid="MonthlyTotalHistogram"
         />
       </div>
       <div
-        class="col-span-6 p-4 mr-4 rounded-sm bg-gunmetal-700"
+        class="card col-span-6"
       >
         <div
           data-testid="MonthlyTotalHistogram"

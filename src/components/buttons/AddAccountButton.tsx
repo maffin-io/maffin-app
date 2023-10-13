@@ -13,8 +13,8 @@ export default function AddAccountButton(): JSX.Element {
     <>
       <Modal
         isOpen={isModalOpen}
-        overlayClassName="fixed inset-0 bg-white bg-opacity-30 overflow-y-auto h-full w-full z-50"
-        className="relative top-20 mx-auto p-5 w-1/3 shadow-lg rounded-md bg-gunmetal-700"
+        overlayClassName="overlay"
+        className="modal"
       >
         <button
           type="button"
@@ -34,7 +34,7 @@ export default function AddAccountButton(): JSX.Element {
       <button
         id="add-account"
         type="button"
-        className="btn-primary"
+        className="btn btn-primary"
         onClick={() => setIsModalOpen(!isModalOpen)}
       >
         <BiPlusCircle className="mr-1" />

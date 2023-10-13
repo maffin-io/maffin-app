@@ -11,10 +11,10 @@ exports[`AccountPage displays loading while accounts is empty 1`] = `
 exports[`AccountPage renders as expected with account 1`] = `
 <div>
   <div
-    class="grid grid-cols-12 items-center pb-4"
+    class="header"
   >
     <span
-      class="col-span-10"
+      class="title"
     >
       <span
         class="text-xl font-medium badge"
@@ -24,13 +24,13 @@ exports[`AccountPage renders as expected with account 1`] = `
         account
       </span>
     </span>
-    <div
-      class="col-span-2 col-end-13 justify-self-end"
+    <span
+      class="ml-auto"
     >
       <div
         data-testid="TransactionFormButton"
       />
-    </div>
+    </span>
   </div>
   <div
     class="grid grid-cols-12"
@@ -45,7 +45,7 @@ exports[`AccountPage renders as expected with account 1`] = `
           class="col-span-6"
         >
           <div
-            class="mr-6 bg-gunmetal-700 rounded-sm p-6"
+            class="card mr-2 rounded-sm p-6"
           >
             <p>
               You have a total of
@@ -66,7 +66,7 @@ exports[`AccountPage renders as expected with account 1`] = `
           class="col-span-6"
         >
           <div
-            class="mr-6 bg-gunmetal-700 rounded-sm p-6"
+            class="card  rounded-sm p-6"
           >
             <p>
               This year you have
@@ -84,7 +84,7 @@ exports[`AccountPage renders as expected with account 1`] = `
           </div>
         </div>
         <div
-          class="col-span-12 bg-gunmetal-700 rounded-sm p-6 my-6 mr-6"
+          class="card col-span-12"
         >
           <div
             data-testid="TotalLineChart"
@@ -93,7 +93,7 @@ exports[`AccountPage renders as expected with account 1`] = `
       </div>
     </div>
     <div
-      class="col-span-6 bg-gunmetal-700 rounded-sm mb-6 p-4"
+      class="card col-span-6"
     >
       <div
         class="flex h-full items-center"
@@ -105,7 +105,11 @@ exports[`AccountPage renders as expected with account 1`] = `
     </div>
   </div>
   <div
-    data-testid="TransactionsTable"
-  />
+    class="card p-0 mt-4 bg-light-100 dark:bg-dark-800"
+  >
+    <div
+      data-testid="TransactionsTable"
+    />
+  </div>
 </div>
 `;

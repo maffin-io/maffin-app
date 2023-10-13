@@ -52,7 +52,7 @@ export default function MainSplit({
 
   return (
     <div className="flex w-1/2">
-      <div className="flex items-center rounded-md bg-gunmetal-800">
+      <div className="flex items-center rounded-md bg-light-100 dark:bg-dark-800">
         <input
           {...form.register(
             'splits.0.quantity',
@@ -61,7 +61,7 @@ export default function MainSplit({
             },
           )}
           aria-label="splits.0.quantity"
-          className="w-full text-right bg-gunmetal-800 border-none m-0"
+          className="w-full text-right m-0"
           type="number"
           step="0.001"
           disabled={disabled}
@@ -89,7 +89,7 @@ export default function MainSplit({
         </span>
         <Tooltip
           id="value-help"
-          className="bg-cyan-600 w-1/3 text-white rounded-lg p-2"
+          className="tooltip"
           disableStyleInjection
         >
           <p className="mb-2">
@@ -101,7 +101,7 @@ export default function MainSplit({
         <div
           className={
             classNames(
-              'flex items-center rounded-md bg-gunmetal-800',
+              'flex items-center rounded-md  bg-light-100 dark:bg-dark-800',
               {
                 'outline outline-red-500/50': form.formState.errors.splits?.type === 'splitsBalance',
               },
@@ -116,7 +116,7 @@ export default function MainSplit({
               },
             )}
             aria-label="splits.0.value"
-            className="w-full text-right bg-gunmetal-800 m-0"
+            className="w-full text-right m-0"
             type="number"
             step="0.001"
             disabled={disabled}

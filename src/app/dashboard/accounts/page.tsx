@@ -38,9 +38,9 @@ export default function AccountsPage(): JSX.Element {
   return (
     <>
       <Onboarding show={showOnboarding} />
-      <div className="flex items-center">
-        <span className="text-xl font-medium">
-          Your finances
+      <div className="header">
+        <span className="title">
+          Dashboard
         </span>
         <span className="ml-auto mr-3">
           <DateRangeInput
@@ -57,40 +57,38 @@ export default function AccountsPage(): JSX.Element {
           <AddAccountButton />
         </div>
       </div>
-      <div className="grid grid-cols-12 items-start items-top pb-4">
+      <div className="grid grid-cols-12 items-start items-top">
         <div className="grid grid-cols-12 col-span-3">
-          <div className="col-span-12 p-4 mr-4 rounded-sm bg-gunmetal-700">
+          <div className="card col-span-12 mb-0 rounded-b-none">
             <NetWorthPie
               selectedDate={selectedDate}
             />
-          </div>
-          <div className="col-span-12 p-4 mr-4 rounded-sm bg-gunmetal-700">
-            <AccountsTable
-              selectedDate={selectedDate}
-              isExpanded={showOnboarding}
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-12 col-span-9">
-          <div className="col-span-9 p-4 mb-4 h-100 mr-4 rounded-sm bg-gunmetal-700">
-            <div className="flex h-full items-center">
-              <NetWorthHistogram
-                startDate={earliestDate}
+            <div className="mt-4">
+              <AccountsTable
                 selectedDate={selectedDate}
+                isExpanded={showOnboarding}
               />
             </div>
           </div>
-          <div className="col-span-3 p-4 mb-4 mr-4 rounded-sm bg-gunmetal-700">
+        </div>
+        <div className="grid grid-cols-12 col-span-9">
+          <div className="card col-span-9">
+            <NetWorthHistogram
+              startDate={earliestDate}
+              selectedDate={selectedDate}
+            />
+          </div>
+          <div className="card col-span-3">
             <LatestTransactions />
           </div>
-          <div className="col-span-6 p-4 mr-4 rounded-sm bg-gunmetal-700">
+          <div className="card col-span-6">
             <MonthlyTotalHistogram
               accounts={accounts?.type_income?.childrenIds.map((guid: string) => accounts?.[guid])}
               title="Income"
               selectedDate={selectedDate}
             />
           </div>
-          <div className="col-span-6 p-4 mr-4 rounded-sm bg-gunmetal-700">
+          <div className="card col-span-6">
             <MonthlyTotalHistogram
               accounts={accounts?.type_expense?.childrenIds.map((guid: string) => accounts?.[guid])}
               title="Expenses"

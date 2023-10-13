@@ -28,7 +28,7 @@ export default function TransactionFormButton(
     account,
     defaultValues,
     children,
-    className = 'btn-primary',
+    className = 'btn btn-primary',
   }: TransactionFormButtonProps,
 ): JSX.Element {
   const { save } = React.useContext(DataSourceContext);
@@ -47,8 +47,8 @@ export default function TransactionFormButton(
     <>
       <Modal
         isOpen={isModalOpen}
-        overlayClassName="fixed inset-0 bg-white bg-opacity-30 overflow-y-auto h-full w-full z-50"
-        className="relative top-20 mx-auto p-5 w-1/3 shadow-lg rounded-md bg-gunmetal-700"
+        overlayClassName="overlay"
+        className="modal"
       >
         <button
           type="button"

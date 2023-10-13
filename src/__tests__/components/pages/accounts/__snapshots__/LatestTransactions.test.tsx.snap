@@ -16,7 +16,7 @@ exports[`LatestTransactions renders as expected with txs 1`] = `
           class="mr-2"
         >
           <svg
-            class="text-3xl text-green-300"
+            class="text-xl amount-positive"
             fill="currentColor"
             height="1em"
             stroke="currentColor"
@@ -61,12 +61,12 @@ exports[`LatestTransactions renders as expected with txs 1`] = `
             class="flex items-center"
           >
             <span
-              class="text-green-300"
+              class="amount-positive"
             >
               €100.00
             </span>
             <a
-              class="ml-auto text-xs badge hover:text-slate-300 bg-cyan-500/20 text-cyan-300"
+              class="ml-auto text-xs badge hover:text-slate-300 info"
               href="/dashboard/accounts/account1"
             >
               Account 1
@@ -85,7 +85,7 @@ exports[`LatestTransactions renders as expected with txs 1`] = `
           class="mr-2"
         >
           <svg
-            class="text-3xl text-red-300"
+            class="text-xl amount-negative"
             fill="currentColor"
             height="1em"
             stroke="currentColor"
@@ -130,12 +130,12 @@ exports[`LatestTransactions renders as expected with txs 1`] = `
             class="flex items-center"
           >
             <span
-              class="text-red-300"
+              class="amount-negative"
             >
               -€100.00
             </span>
             <a
-              class="ml-auto text-xs badge hover:text-slate-300 bg-cyan-500/20 text-cyan-300"
+              class="ml-auto text-xs badge hover:text-slate-300 info"
               href="/dashboard/accounts/account2"
             >
               Account 2

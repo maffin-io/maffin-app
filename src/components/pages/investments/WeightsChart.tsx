@@ -57,7 +57,7 @@ export default function WeightsChart({
 
   return (
     <Tree
-      height="660"
+      height="625"
       data={{
         datasets: [
           {

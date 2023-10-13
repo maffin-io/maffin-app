@@ -18,7 +18,13 @@ export default function DashboardLayout({
   const hookData = useDataSource();
 
   if (!user || !hookData.isLoaded || user.isLoggedIn === false) {
-    return <div>Loading...</div>;
+    return (
+      <div className="h-screen">
+        <div className="flex text-sm h-3/4 place-content-center place-items-center">
+          Loading...
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -30,7 +36,9 @@ export default function DashboardLayout({
           {children}
         </DataSourceContext.Provider>
       </div>
-      <Footer />
+      <div className="mt-2">
+        <Footer />
+      </div>
     </div>
   );
 }

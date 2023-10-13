@@ -196,7 +196,7 @@ export default function AccountForm({ defaultValues, onSave }: AccountFormProps)
       </fieldset>
 
       <div className="flex w-full justify-center">
-        <button className="btn-primary" type="submit" disabled={!form.formState.isValid}>
+        <button className="btn btn-primary" type="submit" disabled={!form.formState.isValid}>
           Save
         </button>
       </div>
