@@ -69,20 +69,22 @@ export default function InvestmentsPage(): JSX.Element {
 
   return (
     <>
-      <span className="text-xl font-medium">
-        Your Investments
-      </span>
+      <div className="header">
+        <span className="title">
+          Your Investments
+        </span>
+      </div>
 
       <div className="grid grid-cols-12 mt-4">
-        <div className="col-span-4">
+        <div className="col-span-4 mt-2">
           <WeightsChart totalValue={totalValue} />
         </div>
 
-        <div className="col-span-8">
+        <div className="col-span-8 ml-4">
           <div className="grid grid-cols-12">
             <div className="col-span-4">
               <StatisticsWidget
-                className="ml-6"
+                className="mr-2"
                 title="Value/Cost"
                 stats={`${totalValue.format()}`}
                 description={
@@ -93,10 +95,10 @@ export default function InvestmentsPage(): JSX.Element {
 
             <div className="col-span-4">
               <StatisticsWidget
-                className="ml-6"
+                className="mr-2"
                 statsTextClass={classNames({
-                  'text-green-500': profitPct >= 0,
-                  'text-red-400': profitPct < 0,
+                  'amount-positive': profitPct >= 0,
+                  'amount-negative': profitPct < 0,
                 })}
                 title="Unrealized Profit"
                 stats={`${profitAbs.format()} (${toFixed(profitPct)}%)`}
@@ -108,10 +110,10 @@ export default function InvestmentsPage(): JSX.Element {
 
             <div className="col-span-4">
               <StatisticsWidget
-                className="mx-6"
+                className="mr-2"
                 statsTextClass={classNames({
-                  'text-green-500': totalRealized.add(totalDividends).toNumber() >= 0,
-                  'text-red-400': totalRealized.add(totalDividends).toNumber() < 0,
+                  'amount-positive': totalRealized.add(totalDividends).toNumber() >= 0,
+                  'amount-negative': totalRealized.add(totalDividends).toNumber() < 0,
                 })}
                 title="Realized"
                 stats={totalRealized.add(totalDividends).format()}
@@ -121,7 +123,9 @@ export default function InvestmentsPage(): JSX.Element {
               />
             </div>
           </div>
-          <DividendChart />
+          <div className="card">
+            <DividendChart />
+          </div>
         </div>
       </div>
 

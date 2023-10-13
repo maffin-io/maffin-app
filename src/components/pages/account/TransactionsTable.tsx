@@ -57,7 +57,7 @@ const columns: ColumnDef<Split>[] = [
         >
           {row.original.transaction.date.toISODate()}
         </span>
-        <Tooltip clickable id={row.original.transaction.guid} />
+        <Tooltip clickable className="tooltip" id={row.original.transaction.guid} />
       </>
     ),
   },
@@ -134,11 +134,11 @@ function FromToAccountPartial(
               <Link
                 href={`/dashboard/accounts/${account.guid}`}
                 className={classNames('badge hover:text-slate-300', {
-                  'bg-green-500/20 text-green-300': account.type === 'INCOME',
-                  'bg-red-500/20 text-red-300': account.type === 'EXPENSE',
-                  'bg-cyan-500/20 text-cyan-300': ['ASSET', 'BANK'].includes(account.type),
-                  'bg-orange-500/20 text-orange-300': account.type === 'LIABILITY',
-                  'bg-violet-500/20 text-violet-300': ['STOCK', 'MUTUAL'].includes(account.type),
+                  success: account.type === 'INCOME',
+                  danger: account.type === 'EXPENSE',
+                  info: ['ASSET', 'BANK'].includes(account.type),
+                  warning: account.type === 'LIABILITY',
+                  misc: ['STOCK', 'MUTUAL'].includes(account.type),
                 })}
               >
                 { account?.path }
@@ -164,8 +164,8 @@ function AmountPartial(
       <span
         className={
           classNames({
-            'text-green-300': value.toNumber() > 0,
-            'text-red-300': value.toNumber() < 0,
+            'amount-positive': value.toNumber() > 0,
+            'amount-negative': value.toNumber() < 0,
           }, 'flex items-center')
         }
       >

@@ -68,12 +68,12 @@ export default function Table<T extends object = {}>(
 
   return (
     <>
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden rounded-md">
         <table id={id} className="w-full text-sm text-left">
           {
             showHeader
             && (
-              <thead className="bg-gunmetal-700 text-slate-300">
+              <thead className="bg-white dark:bg-dark-700">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <tr key={headerGroup.id}>
                     {headerGroup.headers.map(header => (
@@ -126,7 +126,7 @@ export default function Table<T extends object = {}>(
 
           <tbody>
             {table.getRowModel().rows.map(row => (
-              <tr key={row.id} className="border-b border-gunmetal-700">
+              <tr key={row.id} className="border-b border-white/70 dark:border-gunmetal-700">
                 {row.getVisibleCells().map(cell => (
                   <td key={cell.id} className={tdClassName}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

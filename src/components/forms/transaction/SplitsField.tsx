@@ -64,7 +64,7 @@ export default function SplitsField({
                   <div className="col-span-1">
                     <button
                       type="button"
-                      className="btn-primary rounded-sm"
+                      className="btn btn-primary rounded-sm"
                       onClick={() => remove(index)}
                     >
                       X

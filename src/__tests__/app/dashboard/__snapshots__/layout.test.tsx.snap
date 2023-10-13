@@ -21,24 +21,40 @@ exports[`DashboardLayout renders as expected when user and datasource available 
       </span>
     </div>
     <div
-      data-testid="Footer"
-    />
+      class="mt-2"
+    >
+      <div
+        data-testid="Footer"
+      />
+    </div>
   </div>
 </div>
 `;
 
 exports[`DashboardLayout returns loading when datasource not available 1`] = `
 <div>
-  <div>
-    Loading...
+  <div
+    class="h-screen"
+  >
+    <div
+      class="flex text-sm h-3/4 place-content-center place-items-center"
+    >
+      Loading...
+    </div>
   </div>
 </div>
 `;
 
 exports[`DashboardLayout returns loading when no user available 1`] = `
 <div>
-  <div>
-    Loading...
+  <div
+    class="h-screen"
+  >
+    <div
+      class="flex text-sm h-3/4 place-content-center place-items-center"
+    >
+      Loading...
+    </div>
   </div>
 </div>
 `;

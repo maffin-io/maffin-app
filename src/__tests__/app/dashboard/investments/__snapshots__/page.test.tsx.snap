@@ -2,23 +2,27 @@
 
 exports[`InvestmentsPage renders with data 1`] = `
 <div>
-  <span
-    class="text-xl font-medium"
+  <div
+    class="header"
   >
-    Your Investments
-  </span>
+    <span
+      class="title"
+    >
+      Your Investments
+    </span>
+  </div>
   <div
     class="grid grid-cols-12 mt-4"
   >
     <div
-      class="col-span-4"
+      class="col-span-4 mt-2"
     >
       <div
         data-testid="WeightsChart"
       />
     </div>
     <div
-      class="col-span-8"
+      class="col-span-8 ml-4"
     >
       <div
         class="grid grid-cols-12"
@@ -46,8 +50,12 @@ exports[`InvestmentsPage renders with data 1`] = `
         </div>
       </div>
       <div
-        data-testid="DividendChart"
-      />
+        class="card"
+      >
+        <div
+          data-testid="DividendChart"
+        />
+      </div>
     </div>
   </div>
   <div
@@ -62,23 +70,27 @@ exports[`InvestmentsPage renders with data 1`] = `
 
 exports[`InvestmentsPage renders with different mainCurrency 1`] = `
 <div>
-  <span
-    class="text-xl font-medium"
+  <div
+    class="header"
   >
-    Your Investments
-  </span>
+    <span
+      class="title"
+    >
+      Your Investments
+    </span>
+  </div>
   <div
     class="grid grid-cols-12 mt-4"
   >
     <div
-      class="col-span-4"
+      class="col-span-4 mt-2"
     >
       <div
         data-testid="WeightsChart"
       />
     </div>
     <div
-      class="col-span-8"
+      class="col-span-8 ml-4"
     >
       <div
         class="grid grid-cols-12"
@@ -106,8 +118,12 @@ exports[`InvestmentsPage renders with different mainCurrency 1`] = `
         </div>
       </div>
       <div
-        data-testid="DividendChart"
-      />
+        class="card"
+      >
+        <div
+          data-testid="DividendChart"
+        />
+      </div>
     </div>
   </div>
   <div

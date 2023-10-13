@@ -32,8 +32,8 @@ export default function LatestTransactions(): JSX.Element {
                   <div className="mr-2">
                     {
                       (selectedSplit?.quantity || 0) > 0
-                        ? <BiUpArrowAlt className="text-3xl text-green-300" />
-                        : <BiDownArrowAlt className="text-3xl text-red-300" />
+                        ? <BiUpArrowAlt className="text-xl amount-positive" />
+                        : <BiDownArrowAlt className="text-xl amount-negative" />
                     }
                   </div>
                   <div className="w-full">
@@ -46,16 +46,16 @@ export default function LatestTransactions(): JSX.Element {
                     <div className="flex items-center">
                       <span
                         className={classNames('', {
-                          'text-green-300': (selectedSplit?.quantity || 0) > 0,
-                          'text-red-300': (selectedSplit?.quantity || 0) < 0,
+                          'amount-positive': (selectedSplit?.quantity || 0) > 0,
+                          'amount-negative': (selectedSplit?.quantity || 0) < 0,
                         })}
                       >
                         {moneyToString(selectedSplit?.quantity || 0, tx.currency.mnemonic)}
                       </span>
                       <Link
                         className={classNames('ml-auto text-xs badge hover:text-slate-300', {
-                          'bg-cyan-500/20 text-cyan-300': selectedSplit?.account && isAsset(selectedSplit.account),
-                          'bg-orange-500/20 text-orange-300': selectedSplit?.account && isLiability(selectedSplit?.account),
+                          info: selectedSplit?.account && isAsset(selectedSplit.account),
+                          warning: selectedSplit?.account && isLiability(selectedSplit?.account),
                         })}
                         href={`/dashboard/accounts/${selectedSplit?.account?.guid}`}
                       >

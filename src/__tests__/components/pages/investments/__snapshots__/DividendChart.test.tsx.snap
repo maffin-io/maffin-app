@@ -2,9 +2,7 @@
 
 exports[`DividendChart renders as expected with data 1`] = `
 <div>
-  <div
-    class="bg-gunmetal-700 rounded-sm m-6 p-4"
-  >
+  <div>
     <span
       class="text-lg"
     >
@@ -17,7 +15,6 @@ exports[`DividendChart renders as expected with data 1`] = `
         class="col-span-4"
       >
         <div
-          class="text-slate-300"
           id="chart-year"
         >
           <div
@@ -29,7 +26,6 @@ exports[`DividendChart renders as expected with data 1`] = `
         class="col-span-8"
       >
         <div
-          class="text-slate-300"
           id="chart-year"
         >
           <div

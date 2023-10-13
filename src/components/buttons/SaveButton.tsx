@@ -15,7 +15,7 @@ export default function SaveButton(): JSX.Element {
     return (
       <button
         type="button"
-        className="btn-primary"
+        className="btn btn-primary"
       >
         ...
       </button>
@@ -25,7 +25,7 @@ export default function SaveButton(): JSX.Element {
   return (
     <button
       type="button"
-      className="btn-primary"
+      className="btn btn-primary"
       disabled={isSaving}
       onClick={async () => {
         await save();

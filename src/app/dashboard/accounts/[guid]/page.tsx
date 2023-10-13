@@ -95,15 +95,15 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
 
   return (
     <>
-      <div className="grid grid-cols-12 items-center pb-4">
-        <span className="col-span-10">
+      <div className="header">
+        <span className="title">
           <span
             className={classNames('text-xl font-medium badge', {
-              'bg-green-500/20 text-green-300': account.type === 'INCOME',
-              'bg-red-500/20 text-red-300': account.type === 'EXPENSE',
-              'bg-cyan-500/20 text-cyan-300': isAsset(account),
-              'bg-orange-500/20 text-orange-300': isLiability(account),
-              'bg-violet-500/20 text-violet-300': isInvestment(account),
+              success: account.type === 'INCOME',
+              danger: account.type === 'EXPENSE',
+              info: isAsset(account),
+              warning: isLiability(account),
+              misc: isInvestment(account),
             })}
           >
             {account.path}
@@ -111,7 +111,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
             account
           </span>
         </span>
-        <div className="col-span-2 col-end-13 justify-self-end">
+        <span className="ml-auto">
           <TransactionFormButton
             account={account}
             defaultValues={
@@ -123,7 +123,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
               }
             }
           />
-        </div>
+        </span>
       </div>
       <div className="grid grid-cols-12">
         <div className="col-span-6">
@@ -131,7 +131,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
           <div className="grid grid-cols-12">
             <div className="col-span-6">
               <StatisticsWidget
-                className="mr-6"
+                className="mr-2"
                 title={`You ${totalKeyword} a total of`}
                 stats={total.format()}
                 description={`with an average of ${average.format()} per month`}
@@ -139,24 +139,25 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
             </div>
             <div className="col-span-6">
               <StatisticsWidget
-                className="mr-6"
                 title={`This year you ${totalKeyword}`}
                 stats={new Money(totalThisYear, account.commodity.mnemonic).format()}
                 description="in this account"
               />
             </div>
-            <div className="col-span-12 bg-gunmetal-700 rounded-sm p-6 my-6 mr-6">
+            <div className="card col-span-12">
               <TotalLineChart account={account} />
             </div>
           </div>
         </div>
-        <div className="col-span-6 bg-gunmetal-700 rounded-sm mb-6 p-4">
+        <div className="card col-span-6">
           <div className="flex h-full items-center">
             <SplitsHistogram account={account} />
           </div>
         </div>
       </div>
-      <TransactionsTable account={account} />
+      <div className="card p-0 mt-4 bg-light-100 dark:bg-dark-800">
+        <TransactionsTable account={account} />
+      </div>
     </>
   );
 }

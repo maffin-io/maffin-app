@@ -63,30 +63,13 @@ export default function Selector<T extends object = {}>(
       getOptionValue={(option: T) => option[labelAttribute]}
       openMenuOnFocus
       components={{ Control }}
-      className={className}
+      className={`selector ${className}`}
+      classNamePrefix="selector"
       styles={{
         option: () => ({}),
       }}
       classNames={{
-        // We set h-9 so it's the same as other inputs
-        control: (state) => {
-          const styles = '!h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none';
-          if (state.isDisabled) {
-            // For some reason putting focus:bg-gunmetal-700 doesnt work
-            return `opacity-50 ${styles}`;
-          }
-          return styles;
-        },
         indicatorSeparator: () => 'hidden',
-        menu: () => 'text-sm !bg-gunmetal-800',
-        option: (state) => {
-          const styles = 'w-full cursor-default hover:bg-gunmetal-700 px-4 py-2';
-          if (state.isFocused) {
-            // For some reason putting focus:bg-gunmetal-700 doesnt work
-            return `bg-gunmetal-700 ${styles}`;
-          }
-          return styles;
-        },
         singleValue: () => '!text-inherit',
         input: () => '!text-inherit',
       }}

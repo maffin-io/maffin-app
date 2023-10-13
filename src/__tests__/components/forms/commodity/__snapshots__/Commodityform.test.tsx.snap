@@ -7,7 +7,7 @@ exports[`CommodityForm renders as expected 1`] = `
       class="text-sm my-5"
     >
       <div
-        class=" css-b62m3t-container"
+        class="selector css-b62m3t-container"
         id="mnemonicInput"
       >
         <span
@@ -21,7 +21,7 @@ exports[`CommodityForm renders as expected 1`] = `
           class="css-1f43avz-a11yText-A11yText"
         />
         <div
-          class="!h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none css-13cymwt-control"
+          class="selector__control css-13cymwt-control"
         >
           <svg
             class="absolute text-md left-[10px]"
@@ -38,16 +38,16 @@ exports[`CommodityForm renders as expected 1`] = `
             />
           </svg>
           <div
-            class=" css-1fdsijx-ValueContainer"
+            class="selector__value-container css-1fdsijx-ValueContainer"
           >
             <div
-              class=" css-1jqq78o-placeholder"
+              class="selector__placeholder css-1jqq78o-placeholder"
               id="react-select-2-placeholder"
             >
               Choose your currency
             </div>
             <div
-              class="!text-inherit css-qbdosj-Input"
+              class="!text-inherit selector__input-container css-qbdosj-Input"
               data-value=""
             >
               <input
@@ -59,7 +59,7 @@ exports[`CommodityForm renders as expected 1`] = `
                 autocapitalize="none"
                 autocomplete="off"
                 autocorrect="off"
-                class=""
+                class="selector__input"
                 id="react-select-2-input"
                 role="combobox"
                 spellcheck="false"
@@ -71,14 +71,14 @@ exports[`CommodityForm renders as expected 1`] = `
             </div>
           </div>
           <div
-            class=" css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
           >
             <span
-              class="hidden css-1u9des2-indicatorSeparator"
+              class="hidden selector__indicator-separator css-1u9des2-indicatorSeparator"
             />
             <div
               aria-hidden="true"
-              class=" css-1xc3v61-indicatorContainer"
+              class="selector__indicator selector__dropdown-indicator css-1xc3v61-indicatorContainer"
             >
               <svg
                 aria-hidden="true"
@@ -115,7 +115,7 @@ exports[`CommodityForm renders as expected 1`] = `
       class="flex w-full justify-center"
     >
       <button
-        class="btn-primary"
+        class="btn btn-primary"
         disabled=""
         type="submit"
       >

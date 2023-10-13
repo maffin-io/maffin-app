@@ -33,8 +33,8 @@ export default function RootLayout({
   children,
 }: React.PropsWithChildren): JSX.Element {
   return (
-    <html lang="en">
-      <body className="bg-gunmetal-800" data-leftbar-compact-mode="condensed">
+    <html lang="en" className="dark">
+      <body data-leftbar-compact-mode="condensed">
         <noscript>You need to enable JavaScript to run this app.</noscript>
         {children}
         <div id="modals" />

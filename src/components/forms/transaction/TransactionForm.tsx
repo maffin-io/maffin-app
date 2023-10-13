@@ -72,7 +72,7 @@ export default function TransactionForm({
         </span>
         <Tooltip
           id="description-help"
-          className="bg-cyan-600 w-1/3 text-white rounded-lg p-2"
+          className="tooltip"
           disableStyleInjection
         >
           <p className="mb-2">
@@ -120,7 +120,11 @@ export default function TransactionForm({
       />
 
       <div className="flex w-full gap-2 items-center justify-center">
-        <button className={submitButtonClass} type="submit" disabled={Object.keys(errors).length > 0}>
+        <button
+          className={`btn ${submitButtonClass}`}
+          type="submit"
+          disabled={Object.keys(errors).length > 0}
+        >
           {submitButtonText}
         </button>
       </div>

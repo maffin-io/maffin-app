@@ -12,6 +12,7 @@ export default function Pagination<T>({ table }: PaginationProps<T>): JSX.Elemen
       <label className="mr-1">Display:</label>
       <select
         value={pagination.pageSize}
+        className="input"
         onChange={(e) => {
           table.setPageSize(Number(e.target.value));
         }}
@@ -45,7 +46,7 @@ export default function Pagination<T>({ table }: PaginationProps<T>): JSX.Elemen
             const page = e.target.value ? Number(e.target.value) - 1 : 0;
             table.setPageIndex(page);
           }}
-          className="w-1/4"
+          className="input w-1/4"
         />
       </span>
 
@@ -53,7 +54,7 @@ export default function Pagination<T>({ table }: PaginationProps<T>): JSX.Elemen
         <button
           type="button"
           onClick={() => table.setPageIndex(0)}
-          className="bg-gunmetal-700 rounded-full disabled:opacity-50 px-3 py-1"
+          className="bg-white dark:bg-dark-700 rounded-full disabled:opacity-50 px-3 py-1"
           disabled={!table.getCanPreviousPage()}
         >
           {'<<'}
@@ -62,7 +63,7 @@ export default function Pagination<T>({ table }: PaginationProps<T>): JSX.Elemen
         <button
           type="button"
           onClick={() => table.previousPage()}
-          className="bg-gunmetal-700 rounded-full disabled:opacity-50 px-3 py-1"
+          className="bg-white dark:bg-dark-700 rounded-full disabled:opacity-50 px-3 py-1"
           disabled={!table.getCanPreviousPage()}
         >
           {'<'}
@@ -71,7 +72,7 @@ export default function Pagination<T>({ table }: PaginationProps<T>): JSX.Elemen
         <button
           type="button"
           onClick={() => table.nextPage()}
-          className="bg-gunmetal-700 rounded-full disabled:opacity-50 px-3 py-1"
+          className="bg-white dark:bg-dark-700 rounded-full disabled:opacity-50 px-3 py-1"
           disabled={!table.getCanNextPage()}
         >
           {'>'}
@@ -80,7 +81,7 @@ export default function Pagination<T>({ table }: PaginationProps<T>): JSX.Elemen
         <button
           type="button"
           onClick={() => table.setPageIndex(table.getPageOptions().length - 1)}
-          className="bg-gunmetal-700 rounded-full disabled:opacity-50 px-3 py-1"
+          className="bg-white dark:bg-dark-700 rounded-full disabled:opacity-50 px-3 py-1"
           disabled={!table.getCanNextPage()}
         >
           {'>>'}

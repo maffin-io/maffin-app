@@ -101,8 +101,8 @@ const columns: ColumnDef<AccountsTableRow>[] = [
           >
             {(
               row.getIsExpanded()
-                ? <BiSolidDownArrow className="mr-1 text-xs opacity-20" />
-                : <BiSolidRightArrow className="mr-1 text-xs opacity-20" />
+                ? <BiSolidDownArrow className="mr-1 text-xs opacity-50" />
+                : <BiSolidRightArrow className="mr-1 text-xs opacity-50" />
             )}
           </button>
         ) : (
@@ -110,7 +110,7 @@ const columns: ColumnDef<AccountsTableRow>[] = [
             type="button"
             className="cursor-default"
           >
-            <BiCircle className="mr-1 text-xs opacity-20" />
+            <BiCircle className="mr-1 text-xs opacity-50" />
           </button>
         )}
         {
@@ -152,7 +152,7 @@ const columns: ColumnDef<AccountsTableRow>[] = [
           && (
             <Tooltip
               id={row.original.account.guid}
-              className="bg-cyan-600 text-white rounded-lg p-2"
+              className="tooltip"
               disableStyleInjection
             >
               {row.original.account.description}

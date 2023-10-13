@@ -38,7 +38,7 @@ export default function LoginPage(): JSX.Element {
 
   return (
     <button
-      className="btn-primary"
+      className="btn btn-primary"
       type="button"
       onClick={() => { tokenClient.requestAccessToken(); }}
     >

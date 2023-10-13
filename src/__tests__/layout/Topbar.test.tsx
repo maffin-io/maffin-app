@@ -5,6 +5,7 @@ import Topbar from '@/layout/Topbar';
 import { AccountSelector } from '@/components/selectors';
 import SaveButton from '@/components/buttons/SaveButton';
 import ProfileDropdown from '@/components/ProfileDropdown';
+import ThemeButton from '@/components/ThemeButton';
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
@@ -27,6 +28,10 @@ jest.mock('@/components/selectors/AccountSelector', () => jest.fn(
 ));
 const AccountSelectorMock = AccountSelector as jest.MockedFunction<typeof AccountSelector>;
 
+jest.mock('@/components/ThemeButton', () => jest.fn(
+  () => <div data-testid="ThemeButton" />,
+));
+
 describe('Topbar', () => {
   let mockRouterPush: jest.Mock;
 
@@ -42,6 +47,7 @@ describe('Topbar', () => {
 
     expect(ProfileDropdownMock).toHaveBeenLastCalledWith({}, {});
     expect(SaveButtonMock).toHaveBeenLastCalledWith({}, {});
+    expect(ThemeButton).toHaveBeenLastCalledWith({}, {});
     expect(AccountSelectorMock).toHaveBeenLastCalledWith(
       {
         id: 'globalSearch',

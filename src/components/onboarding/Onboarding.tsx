@@ -128,7 +128,7 @@ export default function Onboarding({
               <div className="flex justify-end">
                 <button
                   type="button"
-                  className="btn-primary"
+                  className="btn btn-primary"
                   onClick={() => setStepIndex(3)}
                 >
                   Next
@@ -248,7 +248,7 @@ export default function Onboarding({
               <div className="flex justify-center mt-5">
                 <button
                   type="button"
-                  className="btn-primary"
+                  className="btn btn-primary"
                   onClick={() => setStepIndex(6)}
                 >
                   Agreed!

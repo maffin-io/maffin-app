@@ -33,7 +33,7 @@ describe('WeightsChart', () => {
 
     expect(Tree).toHaveBeenCalledWith(
       {
-        height: '660',
+        height: '625',
         data: {
           datasets: [
             {

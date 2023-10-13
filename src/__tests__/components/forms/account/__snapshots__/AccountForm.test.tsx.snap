@@ -32,7 +32,7 @@ exports[`AccountForm renders as expected 1`] = `
         Parent
       </label>
       <div
-        class=" css-b62m3t-container"
+        class="selector css-b62m3t-container"
         id="parentInput"
       >
         <span
@@ -46,7 +46,7 @@ exports[`AccountForm renders as expected 1`] = `
           class="css-1f43avz-a11yText-A11yText"
         />
         <div
-          class="!h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none css-13cymwt-control"
+          class="selector__control css-13cymwt-control"
         >
           <svg
             class="absolute text-md left-[10px]"
@@ -63,16 +63,16 @@ exports[`AccountForm renders as expected 1`] = `
             />
           </svg>
           <div
-            class=" css-1fdsijx-ValueContainer"
+            class="selector__value-container css-1fdsijx-ValueContainer"
           >
             <div
-              class=" css-1jqq78o-placeholder"
+              class="selector__placeholder css-1jqq78o-placeholder"
               id="react-select-2-placeholder"
             >
               &lt;parent account&gt;
             </div>
             <div
-              class="!text-inherit css-qbdosj-Input"
+              class="!text-inherit selector__input-container css-qbdosj-Input"
               data-value=""
             >
               <input
@@ -84,7 +84,7 @@ exports[`AccountForm renders as expected 1`] = `
                 autocapitalize="none"
                 autocomplete="off"
                 autocorrect="off"
-                class=""
+                class="selector__input"
                 id="react-select-2-input"
                 role="combobox"
                 spellcheck="false"
@@ -96,14 +96,14 @@ exports[`AccountForm renders as expected 1`] = `
             </div>
           </div>
           <div
-            class=" css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
           >
             <span
-              class="hidden css-1u9des2-indicatorSeparator"
+              class="hidden selector__indicator-separator css-1u9des2-indicatorSeparator"
             />
             <div
               aria-hidden="true"
-              class=" css-1xc3v61-indicatorContainer"
+              class="selector__indicator selector__dropdown-indicator css-1xc3v61-indicatorContainer"
             >
               <svg
                 aria-hidden="true"
@@ -140,7 +140,7 @@ exports[`AccountForm renders as expected 1`] = `
         Account type
       </label>
       <div
-        class=" css-3iigni-container"
+        class="selector selector--is-disabled css-3iigni-container"
         id="typeInput"
       >
         <span
@@ -155,7 +155,7 @@ exports[`AccountForm renders as expected 1`] = `
         />
         <div
           aria-disabled="true"
-          class="opacity-50 !h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none css-16xfy0z-control"
+          class="selector__control selector__control--is-disabled css-16xfy0z-control"
         >
           <svg
             class="absolute text-md left-[10px]"
@@ -172,16 +172,16 @@ exports[`AccountForm renders as expected 1`] = `
             />
           </svg>
           <div
-            class=" css-1fdsijx-ValueContainer"
+            class="selector__value-container css-1fdsijx-ValueContainer"
           >
             <div
-              class=" css-1jqq78o-placeholder"
+              class="selector__placeholder css-1jqq78o-placeholder"
               id="react-select-3-placeholder"
             >
               &lt;select parent first&gt;
             </div>
             <div
-              class="!text-inherit css-1h01tm3-Input"
+              class="!text-inherit selector__input-container css-1h01tm3-Input"
               data-value=""
             >
               <input
@@ -193,7 +193,7 @@ exports[`AccountForm renders as expected 1`] = `
                 autocapitalize="none"
                 autocomplete="off"
                 autocorrect="off"
-                class=""
+                class="selector__input"
                 disabled=""
                 id="react-select-3-input"
                 role="combobox"
@@ -206,14 +206,14 @@ exports[`AccountForm renders as expected 1`] = `
             </div>
           </div>
           <div
-            class=" css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
           >
             <span
-              class="hidden css-894a34-indicatorSeparator"
+              class="hidden selector__indicator-separator css-894a34-indicatorSeparator"
             />
             <div
               aria-hidden="true"
-              class=" css-1xc3v61-indicatorContainer"
+              class="selector__indicator selector__dropdown-indicator css-1xc3v61-indicatorContainer"
             >
               <svg
                 aria-hidden="true"
@@ -300,7 +300,7 @@ exports[`AccountForm renders as expected 1`] = `
         Commodity
       </label>
       <div
-        class=" css-b62m3t-container"
+        class="selector css-b62m3t-container"
         id="commodityInput"
       >
         <span
@@ -314,7 +314,7 @@ exports[`AccountForm renders as expected 1`] = `
           class="css-1f43avz-a11yText-A11yText"
         />
         <div
-          class="!h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none css-13cymwt-control"
+          class="selector__control css-13cymwt-control"
         >
           <svg
             class="absolute text-md left-[10px]"
@@ -331,16 +331,16 @@ exports[`AccountForm renders as expected 1`] = `
             />
           </svg>
           <div
-            class=" css-1fdsijx-ValueContainer"
+            class="selector__value-container css-1fdsijx-ValueContainer"
           >
             <div
-              class=" css-1jqq78o-placeholder"
+              class="selector__placeholder css-1jqq78o-placeholder"
               id="react-select-4-placeholder"
             >
               &lt;commodity&gt;
             </div>
             <div
-              class="!text-inherit css-qbdosj-Input"
+              class="!text-inherit selector__input-container css-qbdosj-Input"
               data-value=""
             >
               <input
@@ -352,7 +352,7 @@ exports[`AccountForm renders as expected 1`] = `
                 autocapitalize="none"
                 autocomplete="off"
                 autocorrect="off"
-                class=""
+                class="selector__input"
                 id="react-select-4-input"
                 role="combobox"
                 spellcheck="false"
@@ -364,14 +364,14 @@ exports[`AccountForm renders as expected 1`] = `
             </div>
           </div>
           <div
-            class=" css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
           >
             <span
-              class="hidden css-1u9des2-indicatorSeparator"
+              class="hidden selector__indicator-separator css-1u9des2-indicatorSeparator"
             />
             <div
               aria-hidden="true"
-              class=" css-1xc3v61-indicatorContainer"
+              class="selector__indicator selector__dropdown-indicator css-1xc3v61-indicatorContainer"
             >
               <svg
                 aria-hidden="true"
@@ -402,7 +402,7 @@ exports[`AccountForm renders as expected 1`] = `
       class="flex w-full justify-center"
     >
       <button
-        class="btn-primary"
+        class="btn btn-primary"
         disabled=""
         type="submit"
       >

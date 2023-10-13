@@ -3,7 +3,7 @@
 exports[`SaveButton loads while unavailable datasource 1`] = `
 <div>
   <button
-    class="btn-primary"
+    class="btn btn-primary"
     type="button"
   >
     ...
@@ -14,7 +14,7 @@ exports[`SaveButton loads while unavailable datasource 1`] = `
 exports[`SaveButton renders as expected when datasource ready and not saving 1`] = `
 <div>
   <button
-    class="btn-primary"
+    class="btn btn-primary"
     type="button"
   >
     <svg
@@ -44,7 +44,7 @@ exports[`SaveButton renders as expected when datasource ready and not saving 1`]
 exports[`SaveButton renders as expected when datasource ready and saving 1`] = `
 <div>
   <button
-    class="btn-primary"
+    class="btn btn-primary"
     disabled=""
     type="button"
   >
