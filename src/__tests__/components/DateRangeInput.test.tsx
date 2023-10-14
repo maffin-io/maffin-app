@@ -28,7 +28,7 @@ describe('DateRangeInput', () => {
         useRange: true,
         containerClassName: 'relative w-full text-sm',
         displayFormat: 'DD MMMM YYYY',
-        inputClassName: 'relative transition-all duration-300 text-right py-2.5 px-4 rounded-lg tracking-wide bg-white dark:bg-gunmetal-700',
+        inputClassName: 'relative transition-all duration-300 text-right py-2.5 px-4 rounded-lg tracking-wide bg-white dark:bg-dark-700',
         toggleClassName: 'hidden',
         maxDate: DateTime.now().toJSDate(),
         minDate: undefined,

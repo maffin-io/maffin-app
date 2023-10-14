@@ -11,6 +11,7 @@ import CustomTooltip from '@/components/onboarding/CustomTooltip';
 import maffinLogo from '@/assets/images/maffin_logo_sm.png';
 import { DataSourceContext } from '@/hooks';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
+import { useTheme } from '@/hooks/state';
 
 type OnboardingProps = {
   show?: boolean;
@@ -23,6 +24,7 @@ export default function Onboarding({
   const [run] = React.useState(show);
   const [stepIndex, setStepIndex] = React.useState(0);
   const [accounts, setAccounts] = React.useState<{ [key: string]: Account }>({});
+  const { data: theme } = useTheme();
 
   return (
     <Joyride
@@ -263,8 +265,12 @@ export default function Onboarding({
       tooltipComponent={CustomTooltip}
       styles={{
         options: {
-          arrowColor: '#3a444e',
-          overlayColor: 'rgba(255, 255, 255, .3)',
+          arrowColor: theme === 'dark'
+            ? '#3a444e'
+            : '#FFF',
+          overlayColor: theme === 'dark'
+            ? '#9ca3af90'
+            : '#4b5563',
         },
       }}
     />

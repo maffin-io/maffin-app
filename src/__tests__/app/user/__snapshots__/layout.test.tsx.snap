@@ -6,7 +6,7 @@ exports[`AccountLayout renders as expected 1`] = `
     class="flex h-screen place-content-center place-items-center"
   >
     <div
-      class="flex p-6 bg-gunmetal-700 items-center rounded-md"
+      class="card flex items-center"
     >
       <img
         alt=""

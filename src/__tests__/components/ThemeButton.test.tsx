@@ -1,17 +1,23 @@
 import React from 'react';
-
+import * as swr from 'swr';
 import {
   fireEvent,
   render,
   screen,
   waitFor,
 } from '@testing-library/react';
+
 import ThemeButton from '@/components/ThemeButton';
+
+jest.mock('swr', () => ({
+  __esModule: true,
+  ...jest.requireActual('swr'),
+}));
 
 describe('ThemeButton', () => {
   beforeEach(() => {
-    // Making it match dark theme by default
-    window.matchMedia = jest.fn().mockReturnValue({ matches: true });
+    swr.mutate('/state/theme', undefined);
+    jest.spyOn(swr, 'mutate');
   });
 
   it('sets system theme', async () => {
@@ -39,6 +45,7 @@ describe('ThemeButton', () => {
     const button = screen.getByLabelText('Toggle theme');
     fireEvent.click(button);
 
+    expect(swr.mutate).toBeCalledWith('/state/theme', 'dark', { revalidate: false });
     await waitFor(() => expect(html).toHaveClass('dark'));
   });
 });
