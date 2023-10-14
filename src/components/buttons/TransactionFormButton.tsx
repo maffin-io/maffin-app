@@ -95,6 +95,15 @@ export default function TransactionFormButton(
               ...tx,
               date: tx.date.toISODate() as string,
               fk_currency: tx.currency as Commodity,
+              // This is hacky but if we pass the Split
+              // class to the form, then we have reference errors as when
+              // we update the form, it also updates the defaultValues
+              // which means formState.isDirty is not triggered properly
+              splits: tx.splits.map(split => ({
+                ...split,
+                value: split.value,
+                quantity: split.quantity,
+              } as Split)),
             });
           }
           setIsModalOpen(!isModalOpen);
