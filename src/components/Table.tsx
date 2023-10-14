@@ -126,7 +126,7 @@ export default function Table<T extends object = {}>(
 
           <tbody>
             {table.getRowModel().rows.map(row => (
-              <tr key={row.id} className="border-b border-white/70 dark:border-gunmetal-700">
+              <tr key={row.id} className="border-b border-white/70 dark:border-dark-700">
                 {row.getVisibleCells().map(cell => (
                   <td key={cell.id} className={tdClassName}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

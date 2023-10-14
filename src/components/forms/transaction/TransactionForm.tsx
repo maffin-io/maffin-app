@@ -65,7 +65,7 @@ export default function TransactionForm({
       <fieldset className="text-sm my-5">
         <label htmlFor="descriptionInput" className="inline-block mb-2">Description</label>
         <span
-          className="badge"
+          className="badge ml-0.5"
           data-tooltip-id="description-help"
         >
           ?

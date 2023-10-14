@@ -72,7 +72,7 @@ export default function DateRangeInput({
         shortcuts,
       }}
       containerClassName="relative w-full text-sm"
-      inputClassName="relative transition-all duration-300 text-right py-2.5 px-4 rounded-lg tracking-wide bg-white dark:bg-gunmetal-700"
+      inputClassName="relative transition-all duration-300 text-right py-2.5 px-4 rounded-lg tracking-wide bg-white dark:bg-dark-700"
       toggleClassName="hidden"
     />
   );
