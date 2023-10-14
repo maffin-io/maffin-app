@@ -34,13 +34,22 @@ exports[`DashboardLayout renders as expected when user and datasource available 
 exports[`DashboardLayout returns loading when datasource not available 1`] = `
 <div>
   <div
-    class="h-screen"
+    class="flex h-screen text-sm place-content-center place-items-center"
   >
-    <div
-      class="flex text-sm h-3/4 place-content-center place-items-center"
+    <svg
+      class="text-3xl animate-spin"
+      fill="currentColor"
+      height="1em"
+      stroke="currentColor"
+      stroke-width="0"
+      viewBox="0 0 24 24"
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
     >
-      Loading...
-    </div>
+      <path
+        d="M2 11h5v2H2zm15 0h5v2h-5zm-6 6h2v5h-2zm0-15h2v5h-2zM4.222 5.636l1.414-1.414 3.536 3.536-1.414 1.414zm15.556 12.728-1.414 1.414-3.536-3.536 1.414-1.414zm-12.02-3.536 1.414 1.414-3.536 3.536-1.414-1.414zm7.07-7.071 3.536-3.535 1.414 1.415-3.536 3.535z"
+      />
+    </svg>
   </div>
 </div>
 `;
@@ -48,13 +57,22 @@ exports[`DashboardLayout returns loading when datasource not available 1`] = `
 exports[`DashboardLayout returns loading when no user available 1`] = `
 <div>
   <div
-    class="h-screen"
+    class="flex h-screen text-sm place-content-center place-items-center"
   >
-    <div
-      class="flex text-sm h-3/4 place-content-center place-items-center"
+    <svg
+      class="text-3xl animate-spin"
+      fill="currentColor"
+      height="1em"
+      stroke="currentColor"
+      stroke-width="0"
+      viewBox="0 0 24 24"
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
     >
-      Loading...
-    </div>
+      <path
+        d="M2 11h5v2H2zm15 0h5v2h-5zm-6 6h2v5h-2zm0-15h2v5h-2zM4.222 5.636l1.414-1.414 3.536 3.536-1.414 1.414zm15.556 12.728-1.414 1.414-3.536-3.536 1.414-1.414zm-12.02-3.536 1.414 1.414-3.536 3.536-1.414-1.414zm7.07-7.071 3.536-3.535 1.414 1.415-3.536 3.535z"
+      />
+    </svg>
   </div>
 </div>
 `;

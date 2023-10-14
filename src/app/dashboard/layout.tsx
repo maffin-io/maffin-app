@@ -8,6 +8,7 @@ import useUser from '@/hooks/useUser';
 import Footer from '@/layout/Footer';
 import LeftSidebar from '@/layout/LeftSidebar';
 import Topbar from '@/layout/Topbar';
+import Loading from '@/components/Loading';
 
 Modal.setAppElement('#modals');
 
@@ -19,10 +20,8 @@ export default function DashboardLayout({
 
   if (!user || !hookData.isLoaded || user.isLoggedIn === false) {
     return (
-      <div className="h-screen">
-        <div className="flex text-sm h-3/4 place-content-center place-items-center">
-          Loading...
-        </div>
+      <div className="flex h-screen text-sm place-content-center place-items-center">
+        <Loading />
       </div>
     );
   }

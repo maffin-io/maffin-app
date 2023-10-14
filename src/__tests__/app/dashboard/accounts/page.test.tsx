@@ -57,6 +57,10 @@ jest.mock('@/components/onboarding/Onboarding', () => jest.fn(
   () => <div data-testid="Onboarding" />,
 ));
 
+jest.mock('@/components/Loading', () => jest.fn(
+  () => <div data-testid="Loading" />,
+));
+
 describe('AccountsPage', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02'));
@@ -72,7 +76,7 @@ describe('AccountsPage', () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ isLoading: true } as SWRResponse);
     render(<AccountsPage />);
 
-    await screen.findByText('Loading...');
+    await screen.findByTestId('Loading');
   });
 
   it('shows onboarding when no data', async () => {

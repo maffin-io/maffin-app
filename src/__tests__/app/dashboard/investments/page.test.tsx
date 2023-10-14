@@ -36,6 +36,10 @@ jest.mock('@/components/pages/investments/InvestmentsTable', () => jest.fn(
   () => <div data-testid="InvestmentsTable" />,
 ));
 
+jest.mock('@/components/Loading', () => jest.fn(
+  () => <div data-testid="Loading" />,
+));
+
 describe('InvestmentsPage', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as SWRResponse);
@@ -50,7 +54,7 @@ describe('InvestmentsPage', () => {
     jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ isLoading: true } as SWRResponse);
     render(<InvestmentsPage />);
 
-    await screen.findByText('Loading...');
+    await screen.findByTestId('Loading');
   });
 
   it('renders while loading data', async () => {
