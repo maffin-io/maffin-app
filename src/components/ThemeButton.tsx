@@ -24,6 +24,7 @@ export default function ThemeButton(): JSX.Element {
   return (
     <>
       <span
+        id="theme-button"
         aria-label="Toggle theme"
         className="text-2xl cursor-pointer"
         data-tooltip-id="theme-help"
@@ -36,6 +37,7 @@ export default function ThemeButton(): JSX.Element {
       <Tooltip
         id="theme-help"
         className="tooltip"
+        place="right"
       >
         {text}
       </Tooltip>

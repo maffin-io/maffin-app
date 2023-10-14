@@ -15,6 +15,7 @@ exports[`SaveButton renders as expected when datasource ready and not saving 1`]
 <div>
   <button
     class="btn btn-primary"
+    id="save-button"
     type="button"
   >
     <svg
@@ -46,6 +47,7 @@ exports[`SaveButton renders as expected when datasource ready and saving 1`] = `
   <button
     class="btn btn-primary"
     disabled=""
+    id="save-button"
     type="button"
   >
     <svg
