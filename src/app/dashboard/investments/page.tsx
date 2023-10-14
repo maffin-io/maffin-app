@@ -10,6 +10,7 @@ import {
 } from '@/components/pages/investments';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import { toFixed } from '@/helpers/number';
+import Loading from '@/components/Loading';
 import Money from '@/book/Money';
 import * as API from '@/hooks/api';
 
@@ -23,7 +24,7 @@ export default function InvestmentsPage(): JSX.Element {
     return (
       <div className="h-screen">
         <div className="flex text-sm h-3/4 place-content-center place-items-center">
-          Loading...
+          <Loading />
         </div>
       </div>
     );

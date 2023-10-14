@@ -3,7 +3,9 @@
 exports[`AccountPage displays loading while accounts is empty 1`] = `
 <div>
   <div>
-    Loading...
+    <div
+      data-testid="Loading"
+    />
   </div>
 </div>
 `;

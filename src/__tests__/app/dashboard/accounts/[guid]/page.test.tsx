@@ -38,6 +38,10 @@ jest.mock('@/components/pages/account/TotalLineChart', () => jest.fn(
   () => <div data-testid="TotalLineChart" />,
 ));
 
+jest.mock('@/components/Loading', () => jest.fn(
+  () => <div data-testid="Loading" />,
+));
+
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
@@ -63,7 +67,7 @@ describe('AccountPage', () => {
   it('displays loading while accounts is empty', async () => {
     const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
 
-    await screen.findByText('Loading...');
+    await screen.findByTestId('Loading');
     expect(TransactionFormButton).toHaveBeenCalledTimes(0);
     expect(TransactionsTable).toHaveBeenCalledTimes(0);
     expect(container).toMatchSnapshot();

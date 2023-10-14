@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+import Loading from '@/components/Loading';
+
 export default function LoginLayout({
   children,
 }: {
@@ -31,7 +33,7 @@ export default function LoginLayout({
   if (isLoading) {
     return (
       <div>
-        Loading...
+        <Loading />
       </div>
     );
   }

@@ -14,6 +14,7 @@ import {
 import StatisticsWidget from '@/components/StatisticsWidget';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import { useAccounts, useSplits } from '@/hooks/api';
+import Loading from '@/components/Loading';
 import type { Account } from '@/book/entities';
 import {
   isInvestment,
@@ -42,7 +43,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
   if (!Object.keys(accounts).length) {
     return (
       <div>
-        Loading...
+        <Loading />
       </div>
     );
   }
@@ -52,7 +53,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
     router.push('/404');
     return (
       <div>
-        Loading...
+        <Loading />
       </div>
     );
   }

@@ -11,6 +11,7 @@ import {
   MonthlyTotalHistogram,
   LatestTransactions,
 } from '@/components/pages/accounts';
+import Loading from '@/components/Loading';
 import DateRangeInput from '@/components/DateRangeInput';
 import Onboarding from '@/components/onboarding/Onboarding';
 import * as API from '@/hooks/api';
@@ -26,7 +27,7 @@ export default function AccountsPage(): JSX.Element {
     return (
       <div className="h-screen">
         <div className="flex text-sm h-3/4 place-content-center place-items-center">
-          Loading...
+          <Loading />
         </div>
       </div>
     );
