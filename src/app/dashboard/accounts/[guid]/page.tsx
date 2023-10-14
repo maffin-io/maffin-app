@@ -31,6 +31,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
   const router = useRouter();
   let { data: accounts } = useAccounts();
   let { data: splits } = useSplits(params.guid);
+  const latestDate = splits?.[0].transaction.date;
 
   // We cant use fallback data to set a default as SWR treats
   // fallback data as stale data which means with immutable we will
@@ -116,7 +117,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
             account={account}
             defaultValues={
               {
-                date: DateTime.now().toISODate() as string,
+                date: (latestDate || DateTime.now()).toISODate() as string,
                 description: '',
                 splits: [],
                 fk_currency: account.commodity,

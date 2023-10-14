@@ -117,7 +117,7 @@
   }
 
   .amount-negative {
-    @apply text-red-600 dark:text-red-500;
+    @apply text-red-600 dark:text-red-400/90;
   }
 
   .header {
