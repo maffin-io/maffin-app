@@ -248,7 +248,7 @@ exports[`AccountForm renders as expected 1`] = `
           Opening balance
         </label>
         <span
-          class="badge"
+          class="badge ml-0.5"
           data-tooltip-id="balance-help"
         >
           ?
@@ -273,7 +273,7 @@ exports[`AccountForm renders as expected 1`] = `
           When
         </label>
         <span
-          class="badge"
+          class="badge ml-0.5"
           data-tooltip-id="date-help"
         >
           ?

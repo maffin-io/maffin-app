@@ -1,11 +1,12 @@
 import React from 'react';
 import { BiSolidMoon, BiSolidSun } from 'react-icons/bi';
 import { Tooltip } from 'react-tooltip';
+import { mutate } from 'swr';
+
+import { useTheme } from '@/hooks/state';
 
 export default function ThemeButton(): JSX.Element {
-  const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  const selectedTheme = localStorage.theme;
-  const [theme, setTheme] = React.useState<'dark' | 'light'>(selectedTheme || preferredTheme);
+  const { data: theme } = useTheme();
 
   let text = 'Change to dark theme';
   if (theme === 'dark') {
@@ -26,7 +27,7 @@ export default function ThemeButton(): JSX.Element {
         aria-label="Toggle theme"
         className="text-2xl cursor-pointer"
         data-tooltip-id="theme-help"
-        onClick={() => toggleTheme(setTheme, theme)}
+        onClick={() => toggleTheme(theme)}
       >
         {
           theme === 'dark' ? <BiSolidSun /> : <BiSolidMoon />
@@ -42,14 +43,14 @@ export default function ThemeButton(): JSX.Element {
   );
 }
 
-function toggleTheme(setTheme: Function, theme: 'dark' | 'light') {
-  if (theme === 'dark') {
-    setTheme('light');
+function toggleTheme(currentTheme: 'dark' | 'light' | undefined) {
+  if (currentTheme === 'dark') {
     localStorage.setItem('theme', 'light');
+    mutate('/state/theme', 'light', { revalidate: false });
     document.documentElement.classList.remove('dark');
   } else {
-    setTheme('dark');
     localStorage.setItem('theme', 'dark');
+    mutate('/state/theme', 'dark', { revalidate: false });
     document.documentElement.classList.add('dark');
   }
 }

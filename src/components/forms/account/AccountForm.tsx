@@ -123,7 +123,7 @@ export default function AccountForm({ defaultValues, onSave }: AccountFormProps)
         >
           <label htmlFor="balanceInput" className="inline-block mb-2">Opening balance</label>
           <span
-            className="badge"
+            className="badge ml-0.5"
             data-tooltip-id="balance-help"
           >
             ?
@@ -151,7 +151,7 @@ export default function AccountForm({ defaultValues, onSave }: AccountFormProps)
         >
           <label htmlFor="dateInput" className="inline-block mb-2">When</label>
           <span
-            className="badge"
+            className="badge ml-0.5"
             data-tooltip-id="date-help"
           >
             ?

@@ -22,7 +22,7 @@ export default function AccountLayout({
   return (
     <>
       <div className="flex h-screen place-content-center place-items-center">
-        <div className="flex p-6 bg-gunmetal-700 items-center rounded-md">
+        <div className="card flex items-center">
           <Image className="m-0" src={maffinLogo} alt="" height="54" />
           <div className="p-4">{children}</div>
         </div>

@@ -32,7 +32,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
         Description
       </label>
       <span
-        class="badge"
+        class="badge ml-0.5"
         data-tooltip-id="description-help"
       >
         ?
@@ -340,7 +340,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
         Description
       </label>
       <span
-        class="badge"
+        class="badge ml-0.5"
         data-tooltip-id="description-help"
       >
         ?
@@ -646,7 +646,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
         Description
       </label>
       <span
-        class="badge"
+        class="badge ml-0.5"
         data-tooltip-id="description-help"
       >
         ?

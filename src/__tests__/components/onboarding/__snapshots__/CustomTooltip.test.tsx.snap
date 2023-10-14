@@ -3,7 +3,7 @@
 exports[`CustomTooltip renders as expected 1`] = `
 <div>
   <div
-    class="mx-auto w-1/2 bg-gunmetal-700 text-sm p-5 rounded-md"
+    class="card mb-0 mx-auto w-1/2 text-sm rounded-md"
   >
     Hello
   </div>

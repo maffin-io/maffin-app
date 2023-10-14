@@ -10,7 +10,7 @@ export default function ProfileDropdown(): JSX.Element {
   const { user } = useUser();
 
   return (
-    <div className="group relative h-full bg-light-100/60 hover:bg-light-100 dark:bg-dark-800/50 dark:hover:bg-gunmetal-800">
+    <div className="group relative h-full bg-light-100/60 hover:bg-light-100 dark:bg-dark-800/50 dark:hover:bg-dark-800">
       <button
         type="button"
         className="flex h-full w-full pl-3 pr-4 items-center"

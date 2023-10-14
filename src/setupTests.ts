@@ -28,5 +28,8 @@ jest.mock('chart.js', () => ({
   },
 }));
 
+// set dark theme as default
+window.matchMedia = jest.fn().mockReturnValue({ matches: true });
+
 Settings.defaultZone = 'utc';
 Settings.throwOnInvalid = true;
