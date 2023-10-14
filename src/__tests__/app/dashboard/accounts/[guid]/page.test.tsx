@@ -119,7 +119,7 @@ describe('AccountPage', () => {
       {
         account: accounts.guid,
         defaultValues: {
-          date: DateTime.now().toISODate(),
+          date: '2023-01-01',
           description: '',
           fk_currency: {
             mnemonic: 'EUR',
