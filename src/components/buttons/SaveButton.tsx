@@ -24,6 +24,7 @@ export default function SaveButton(): JSX.Element {
 
   return (
     <button
+      id="save-button"
       type="button"
       className="btn btn-primary"
       disabled={isSaving}

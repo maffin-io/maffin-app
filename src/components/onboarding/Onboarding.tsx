@@ -77,6 +77,54 @@ export default function Onboarding({
         {
           content: (
             <div className="text-left leading-relaxed">
+              <p className="mb-2">
+                We save the data automatically for you whenever you do changes.
+              </p>
+              <p className="mb-2">
+                The data is uploaded to your Google Drive, under the maffin.io folder. Make
+                sure you take good care of that file!
+              </p>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => setStepIndex(2)}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          ),
+          target: '#save-button',
+        },
+        {
+          spotlightClicks: true,
+          content: (
+            <div className="text-left leading-relaxed">
+              <p className="mb-2">
+                We know some people are very opinionated about dark vs light
+                themes.
+              </p>
+              <p className="mb-2">
+                In order for you not to suffer the whole tutorial with a theme you
+                don&apos;t like, feel free to change it by clicking here!
+              </p>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => setStepIndex(3)}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          ),
+          target: '#theme-button',
+        },
+        {
+          content: (
+            <div className="text-left leading-relaxed">
               <span>
                 Let&apos;s add your first
                 {' '}
@@ -97,7 +145,7 @@ export default function Onboarding({
                     ...accounts,
                     bank: account,
                   });
-                  setStepIndex(2);
+                  setStepIndex(4);
                 }}
                 defaultValues={{
                   name: 'My bank account',
@@ -131,7 +179,7 @@ export default function Onboarding({
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={() => setStepIndex(3)}
+                  onClick={() => setStepIndex(5)}
                 >
                   Next
                 </button>
@@ -161,7 +209,7 @@ export default function Onboarding({
                     ...accounts,
                     expense: account,
                   });
-                  setStepIndex(4);
+                  setStepIndex(6);
                 }}
                 defaultValues={{
                   name: 'Groceries',
@@ -198,7 +246,7 @@ export default function Onboarding({
               <TransactionForm
                 onSave={() => {
                   save();
-                  setStepIndex(5);
+                  setStepIndex(7);
                 }}
                 defaultValues={{
                   date: '',
@@ -235,10 +283,6 @@ export default function Onboarding({
                   Good job! From here onwards you just need to keep adding
                   transactions and accounts to reflect your financial life as you need.
                 </p>
-                <p className="mt-3">
-                  Every time you do changes, they are auto saved and uploaded to
-                  your Google Drive which is where the data lives.
-                </p>
                 <div className="flex py-3 justify-center">
                   <Image src={maffinLogo} alt="logo" height="45" />
                 </div>
@@ -251,7 +295,7 @@ export default function Onboarding({
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={() => setStepIndex(6)}
+                  onClick={() => setStepIndex(8)}
                 >
                   Agreed!
                 </button>
