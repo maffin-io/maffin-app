@@ -31,7 +31,7 @@ export default function TransactionsTable({
   splits = splits || [];
 
   columns[2].cell = FromToAccountPartial(accounts);
-  columns[3].cell = AmountPartial(accounts[splits[0]?.account.guid]);
+  columns[3].cell = AmountPartial(account);
   columns[4].cell = TotalPartial(accounts);
 
   return (
@@ -133,7 +133,7 @@ function FromToAccountPartial(
             <li key={split.guid}>
               <Link
                 href={`/dashboard/accounts/${account.guid}`}
-                className={classNames('badge hover:text-slate-300', {
+                className={classNames('badge mb-0.5 hover:text-slate-300', {
                   success: account.type === 'INCOME',
                   danger: account.type === 'EXPENSE',
                   info: ['ASSET', 'BANK'].includes(account.type),
@@ -152,10 +152,10 @@ function FromToAccountPartial(
 }
 
 function AmountPartial(
-  account?: Account,
+  account: Account,
 ) {
   return function Amount({ row }: CellContext<Split, unknown>): JSX.Element {
-    let value = new Money(row.original.quantity, account?.commodity.mnemonic || '');
+    let value = new Money(row.original.quantity, account.commodity.mnemonic || '');
 
     if (account?.type === 'INCOME') {
       value = value.multiply(-1);

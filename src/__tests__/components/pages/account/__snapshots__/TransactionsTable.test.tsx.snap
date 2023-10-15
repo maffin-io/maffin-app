@@ -111,7 +111,7 @@ exports[`TransactionsTable renders FromTo column as expected 1`] = `
   <ul>
     <li>
       <a
-        class="badge hover:text-slate-300 danger"
+        class="badge mb-0.5 hover:text-slate-300 danger"
         href="/dashboard/accounts/account_guid_2"
       >
         Expenses:expense
