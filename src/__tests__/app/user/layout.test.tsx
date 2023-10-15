@@ -1,17 +1,35 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
+import * as swr from 'swr';
 
 import AccountLayout from '@/app/user/layout';
 
 describe('AccountLayout', () => {
-  it('renders as expected', () => {
+  beforeEach(() => {
+    swr.mutate('/state/theme', undefined);
+  });
+
+  it('renders as expected', async () => {
     const { container } = render(
       <AccountLayout>
         <span>child</span>
       </AccountLayout>,
     );
+    const html = document.documentElement;
+    await waitFor(() => expect(html).toHaveClass('dark'));
 
     expect(container).toMatchSnapshot();
-    expect(document.body.classList).toContain('authentication-bg');
+  });
+
+  it('sets localstorage theme', async () => {
+    localStorage.setItem('theme', 'light');
+    render(
+      <AccountLayout>
+        <span data-testid="child">child</span>
+      </AccountLayout>,
+    );
+
+    const html = document.documentElement;
+    await waitFor(() => expect(html.classList).toHaveLength(0));
   });
 });

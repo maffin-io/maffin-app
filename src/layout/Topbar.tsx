@@ -13,7 +13,7 @@ export default function Topbar(): JSX.Element {
   const router = useRouter();
 
   return (
-    <div className="grid grid-cols-12 bg-white dark:bg-dark-700 h-20 fixed z-10 top-0 px-6 left-20 right-0">
+    <div className="grid grid-cols-12 bg-white dark:bg-dark-700 shadow-sm h-20 fixed z-10 top-0 px-6 left-20 right-0">
       <div className="col-span-3">
         <AccountSelector
           id="globalSearch"

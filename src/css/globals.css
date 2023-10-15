@@ -37,7 +37,7 @@
 
 @layer components {
   .card {
-    @apply bg-white dark:bg-dark-700 m-2 p-4 rounded-md;
+    @apply bg-white dark:bg-dark-700 m-2 p-4 rounded-md shadow-md;
   }
 
   .overlay {

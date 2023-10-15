@@ -13,14 +13,6 @@ export default function ThemeButton(): JSX.Element {
     text = 'Change to light theme';
   }
 
-  React.useLayoutEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  });
-
   return (
     <>
       <span

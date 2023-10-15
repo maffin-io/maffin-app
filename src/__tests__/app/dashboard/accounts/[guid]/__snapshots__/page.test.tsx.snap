@@ -47,7 +47,7 @@ exports[`AccountPage renders as expected with account 1`] = `
           class="col-span-6"
         >
           <div
-            class="card mr-2 rounded-sm p-6"
+            class="card mr-2 p-6"
           >
             <p>
               You have a total of
@@ -68,7 +68,7 @@ exports[`AccountPage renders as expected with account 1`] = `
           class="col-span-6"
         >
           <div
-            class="card  rounded-sm p-6"
+            class="card  p-6"
           >
             <p>
               This year you have

@@ -5,19 +5,22 @@ import Image from 'next/image';
 
 import Footer from '@/layout/Footer';
 import maffinLogo from '@/assets/images/maffin_logo_sm.png';
+import { useTheme } from '@/hooks/state';
 
 export default function AccountLayout({
   children,
 }: {
   children: React.ReactNode
 }): JSX.Element {
-  React.useEffect(() => {
-    if (document.body) document.body.classList.add('authentication-bg');
+  const { data: theme } = useTheme();
 
-    return () => {
-      if (document.body) document.body.classList.remove('authentication-bg');
-    };
-  }, []);
+  React.useLayoutEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  });
 
   return (
     <>

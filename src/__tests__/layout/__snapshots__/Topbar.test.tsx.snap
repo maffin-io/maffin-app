@@ -3,7 +3,7 @@
 exports[`Topbar renders as expected 1`] = `
 <div>
   <div
-    class="grid grid-cols-12 bg-white dark:bg-dark-700 h-20 fixed z-10 top-0 px-6 left-20 right-0"
+    class="grid grid-cols-12 bg-white dark:bg-dark-700 shadow-sm h-20 fixed z-10 top-0 px-6 left-20 right-0"
   >
     <div
       class="col-span-3"

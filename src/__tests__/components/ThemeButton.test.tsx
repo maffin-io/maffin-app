@@ -20,21 +20,6 @@ describe('ThemeButton', () => {
     jest.spyOn(swr, 'mutate');
   });
 
-  it('sets system theme', async () => {
-    render(<ThemeButton />);
-    const html = document.documentElement;
-
-    await waitFor(() => expect(html).toHaveClass('dark'));
-  });
-
-  it('sets localstorage theme', async () => {
-    localStorage.setItem('theme', 'light');
-    render(<ThemeButton />);
-    const html = document.documentElement;
-
-    await waitFor(() => expect(html.classList).toHaveLength(0));
-  });
-
   it('toggles on click', async () => {
     localStorage.setItem('theme', 'light');
     render(<ThemeButton />);
