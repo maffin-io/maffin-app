@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import * as swr from 'swr';
 
 import type { DataSourceContextType } from '@/hooks';
 import DashboardLayout from '@/app/dashboard/layout';
@@ -37,6 +38,7 @@ jest.mock('react-modal', () => ({
 
 describe('DashboardLayout', () => {
   beforeEach(() => {
+    swr.mutate('/state/theme', undefined);
     jest.spyOn(userHooks, 'default').mockReturnValue({
       user: {
         name: '',
@@ -56,6 +58,9 @@ describe('DashboardLayout', () => {
         <span data-testid="child">child</span>
       </DashboardLayout>,
     );
+
+    const html = document.documentElement;
+    await waitFor(() => expect(html).toHaveClass('dark'));
 
     expect(screen.queryByTestId('child')).not.toBeInTheDocument();
     expect(Topbar).toBeCalledTimes(0);
@@ -82,11 +87,37 @@ describe('DashboardLayout', () => {
       </DashboardLayout>,
     );
 
+    const html = document.documentElement;
+    await waitFor(() => expect(html).toHaveClass('dark'));
+
     expect(screen.queryByTestId('child')).not.toBeInTheDocument();
     expect(Topbar).toBeCalledTimes(0);
     expect(LeftSidebar).toBeCalledTimes(0);
     expect(Footer).toBeCalledTimes(0);
     expect(container).toMatchSnapshot();
+  });
+
+  it('sets system theme', async () => {
+    render(
+      <DashboardLayout>
+        <span data-testid="child">child</span>
+      </DashboardLayout>,
+    );
+    const html = document.documentElement;
+
+    await waitFor(() => expect(html).toHaveClass('dark'));
+  });
+
+  it('sets localstorage theme', async () => {
+    localStorage.setItem('theme', 'light');
+    render(
+      <DashboardLayout>
+        <span data-testid="child">child</span>
+      </DashboardLayout>,
+    );
+    const html = document.documentElement;
+
+    await waitFor(() => expect(html.classList).toHaveLength(0));
   });
 
   it('renders as expected when user and datasource available', async () => {

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Settings } from 'luxon';
-
 import '@/css/globals.css';
 
 Settings.throwOnInvalid = true;
@@ -34,7 +33,7 @@ export default function RootLayout({
 }: React.PropsWithChildren): JSX.Element {
   return (
     <html lang="en">
-      <body data-leftbar-compact-mode="condensed">
+      <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         {children}
         <div id="modals" />

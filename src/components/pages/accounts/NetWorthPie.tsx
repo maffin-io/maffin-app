@@ -69,7 +69,12 @@ export default function NetWorthPie({
               borderRadius: 2,
               color: '#DDDDDD',
               textAlign: 'center',
-              formatter: (value, context) => `${context.chart.data.labels?.[context.dataIndex]}\n${moneyToString(value, unit)}`,
+              formatter: (value, context) => {
+                if (value > 0) {
+                  return `${context.chart.data.labels?.[context.dataIndex]}\n${moneyToString(value, unit)}`;
+                }
+                return '';
+              },
               font: {
                 weight: 300,
                 family: 'Intervariable',
