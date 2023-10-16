@@ -34,7 +34,7 @@ export default function AccountsPage(): JSX.Element {
   }
 
   accounts = accounts || { root: { childrenIds: [] } };
-  const showOnboarding = Object.keys(accounts).length === 1;
+  const showOnboarding = Object.keys(accounts).length <= 2;
 
   return (
     <>

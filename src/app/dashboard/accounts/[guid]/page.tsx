@@ -4,7 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
-import { BiEdit } from 'react-icons/bi';
+import { BiEdit, BiX, BiXCircle } from 'react-icons/bi';
 
 import Money from '@/book/Money';
 import {
