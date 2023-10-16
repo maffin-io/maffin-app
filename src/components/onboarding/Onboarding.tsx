@@ -52,7 +52,7 @@ export default function Onboarding({
                   is going to be your main one. This is the currency that will be used to show
                   reports and calculate other things like net worth.
                 </p>
-                <p className="badge info mt-3 text-left">
+                <p className="badge rounded-md info mt-3 text-left">
                   The main currency cannot be changed later so make sure you
                   choose the right one for you!
                 </p>
@@ -286,7 +286,7 @@ export default function Onboarding({
                 <div className="flex py-3 justify-center">
                   <Image src={maffinLogo} alt="logo" height="45" />
                 </div>
-                <p className="badge warning mt-3">
+                <p className="badge rounded-md warning mt-3">
                   You own your data which means you have to be careful. Do not
                   delete the maffin.io folder from your Google drive!
                 </p>
