@@ -19,6 +19,7 @@ export default function Topbar(): JSX.Element {
           id="globalSearch"
           className="py-5 pl-1"
           placeholder="Search (cmd + k)..."
+          ignoreHidden={false}
           onChange={(selected: Account | null) => {
             if (selected) {
               router.push(`/dashboard/accounts/${selected.guid}`);

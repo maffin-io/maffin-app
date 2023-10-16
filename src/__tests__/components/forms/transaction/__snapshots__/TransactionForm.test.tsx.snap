@@ -294,13 +294,13 @@ exports[`TransactionForm renders as expected with action add 1`] = `
       type="number"
     />
     <div
-      class="flex w-full gap-2 items-center justify-center"
+      class="flex w-full justify-center"
     >
       <button
-        class="btn btn-primary"
+        class="btn capitalize btn-primary"
         type="submit"
       >
-        Save
+        add
       </button>
     </div>
   </form>
@@ -600,14 +600,14 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
       type="number"
     />
     <div
-      class="flex w-full gap-2 items-center justify-center"
+      class="flex w-full justify-center"
     >
       <button
-        class="btn btn-danger"
+        class="btn capitalize btn-danger"
         disabled=""
         type="submit"
       >
-        Delete
+        delete
       </button>
     </div>
   </form>
@@ -910,14 +910,14 @@ exports[`TransactionForm renders as expected with action update 1`] = `
       type="number"
     />
     <div
-      class="flex w-full gap-2 items-center justify-center"
+      class="flex w-full justify-center"
     >
       <button
-        class="btn btn-warn"
+        class="btn capitalize btn-warn"
         disabled=""
         type="submit"
       >
-        Update
+        update
       </button>
     </div>
   </form>

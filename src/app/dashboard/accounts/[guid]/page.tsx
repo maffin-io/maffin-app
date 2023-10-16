@@ -4,6 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
+import { BiEdit } from 'react-icons/bi';
 
 import Money from '@/book/Money';
 import {
@@ -13,14 +14,15 @@ import {
 } from '@/components/pages/account';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
+import AccountFormButton from '@/components/buttons/AccountFormButton';
 import { useAccounts, useSplits } from '@/hooks/api';
 import Loading from '@/components/Loading';
-import type { Account } from '@/book/entities';
 import {
   isInvestment,
   isAsset,
   isLiability,
 } from '@/book/helpers/accountType';
+import type { Account } from '@/book/entities';
 
 export type AccountPageProps = {
   params: {
@@ -32,7 +34,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
   const router = useRouter();
   let { data: accounts } = useAccounts();
   let { data: splits } = useSplits(params.guid);
-  const latestDate = splits?.[0].transaction.date;
+  const latestDate = splits?.[0]?.transaction.date;
 
   // We cant use fallback data to set a default as SWR treats
   // fallback data as stale data which means with immutable we will
@@ -113,19 +115,30 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
             account
           </span>
         </span>
-        <span className="ml-auto">
-          <TransactionFormButton
-            account={account}
-            defaultValues={
-              {
-                date: (latestDate || DateTime.now()).toISODate() as string,
-                description: '',
-                splits: [],
-                fk_currency: account.commodity,
+        <div className="ml-auto">
+          <div className="flex gap-1">
+            <TransactionFormButton
+              account={account}
+              defaultValues={
+                {
+                  date: (latestDate || DateTime.now()).toISODate() as string,
+                  description: '',
+                  splits: [],
+                  fk_currency: account.commodity,
+                }
               }
-            }
-          />
-        </span>
+            />
+            <AccountFormButton
+              defaultValues={{
+                ...account,
+                parent: accounts[account.parentId],
+              }}
+              action="update"
+            >
+              <BiEdit />
+            </AccountFormButton>
+          </div>
+        </div>
       </div>
       <div className="grid grid-cols-12">
         <div className="col-span-6">

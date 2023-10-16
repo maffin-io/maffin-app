@@ -5,6 +5,7 @@ import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 import { mutate } from 'swr';
 import { IsNull } from 'typeorm';
 import { Tooltip } from 'react-tooltip';
+import classNames from 'classnames';
 
 import {
   Split,
@@ -19,7 +20,7 @@ const resolver = classValidatorResolver(Transaction, { validator: { stopAtFirstE
 export type TransactionFormProps = {
   action?: 'add' | 'update' | 'delete',
   onSave: Function,
-  defaultValues: FormValues,
+  defaultValues: Partial<FormValues>,
 };
 
 export default function TransactionForm({
@@ -34,19 +35,7 @@ export default function TransactionForm({
   });
 
   const { errors } = form.formState;
-
-  let disabled = false;
-  let submitButtonText = 'Save';
-  let submitButtonClass = 'btn-primary';
-  if (action === 'update') {
-    submitButtonText = 'Update';
-    submitButtonClass = 'btn-warn';
-  }
-  if (action === 'delete') {
-    disabled = true;
-    submitButtonText = 'Delete';
-    submitButtonClass = 'btn-danger';
-  }
+  const disabled = action === 'delete';
 
   return (
     <form onSubmit={form.handleSubmit((data) => onSubmit(data, action, onSave))}>
@@ -119,13 +108,20 @@ export default function TransactionForm({
         type="number"
       />
 
-      <div className="flex w-full gap-2 items-center justify-center">
+      <div className="flex w-full justify-center">
         <button
-          className={`btn ${submitButtonClass}`}
+          className={classNames(
+            'btn capitalize',
+            {
+              'btn-primary': action === 'add',
+              'btn-danger': action === 'delete',
+              'btn-warn': action === 'update',
+            },
+          )}
           type="submit"
           disabled={Object.keys(errors).length > 0}
         >
-          {submitButtonText}
+          {action}
         </button>
       </div>
     </form>

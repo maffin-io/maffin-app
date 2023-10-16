@@ -3,7 +3,7 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 
-import AddAccountButton from '@/components/buttons/AddAccountButton';
+import AccountFormButton from '@/components/buttons/AccountFormButton';
 import {
   AccountsTable,
   NetWorthPie,
@@ -55,7 +55,7 @@ export default function AccountsPage(): JSX.Element {
           />
         </span>
         <div>
-          <AddAccountButton />
+          <AccountFormButton />
         </div>
       </div>
       <div className="grid grid-cols-12 items-start items-top">

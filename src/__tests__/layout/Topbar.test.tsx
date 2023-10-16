@@ -54,6 +54,7 @@ describe('Topbar', () => {
         className: 'py-5 pl-1',
         onChange: expect.any(Function),
         placeholder: 'Search (cmd + k)...',
+        ignoreHidden: false,
       },
       {},
     );

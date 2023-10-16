@@ -11,7 +11,6 @@ import Table from '@/components/Table';
 import Money from '@/book/Money';
 import {
   Account,
-  Commodity,
   Split,
 } from '@/book/entities';
 import type { AccountsMap } from '@/types/book';
@@ -85,13 +84,13 @@ const columns: ColumnDef<Split>[] = [
     cell: ({ row }) => (
       <>
         <TransactionFormButton
-          guid={row.original.transaction.guid}
           action="update"
           defaultValues={
             {
               ...row.original.transaction,
               date: row.original.transaction.date.toISODate() as string,
-              fk_currency: row.original.transaction.currency as Commodity,
+              // At this point tx currency is not loaded
+              fk_currency: undefined,
             }
           }
           className="link"
@@ -99,13 +98,13 @@ const columns: ColumnDef<Split>[] = [
           <BiEdit className="flex" />
         </TransactionFormButton>
         <TransactionFormButton
-          guid={row.original.transaction.guid}
           action="delete"
           defaultValues={
             {
               ...row.original.transaction,
               date: row.original.transaction.date.toISODate() as string,
-              fk_currency: row.original.transaction.currency as Commodity,
+              // At this point tx currency is not loaded
+              fk_currency: undefined,
             }
           }
           className="link"

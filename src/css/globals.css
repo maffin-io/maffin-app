@@ -23,6 +23,10 @@
     margin: 0;
   }
 
+  input[type="checkbox"] {
+    @apply appearance-none checked:bg-cyan-700 cursor-pointer rounded-md border-solid border-2 border-dark-800;
+  }
+
   button.link {
     @apply text-left text-cyan-700;
   }

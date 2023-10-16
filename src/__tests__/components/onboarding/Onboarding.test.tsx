@@ -132,8 +132,8 @@ describe('Onboarding', () => {
     await screen.findByText('Assets');
     await user.type(screen.getByLabelText('Opening balance'), '1000');
 
-    expect(screen.getByText('Save')).toBeEnabled();
-    await user.click(screen.getByText('Save'));
+    expect(screen.getByText('add')).toBeEnabled();
+    await user.click(screen.getByText('add'));
     const bankAccount = await Account.findOneByOrFail({ name: 'My bank account' });
     expect(bankAccount).toEqual(expect.objectContaining({
       fk_commodity: eur,
@@ -153,8 +153,8 @@ describe('Onboarding', () => {
     await screen.findByText('account to track your expenses', { exact: false });
     await screen.findByText('Expenses');
 
-    expect(screen.getByText('Save')).toBeEnabled();
-    await user.click(screen.getByText('Save'));
+    expect(screen.getByText('add')).toBeEnabled();
+    await user.click(screen.getByText('add'));
     const expensesAccount = await Account.findOneByOrFail({ name: 'Groceries' });
     expect(expensesAccount).toEqual(expect.objectContaining({
       fk_commodity: eur,
@@ -169,8 +169,8 @@ describe('Onboarding', () => {
     await screen.findByText('add the first transaction', { exact: false });
     await user.type(screen.getByLabelText('Date'), DateTime.now().toISODate() as string);
 
-    expect(screen.getByText('Save')).toBeEnabled();
-    await user.click(screen.getByText('Save'));
+    expect(screen.getByText('add')).toBeEnabled();
+    await user.click(screen.getByText('add'));
     const tx = await Transaction.findOneOrFail(
       {
         where: { description: 'Grocery shopping' },

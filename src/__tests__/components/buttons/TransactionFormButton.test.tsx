@@ -176,8 +176,10 @@ describe('TransactionFormButton', () => {
     } as Transaction);
     render(
       <TransactionFormButton
-        defaultValues={{} as FormValues}
-        guid="guid"
+        defaultValues={{
+          guid: 'guid',
+          date: '2023-01-01',
+        } as FormValues}
         action={action as 'update' | 'delete'}
       />,
     );
@@ -197,9 +199,6 @@ describe('TransactionFormButton', () => {
           defaultValues: {
             guid: 'guid',
             date: '2023-01-01',
-            currency: {
-              mnemonic: 'EUR',
-            },
             fk_currency: {
               mnemonic: 'EUR',
             },

@@ -7,16 +7,14 @@ import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import type { FormValues } from '@/components/forms/transaction/types';
 import {
   Account,
-  Commodity,
   Split,
   Transaction,
 } from '@/book/entities';
 
 export type TransactionFormButtonProps = {
   action?: 'add' | 'update' | 'delete',
-  guid?: string, // The transaction to update or delete
   account?: Account, // Account to populate for the main split
-  defaultValues: FormValues,
+  defaultValues: Partial<FormValues>,
   className?: string,
   children?: React.ReactNode,
 };
@@ -24,7 +22,6 @@ export type TransactionFormButtonProps = {
 export default function TransactionFormButton(
   {
     action = 'add',
-    guid,
     account,
     defaultValues,
     children,
@@ -84,7 +81,7 @@ export default function TransactionFormButton(
             } as FormValues);
           } else if (action === 'update' || action === 'delete') {
             const tx = await Transaction.findOneOrFail({
-              where: { guid },
+              where: { guid: defaultValues.guid },
               relations: {
                 splits: {
                   fk_account: true,
@@ -92,9 +89,10 @@ export default function TransactionFormButton(
               },
             });
             setDefaults({
-              ...tx,
-              date: tx.date.toISODate() as string,
-              fk_currency: tx.currency as Commodity,
+              ...defaults,
+              // The currency is not loaded in the transactions table view
+              // so we load it here.
+              fk_currency: tx.currency,
               // This is hacky but if we pass the Split
               // class to the form, then we have reference errors as when
               // we update the form, it also updates the defaultValues

@@ -4,10 +4,26 @@ import { BiPlusCircle } from 'react-icons/bi';
 
 import { DataSourceContext } from '@/hooks';
 import AccountForm from '@/components/forms/account/AccountForm';
+import type { FormValues } from '@/components/forms/account/types';
 
-export default function AddAccountButton(): JSX.Element {
+export type AccountFormButtonProps = {
+  action?: 'add' | 'update',
+  defaultValues?: Partial<FormValues>,
+  children?: React.ReactNode,
+};
+
+export default function AccountFormButton({
+  action = 'add',
+  defaultValues,
+  children,
+}: AccountFormButtonProps): JSX.Element {
   const { save } = React.useContext(DataSourceContext);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+
+  let title = 'Add account';
+  if (action === 'update') {
+    title = `Edit ${defaultValues?.name} account`;
+  }
 
   return (
     <>
@@ -23,8 +39,10 @@ export default function AddAccountButton(): JSX.Element {
         >
           X
         </button>
-        <span>Add account</span>
+        <span>{title}</span>
         <AccountForm
+          action={action}
+          defaultValues={defaultValues}
           onSave={() => {
             save();
             setIsModalOpen(false);
@@ -37,8 +55,15 @@ export default function AddAccountButton(): JSX.Element {
         className="btn btn-primary"
         onClick={() => setIsModalOpen(!isModalOpen)}
       >
-        <BiPlusCircle className="mr-1" />
-        Add Account
+        {
+          children
+          || (
+            <>
+              <BiPlusCircle className="mr-1" />
+              Add Account
+            </>
+          )
+        }
       </button>
     </>
   );
