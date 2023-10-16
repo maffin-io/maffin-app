@@ -6,7 +6,6 @@ import { mutate } from 'swr';
 
 import {
   Account,
-  Commodity,
   Split,
   Transaction,
 } from '@/book/entities';
@@ -20,21 +19,15 @@ import { toAmountWithScale } from '@/helpers/number';
 import type { AccountsMap } from '@/types/book';
 import createEquityAccount from '@/lib/createEquityAccount';
 import { Tooltip } from 'react-tooltip';
+import type { FormValues } from '@/components/forms/account/types';
+import classNames from 'classnames';
 
 const resolver = classValidatorResolver(Account, { validator: { stopAtFirstError: true } });
 
 export type AccountFormProps = {
+  action?: 'add' | 'update',
   onSave: Function,
-  defaultValues?: FormValues,
-};
-
-export type FormValues = {
-  name: string,
-  parent: Account,
-  fk_commodity: Commodity,
-  type: string,
-  balance?: number,
-  balanceDate?: string,
+  defaultValues?: Partial<FormValues>,
 };
 
 export type SplitFieldData = {
@@ -43,7 +36,11 @@ export type SplitFieldData = {
   exchangeRate?: number,
 };
 
-export default function AccountForm({ defaultValues, onSave }: AccountFormProps): JSX.Element {
+export default function AccountForm({
+  action = 'add',
+  defaultValues,
+  onSave,
+}: AccountFormProps): JSX.Element {
   const form = useForm<FormValues>({
     defaultValues,
     mode: 'onChange',
@@ -60,16 +57,50 @@ export default function AccountForm({ defaultValues, onSave }: AccountFormProps)
 
   return (
     <form onSubmit={form.handleSubmit((data) => onSubmit(data, onSave))}>
-      <fieldset className="text-sm my-5">
-        <label htmlFor="nameInput" className="inline-block mb-2">Name</label>
-        <input
-          id="nameInput"
-          className="block w-full m-0"
-          {...form.register('name')}
-          type="text"
-        />
-        <p className="invalid-feedback">{errors.name?.message}</p>
-      </fieldset>
+      <div className="grid grid-cols-12 text-sm my-5 gap-2">
+        <fieldset className="col-span-6">
+          <label htmlFor="nameInput" className="inline-block mb-2">Name</label>
+          <input
+            id="nameInput"
+            className="w-full m-0"
+            {...form.register('name')}
+            type="text"
+          />
+          <p className="invalid-feedback">{errors.name?.message}</p>
+        </fieldset>
+
+        <fieldset
+          className={classNames(
+            'col-start-8 col-span-2',
+            {
+              hidden: action === 'add',
+            },
+          )}
+        >
+          <label htmlFor="hiddenInput" className="inline-block mb-2">Hide</label>
+          <span
+            className="badge ml-0.5"
+            data-tooltip-id="hidden-help"
+          >
+            ?
+          </span>
+          <Tooltip
+            id="hidden-help"
+            className="tooltip"
+            disableStyleInjection
+          >
+            <p>
+              For accounts that are closed or not used anymore.
+            </p>
+          </Tooltip>
+          <input
+            id="hiddenInput"
+            className="block m-0"
+            {...form.register('hidden')}
+            type="checkbox"
+          />
+        </fieldset>
+      </div>
 
       <fieldset className="text-sm my-5">
         <label htmlFor="parent" className="inline-block mb-2">Parent</label>
@@ -116,7 +147,12 @@ export default function AccountForm({ defaultValues, onSave }: AccountFormProps)
       </fieldset>
 
       <fieldset
-        className={`grid grid-cols-12 text-sm my-5 ${type === 'BANK' ? 'visible' : 'hidden'}`}
+        className={classNames(
+          'grid grid-cols-12 text-sm my-5',
+          {
+            hidden: type !== 'BANK' || action !== 'add',
+          },
+        )}
       >
         <div
           className="col-span-6"
@@ -130,7 +166,7 @@ export default function AccountForm({ defaultValues, onSave }: AccountFormProps)
           </span>
           <Tooltip
             id="balance-help"
-            className="bg-cyan-600 w-1/3 text-white rounded-lg p-2"
+            className="tooltip"
             disableStyleInjection
           >
             <p>
@@ -158,7 +194,7 @@ export default function AccountForm({ defaultValues, onSave }: AccountFormProps)
           </span>
           <Tooltip
             id="date-help"
-            className="bg-cyan-600 w-1/3 text-white rounded-lg p-2"
+            className="tooltip"
             disableStyleInjection
           >
             <p>
@@ -188,6 +224,7 @@ export default function AccountForm({ defaultValues, onSave }: AccountFormProps)
                 placeholder="<commodity>"
                 onChange={field.onChange}
                 defaultValue={defaultValues?.fk_commodity}
+                disabled={action !== 'add'}
               />
               <p className="invalid-feedback">{fieldState.error?.message}</p>
             </>
@@ -195,9 +232,27 @@ export default function AccountForm({ defaultValues, onSave }: AccountFormProps)
         />
       </fieldset>
 
+      <input
+        {...form.register(
+          'guid',
+        )}
+        hidden
+        type="text"
+      />
+
       <div className="flex w-full justify-center">
-        <button className="btn btn-primary" type="submit" disabled={!form.formState.isValid}>
-          Save
+        <button
+          className={classNames(
+            'btn capitalize',
+            {
+              'btn-primary': action === 'add',
+              'btn-warn': action === 'update',
+            },
+          )}
+          type="submit"
+          disabled={!form.formState.isValid}
+        >
+          {action}
         </button>
       </div>
     </form>
@@ -205,7 +260,14 @@ export default function AccountForm({ defaultValues, onSave }: AccountFormProps)
 }
 
 async function onSubmit(data: FormValues, onSave: Function) {
-  const account = await Account.create({ ...data }).save();
+  const account = Account.create({
+    ...data,
+    guid: data.guid || undefined,
+  });
+  // For some reason the beforeInsert doesn't work when updating an account.
+  // The code is not different from when we add an account and it works there...
+  account.setPath();
+  await account.save();
 
   mutate('/api/accounts');
 
@@ -263,5 +325,6 @@ async function onSubmit(data: FormValues, onSave: Function) {
     // Opening balances affect net worth
     mutate('/api/monthly-totals', undefined);
   }
+
   onSave(account);
 }

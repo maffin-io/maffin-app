@@ -22,7 +22,7 @@ exports[`AccountsPage shows onboarding when no data 1`] = `
     </span>
     <div>
       <div
-        data-testid="AddAccountButton"
+        data-testid="AccountFormButton"
       />
     </div>
   </div>

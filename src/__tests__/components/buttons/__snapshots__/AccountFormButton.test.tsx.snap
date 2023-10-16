@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AddAccountButton opens modal when clicking the button 1`] = `
+exports[`AccountFormButton opens modal when clicking the button 1`] = `
 <div
   data-testid="Modal"
 >

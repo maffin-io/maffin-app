@@ -8,7 +8,7 @@ import type { SWRResponse } from 'swr';
 
 import type { Account } from '@/book/entities';
 import AccountsPage from '@/app/dashboard/accounts/page';
-import AddAccountButton from '@/components/buttons/AddAccountButton';
+import AccountFormButton from '@/components/buttons/AccountFormButton';
 import DateRangeInput from '@/components/DateRangeInput';
 import Onboarding from '@/components/onboarding/Onboarding';
 import {
@@ -25,8 +25,8 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
-jest.mock('@/components/buttons/AddAccountButton', () => jest.fn(
-  () => <div data-testid="AddAccountButton" />,
+jest.mock('@/components/buttons/AccountFormButton', () => jest.fn(
+  () => <div data-testid="AccountFormButton" />,
 ));
 
 jest.mock('@/components/pages/accounts/AccountsTable', () => jest.fn(
@@ -84,8 +84,8 @@ describe('AccountsPage', () => {
     jest.spyOn(apiHook, 'useStartDate').mockReturnValueOnce({ data: date } as SWRResponse);
     const { container } = render(<AccountsPage />);
 
-    await screen.findByTestId('AddAccountButton');
-    expect(AddAccountButton).toHaveBeenLastCalledWith({}, {});
+    await screen.findByTestId('AccountFormButton');
+    expect(AccountFormButton).toHaveBeenLastCalledWith({}, {});
 
     await screen.findByTestId('Onboarding');
     expect(Onboarding).toHaveBeenLastCalledWith(

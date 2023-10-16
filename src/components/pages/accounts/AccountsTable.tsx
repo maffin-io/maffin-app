@@ -63,9 +63,13 @@ function getTreeTotals(
   monthlyTotals: MonthlyTotals,
   selectedDate: DateTime,
 ): AccountsTableRow {
-  const leaves = current.childrenIds.map(
-    childId => getTreeTotals(accounts[childId], accounts, monthlyTotals, selectedDate),
-  );
+  const leaves: AccountsTableRow[] = [];
+  current.childrenIds.forEach(childId => {
+    const childAccount = accounts[childId];
+    if (!childAccount.hidden) {
+      leaves.push(getTreeTotals(accounts[childId], accounts, monthlyTotals, selectedDate));
+    }
+  });
 
   const accountTotal = Object.entries(monthlyTotals[current.guid] || {}).reduce(
     (total, [monthYear, amount]) => {

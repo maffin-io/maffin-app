@@ -83,18 +83,35 @@ describe('AccountForm', () => {
     await datasource.destroy();
   });
 
-  it('renders as expected', async () => {
+  it('renders as expected with add', async () => {
     const { container } = render(
       <AccountForm
+        action="add"
         onSave={() => {}}
       />,
     );
 
     await screen.findByLabelText('Name');
     screen.getByRole('combobox', { name: 'parentInput' });
-    expect(screen.getByRole('combobox', { name: '', hidden: true })).toBeDisabled();
-    screen.getByRole('spinbutton', { name: 'Opening balance', hidden: true });
     screen.getByRole('combobox', { name: 'commodityInput' });
+    expect(screen.getByLabelText('typeInput')).toBeDisabled();
+    screen.getByRole('spinbutton', { name: 'Opening balance', hidden: true });
+    expect(container).toMatchSnapshot();
+  });
+
+  it('renders as expected with update', async () => {
+    const { container } = render(
+      <AccountForm
+        action="update"
+        onSave={() => {}}
+      />,
+    );
+
+    await screen.findByLabelText('Name');
+    screen.getByRole('combobox', { name: 'parentInput' });
+    expect(screen.getByLabelText('typeInput')).toBeDisabled();
+    expect(screen.getByLabelText('commodityInput')).toBeDisabled();
+    screen.getByRole('spinbutton', { name: 'Opening balance', hidden: true });
     expect(container).toMatchSnapshot();
   });
 
@@ -124,7 +141,7 @@ describe('AccountForm', () => {
       />,
     );
 
-    const button = await screen.findByText('Save');
+    const button = await screen.findByText('add');
     expect(button).toBeDisabled();
   });
 
@@ -195,8 +212,8 @@ describe('AccountForm', () => {
     await user.click(screen.getByRole('combobox', { name: 'commodityInput' }));
     await user.click(screen.getByText('EUR'));
 
-    expect(screen.getByText('Save')).not.toBeDisabled();
-    await user.click(screen.getByText('Save'));
+    expect(screen.getByText('add')).not.toBeDisabled();
+    await user.click(screen.getByText('add'));
 
     const account = await Account.findOneByOrFail({ name: 'TestAccount' });
     expect(account).toEqual({
@@ -214,6 +231,40 @@ describe('AccountForm', () => {
     expect(mockSave).toHaveBeenCalledTimes(1);
     expect(swr.mutate).toBeCalledTimes(1);
     expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/accounts');
+  });
+
+  it('updates account', async () => {
+    const user = userEvent.setup();
+    const mockSave = jest.fn();
+
+    const account = await Account.findOneOrFail({
+      where: { name: 'Assets' },
+      relations: { parent: true },
+    });
+
+    render(
+      <AccountForm
+        action="update"
+        onSave={mockSave}
+        defaultValues={{
+          ...account,
+        }}
+      />,
+    );
+
+    await user.clear(screen.getByLabelText('Name'));
+    await user.type(screen.getByLabelText('Name'), 'New name');
+
+    expect(screen.getByText('update')).not.toBeDisabled();
+    await user.click(screen.getByText('update'));
+    const accounts = await Account.find();
+
+    expect(accounts).toHaveLength(3);
+    expect(accounts[1]).toMatchObject({
+      guid: assetAccount.guid,
+      name: 'New name',
+      path: 'New name',
+    });
   });
 
   it('creates bank account with opening balance', async () => {
@@ -241,8 +292,8 @@ describe('AccountForm', () => {
     await user.click(screen.getByRole('combobox', { name: 'commodityInput' }));
     await user.click(screen.getByText('EUR'));
 
-    expect(screen.getByText('Save')).not.toBeDisabled();
-    await user.click(screen.getByText('Save'));
+    expect(screen.getByText('add')).not.toBeDisabled();
+    await user.click(screen.getByText('add'));
 
     const account = await Account.findOneByOrFail({ name: 'TestAccount' });
     expect(account).toEqual({

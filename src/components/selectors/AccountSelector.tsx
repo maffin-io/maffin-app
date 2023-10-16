@@ -8,6 +8,7 @@ export type AccountSelectorProps = {
   placeholder?: string,
   ignoreAccounts?: string[],
   ignorePlaceholders?: boolean,
+  ignoreHidden?: boolean,
   defaultValue?: Account,
   id?: string,
   showRoot?: boolean,
@@ -22,6 +23,7 @@ export default function AccountSelector(
     placeholder,
     ignoreAccounts = [],
     ignorePlaceholders = true,
+    ignoreHidden = true,
     defaultValue,
     id = 'accountSelector',
     showRoot = false,
@@ -50,6 +52,10 @@ export default function AccountSelector(
 
   if (ignorePlaceholders) {
     options = options.filter(account => !account.placeholder);
+  }
+
+  if (ignoreHidden) {
+    options = options.filter(account => !account.hidden);
   }
 
   return (
