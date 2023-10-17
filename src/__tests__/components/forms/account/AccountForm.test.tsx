@@ -9,6 +9,7 @@ import userEvent from '@testing-library/user-event';
 import { DataSource } from 'typeorm';
 import * as swr from 'swr';
 import type { SWRResponse } from 'swr';
+import { useRouter } from 'next/navigation';
 
 import { getAllowedSubAccounts } from '@/book/helpers/accountType';
 import {
@@ -99,7 +100,7 @@ describe('AccountForm', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('renders as expected with update', async () => {
+  it('renders as expected with %s', async () => {
     const { container } = render(
       <AccountForm
         action="update"
@@ -109,6 +110,22 @@ describe('AccountForm', () => {
 
     await screen.findByLabelText('Name');
     screen.getByRole('combobox', { name: 'parentInput' });
+    expect(screen.getByLabelText('typeInput')).toBeDisabled();
+    expect(screen.getByLabelText('commodityInput')).toBeDisabled();
+    screen.getByRole('spinbutton', { name: 'Opening balance', hidden: true });
+    expect(container).toMatchSnapshot();
+  });
+
+  it('renders as expected with delete', async () => {
+    const { container } = render(
+      <AccountForm
+        action="delete"
+        onSave={() => {}}
+      />,
+    );
+
+    await screen.findByLabelText('Name');
+    expect(screen.getByLabelText('parentInput')).toBeDisabled();
     expect(screen.getByLabelText('typeInput')).toBeDisabled();
     expect(screen.getByLabelText('commodityInput')).toBeDisabled();
     screen.getByRole('spinbutton', { name: 'Opening balance', hidden: true });
@@ -135,11 +152,14 @@ describe('AccountForm', () => {
   });
 
   it('button is disabled when form not valid', async () => {
+    const user = userEvent.setup();
     render(
       <AccountForm
         onSave={() => {}}
       />,
     );
+
+    await user.type(screen.getByLabelText('Name'), 'ha');
 
     const button = await screen.findByText('add');
     expect(button).toBeDisabled();
@@ -265,6 +285,41 @@ describe('AccountForm', () => {
       name: 'New name',
       path: 'New name',
     });
+  });
+
+  it('deletes account', async () => {
+    const user = userEvent.setup();
+    const mockSave = jest.fn();
+
+    const mockRouterReplace = jest.fn();
+    (useRouter as jest.Mock).mockImplementation(() => ({
+      replace: mockRouterReplace,
+    }));
+
+    const account = await Account.findOneOrFail({
+      where: { name: 'Assets' },
+      relations: { parent: true },
+    });
+
+    render(
+      <AccountForm
+        action="delete"
+        onSave={mockSave}
+        defaultValues={{
+          ...account,
+        }}
+      />,
+    );
+
+    const deleteButton = await screen.findByText('delete');
+
+    expect(deleteButton).not.toBeDisabled();
+    await user.click(deleteButton);
+    const accounts = await Account.find();
+
+    expect(accounts).toHaveLength(2);
+    expect(account.guid in accounts).toBe(false);
+    expect(mockRouterReplace).toBeCalledWith('/dashboard/accounts');
   });
 
   it('creates bank account with opening balance', async () => {

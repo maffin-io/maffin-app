@@ -6,16 +6,17 @@ import { DataSourceContext } from '@/hooks';
 import AccountForm from '@/components/forms/account/AccountForm';
 import type { FormValues } from '@/components/forms/account/types';
 
-export type AccountFormButtonProps = {
-  action?: 'add' | 'update',
+export interface AccountFormButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  action?: 'add' | 'update' | 'delete',
   defaultValues?: Partial<FormValues>,
-  children?: React.ReactNode,
-};
+}
 
 export default function AccountFormButton({
   action = 'add',
   defaultValues,
   children,
+  className = 'btn btn-primary',
+  ...props
 }: AccountFormButtonProps): JSX.Element {
   const { save } = React.useContext(DataSourceContext);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -23,6 +24,9 @@ export default function AccountFormButton({
   let title = 'Add account';
   if (action === 'update') {
     title = `Edit ${defaultValues?.name} account`;
+  }
+  if (action === 'delete') {
+    title = 'Confirm you want to remove this account';
   }
 
   return (
@@ -52,8 +56,9 @@ export default function AccountFormButton({
       <button
         id="add-account"
         type="button"
-        className="btn btn-primary"
         onClick={() => setIsModalOpen(!isModalOpen)}
+        className={className}
+        {...props}
       >
         {
           children

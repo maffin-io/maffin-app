@@ -11,23 +11,19 @@ import {
   Transaction,
 } from '@/book/entities';
 
-export type TransactionFormButtonProps = {
-  action?: 'add' | 'update' | 'delete',
+export interface TransactionFormButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   account?: Account, // Account to populate for the main split
-  defaultValues: Partial<FormValues>,
-  className?: string,
-  children?: React.ReactNode,
-};
+  action?: 'add' | 'update' | 'delete',
+  defaultValues?: Partial<FormValues>,
+}
 
-export default function TransactionFormButton(
-  {
-    action = 'add',
-    account,
-    defaultValues,
-    children,
-    className = 'btn btn-primary',
-  }: TransactionFormButtonProps,
-): JSX.Element {
+export default function TransactionFormButton({
+  action = 'add',
+  account,
+  defaultValues,
+  children,
+  className = 'btn btn-primary',
+}: TransactionFormButtonProps): JSX.Element {
   const { save } = React.useContext(DataSourceContext);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [defaults, setDefaults] = React.useState(defaultValues);
@@ -81,7 +77,7 @@ export default function TransactionFormButton(
             } as FormValues);
           } else if (action === 'update' || action === 'delete') {
             const tx = await Transaction.findOneOrFail({
-              where: { guid: defaultValues.guid },
+              where: { guid: defaultValues?.guid },
               relations: {
                 splits: {
                   fk_account: true,

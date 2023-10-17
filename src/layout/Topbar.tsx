@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import ProfileDropdown from '@/components/ProfileDropdown';
 import SaveButton from '@/components/buttons/SaveButton';
 import { AccountSelector } from '@/components/selectors';
-import ThemeButton from '@/components/ThemeButton';
+import ThemeButton from '@/components/buttons/ThemeButton';
 import type { Account } from '@/book/entities';
 
 export default function Topbar(): JSX.Element {

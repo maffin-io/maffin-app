@@ -54,19 +54,16 @@ export function useAccounts(): SWRResponse<AccountsMap> {
 }
 
 export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
-  const { data: accounts } = useSWRImmutable(
-    '/api/accounts',
-    fetcher(queries.getAccounts, '/api/accounts'),
-  );
-  const { data: todayPrices } = useSWRImmutable(
-    '/api/prices/today',
-    fetcher(PriceDB.getTodayQuotes, '/api/prices/today'),
-  );
+  const { data: accounts } = useAccounts();
+  const { data: todayPrices } = useTodayPrices();
 
   const key = '/api/monthly-totals';
   const result = useSWRImmutable(
     key,
-    fetcher(() => queries.getMonthlyTotals(accounts, todayPrices), key),
+    fetcher(
+      () => queries.getMonthlyTotals(accounts as AccountsMap, todayPrices as PriceDBMap),
+      key,
+    ),
   );
 
   return result;

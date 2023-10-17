@@ -7,7 +7,7 @@ import {
   waitFor,
 } from '@testing-library/react';
 
-import ThemeButton from '@/components/ThemeButton';
+import ThemeButton from '@/components/buttons/ThemeButton';
 
 jest.mock('swr', () => ({
   __esModule: true,
