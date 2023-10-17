@@ -23,6 +23,8 @@ import createEquityAccount from '@/lib/createEquityAccount';
 import { Tooltip } from 'react-tooltip';
 import type { FormValues } from '@/components/forms/account/types';
 import classNames from 'classnames';
+import CommodityFormButton from '@/components/buttons/CommodityFormButton';
+import {MonthlyTotals} from '@/lib/queries';
 
 const resolver = classValidatorResolver(Account, { validator: { stopAtFirstError: true } });
 
@@ -290,12 +292,13 @@ async function onSubmit(
     }
   } else if (action === 'update') {
     await account.save();
+    mutate('/api/accounts');
   } else if (action === 'delete') {
     await Account.remove(account);
     router.replace('/dashboard/accounts');
+    mutate('/api/accounts');
   }
 
-  mutate('/api/accounts');
   onSave(account);
 }
 
@@ -350,6 +353,7 @@ async function createBalance(data: FormValues, account: Account) {
     date: data.balanceDate ? DateTime.fromISO(data.balanceDate as string) : DateTime.now(),
   }).save();
 
+  mutate('/api/accounts');
   // Opening balances affect net worth
-  mutate('/api/monthly-totals', undefined);
+  mutate('/api/monthly-totals');
 }

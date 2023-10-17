@@ -37,7 +37,7 @@ function MenuItem({ item, className }: MenuItemProps): JSX.Element {
         target={item.target}
         className="block pt-3 pb-3"
       >
-        <span className={`flex justify-center items-center w-20 ${className} text-slate-400 hover:text-white`}>
+        <span className={`flex justify-center cursor-pointer items-center w-20 ${className} text-slate-400 hover:text-white`}>
           {item.icon}
         </span>
       </Link>

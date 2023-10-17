@@ -2,7 +2,9 @@ import React from 'react';
 
 import { useCommodities } from '@/hooks/api';
 import { Commodity } from '@/book/entities';
-import Selector from '@/components/selectors/Selector';
+import { SingleValue, components } from 'react-select';
+import CreatableSelect from 'react-select/creatable';
+import { BiSearch } from 'react-icons/bi';
 
 export type CommoditySelectorProps = {
   placeholder?: string,
@@ -27,6 +29,7 @@ export default function CommoditySelector(
     onChange = () => {},
   }: CommoditySelectorProps,
 ): JSX.Element {
+  const ref = React.useRef<HTMLDivElement>();
   let { data: commodities } = useCommodities();
   commodities = commodities || [];
   commodities = commodities.filter(
@@ -34,16 +37,57 @@ export default function CommoditySelector(
   );
 
   return (
-    <Selector<Commodity>
+    <CreatableSelect<Commodity>
       id={id}
-      labelAttribute="mnemonic"
       options={commodities}
-      onChange={onChange}
       placeholder={placeholder || 'Choose commodity'}
       isClearable={isClearable}
-      disabled={disabled}
       defaultValue={defaultValue}
-      className={className}
+      getOptionLabel={(option: Commodity) => {
+        let label = option.mnemonic;
+        if (!commodities?.find(c => c.guid === option.guid)) {
+          label = `Create '${option.mnemonic}' ${option.namespace.toLowerCase()}`;
+        }
+
+        return label;
+      }}
+      onChange={(newValue: SingleValue<Commodity> | null) => {
+        if (onChange) {
+          onChange(newValue);
+        }
+        ref.current?.blur();
+      }}
+      isDisabled={disabled}
+      getOptionValue={(option: Commodity) => option.mnemonic}
+      getNewOptionData={(value) => Commodity.create({
+        mnemonic: value,
+        namespace: 'CURRENCY',
+      })}
+      components={{ Control }}
+      className={`selector ${className}`}
+      classNamePrefix="selector"
+      styles={{
+        option: () => ({}),
+      }}
+      classNames={{
+        indicatorSeparator: () => 'hidden',
+        singleValue: () => '!text-inherit',
+        input: () => '!text-inherit',
+      }}
     />
+  );
+}
+
+function Control(
+  {
+    children,
+    ...props
+  }: any,
+): JSX.Element {
+  return (
+    <components.Control {...props}>
+      <BiSearch className="absolute text-md left-[10px]" />
+      {children}
+    </components.Control>
   );
 }

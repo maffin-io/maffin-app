@@ -102,7 +102,7 @@ export default class Account extends BaseEntity {
   @RelationId((account: Account) => account.children)
     childrenIds: string[];
 
-  @ManyToOne('Commodity', { eager: true })
+  @ManyToOne('Commodity', { eager: true, cascade: true })
   @JoinColumn({ name: 'commodity_guid' })
   @CheckCommodity()
   @v.ValidateIf(o => o.type !== 'ROOT')
