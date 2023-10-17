@@ -9,6 +9,10 @@ import { Settings } from 'luxon';
 // https://github.com/chartjs/chartjs-adapter-luxon/issues/91
 jest.mock('chartjs-adapter-luxon', jest.fn());
 
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(),
+}));
+
 Object.defineProperty(global.self, 'crypto', {
   value: {
     randomUUID: () => crypto.randomUUID(),

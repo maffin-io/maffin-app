@@ -67,6 +67,25 @@ describe('AccountFormButton', () => {
     );
   });
 
+  it('renders hidden modal on mount with delete', async () => {
+    render(<AccountFormButton action="delete" />);
+    expect(Modal).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        isOpen: false,
+      }),
+      {},
+    );
+
+    expect(AccountForm).toHaveBeenLastCalledWith(
+      {
+        action: 'delete',
+        onSave: expect.any(Function),
+        defaultValues: undefined,
+      },
+      {},
+    );
+  });
+
   it('opens modal when clicking the button', async () => {
     render(
       <AccountFormButton />,

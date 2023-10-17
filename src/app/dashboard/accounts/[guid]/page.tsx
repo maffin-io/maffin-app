@@ -1,10 +1,10 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
-import { BiEdit, BiX, BiXCircle } from 'react-icons/bi';
+import { BiEdit, BiXCircle } from 'react-icons/bi';
+import { Tooltip } from 'react-tooltip';
 
 import Money from '@/book/Money';
 import {
@@ -31,7 +31,6 @@ export type AccountPageProps = {
 };
 
 export default function AccountPage({ params }: AccountPageProps): JSX.Element {
-  const router = useRouter();
   let { data: accounts } = useAccounts();
   let { data: splits } = useSplits(params.guid);
   const latestDate = splits?.[0]?.transaction.date;
@@ -52,10 +51,9 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
 
   const account = accounts[params.guid] as Account;
   if (!account) {
-    router.push('/404');
     return (
-      <div>
-        <Loading />
+      <div className="flex h-screen text-sm place-content-center place-items-center">
+        {`Account ${params.guid} does not exist`}
       </div>
     );
   }
@@ -137,6 +135,35 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
             >
               <BiEdit />
             </AccountFormButton>
+            <AccountFormButton
+              defaultValues={{
+                ...account,
+                parent: accounts[account.parentId],
+              }}
+              disabled={splits.length > 0}
+              className="btn btn-danger"
+              action="delete"
+              data-tooltip-id="delete-help"
+            >
+              <BiXCircle />
+            </AccountFormButton>
+            {
+              splits.length > 0
+              && (
+                <Tooltip
+                  id="delete-help"
+                  className="tooltip"
+                  disableStyleInjection
+                >
+                  <p>
+                    Accounts that contain transactions can&apos;t be deleted.
+                  </p>
+                  <p>
+                    Move the transactions to another account first.
+                  </p>
+                </Tooltip>
+              )
+            }
           </div>
         </div>
       </div>

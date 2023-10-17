@@ -20,7 +20,7 @@ const resolver = classValidatorResolver(Transaction, { validator: { stopAtFirstE
 export type TransactionFormProps = {
   action?: 'add' | 'update' | 'delete',
   onSave: Function,
-  defaultValues: Partial<FormValues>,
+  defaultValues?: Partial<FormValues>,
 };
 
 export default function TransactionForm({
@@ -156,7 +156,7 @@ async function onSubmit(data: FormValues, action: 'add' | 'update' | 'delete', o
     mutate(`/api/splits/${split.account.guid}`);
   });
 
-  mutate('/api/monthly-totals');
-  mutate('/api/txs/latest');
+  mutate('/api/monthly-totals', undefined);
+  mutate('/api/txs/latest', undefined);
   onSave();
 }

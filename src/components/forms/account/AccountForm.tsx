@@ -3,6 +3,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 import { DateTime } from 'luxon';
 import { mutate } from 'swr';
+import { useRouter } from 'next/navigation';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 import {
   Account,
@@ -25,7 +27,7 @@ import classNames from 'classnames';
 const resolver = classValidatorResolver(Account, { validator: { stopAtFirstError: true } });
 
 export type AccountFormProps = {
-  action?: 'add' | 'update',
+  action?: 'add' | 'update' | 'delete',
   onSave: Function,
   defaultValues?: Partial<FormValues>,
 };
@@ -41,12 +43,15 @@ export default function AccountForm({
   defaultValues,
   onSave,
 }: AccountFormProps): JSX.Element {
+  const router = useRouter();
   const form = useForm<FormValues>({
     defaultValues,
     mode: 'onChange',
     resolver,
   });
+
   const { errors } = form.formState;
+  const disabled = action === 'delete';
 
   const parent = form.watch('parent');
   const ignoreTypes = (
@@ -56,12 +61,13 @@ export default function AccountForm({
   const type = form.watch('type');
 
   return (
-    <form onSubmit={form.handleSubmit((data) => onSubmit(data, onSave))}>
+    <form onSubmit={form.handleSubmit((data) => onSubmit(data, action, router, onSave))}>
       <div className="grid grid-cols-12 text-sm my-5 gap-2">
         <fieldset className="col-span-6">
           <label htmlFor="nameInput" className="inline-block mb-2">Name</label>
           <input
             id="nameInput"
+            disabled={disabled}
             className="w-full m-0"
             {...form.register('name')}
             type="text"
@@ -95,6 +101,7 @@ export default function AccountForm({
           </Tooltip>
           <input
             id="hiddenInput"
+            disabled={disabled}
             className="block m-0"
             {...form.register('hidden')}
             type="checkbox"
@@ -112,6 +119,7 @@ export default function AccountForm({
               <AccountSelector
                 id="parentInput"
                 showRoot
+                disabled={disabled}
                 isClearable={false}
                 ignoreAccounts={['STOCK', 'MUTUAL']}
                 ignorePlaceholders={false}
@@ -135,7 +143,7 @@ export default function AccountForm({
               <AccountTypeSelector
                 id="typeInput"
                 placeholder={parent ? '<select account type>' : '<select parent first>'}
-                disabled={!parent}
+                disabled={disabled || !parent}
                 ignoreTypes={ignoreTypes}
                 onChange={field.onChange}
                 defaultValue={(defaultValues?.type && { type: defaultValues.type }) || undefined}
@@ -176,6 +184,7 @@ export default function AccountForm({
           </Tooltip>
           <input
             id="balanceInput"
+            disabled={disabled}
             className="block w-full h-[38px] m-0 rounded-r-none"
             {...form.register('balance')}
             type="number"
@@ -224,7 +233,7 @@ export default function AccountForm({
                 placeholder="<commodity>"
                 onChange={field.onChange}
                 defaultValue={defaultValues?.fk_commodity}
-                disabled={action !== 'add'}
+                disabled={disabled || action !== 'add'}
               />
               <p className="invalid-feedback">{fieldState.error?.message}</p>
             </>
@@ -247,10 +256,11 @@ export default function AccountForm({
             {
               'btn-primary': action === 'add',
               'btn-warn': action === 'update',
+              'btn-danger': action === 'delete',
             },
           )}
           type="submit"
-          disabled={!form.formState.isValid}
+          disabled={Object.keys(errors).length > 0}
         >
           {action}
         </button>
@@ -259,7 +269,12 @@ export default function AccountForm({
   );
 }
 
-async function onSubmit(data: FormValues, onSave: Function) {
+async function onSubmit(
+  data: FormValues,
+  action: 'add' | 'update' | 'delete',
+  router: AppRouterInstance,
+  onSave: Function,
+) {
   const account = Account.create({
     ...data,
     guid: data.guid || undefined,
@@ -267,64 +282,74 @@ async function onSubmit(data: FormValues, onSave: Function) {
   // For some reason the beforeInsert doesn't work when updating an account.
   // The code is not different from when we add an account and it works there...
   account.setPath();
-  await account.save();
 
-  mutate('/api/accounts');
-
-  if (data.balance) {
-    let equityAccount = await Account.findOneBy({
-      type: 'EQUITY',
-      name: `Opening balances - ${account.commodity.mnemonic}`,
-    });
-
-    if (!equityAccount) {
-      equityAccount = await createEquityAccount(account.commodity);
-
-      mutate(
-        '/api/accounts',
-        async (accounts: AccountsMap) => {
-          const [equity, equityRoot] = await Promise.all([
-            Account.findOneByOrFail({ guid: equityAccount?.guid }),
-            Account.findOneByOrFail({ guid: equityAccount?.parent.guid }),
-          ]);
-          return {
-            ...accounts,
-            [equity.guid]: equity,
-            [equityRoot.guid]: equityRoot,
-          };
-        },
-        { revalidate: false },
-      );
+  if (action === 'add') {
+    await account.save();
+    if (data.balance) {
+      await createBalance(data, account);
     }
-
-    const { amount, scale } = toAmountWithScale(data.balance);
-    const denom = parseInt('1'.padEnd(scale + 1, '0'), 10);
-
-    await Transaction.create({
-      description: 'Opening balance',
-      fk_currency: data.fk_commodity,
-      splits: [
-        Split.create({
-          fk_account: account,
-          valueNum: amount,
-          valueDenom: denom,
-          quantityNum: amount,
-          quantityDenom: denom,
-        }),
-        Split.create({
-          fk_account: equityAccount,
-          valueNum: -amount,
-          valueDenom: denom,
-          quantityNum: -amount,
-          quantityDenom: denom,
-        }),
-      ],
-      date: data.balanceDate ? DateTime.fromISO(data.balanceDate as string) : DateTime.now(),
-    }).save();
-
-    // Opening balances affect net worth
-    mutate('/api/monthly-totals', undefined);
+  } else if (action === 'update') {
+    await account.save();
+  } else if (action === 'delete') {
+    await Account.remove(account);
+    router.replace('/dashboard/accounts');
   }
 
+  mutate('/api/accounts');
   onSave(account);
+}
+
+async function createBalance(data: FormValues, account: Account) {
+  let equityAccount = await Account.findOneBy({
+    type: 'EQUITY',
+    name: `Opening balances - ${account.commodity.mnemonic}`,
+  });
+
+  if (!equityAccount) {
+    equityAccount = await createEquityAccount(account.commodity);
+
+    mutate(
+      '/api/accounts',
+      async (accounts: AccountsMap) => {
+        const [equity, equityRoot] = await Promise.all([
+          Account.findOneByOrFail({ guid: equityAccount?.guid }),
+          Account.findOneByOrFail({ guid: equityAccount?.parent.guid }),
+        ]);
+        return {
+          ...accounts,
+          [equity.guid]: equity,
+          [equityRoot.guid]: equityRoot,
+        };
+      },
+      { revalidate: false },
+    );
+  }
+
+  const { amount, scale } = toAmountWithScale(data.balance as number);
+  const denom = parseInt('1'.padEnd(scale + 1, '0'), 10);
+
+  await Transaction.create({
+    description: 'Opening balance',
+    fk_currency: data.fk_commodity,
+    splits: [
+      Split.create({
+        fk_account: account,
+        valueNum: amount,
+        valueDenom: denom,
+        quantityNum: amount,
+        quantityDenom: denom,
+      }),
+      Split.create({
+        fk_account: equityAccount,
+        valueNum: -amount,
+        valueDenom: denom,
+        quantityNum: -amount,
+        quantityDenom: denom,
+      }),
+    ],
+    date: data.balanceDate ? DateTime.fromISO(data.balanceDate as string) : DateTime.now(),
+  }).save();
+
+  // Opening balances affect net worth
+  mutate('/api/monthly-totals', undefined);
 }
