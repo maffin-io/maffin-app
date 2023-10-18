@@ -3900,12 +3900,7 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*":
-  version "18.16.3"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.16.3.tgz#6bda7819aae6ea0b386ebc5b24bdf602f1b42b01"
-  integrity sha512-OPs5WnnT1xkCBiuQrZA4+YAV4HEJejmHneyraIaxsbev5yCEr6KMwINNFP9wQeFIw8FWcoTqF3vQsa5CDaI+8Q==
-
-"@types/node@^20.8.4":
+"@types/node@*", "@types/node@^20.8.4":
   version "20.8.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.8.4.tgz#0e9ebb2ff29d5c3302fc84477d066fa7c6b441aa"
   integrity sha512-ZVPnqU58giiCjSxjVUESDtdPk4QR5WQhhINbc9UBrKLU68MX5BF6kbQzTrkwbolyr0X8ChBpXfavr5mZFKZQ5A==
@@ -4019,10 +4014,10 @@
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-7.5.0.tgz#591c1ce3a702c45ee15f47a42ade72c2fd78978a"
   integrity sha512-G8hZ6XJiHnuhQKR7ZmysCeJWE08o8T0AXtk5darsCaTVsYZhhgUrq53jizaR2FvsoeCwJhlmwTjkXBY5Pn/ZHw==
 
-"@types/sql.js@^1.4.4":
-  version "1.4.5"
-  resolved "https://registry.yarnpkg.com/@types/sql.js/-/sql.js-1.4.5.tgz#e69d1a1ca3515ca6dea209f1cb85b402839c568f"
-  integrity sha512-FxaKd4TLmXC2gGsV0Pe1fX0GJkfVP3fIFJCXOjNMOYHoTLCi0+FLsURQmCtJLwlhabryvN67RMzRxpAErpEBWw==
+"@types/sql.js@^1.4.6":
+  version "1.4.6"
+  resolved "https://registry.yarnpkg.com/@types/sql.js/-/sql.js-1.4.6.tgz#d8fbacb981ce75ad5f49a05eb44d9ce0713fce80"
+  integrity sha512-RjdHRai4nsiOg9wU/LNR5dE3CNqnjaM+KBAkQNxoI54QtyJqk2zV9laOQACG9+C0BEFaDwf594nxmzsWzJt+Ng==
   dependencies:
     "@types/emscripten" "*"
     "@types/node" "*"
