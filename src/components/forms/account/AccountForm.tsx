@@ -354,4 +354,5 @@ async function createBalance(data: FormValues, account: Account) {
 
   // Opening balances affect net worth
   mutate('/api/monthly-totals', undefined);
+  mutate('/api/txs/latest', undefined);
 }

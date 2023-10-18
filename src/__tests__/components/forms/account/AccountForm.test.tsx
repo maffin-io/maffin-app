@@ -397,6 +397,12 @@ describe('AccountForm', () => {
         valueNum: -1000,
       },
     ]);
+
+    expect(swr.mutate).toBeCalledTimes(4);
+    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/accounts');
+    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/accounts', expect.any(Function), { revalidate: false });
+    expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/monthly-totals', undefined);
+    expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/txs/latest', undefined);
   });
 
   it.each([
