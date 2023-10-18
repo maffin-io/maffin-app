@@ -7,6 +7,24 @@ class YahooError extends HTTPError {}
 
 const HOST = 'https://query2.finance.yahoo.com';
 
+async function search(ticker) {
+  const url = `${HOST}/v6/finance/quoteSummary/${ticker}?modules=price`;
+  try {
+    resp = await axios.get(url);
+  } catch (error) {
+    throw new YahooError(
+      `${url} failed: ${error.message}`,
+      error.response.status,
+      'UNKNOWN',
+    );
+  }
+
+  return {
+    ticker: 'ticker',
+    type: 'whatever',
+  };
+}
+
 async function getLiveSummary(ticker) {
   let resp;
   if (ticker === 'SGDCAD=X') {

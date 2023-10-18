@@ -287,6 +287,7 @@ async function onSubmit(
 
   if (action === 'add') {
     await account.save();
+    mutate('/api/accounts');
     if (data.balance) {
       await createBalance(data, account);
     }
@@ -295,8 +296,8 @@ async function onSubmit(
     mutate('/api/accounts');
   } else if (action === 'delete') {
     await Account.remove(account);
-    router.replace('/dashboard/accounts');
     mutate('/api/accounts');
+    router.replace('/dashboard/accounts');
   }
 
   onSave(account);
@@ -353,7 +354,6 @@ async function createBalance(data: FormValues, account: Account) {
     date: data.balanceDate ? DateTime.fromISO(data.balanceDate as string) : DateTime.now(),
   }).save();
 
-  mutate('/api/accounts');
-  // Opening balances affect net worth
-  mutate('/api/monthly-totals');
+  mutate('/api/monthly-totals', undefined);
+  mutate('/api/txs/latest', undefined);
 }

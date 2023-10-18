@@ -29,6 +29,29 @@ app.use(cors({
   }
 }));
 
+app.get('/api/search', async (req, res) => {
+  const ticker = req.query.id;
+  if (!ticker) {
+    res.status(400).json({
+      error: 'ID_REQUIRED',
+      description: 'You need to pass \'id\' queryparam to search for a quote',
+    });
+    return;
+  }
+
+  try {
+    const result = await yahoo.search(ticker);
+    res.json(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      error: 'UNKNOWN_ERROR',
+      description: 'Failed to retrieve prices',
+    });
+    return;
+  }
+});
+
 app.get('/api/prices/live', async (req, res) => {
   let tickers = req.query.ids;
   if (!tickers) {

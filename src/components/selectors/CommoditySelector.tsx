@@ -4,7 +4,9 @@ import { useCommodities } from '@/hooks/api';
 import { Commodity } from '@/book/entities';
 import { SingleValue, components } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
+import AsyncCreatableSelect from 'react-select/async-creatable';
 import { BiSearch } from 'react-icons/bi';
+import Stocker from '@/apis/Stocker';
 
 export type CommoditySelectorProps = {
   placeholder?: string,
@@ -37,9 +39,17 @@ export default function CommoditySelector(
   );
 
   return (
-    <CreatableSelect<Commodity>
+    <AsyncCreatableSelect<Commodity>
       id={id}
-      options={commodities}
+      cacheOptions
+      defaultOptions={commodities}
+      loadOptions={async (inputValue: string) => {
+        const result = await new Stocker().search(inputValue);
+        console.log(result);
+        return (commodities || []).filter(
+          c => c.mnemonic.toLowerCase().includes(inputValue.toLowerCase()),
+        );
+      }}
       placeholder={placeholder || 'Choose commodity'}
       isClearable={isClearable}
       defaultValue={defaultValue}
