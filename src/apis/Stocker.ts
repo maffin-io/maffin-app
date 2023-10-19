@@ -12,16 +12,21 @@ export default class Stocker {
     this.apiName = 'stocker';
   }
 
-  async search(ticker: string): any {
+  async search(
+    ticker: string,
+  ): Promise<{ ticker: string, namespace: string, name: string } | undefined> {
     const options = {
       queryStringParameters: {
         id: ticker,
       },
     };
 
-    const resp = await API.get(this.apiName, '/api/search', options);
-
-    return resp;
+    try {
+      const resp = await API.get(this.apiName, '/api/search', options);
+      return resp;
+    } catch {
+      return undefined;
+    }
   }
 
   async getLiveSummary(tickers: string[]): Promise<{ [key: string]:LiveSummary; }> {

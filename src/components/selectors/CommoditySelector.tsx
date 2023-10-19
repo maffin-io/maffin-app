@@ -1,9 +1,9 @@
 import React from 'react';
+import debounce from 'debounce-promise';
 
 import { useCommodities } from '@/hooks/api';
 import { Commodity } from '@/book/entities';
 import { SingleValue, components } from 'react-select';
-import CreatableSelect from 'react-select/creatable';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import { BiSearch } from 'react-icons/bi';
 import Stocker from '@/apis/Stocker';
@@ -32,35 +32,79 @@ export default function CommoditySelector(
   }: CommoditySelectorProps,
 ): JSX.Element {
   const ref = React.useRef<HTMLDivElement>();
+  const [isLoading, setIsLoading] = React.useState(false);
   let { data: commodities } = useCommodities();
   commodities = commodities || [];
   commodities = commodities.filter(
     commodity => !(ignoreNamespaces).includes(commodity.namespace),
   );
 
+  const loadCommodities = React.useCallback(
+    async (inputValue: string) => {
+      setIsLoading(true);
+      const filteredDefaults = [];
+      let exactMatch = false;
+
+      (commodities || []).forEach(c => {
+        if (c.mnemonic.toLowerCase().includes(inputValue.toLowerCase())) {
+          filteredDefaults.push(c);
+          if (inputValue.toLowerCase() === c.mnemonic.toLowerCase()) {
+            exactMatch = true;
+          }
+        }
+      });
+
+      if (!exactMatch) {
+        const result = await new Stocker().search(inputValue);
+        console.log(result);
+        if (result) {
+          filteredDefaults.push(
+            Commodity.create({
+              mnemonic: result.ticker,
+              namespace: result.namespace,
+              fullname: result.name,
+            }),
+          );
+        }
+      }
+
+      setIsLoading(false);
+      return filteredDefaults;
+    },
+    [commodities],
+  );
+
+  const debouncedSearch = debounce(loadCommodities, 1000);
+
   return (
     <AsyncCreatableSelect<Commodity>
       id={id}
       cacheOptions
+      isLoading={isLoading}
       defaultOptions={commodities}
-      loadOptions={async (inputValue: string) => {
-        const result = await new Stocker().search(inputValue);
-        console.log(result);
-        return (commodities || []).filter(
-          c => c.mnemonic.toLowerCase().includes(inputValue.toLowerCase()),
-        );
-      }}
+      loadOptions={debouncedSearch}
       placeholder={placeholder || 'Choose commodity'}
       isClearable={isClearable}
       defaultValue={defaultValue}
-      getOptionLabel={(option: Commodity) => {
-        let label = option.mnemonic;
-        if (!commodities?.find(c => c.guid === option.guid)) {
-          label = `Create '${option.mnemonic}' ${option.namespace.toLowerCase()}`;
-        }
+      getOptionLabel={
+        (option: Commodity | { label: string, value: string, __isNew__: boolean }) => {
+          if (!(option instanceof Commodity)) {
+            option = Commodity.create({
+              mnemonic: option.value.toUpperCase(),
+              namespace: 'OTHER',
+            });
+          }
+          let label = option.mnemonic;
+          if (!commodities?.find(c => c.guid === (option as Commodity).guid)) {
+            label = `${option.namespace}: ${option.mnemonic}`;
+            if (option.fullname) {
+              label = `${label} (${option.fullname})`;
+            }
+          }
 
-        return label;
-      }}
+          return label;
+        }
+      }
       onChange={(newValue: SingleValue<Commodity> | null) => {
         if (onChange) {
           onChange(newValue);
@@ -69,10 +113,6 @@ export default function CommoditySelector(
       }}
       isDisabled={disabled}
       getOptionValue={(option: Commodity) => option.mnemonic}
-      getNewOptionData={(value) => Commodity.create({
-        mnemonic: value,
-        namespace: 'CURRENCY',
-      })}
       components={{ Control }}
       className={`selector ${className}`}
       classNamePrefix="selector"

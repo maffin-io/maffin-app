@@ -18,6 +18,7 @@ import {
   Transaction,
 } from '@/book/entities';
 import type BookStorage from '@/apis/BookStorage';
+import { MIGRATIONS } from '@/book/migrations';
 
 export type DataSourceContextType = {
   datasource: DataSource | null,
@@ -31,6 +32,7 @@ const DATASOURCE: DataSource = new DataSource({
   synchronize: true,
   logging: false,
   entities: [Account, Book, Commodity, Price, Split, Transaction],
+  migrations: MIGRATIONS,
 });
 
 export const DataSourceContext = React.createContext<DataSourceContextType>({
@@ -61,6 +63,7 @@ export default function useDataSource(): DataSourceContextType {
 
           if (rawBook.length) {
             await DATASOURCE.sqljsManager.loadDatabase(rawBook);
+            await DATASOURCE.runMigrations();
           } else {
             await createEmptyBook();
           }

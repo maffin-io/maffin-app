@@ -8,7 +8,7 @@ class YahooError extends HTTPError {}
 const HOST = 'https://query2.finance.yahoo.com';
 
 async function search(ticker) {
-  const url = `${HOST}/v6/finance/quoteSummary/${ticker}?modules=price`;
+  const url = `${HOST}/v1/finance/search?q=${ticker}`;
   try {
     resp = await axios.get(url);
   } catch (error) {
@@ -19,10 +19,29 @@ async function search(ticker) {
     );
   }
 
-  return {
-    ticker: 'ticker',
-    type: 'whatever',
+  const quotes = resp.data.quotes.filter(
+    quote => ['EQUITY', 'ETF', 'MUTUALFUND', 'CURRENCY'].includes(quote.quoteType),
+  );
+
+  if (
+    quotes.length === 0
+  ) {
+    throw new YahooError(
+      `No results for ${ticker}`,
+      404,
+      'NOT_FOUND',
+    );
+  }
+
+  const info = quotes[0];
+  const symbol = info.quoteType === 'CURRENCY' ? info.symbol.substring(0, 3) : info.symbol;
+
+  const result = {
+    ticker: symbol,
+    namespace: info.quoteType || '',
+    name: info.quoteType === 'CURRENCY' ? '' : info.longname,
   };
+  return result;
 }
 
 async function getLiveSummary(ticker) {
@@ -143,6 +162,7 @@ function toCurrency(currency) {
 }
 
 module.exports = {
+  search,
   getLiveSummary,
   getPrice,
   YahooError,

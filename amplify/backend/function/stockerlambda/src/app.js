@@ -43,10 +43,14 @@ app.get('/api/search', async (req, res) => {
     const result = await yahoo.search(ticker);
     res.json(result);
   } catch (error) {
+    if (error.status === 404) {
+      res.status(404).json(error);
+      return 
+    }
     console.log(error);
     res.status(500).json({
       error: 'UNKNOWN_ERROR',
-      description: 'Failed to retrieve prices',
+      description: 'Failed to search',
     });
     return;
   }
