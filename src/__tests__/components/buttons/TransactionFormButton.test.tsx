@@ -94,7 +94,7 @@ describe('TransactionFormButton', () => {
     expect(TransactionForm).toHaveBeenLastCalledWith(
       {
         action,
-        defaultValues: {},
+        defaultValues: undefined,
         onSave: expect.any(Function),
       },
       {},
@@ -174,6 +174,7 @@ describe('TransactionFormButton', () => {
       },
       splits: [split1, split2],
     } as Transaction);
+
     render(
       <TransactionFormButton
         defaultValues={{
@@ -226,6 +227,53 @@ describe('TransactionFormButton', () => {
         {},
       );
     });
+  });
+
+  it('uses latest default values always when update', async () => {
+    jest.spyOn(Transaction, 'findOneOrFail').mockResolvedValue({
+      currency: {
+        mnemonic: 'EUR',
+      },
+      splits: [] as Split[],
+    } as Transaction);
+
+    const { rerender } = render(
+      <TransactionFormButton
+        action="update"
+        defaultValues={{
+          description: 'hello',
+        } as FormValues}
+        account={{
+          guid: '1',
+          name: 'account',
+        } as Account}
+      />,
+    );
+
+    rerender(
+      <TransactionFormButton
+        action="update"
+        defaultValues={{
+          description: 'haha',
+        } as FormValues}
+        account={{
+          guid: '1',
+          name: 'account',
+        } as Account}
+      />,
+    );
+
+    const button = await screen.findByRole('button', { name: /add transaction/i });
+    fireEvent.click(button);
+
+    await waitFor(() => expect(TransactionForm).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        defaultValues: expect.objectContaining({
+          description: 'haha',
+        }),
+      }),
+      {},
+    ));
   });
 
   it('passes expected data to TransactionForm', async () => {
