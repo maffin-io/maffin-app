@@ -33,7 +33,7 @@ export type AccountPageProps = {
 export default function AccountPage({ params }: AccountPageProps): JSX.Element {
   let { data: accounts } = useAccounts();
   let { data: splits } = useSplits(params.guid);
-  const latestDate = splits?.[0]?.transaction.date;
+  const latestDate = splits?.[0]?.transaction?.date;
 
   // We cant use fallback data to set a default as SWR treats
   // fallback data as stale data which means with immutable we will
