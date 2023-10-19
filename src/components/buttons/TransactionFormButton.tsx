@@ -26,7 +26,7 @@ export default function TransactionFormButton({
 }: TransactionFormButtonProps): JSX.Element {
   const { save } = React.useContext(DataSourceContext);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
-  const [defaults, setDefaults] = React.useState(defaultValues);
+  const [defaults, setDefaults] = React.useState<Partial<FormValues>>();
 
   let title = `Add transaction to ${account?.name}`;
   if (action === 'update') {
@@ -85,7 +85,7 @@ export default function TransactionFormButton({
               },
             });
             setDefaults({
-              ...defaults,
+              ...defaultValues,
               // The currency is not loaded in the transactions table view
               // so we load it here.
               fk_currency: tx.currency,
