@@ -4,7 +4,7 @@ import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 import { SingleValue } from 'react-select';
 
 import { Commodity } from '@/book/entities';
-import Selector from '@/components/selectors/Selector';
+import { CommoditySelector } from '@/components/selectors';
 
 const resolver = classValidatorResolver(Commodity, { validator: { stopAtFirstError: true } });
 
@@ -13,22 +13,16 @@ export type FormValues = {
   mnemonic: string,
 };
 
-export type CommodityFormProps = {
+export type CurrencyFormProps = {
   onSave: Function,
 };
 
-const BASE_CURRENCIES = [
-  { label: 'EUR' },
-  { label: 'USD' },
-  { label: 'SGD' },
-  { label: 'GBP' },
-];
-
-export default function CommodityForm({ onSave }: CommodityFormProps): JSX.Element {
+export default function CurrencyForm({ onSave }: CurrencyFormProps): JSX.Element {
   const form = useForm<FormValues>({
     mode: 'onChange',
     resolver,
   });
+  const { errors } = form.formState;
 
   return (
     <form onSubmit={form.handleSubmit((data) => onSubmit(data, onSave))}>
@@ -38,15 +32,17 @@ export default function CommodityForm({ onSave }: CommodityFormProps): JSX.Eleme
           name="mnemonic"
           render={({ field, fieldState }) => (
             <>
-              <Selector<{ label: string }>
+              <CommoditySelector
                 id="mnemonicInput"
-                labelAttribute="label"
-                options={BASE_CURRENCIES}
-                onChange={(newValue: SingleValue<{ label: string }> | null) => {
-                  field.onChange(newValue?.label);
+                onChange={(newValue: SingleValue<Commodity> | null) => {
+                  if (newValue) {
+                    field.onChange(newValue.mnemonic);
+                    form.setValue('namespace', newValue.namespace);
+                  }
                 }}
-                placeholder="Choose your currency"
+                placeholder="Choose or search your currency"
                 isClearable={false}
+                namespace="CURRENCY"
               />
               <p className="invalid-feedback">{fieldState.error?.message}</p>
             </>
@@ -54,17 +50,12 @@ export default function CommodityForm({ onSave }: CommodityFormProps): JSX.Eleme
         />
       </fieldset>
 
-      <input
-        {...form.register(
-          'namespace',
-        )}
-        hidden
-        value="CURRENCY"
-        type="text"
-      />
-
       <div className="flex w-full justify-center">
-        <button className="btn btn-primary" type="submit" disabled={!form.formState.isValid}>
+        <button
+          className="btn btn-primary"
+          type="submit"
+          disabled={Object.keys(errors).length > 0}
+        >
           Save
         </button>
       </div>

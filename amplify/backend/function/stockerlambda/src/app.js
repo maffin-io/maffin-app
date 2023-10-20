@@ -31,6 +31,7 @@ app.use(cors({
 
 app.get('/api/search', async (req, res) => {
   const ticker = req.query.id;
+  const type = req.query.type;
   if (!ticker) {
     res.status(400).json({
       error: 'ID_REQUIRED',
@@ -40,7 +41,7 @@ app.get('/api/search', async (req, res) => {
   }
 
   try {
-    const result = await yahoo.search(ticker);
+    const result = await yahoo.search(ticker, type);
     res.json(result);
   } catch (error) {
     if (error.status === 404) {

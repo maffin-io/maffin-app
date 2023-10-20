@@ -232,7 +232,7 @@ export default function AccountForm({
             <>
               <CommoditySelector
                 id="commodityInput"
-                placeholder="<commodity>"
+                placeholder="Choose or search for a new commodity"
                 onChange={field.onChange}
                 defaultValue={defaultValues?.fk_commodity}
                 disabled={disabled || action !== 'add'}

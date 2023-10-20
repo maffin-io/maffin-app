@@ -5,10 +5,10 @@ const { HTTPError } = require('./errors');
 
 class YahooError extends HTTPError {}
 
-const HOST = 'https://query2.finance.yahoo.com';
+const HOST = 'https://query1.finance.yahoo.com';
 
-async function search(ticker) {
-  const url = `${HOST}/v1/finance/search?q=${ticker}`;
+async function search(ticker, type) {
+  const url = `${HOST}/v1/finance/search?q=${ticker}&newsCount=0&enableFuzzyQuery=false`;
   try {
     resp = await axios.get(url);
   } catch (error) {
@@ -19,8 +19,13 @@ async function search(ticker) {
     );
   }
 
+  let typeFilter = ['EQUITY', 'ETF', 'MUTUALFUND', 'CURRENCY'];
+  if (type) {
+    typeFilter = [type];
+  }
+
   const quotes = resp.data.quotes.filter(
-    quote => ['EQUITY', 'ETF', 'MUTUALFUND', 'CURRENCY'].includes(quote.quoteType),
+    quote => typeFilter.includes(quote.quoteType),
   );
 
   if (

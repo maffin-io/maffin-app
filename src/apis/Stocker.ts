@@ -14,10 +14,12 @@ export default class Stocker {
 
   async search(
     ticker: string,
+    type: 'EQUITY' | 'ETF' | 'MUTUALFUND' | 'CURRENCY' | undefined,
   ): Promise<{ ticker: string, namespace: string, name: string } | undefined> {
     const options = {
       queryStringParameters: {
         id: ticker,
+        type,
       },
     };
 

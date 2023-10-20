@@ -54,7 +54,7 @@ export default class Account extends BaseEntity {
     length: 2048,
   })
   @v.Matches(/[a-zA-Z.]+/)
-  @v.Length(4, 2048)
+  @v.Length(1, 2048)
     name!: string;
 
   @Column({

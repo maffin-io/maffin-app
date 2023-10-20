@@ -10,7 +10,7 @@ import Stocker from '@/apis/Stocker';
 
 export type CommoditySelectorProps = {
   placeholder?: string,
-  ignoreNamespaces?: string[],
+  namespace?: 'EQUITY' | 'ETF' | 'MUTUALFUND' | 'CURRENCY' | undefined,
   defaultValue?: Commodity,
   id?: string,
   isClearable?: boolean,
@@ -22,7 +22,7 @@ export type CommoditySelectorProps = {
 export default function CommoditySelector(
   {
     placeholder,
-    ignoreNamespaces = [],
+    namespace,
     defaultValue,
     id = 'commoditySelector',
     isClearable = true,
@@ -34,10 +34,14 @@ export default function CommoditySelector(
   const ref = React.useRef<HTMLDivElement>();
   const [isLoading, setIsLoading] = React.useState(false);
   let { data: commodities } = useCommodities();
+  console.log(commodities);
   commodities = commodities || [];
-  commodities = commodities.filter(
-    commodity => !(ignoreNamespaces).includes(commodity.namespace),
-  );
+
+  if (namespace) {
+    commodities = commodities.filter(
+      commodity => namespace === commodity.namespace,
+    );
+  }
 
   const loadCommodities = React.useCallback(
     async (inputValue: string) => {
@@ -55,8 +59,7 @@ export default function CommoditySelector(
       });
 
       if (!exactMatch) {
-        const result = await new Stocker().search(inputValue);
-        console.log(result);
+        const result = await new Stocker().search(inputValue, namespace);
         if (result) {
           filteredDefaults.push(
             Commodity.create({
@@ -91,7 +94,7 @@ export default function CommoditySelector(
           if (!(option instanceof Commodity)) {
             option = Commodity.create({
               mnemonic: option.value.toUpperCase(),
-              namespace: 'OTHER',
+              namespace: 'UNKNOWN',
             });
           }
           let label = option.mnemonic;
