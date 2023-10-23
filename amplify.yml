@@ -21,3 +21,14 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
+backend:
+  phases:
+    preBuild:
+      commands:
+        - yarn stocker:install
+    build:
+      commands:
+        - yarn stocker:build
+  cache:
+    paths:
+      - node_modules/**/*
