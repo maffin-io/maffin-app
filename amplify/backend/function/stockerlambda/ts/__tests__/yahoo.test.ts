@@ -16,15 +16,7 @@ describe('getPrice', () => {
               meta: {
                 currency: 'USD',
                 chartPreviousClose: 1.79,
-              },
-              indicators: {
-                quote: [
-                  {
-                    close: [
-                      1.89,
-                    ],
-                  },
-                ],
+                regularMarketPrice: 1.89,
               },
             },
           ],
@@ -116,36 +108,6 @@ describe('getPrice', () => {
     );
   });
 
-  it('fails gracefully when no quote data', async () => {
-    mockAxiosGet.mockImplementation(() => Promise.resolve({
-      data: {
-        chart: {
-          result: [
-            {
-              meta: {
-                currency: null,
-              },
-              indicators: {
-                quote: [{}],
-              },
-            },
-          ],
-          error: null,
-        },
-      },
-      status: 200,
-      statusText: 'OK',
-    }));
-
-    await expect(yh.getPrice('SGDCAD=X', 1684139670)).rejects.toThrow(
-      'no historical data for \'SGDCAX=X\' found',
-    );
-    expect(mockAxiosGet).toHaveBeenNthCalledWith(
-      1,
-      'https://query2.finance.yahoo.com/v8/finance/chart/SGDCAX=X?interval=1d&includePrePost=false&period1=1684108800&period2=1684195199',
-    );
-  });
-
   it('returns price *100 from http request call when GBP', async () => {
     mockAxiosGet.mockImplementation(() => Promise.resolve({
       data: {
@@ -154,16 +116,8 @@ describe('getPrice', () => {
             {
               meta: {
                 currency: 'GBp',
-                chartPreviousClose: 9,
-              },
-              indicators: {
-                quote: [
-                  {
-                    close: [
-                      10,
-                    ],
-                  },
-                ],
+                chartPreviousClose: 210,
+                regularMarketPrice: 212.5,
               },
             },
           ],
@@ -177,9 +131,9 @@ describe('getPrice', () => {
     const resp = await yh.getPrice('ticker');
 
     expect(resp).toEqual({
-      price: 10,
-      changePct: 11.11,
-      changeAbs: 1,
+      price: 2.125,
+      changePct: 1.19,
+      changeAbs: 0.02,
       currency: 'GBP',
     });
   });

@@ -1,16 +1,12 @@
 version: 1
 backend:
   phases:
-    preBuild:
-      commands:
-        - yarn stocker:install
     build:
       commands:
-        - yarn stocker:build
+        - mkdir amplify/backend/function/stockerlambda/src
         - cp amplify/backend/function/stockerlambda/package.json amplify/backend/function/stockerlambda/src/
-        - mv amplify/backend/function/stockerlambda/node_modules amplify/backend/function/stockerlambda/src/
-        - '# Execute Amplify CLI with the helper script'
-        - ls amplify/backend
+        - yarn stocker:install
+        - yarn stocker:build
         - amplifyPush --simple
 frontend:
   phases:
