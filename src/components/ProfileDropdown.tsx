@@ -10,7 +10,7 @@ export default function ProfileDropdown(): JSX.Element {
   const { user } = useUser();
 
   return (
-    <div className="group relative h-full pl-3 pr-4 rounded-t-sm hover:bg-gunmetal-800">
+    <div className="group relative h-full bg-light-100/60 hover:bg-light-100 dark:bg-dark-800/50 dark:hover:bg-dark-800">
       <button
         type="button"
         className="flex h-full w-full pl-3 pr-4 items-center"
@@ -28,7 +28,7 @@ export default function ProfileDropdown(): JSX.Element {
           )
         }
         <div>
-          <p className="font-semibold capitalize">
+          <p className="fontsemibold capitalize">
             {user?.name || '...'}
           </p>
           <p className="text-xs">
@@ -36,11 +36,11 @@ export default function ProfileDropdown(): JSX.Element {
           </p>
         </div>
       </button>
-      <ul className="absolute w-40 hidden bg-gunmetal-700 rounded-b-sm py-1 group-hover:block">
-        <li className="px-3 py-2 text-sm hover:bg-gunmetal-800">
+      <ul className="absolute rounded-md w-40 hidden py-1 group-hover:block bg-white dark:bg-dark-700 ">
+        <li className="px-3 py-2 text-sm hover:bg-light-100 dark:hover:bg-dark-800">
           <ImportButton />
         </li>
-        <li className="block px-3 py-2 text-sm hover:bg-gunmetal-800">
+        <li className="block px-3 py-2 text-sm hover:bg-light-100 dark:hover:bg-dark-800">
           <Link
             id="menu-item-1"
             role="menuitem"

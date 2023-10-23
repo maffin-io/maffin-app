@@ -18,9 +18,7 @@ export default async function getAccounts(): Promise<AccountsMap> {
       accountsMap.root = account;
     }
 
-    if (account.type !== 'ROOT') {
-      accountsMap[account.guid] = account;
-    }
+    accountsMap[account.guid] = account;
   });
 
   accounts.forEach(account => {

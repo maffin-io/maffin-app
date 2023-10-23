@@ -48,6 +48,8 @@ describe('Onboarding', () => {
     const user = userEvent.setup();
     render(
       <div>
+        <span id="save-button" />
+        <span id="theme-button" />
         <span id="add-account" />
         <span id="accounts-table" />
         <Onboarding show />
@@ -115,13 +117,23 @@ describe('Onboarding', () => {
     ]);
 
     // STEP 2
+    // Shows about the Save button
+    await screen.findByText('We save the data automatically', { exact: false });
+    await user.click(screen.getByText('Next'));
+
+    // STEP 3
+    // Shows about the Theme button
+    await screen.findByText('We know some people are very opinionated', { exact: false });
+    await user.click(screen.getByText('Next'));
+
+    // STEP 4
     // Adds a bank account, all data is prefilled except the opening balance
     await screen.findByText('Let\'s add your first', { exact: false });
     await screen.findByText('Assets');
     await user.type(screen.getByLabelText('Opening balance'), '1000');
 
-    expect(screen.getByText('Save')).toBeEnabled();
-    await user.click(screen.getByText('Save'));
+    expect(screen.getByText('add')).toBeEnabled();
+    await user.click(screen.getByText('add'));
     const bankAccount = await Account.findOneByOrFail({ name: 'My bank account' });
     expect(bankAccount).toEqual(expect.objectContaining({
       fk_commodity: eur,
@@ -131,18 +143,18 @@ describe('Onboarding', () => {
       parentId: accounts[1].guid,
     }));
 
-    // STEP 3
+    // STEP 5
     // Show accounts tree
     await screen.findByText('This represents your accounts tree', { exact: false });
     await user.click(screen.getByText('Next'));
 
-    // STEP 4
+    // STEP 6
     // Adds an expense account
     await screen.findByText('account to track your expenses', { exact: false });
     await screen.findByText('Expenses');
 
-    expect(screen.getByText('Save')).toBeEnabled();
-    await user.click(screen.getByText('Save'));
+    expect(screen.getByText('add')).toBeEnabled();
+    await user.click(screen.getByText('add'));
     const expensesAccount = await Account.findOneByOrFail({ name: 'Groceries' });
     expect(expensesAccount).toEqual(expect.objectContaining({
       fk_commodity: eur,
@@ -152,13 +164,13 @@ describe('Onboarding', () => {
       parentId: accounts[2].guid,
     }));
 
-    // STEP 5
+    // STEP 7
     // Adds a transaction between bank account and groceries account
     await screen.findByText('add the first transaction', { exact: false });
     await user.type(screen.getByLabelText('Date'), DateTime.now().toISODate() as string);
 
-    expect(screen.getByText('Save')).toBeEnabled();
-    await user.click(screen.getByText('Save'));
+    expect(screen.getByText('add')).toBeEnabled();
+    await user.click(screen.getByText('add'));
     const tx = await Transaction.findOneOrFail(
       {
         where: { description: 'Grocery shopping' },
@@ -186,7 +198,7 @@ describe('Onboarding', () => {
       ],
     }));
 
-    // STEP 6
+    // STEP 8
     // Shows final disclaimer
     await screen.findByText('Good job!', { exact: false });
     await user.click(screen.getByText('Agreed!'));

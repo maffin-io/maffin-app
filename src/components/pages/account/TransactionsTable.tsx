@@ -11,7 +11,6 @@ import Table from '@/components/Table';
 import Money from '@/book/Money';
 import {
   Account,
-  Commodity,
   Split,
 } from '@/book/entities';
 import type { AccountsMap } from '@/types/book';
@@ -31,7 +30,7 @@ export default function TransactionsTable({
   splits = splits || [];
 
   columns[2].cell = FromToAccountPartial(accounts);
-  columns[3].cell = AmountPartial(accounts[splits[0]?.account.guid]);
+  columns[3].cell = AmountPartial(account);
   columns[4].cell = TotalPartial(accounts);
 
   return (
@@ -57,7 +56,7 @@ const columns: ColumnDef<Split>[] = [
         >
           {row.original.transaction.date.toISODate()}
         </span>
-        <Tooltip clickable id={row.original.transaction.guid} />
+        <Tooltip clickable className="tooltip" id={row.original.transaction.guid} />
       </>
     ),
   },
@@ -85,13 +84,13 @@ const columns: ColumnDef<Split>[] = [
     cell: ({ row }) => (
       <>
         <TransactionFormButton
-          guid={row.original.transaction.guid}
           action="update"
           defaultValues={
             {
               ...row.original.transaction,
               date: row.original.transaction.date.toISODate() as string,
-              fk_currency: row.original.transaction.currency as Commodity,
+              // At this point tx currency is not loaded
+              fk_currency: undefined,
             }
           }
           className="link"
@@ -99,13 +98,13 @@ const columns: ColumnDef<Split>[] = [
           <BiEdit className="flex" />
         </TransactionFormButton>
         <TransactionFormButton
-          guid={row.original.transaction.guid}
           action="delete"
           defaultValues={
             {
               ...row.original.transaction,
               date: row.original.transaction.date.toISODate() as string,
-              fk_currency: row.original.transaction.currency as Commodity,
+              // At this point tx currency is not loaded
+              fk_currency: undefined,
             }
           }
           className="link"
@@ -133,12 +132,12 @@ function FromToAccountPartial(
             <li key={split.guid}>
               <Link
                 href={`/dashboard/accounts/${account.guid}`}
-                className={classNames('badge hover:text-slate-300', {
-                  'bg-green-500/20 text-green-300': account.type === 'INCOME',
-                  'bg-red-500/20 text-red-300': account.type === 'EXPENSE',
-                  'bg-cyan-500/20 text-cyan-300': ['ASSET', 'BANK'].includes(account.type),
-                  'bg-orange-500/20 text-orange-300': account.type === 'LIABILITY',
-                  'bg-violet-500/20 text-violet-300': ['STOCK', 'MUTUAL'].includes(account.type),
+                className={classNames('badge mb-0.5 hover:text-slate-300', {
+                  success: account.type === 'INCOME',
+                  danger: account.type === 'EXPENSE',
+                  info: ['ASSET', 'BANK'].includes(account.type),
+                  warning: account.type === 'LIABILITY',
+                  misc: ['STOCK', 'MUTUAL'].includes(account.type),
                 })}
               >
                 { account?.path }
@@ -152,10 +151,10 @@ function FromToAccountPartial(
 }
 
 function AmountPartial(
-  account?: Account,
+  account: Account,
 ) {
   return function Amount({ row }: CellContext<Split, unknown>): JSX.Element {
-    let value = new Money(row.original.quantity, account?.commodity.mnemonic || '');
+    let value = new Money(row.original.quantity, account.commodity.mnemonic || '');
 
     if (account?.type === 'INCOME') {
       value = value.multiply(-1);
@@ -164,8 +163,8 @@ function AmountPartial(
       <span
         className={
           classNames({
-            'text-green-300': value.toNumber() > 0,
-            'text-red-300': value.toNumber() < 0,
+            'amount-positive': value.toNumber() > 0,
+            'amount-negative': value.toNumber() < 0,
           }, 'flex items-center')
         }
       >

@@ -63,9 +63,13 @@ function getTreeTotals(
   monthlyTotals: MonthlyTotals,
   selectedDate: DateTime,
 ): AccountsTableRow {
-  const leaves = current.childrenIds.map(
-    childId => getTreeTotals(accounts[childId], accounts, monthlyTotals, selectedDate),
-  );
+  const leaves: AccountsTableRow[] = [];
+  current.childrenIds.forEach(childId => {
+    const childAccount = accounts[childId];
+    if (!childAccount.hidden) {
+      leaves.push(getTreeTotals(accounts[childId], accounts, monthlyTotals, selectedDate));
+    }
+  });
 
   const accountTotal = Object.entries(monthlyTotals[current.guid] || {}).reduce(
     (total, [monthYear, amount]) => {
@@ -101,8 +105,8 @@ const columns: ColumnDef<AccountsTableRow>[] = [
           >
             {(
               row.getIsExpanded()
-                ? <BiSolidDownArrow className="mr-1 text-xs opacity-20" />
-                : <BiSolidRightArrow className="mr-1 text-xs opacity-20" />
+                ? <BiSolidDownArrow className="mr-1 text-xs opacity-50" />
+                : <BiSolidRightArrow className="mr-1 text-xs opacity-50" />
             )}
           </button>
         ) : (
@@ -110,7 +114,7 @@ const columns: ColumnDef<AccountsTableRow>[] = [
             type="button"
             className="cursor-default"
           >
-            <BiCircle className="mr-1 text-xs opacity-20" />
+            <BiCircle className="mr-1 text-xs opacity-50" />
           </button>
         )}
         {
@@ -152,7 +156,7 @@ const columns: ColumnDef<AccountsTableRow>[] = [
           && (
             <Tooltip
               id={row.original.account.guid}
-              className="bg-cyan-600 text-white rounded-lg p-2"
+              className="tooltip"
               disableStyleInjection
             >
               {row.original.account.description}

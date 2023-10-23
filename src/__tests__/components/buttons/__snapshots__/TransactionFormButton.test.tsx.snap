@@ -19,7 +19,7 @@ exports[`TransactionFormButton renders as expected by default 1`] = `
     />
   </div>
   <button
-    class="btn-primary"
+    class="btn btn-primary"
     id="add-tx"
     type="button"
   >

@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
+import { BiEdit, BiXCircle } from 'react-icons/bi';
+import { Tooltip } from 'react-tooltip';
 
 import Money from '@/book/Money';
 import {
@@ -13,13 +14,15 @@ import {
 } from '@/components/pages/account';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
+import AccountFormButton from '@/components/buttons/AccountFormButton';
 import { useAccounts, useSplits } from '@/hooks/api';
-import type { Account } from '@/book/entities';
+import Loading from '@/components/Loading';
 import {
   isInvestment,
   isAsset,
   isLiability,
 } from '@/book/helpers/accountType';
+import type { Account } from '@/book/entities';
 
 export type AccountPageProps = {
   params: {
@@ -28,9 +31,9 @@ export type AccountPageProps = {
 };
 
 export default function AccountPage({ params }: AccountPageProps): JSX.Element {
-  const router = useRouter();
   let { data: accounts } = useAccounts();
   let { data: splits } = useSplits(params.guid);
+  const latestDate = splits?.[0]?.transaction?.date;
 
   // We cant use fallback data to set a default as SWR treats
   // fallback data as stale data which means with immutable we will
@@ -41,17 +44,16 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
   if (!Object.keys(accounts).length) {
     return (
       <div>
-        Loading...
+        <Loading />
       </div>
     );
   }
 
   const account = accounts[params.guid] as Account;
   if (!account) {
-    router.push('/404');
     return (
-      <div>
-        Loading...
+      <div className="flex h-screen text-sm place-content-center place-items-center">
+        {`Account ${params.guid} does not exist`}
       </div>
     );
   }
@@ -95,15 +97,15 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
 
   return (
     <>
-      <div className="grid grid-cols-12 items-center pb-4">
-        <span className="col-span-10">
+      <div className="header">
+        <span className="title">
           <span
             className={classNames('text-xl font-medium badge', {
-              'bg-green-500/20 text-green-300': account.type === 'INCOME',
-              'bg-red-500/20 text-red-300': account.type === 'EXPENSE',
-              'bg-cyan-500/20 text-cyan-300': isAsset(account),
-              'bg-orange-500/20 text-orange-300': isLiability(account),
-              'bg-violet-500/20 text-violet-300': isInvestment(account),
+              success: account.type === 'INCOME',
+              danger: account.type === 'EXPENSE',
+              info: isAsset(account),
+              warning: isLiability(account),
+              misc: isInvestment(account),
             })}
           >
             {account.path}
@@ -111,18 +113,58 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
             account
           </span>
         </span>
-        <div className="col-span-2 col-end-13 justify-self-end">
-          <TransactionFormButton
-            account={account}
-            defaultValues={
-              {
-                date: DateTime.now().toISODate() as string,
-                description: '',
-                splits: [],
-                fk_currency: account.commodity,
+        <div className="ml-auto">
+          <div className="flex gap-1">
+            <TransactionFormButton
+              account={account}
+              defaultValues={
+                {
+                  date: (latestDate || DateTime.now()).toISODate() as string,
+                  description: '',
+                  splits: [],
+                  fk_currency: account.commodity,
+                }
               }
+            />
+            <AccountFormButton
+              defaultValues={{
+                ...account,
+                parent: accounts[account.parentId],
+              }}
+              action="update"
+            >
+              <BiEdit />
+            </AccountFormButton>
+            <AccountFormButton
+              defaultValues={{
+                ...account,
+                parent: accounts[account.parentId],
+              }}
+              disabled={splits.length > 0}
+              className="btn btn-danger"
+              action="delete"
+              data-tooltip-id="delete-help"
+            >
+              <BiXCircle />
+            </AccountFormButton>
+            {
+              splits.length > 0
+              && (
+                <Tooltip
+                  id="delete-help"
+                  className="tooltip"
+                  disableStyleInjection
+                >
+                  <p>
+                    Accounts that contain transactions can&apos;t be deleted.
+                  </p>
+                  <p>
+                    Move the transactions to another account first.
+                  </p>
+                </Tooltip>
+              )
             }
-          />
+          </div>
         </div>
       </div>
       <div className="grid grid-cols-12">
@@ -131,7 +173,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
           <div className="grid grid-cols-12">
             <div className="col-span-6">
               <StatisticsWidget
-                className="mr-6"
+                className="mr-2"
                 title={`You ${totalKeyword} a total of`}
                 stats={total.format()}
                 description={`with an average of ${average.format()} per month`}
@@ -139,24 +181,25 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
             </div>
             <div className="col-span-6">
               <StatisticsWidget
-                className="mr-6"
                 title={`This year you ${totalKeyword}`}
                 stats={new Money(totalThisYear, account.commodity.mnemonic).format()}
                 description="in this account"
               />
             </div>
-            <div className="col-span-12 bg-gunmetal-700 rounded-sm p-6 my-6 mr-6">
+            <div className="card col-span-12">
               <TotalLineChart account={account} />
             </div>
           </div>
         </div>
-        <div className="col-span-6 bg-gunmetal-700 rounded-sm mb-6 p-4">
+        <div className="card col-span-6">
           <div className="flex h-full items-center">
             <SplitsHistogram account={account} />
           </div>
         </div>
       </div>
-      <TransactionsTable account={account} />
+      <div className="card p-0 mt-4 bg-light-100 dark:bg-dark-800">
+        <TransactionsTable account={account} />
+      </div>
     </>
   );
 }

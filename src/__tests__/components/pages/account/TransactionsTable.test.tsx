@@ -361,10 +361,10 @@ describe('TransactionsTable', () => {
         action: 'update',
         className: 'link',
         children: <BiEdit className="flex" />,
-        guid: 'tx_guid',
         defaultValues: {
           ...splits1[0].transaction,
           date: '2023-01-01',
+          fk_currency: undefined,
         },
       },
       {},
@@ -375,10 +375,10 @@ describe('TransactionsTable', () => {
         action: 'delete',
         className: 'link',
         children: <BiXCircle className="flex" />,
-        guid: 'tx_guid',
         defaultValues: {
           ...splits1[0].transaction,
           date: '2023-01-01',
+          fk_currency: undefined,
         },
       },
       {},

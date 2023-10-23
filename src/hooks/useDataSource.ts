@@ -146,7 +146,7 @@ async function preloadData() {
     queries.getAccounts(),
     PriceDB.getTodayQuotes(),
   ]);
-  mutate('/api/main-currency', accounts.type_asset.commodity);
+  mutate('/api/main-currency', accounts.type_asset?.commodity);
   mutate(
     '/api/monthly-totals',
     async () => queries.getMonthlyTotals(accounts, todayPrices),

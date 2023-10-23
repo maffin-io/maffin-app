@@ -7,7 +7,7 @@ import {
 } from '@testing-library/react';
 import Modal from 'react-modal';
 
-import AddAccountButton from '@/components/buttons/AddAccountButton';
+import AccountFormButton from '@/components/buttons/AccountFormButton';
 import AccountForm from '@/components/forms/account/AccountForm';
 import { DataSourceContext } from '@/hooks';
 import type { DataSourceContextType } from '@/hooks';
@@ -23,15 +23,14 @@ jest.mock('react-modal', () => jest.fn(
 jest.mock('@/components/forms/account/AccountForm', () => jest.fn(
   () => <div data-testid="AccountForm" />,
 ).mockName('AccountForm'));
-const AccountFormMock = AccountForm as jest.MockedFunction<typeof AccountForm>;
 
-describe('AddAccountButton', () => {
+describe('AccountFormButton', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('renders hidden modal on mount', async () => {
-    render(<AddAccountButton />);
+    render(<AccountFormButton />);
     expect(Modal).toHaveBeenLastCalledWith(
       expect.objectContaining({
         isOpen: false,
@@ -41,7 +40,47 @@ describe('AddAccountButton', () => {
 
     expect(AccountForm).toHaveBeenLastCalledWith(
       {
+        action: 'add',
         onSave: expect.any(Function),
+        defaultValues: undefined,
+      },
+      {},
+    );
+  });
+
+  it('renders hidden modal on mount with update', async () => {
+    render(<AccountFormButton action="update" />);
+    expect(Modal).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        isOpen: false,
+      }),
+      {},
+    );
+
+    expect(AccountForm).toHaveBeenLastCalledWith(
+      {
+        action: 'update',
+        onSave: expect.any(Function),
+        defaultValues: undefined,
+      },
+      {},
+    );
+  });
+
+  it('renders hidden modal on mount with delete', async () => {
+    render(<AccountFormButton action="delete" />);
+    expect(Modal).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        isOpen: false,
+      }),
+      {},
+    );
+
+    expect(AccountForm).toHaveBeenLastCalledWith(
+      {
+        action: 'delete',
+        onSave: expect.any(Function),
+        defaultValues: undefined,
       },
       {},
     );
@@ -49,7 +88,7 @@ describe('AddAccountButton', () => {
 
   it('opens modal when clicking the button', async () => {
     render(
-      <AddAccountButton />,
+      <AccountFormButton />,
     );
 
     const button = await screen.findByRole('button', { name: /add account/i });
@@ -67,7 +106,7 @@ describe('AddAccountButton', () => {
 
   it('closes modal when clicking the X button', async () => {
     render(
-      <AddAccountButton />,
+      <AccountFormButton />,
     );
 
     const button = await screen.findByRole('button', { name: /add account/i });
@@ -96,7 +135,7 @@ describe('AddAccountButton', () => {
     const mockSave = jest.fn();
     render(
       <DataSourceContext.Provider value={{ save: mockSave as Function } as DataSourceContextType}>
-        <AddAccountButton />
+        <AccountFormButton />
       </DataSourceContext.Provider>,
     );
 
@@ -104,7 +143,7 @@ describe('AddAccountButton', () => {
     const button = await screen.findByRole('button', { name: /add account/i });
     fireEvent.click(button);
 
-    const { onSave } = AccountFormMock.mock.calls[0][0];
+    const { onSave } = (AccountForm as jest.Mock).mock.calls[0][0];
     act(() => onSave());
     expect(mockSave).toBeCalledTimes(1);
 
@@ -114,5 +153,45 @@ describe('AddAccountButton', () => {
       }),
       {},
     );
+  });
+
+  it('passes values to AccountForm', async () => {
+    const mockSave = jest.fn();
+    render(
+      <DataSourceContext.Provider value={{ save: mockSave as Function } as DataSourceContextType}>
+        <AccountFormButton
+          defaultValues={{
+            name: 'Test',
+            hidden: true,
+          }}
+        />
+      </DataSourceContext.Provider>,
+    );
+
+    // open modal to prove that onSave closes it
+    const button = await screen.findByRole('button', { name: /add account/i });
+    fireEvent.click(button);
+
+    expect(AccountForm as jest.Mock).toBeCalledWith(
+      {
+        action: 'add',
+        onSave: expect.any(Function),
+        defaultValues: {
+          hidden: true,
+          name: 'Test',
+        },
+      },
+      {},
+    );
+  });
+
+  it('renders the children', async () => {
+    render(
+      <AccountFormButton>
+        <span>hello</span>
+      </AccountFormButton>,
+    );
+
+    await screen.findByText('hello');
   });
 });

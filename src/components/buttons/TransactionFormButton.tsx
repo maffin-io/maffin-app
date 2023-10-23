@@ -7,33 +7,26 @@ import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import type { FormValues } from '@/components/forms/transaction/types';
 import {
   Account,
-  Commodity,
   Split,
   Transaction,
 } from '@/book/entities';
 
-export type TransactionFormButtonProps = {
-  action?: 'add' | 'update' | 'delete',
-  guid?: string, // The transaction to update or delete
+export interface TransactionFormButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   account?: Account, // Account to populate for the main split
-  defaultValues: FormValues,
-  className?: string,
-  children?: React.ReactNode,
-};
+  action?: 'add' | 'update' | 'delete',
+  defaultValues?: Partial<FormValues>,
+}
 
-export default function TransactionFormButton(
-  {
-    action = 'add',
-    guid,
-    account,
-    defaultValues,
-    children,
-    className = 'btn-primary',
-  }: TransactionFormButtonProps,
-): JSX.Element {
+export default function TransactionFormButton({
+  action = 'add',
+  account,
+  defaultValues,
+  children,
+  className = 'btn btn-primary',
+}: TransactionFormButtonProps): JSX.Element {
   const { save } = React.useContext(DataSourceContext);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
-  const [defaults, setDefaults] = React.useState(defaultValues);
+  const [defaults, setDefaults] = React.useState<Partial<FormValues>>();
 
   let title = `Add transaction to ${account?.name}`;
   if (action === 'update') {
@@ -47,8 +40,8 @@ export default function TransactionFormButton(
     <>
       <Modal
         isOpen={isModalOpen}
-        overlayClassName="fixed inset-0 bg-white bg-opacity-30 overflow-y-auto h-full w-full z-50"
-        className="relative top-20 mx-auto p-5 w-1/3 shadow-lg rounded-md bg-gunmetal-700"
+        overlayClassName="overlay"
+        className="modal"
       >
         <button
           type="button"
@@ -84,7 +77,7 @@ export default function TransactionFormButton(
             } as FormValues);
           } else if (action === 'update' || action === 'delete') {
             const tx = await Transaction.findOneOrFail({
-              where: { guid },
+              where: { guid: defaultValues?.guid },
               relations: {
                 splits: {
                   fk_account: true,
@@ -92,9 +85,19 @@ export default function TransactionFormButton(
               },
             });
             setDefaults({
-              ...tx,
-              date: tx.date.toISODate() as string,
-              fk_currency: tx.currency as Commodity,
+              ...defaultValues,
+              // The currency is not loaded in the transactions table view
+              // so we load it here.
+              fk_currency: tx.currency,
+              // This is hacky but if we pass the Split
+              // class to the form, then we have reference errors as when
+              // we update the form, it also updates the defaultValues
+              // which means formState.isDirty is not triggered properly
+              splits: tx.splits.map(split => ({
+                ...split,
+                value: split.value,
+                quantity: split.quantity,
+              } as Split)),
             });
           }
           setIsModalOpen(!isModalOpen);

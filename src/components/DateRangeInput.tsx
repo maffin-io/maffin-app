@@ -54,7 +54,7 @@ export default function DateRangeInput({
       useRange={!asSingle}
       minDate={earliestDate && earliestDate.toJSDate()}
       maxDate={now.toJSDate()}
-      displayFormat="DD/MMM/YY"
+      displayFormat="DD MMMM YYYY"
       placeholder="Select date range"
       primaryColor="cyan"
       onChange={(newValue) => {
@@ -71,8 +71,9 @@ export default function DateRangeInput({
       configs={{
         shortcuts,
       }}
-      containerClassName="relative w-full text-sm text-slate-400"
-      inputClassName="relative transition-all duration-300 py-2.5 pl-4 pr-14 w-full border-gray-300 rounded-lg tracking-wide placeholder-gray-400 bg-gunmetal-700"
+      containerClassName="relative w-full text-sm"
+      inputClassName="relative transition-all duration-300 text-right py-2.5 px-4 rounded-lg tracking-wide bg-white dark:bg-dark-700"
+      toggleClassName="hidden"
     />
   );
 }

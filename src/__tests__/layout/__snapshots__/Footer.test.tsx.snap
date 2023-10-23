@@ -3,7 +3,7 @@
 exports[`Footer renders as expected 1`] = `
 <div>
   <footer
-    class="bottom-0 w-full fixed flex justify-end bg-gunmetal-700 text-sm px-3 z-1"
+    class="bottom-0 w-full flex justify-end bg-white dark:bg-dark-700 text-sm px-5 z-1"
   >
     2023
     ©

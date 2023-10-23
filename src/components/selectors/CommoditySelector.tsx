@@ -10,6 +10,7 @@ export type CommoditySelectorProps = {
   defaultValue?: Commodity,
   id?: string,
   isClearable?: boolean,
+  disabled?: boolean,
   className?: string,
   onChange?: Function,
 };
@@ -21,6 +22,7 @@ export default function CommoditySelector(
     defaultValue,
     id = 'commoditySelector',
     isClearable = true,
+    disabled = false,
     className = '',
     onChange = () => {},
   }: CommoditySelectorProps,
@@ -39,6 +41,7 @@ export default function CommoditySelector(
       onChange={onChange}
       placeholder={placeholder || 'Choose commodity'}
       isClearable={isClearable}
+      disabled={disabled}
       defaultValue={defaultValue}
       className={className}
     />

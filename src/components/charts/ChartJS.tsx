@@ -34,7 +34,7 @@ C.register(
 );
 
 C.defaults.color = '#94a3b8';
-C.defaults.scale.grid.color = '#777f85';
+C.defaults.scale.grid.color = '#777f8522';
 
 export default function ChartJS<T extends keyof ChartTypeRegistry>({
   options,

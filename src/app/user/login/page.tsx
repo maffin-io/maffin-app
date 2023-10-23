@@ -4,6 +4,8 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { mutate } from 'swr';
 
+import Loading from '@/components/Loading';
+
 export default function LoginPage(): JSX.Element {
   const router = useRouter();
   const [
@@ -30,15 +32,13 @@ export default function LoginPage(): JSX.Element {
 
   if (tokenClient === null) {
     return (
-      <>
-        Loading...
-      </>
+      <Loading />
     );
   }
 
   return (
     <button
-      className="btn-primary"
+      className="btn btn-primary"
       type="button"
       onClick={() => { tokenClient.requestAccessToken(); }}
     >

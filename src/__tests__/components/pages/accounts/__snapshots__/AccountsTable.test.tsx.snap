@@ -17,7 +17,7 @@ exports[`AccountsTable renders Name column as expected when expandable and expan
       type="button"
     >
       <svg
-        class="mr-1 text-xs opacity-20"
+        class="mr-1 text-xs opacity-50"
         fill="currentColor"
         height="1em"
         stroke="currentColor"
@@ -51,7 +51,7 @@ exports[`AccountsTable renders Name column as expected when expandable and not e
       type="button"
     >
       <svg
-        class="mr-1 text-xs opacity-20"
+        class="mr-1 text-xs opacity-50"
         fill="currentColor"
         height="1em"
         stroke="currentColor"
@@ -86,7 +86,7 @@ exports[`AccountsTable renders Name column as expected when not expandable 1`] =
       type="button"
     >
       <svg
-        class="mr-1 text-xs opacity-20"
+        class="mr-1 text-xs opacity-50"
         fill="currentColor"
         height="1em"
         stroke="currentColor"

@@ -3,7 +3,7 @@
 exports[`Topbar renders as expected 1`] = `
 <div>
   <div
-    class="grid grid-cols-12 bg-gunmetal-700 h-20 fixed z-10 top-0 px-6 left-20 right-0"
+    class="grid grid-cols-12 bg-white dark:bg-dark-700 shadow-sm h-20 fixed z-10 top-0 px-6 left-20 right-0"
   >
     <div
       class="col-span-3"
@@ -13,22 +13,29 @@ exports[`Topbar renders as expected 1`] = `
       />
     </div>
     <div
-      class="col-span-1 col-end-11 h-20 mb-0"
+      class="col-span-9"
     >
       <div
-        class="flex h-full justify-center items-center"
+        class="flex h-full items-center justify-end"
       >
         <div
-          data-testid="SaveButton"
+          class="px-2"
+        >
+          <div
+            data-testid="SaveButton"
+          />
+        </div>
+        <div
+          class="px-2"
+        >
+          <div
+            data-testid="ThemeButton"
+          />
+        </div>
+        <div
+          data-testid="ProfileDropdown"
         />
       </div>
-    </div>
-    <div
-      class="col-span-2 col-end-13 h-20"
-    >
-      <div
-        data-testid="ProfileDropdown"
-      />
     </div>
   </div>
 </div>

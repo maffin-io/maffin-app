@@ -8,12 +8,18 @@ import {
 } from '@testing-library/react';
 import Modal from 'react-modal';
 
-import { Account, Commodity, Transaction } from '@/book/entities';
+import {
+  Account,
+  Commodity,
+  Split,
+  Transaction,
+} from '@/book/entities';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import { DataSourceContext } from '@/hooks';
 import type { DataSourceContextType } from '@/hooks';
 import { DateTime } from 'luxon';
+import type { FormValues } from '@/components/forms/transaction/types';
 
 jest.mock('react-modal', () => jest.fn(
   (props: React.PropsWithChildren) => (
@@ -36,6 +42,7 @@ describe('TransactionFormButton', () => {
   it('renders as expected by default', async () => {
     const { container } = render(
       <TransactionFormButton
+        defaultValues={{} as FormValues}
         account={{
           guid: '1',
           name: 'account',
@@ -49,6 +56,7 @@ describe('TransactionFormButton', () => {
   it('can pass children to render alternative button text', async () => {
     render(
       <TransactionFormButton
+        defaultValues={{} as FormValues}
         account={{
           guid: '1',
           name: 'account',
@@ -68,6 +76,7 @@ describe('TransactionFormButton', () => {
   ])('renders hidden modal with TransactionForm on mount with action %s', async (action) => {
     render(
       <TransactionFormButton
+        defaultValues={{} as FormValues}
         account={{
           guid: '1',
           name: 'account',
@@ -95,6 +104,7 @@ describe('TransactionFormButton', () => {
   it('opens modal when clicking the button', async () => {
     render(
       <TransactionFormButton
+        defaultValues={{} as FormValues}
         account={{
           guid: '1',
           name: 'account',
@@ -116,6 +126,7 @@ describe('TransactionFormButton', () => {
   it('closes modal when clicking the X button', async () => {
     render(
       <TransactionFormButton
+        defaultValues={{} as FormValues}
         account={{
           guid: '1',
           name: 'account',
@@ -148,16 +159,28 @@ describe('TransactionFormButton', () => {
   it.each(
     ['update', 'delete'],
   )('retrieves original Transaction when %s', async (action) => {
+    const split1 = new Split();
+    split1.value = -10;
+    split1.quantity = -10;
+    const split2 = new Split();
+    split2.value = 10;
+    split2.quantity = 10;
+
     jest.spyOn(Transaction, 'findOneOrFail').mockResolvedValue({
       guid: 'guid',
       date: DateTime.fromISO('2023-01-01'),
       currency: {
         mnemonic: 'EUR',
       },
+      splits: [split1, split2],
     } as Transaction);
+
     render(
       <TransactionFormButton
-        guid="guid"
+        defaultValues={{
+          guid: 'guid',
+          date: '2023-01-01',
+        } as FormValues}
         action={action as 'update' | 'delete'}
       />,
     );
@@ -177,18 +200,80 @@ describe('TransactionFormButton', () => {
           defaultValues: {
             guid: 'guid',
             date: '2023-01-01',
-            currency: {
-              mnemonic: 'EUR',
-            },
             fk_currency: {
               mnemonic: 'EUR',
             },
+            splits: [
+              expect.objectContaining({
+                quantity: -10,
+                quantityDenom: 1,
+                quantityNum: -10,
+                value: -10,
+                valueNum: -10,
+                valueDenom: 1,
+              }),
+              expect.objectContaining({
+                quantity: 10,
+                quantityDenom: 1,
+                quantityNum: 10,
+                value: 10,
+                valueNum: 10,
+                valueDenom: 1,
+              }),
+            ],
           },
           onSave: expect.any(Function),
         },
         {},
       );
     });
+  });
+
+  it('uses latest default values always when update', async () => {
+    jest.spyOn(Transaction, 'findOneOrFail').mockResolvedValue({
+      currency: {
+        mnemonic: 'EUR',
+      },
+      splits: [] as Split[],
+    } as Transaction);
+
+    const { rerender } = render(
+      <TransactionFormButton
+        action="update"
+        defaultValues={{
+          description: 'hello',
+        } as FormValues}
+        account={{
+          guid: '1',
+          name: 'account',
+        } as Account}
+      />,
+    );
+
+    rerender(
+      <TransactionFormButton
+        action="update"
+        defaultValues={{
+          description: 'haha',
+        } as FormValues}
+        account={{
+          guid: '1',
+          name: 'account',
+        } as Account}
+      />,
+    );
+
+    const button = await screen.findByRole('button', { name: /add transaction/i });
+    fireEvent.click(button);
+
+    await waitFor(() => expect(TransactionForm).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        defaultValues: expect.objectContaining({
+          description: 'haha',
+        }),
+      }),
+      {},
+    ));
   });
 
   it('passes expected data to TransactionForm', async () => {

@@ -1,7 +1,6 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 import {
-  waitFor,
   render,
   screen,
 } from '@testing-library/react';
@@ -9,6 +8,7 @@ import type { SWRResponse } from 'swr';
 
 import AccountPage from '@/app/dashboard/accounts/[guid]/page';
 import TransactionFormButton from '@/components/buttons/TransactionFormButton';
+import AccountFormButton from '@/components/buttons/AccountFormButton';
 import { Account, Split } from '@/book/entities';
 import * as apiHook from '@/hooks/api';
 import {
@@ -26,6 +26,10 @@ jest.mock('@/components/buttons/TransactionFormButton', () => jest.fn(
   () => <div data-testid="TransactionFormButton" />,
 ));
 
+jest.mock('@/components/buttons/AccountFormButton', () => jest.fn(
+  () => <div data-testid="AccountFormButton" />,
+));
+
 jest.mock('@/components/pages/account/TransactionsTable', () => jest.fn(
   () => <div data-testid="TransactionsTable" />,
 ));
@@ -38,20 +42,12 @@ jest.mock('@/components/pages/account/TotalLineChart', () => jest.fn(
   () => <div data-testid="TotalLineChart" />,
 ));
 
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-}));
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const useRouter = jest.spyOn(require('next/navigation'), 'useRouter');
+jest.mock('@/components/Loading', () => jest.fn(
+  () => <div data-testid="Loading" />,
+));
 
 describe('AccountPage', () => {
-  let mockRouterPush: jest.Mock;
-
   beforeEach(() => {
-    mockRouterPush = jest.fn();
-    useRouter.mockImplementation(() => ({
-      push: mockRouterPush,
-    }));
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
     jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as SWRResponse);
   });
@@ -63,19 +59,21 @@ describe('AccountPage', () => {
   it('displays loading while accounts is empty', async () => {
     const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
 
-    await screen.findByText('Loading...');
+    await screen.findByTestId('Loading');
+    expect(AccountFormButton).toHaveBeenCalledTimes(0);
     expect(TransactionFormButton).toHaveBeenCalledTimes(0);
     expect(TransactionsTable).toHaveBeenCalledTimes(0);
     expect(container).toMatchSnapshot();
   });
 
-  it('returns 404 when account not found', async () => {
+  it('displays message when account not found', async () => {
     jest.spyOn(apiHook, 'useAccounts')
       .mockReturnValueOnce({ data: [{ guid: 'other' }] } as SWRResponse);
 
     render(<AccountPage params={{ guid: 'guid' }} />);
 
-    await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/404'));
+    screen.getByText('does not exist', { exact: false });
+    expect(AccountFormButton).toHaveBeenCalledTimes(0);
     expect(TransactionFormButton).toHaveBeenCalledTimes(0);
     expect(TransactionsTable).toHaveBeenCalledTimes(0);
   });
@@ -119,7 +117,7 @@ describe('AccountPage', () => {
       {
         account: accounts.guid,
         defaultValues: {
-          date: DateTime.now().toISODate(),
+          date: '2023-01-01',
           description: '',
           fk_currency: {
             mnemonic: 'EUR',
@@ -127,6 +125,41 @@ describe('AccountPage', () => {
           splits: [],
         },
       },
+      {},
+    );
+    expect(AccountFormButton).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        action: 'update',
+        defaultValues: {
+          commodity: {
+            mnemonic: 'EUR',
+          },
+          guid: 'guid',
+          parent: undefined,
+          path: 'path',
+          type: 'TYPE',
+        },
+      }),
+      {},
+    );
+    expect(AccountFormButton).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        action: 'delete',
+        className: 'btn btn-danger',
+        'data-tooltip-id': 'delete-help',
+        disabled: true,
+        defaultValues: {
+          commodity: {
+            mnemonic: 'EUR',
+          },
+          guid: 'guid',
+          parent: undefined,
+          path: 'path',
+          type: 'TYPE',
+        },
+      }),
       {},
     );
     expect(TransactionsTable).toHaveBeenLastCalledWith(

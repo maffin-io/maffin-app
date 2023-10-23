@@ -5,6 +5,7 @@ import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 import { mutate } from 'swr';
 import { IsNull } from 'typeorm';
 import { Tooltip } from 'react-tooltip';
+import classNames from 'classnames';
 
 import {
   Split,
@@ -19,7 +20,7 @@ const resolver = classValidatorResolver(Transaction, { validator: { stopAtFirstE
 export type TransactionFormProps = {
   action?: 'add' | 'update' | 'delete',
   onSave: Function,
-  defaultValues: FormValues,
+  defaultValues?: Partial<FormValues>,
 };
 
 export default function TransactionForm({
@@ -34,19 +35,7 @@ export default function TransactionForm({
   });
 
   const { errors } = form.formState;
-
-  let disabled = false;
-  let submitButtonText = 'Save';
-  let submitButtonClass = 'btn-primary';
-  if (action === 'update') {
-    submitButtonText = 'Update';
-    submitButtonClass = 'btn-warn';
-  }
-  if (action === 'delete') {
-    disabled = true;
-    submitButtonText = 'Delete';
-    submitButtonClass = 'btn-danger';
-  }
+  const disabled = action === 'delete';
 
   return (
     <form onSubmit={form.handleSubmit((data) => onSubmit(data, action, onSave))}>
@@ -65,14 +54,14 @@ export default function TransactionForm({
       <fieldset className="text-sm my-5">
         <label htmlFor="descriptionInput" className="inline-block mb-2">Description</label>
         <span
-          className="badge"
+          className="badge ml-0.5"
           data-tooltip-id="description-help"
         >
           ?
         </span>
         <Tooltip
           id="description-help"
-          className="bg-cyan-600 w-1/3 text-white rounded-lg p-2"
+          className="tooltip"
           disableStyleInjection
         >
           <p className="mb-2">
@@ -119,9 +108,20 @@ export default function TransactionForm({
         type="number"
       />
 
-      <div className="flex w-full gap-2 items-center justify-center">
-        <button className={submitButtonClass} type="submit" disabled={Object.keys(errors).length > 0}>
-          {submitButtonText}
+      <div className="flex w-full justify-center">
+        <button
+          className={classNames(
+            'btn capitalize',
+            {
+              'btn-primary': action === 'add',
+              'btn-danger': action === 'delete',
+              'btn-warn': action === 'update',
+            },
+          )}
+          type="submit"
+          disabled={Object.keys(errors).length > 0}
+        >
+          {action}
         </button>
       </div>
     </form>
@@ -156,7 +156,7 @@ async function onSubmit(data: FormValues, action: 'add' | 'update' | 'delete', o
     mutate(`/api/splits/${split.account.guid}`);
   });
 
-  mutate('/api/monthly-totals');
-  mutate('/api/txs/latest');
+  mutate('/api/monthly-totals', undefined);
+  mutate('/api/txs/latest', undefined);
   onSave();
 }

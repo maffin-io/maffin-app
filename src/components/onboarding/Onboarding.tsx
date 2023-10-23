@@ -11,6 +11,7 @@ import CustomTooltip from '@/components/onboarding/CustomTooltip';
 import maffinLogo from '@/assets/images/maffin_logo_sm.png';
 import { DataSourceContext } from '@/hooks';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
+import { useTheme } from '@/hooks/state';
 
 type OnboardingProps = {
   show?: boolean;
@@ -23,6 +24,7 @@ export default function Onboarding({
   const [run] = React.useState(show);
   const [stepIndex, setStepIndex] = React.useState(0);
   const [accounts, setAccounts] = React.useState<{ [key: string]: Account }>({});
+  const { data: theme } = useTheme();
 
   return (
     <Joyride
@@ -50,7 +52,7 @@ export default function Onboarding({
                   is going to be your main one. This is the currency that will be used to show
                   reports and calculate other things like net worth.
                 </p>
-                <p className="badge info mt-3 text-left">
+                <p className="badge rounded-md info mt-3 text-left">
                   The main currency cannot be changed later so make sure you
                   choose the right one for you!
                 </p>
@@ -75,6 +77,54 @@ export default function Onboarding({
         {
           content: (
             <div className="text-left leading-relaxed">
+              <p className="mb-2">
+                We save the data automatically for you whenever you do changes.
+              </p>
+              <p className="mb-2">
+                The data is uploaded to your Google Drive, under the maffin.io folder. Make
+                sure you take good care of that file!
+              </p>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => setStepIndex(2)}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          ),
+          target: '#save-button',
+        },
+        {
+          spotlightClicks: true,
+          content: (
+            <div className="text-left leading-relaxed">
+              <p className="mb-2">
+                We know some people are very opinionated about dark vs light
+                themes.
+              </p>
+              <p className="mb-2">
+                In order for you not to suffer the whole tutorial with a theme you
+                don&apos;t like, feel free to change it by clicking here!
+              </p>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => setStepIndex(3)}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          ),
+          target: '#theme-button',
+        },
+        {
+          content: (
+            <div className="text-left leading-relaxed">
               <span>
                 Let&apos;s add your first
                 {' '}
@@ -95,7 +145,7 @@ export default function Onboarding({
                     ...accounts,
                     bank: account,
                   });
-                  setStepIndex(2);
+                  setStepIndex(4);
                 }}
                 defaultValues={{
                   name: 'My bank account',
@@ -128,8 +178,8 @@ export default function Onboarding({
               <div className="flex justify-end">
                 <button
                   type="button"
-                  className="btn-primary"
-                  onClick={() => setStepIndex(3)}
+                  className="btn btn-primary"
+                  onClick={() => setStepIndex(5)}
                 >
                   Next
                 </button>
@@ -159,7 +209,7 @@ export default function Onboarding({
                     ...accounts,
                     expense: account,
                   });
-                  setStepIndex(4);
+                  setStepIndex(6);
                 }}
                 defaultValues={{
                   name: 'Groceries',
@@ -196,7 +246,7 @@ export default function Onboarding({
               <TransactionForm
                 onSave={() => {
                   save();
-                  setStepIndex(5);
+                  setStepIndex(7);
                 }}
                 defaultValues={{
                   date: '',
@@ -233,14 +283,10 @@ export default function Onboarding({
                   Good job! From here onwards you just need to keep adding
                   transactions and accounts to reflect your financial life as you need.
                 </p>
-                <p className="mt-3">
-                  Every time you do changes, they are auto saved and uploaded to
-                  your Google Drive which is where the data lives.
-                </p>
                 <div className="flex py-3 justify-center">
                   <Image src={maffinLogo} alt="logo" height="45" />
                 </div>
-                <p className="badge warning mt-3">
+                <p className="badge rounded-md warning mt-3">
                   You own your data which means you have to be careful. Do not
                   delete the maffin.io folder from your Google drive!
                 </p>
@@ -248,8 +294,8 @@ export default function Onboarding({
               <div className="flex justify-center mt-5">
                 <button
                   type="button"
-                  className="btn-primary"
-                  onClick={() => setStepIndex(6)}
+                  className="btn btn-primary"
+                  onClick={() => setStepIndex(8)}
                 >
                   Agreed!
                 </button>
@@ -263,8 +309,12 @@ export default function Onboarding({
       tooltipComponent={CustomTooltip}
       styles={{
         options: {
-          arrowColor: '#3a444e',
-          overlayColor: 'rgba(255, 255, 255, .3)',
+          arrowColor: theme === 'dark'
+            ? '#3a444e'
+            : '#FFF',
+          overlayColor: theme === 'dark'
+            ? '#9ca3af90'
+            : '#4b5563',
         },
       }}
     />

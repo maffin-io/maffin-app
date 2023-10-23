@@ -225,8 +225,8 @@ describe('TransactionForm', () => {
     const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
     await waitFor(() => expect(q1).toHaveValue(100));
 
-    expect(screen.getByText('Save')).not.toBeDisabled();
-    await user.click(screen.getByText('Save'));
+    expect(screen.getByText('add')).not.toBeDisabled();
+    await user.click(screen.getByText('add'));
 
     const tx = await Transaction.findOneOrFail({
       where: { description: 'My expense' },
@@ -272,8 +272,8 @@ describe('TransactionForm', () => {
     expect(swr.mutate).toBeCalledTimes(4);
     expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/account_guid_1');
     expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/splits/account_guid_2');
-    expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/monthly-totals');
-    expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/txs/latest');
+    expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/monthly-totals', undefined);
+    expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/txs/latest', undefined);
   });
 
   it('creates transaction with mainSplit not being main currency', async () => {
@@ -327,8 +327,8 @@ describe('TransactionForm', () => {
     // We have selected an EUR account here which is our mainCurrency
     await waitFor(() => expect(q1).toHaveValue(70));
 
-    expect(screen.getByText('Save')).not.toBeDisabled();
-    await user.click(screen.getByText('Save'));
+    expect(screen.getByText('add')).not.toBeDisabled();
+    await user.click(screen.getByText('add'));
 
     const tx = await Transaction.findOneOrFail({
       where: { description: 'My expense' },
@@ -459,8 +459,8 @@ describe('TransactionForm', () => {
     const v2 = screen.getByRole('spinbutton', { name: 'splits.2.value', hidden: true });
     await waitFor(() => expect(v2).toHaveValue(20));
 
-    expect(screen.getByText('Save')).not.toBeDisabled();
-    await user.click(screen.getByText('Save'));
+    expect(screen.getByText('add')).not.toBeDisabled();
+    await user.click(screen.getByText('add'));
 
     const tx = await Transaction.findOneOrFail({
       where: { description: 'My expense' },
@@ -567,8 +567,8 @@ describe('TransactionForm', () => {
     // We have selected an SGD account which is not our mainCurrency
     await waitFor(() => expect(q1).toHaveValue(70));
 
-    expect(screen.getByText('Save')).not.toBeDisabled();
-    await user.click(screen.getByText('Save'));
+    expect(screen.getByText('add')).not.toBeDisabled();
+    await user.click(screen.getByText('add'));
 
     const tx = await Transaction.findOneOrFail({
       where: { description: 'My expense' },
@@ -669,15 +669,15 @@ describe('TransactionForm', () => {
       />,
     );
 
-    expect(screen.getByText('Save')).toBeEnabled();
-    await user.click(screen.getByText('Save'));
+    expect(screen.getByText('add')).toBeEnabled();
+    await user.click(screen.getByText('add'));
 
     expect(swr.mutate).toBeCalledTimes(5);
     expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/account_guid_1');
     expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/investments');
     expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/splits/stock_account');
-    expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/monthly-totals');
-    expect(swr.mutate).toHaveBeenNthCalledWith(5, '/api/txs/latest');
+    expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/monthly-totals', undefined);
+    expect(swr.mutate).toHaveBeenNthCalledWith(5, '/api/txs/latest', undefined);
   });
 
   // When the main split is a stock account the getExchangeRate rate logic
@@ -771,8 +771,8 @@ describe('TransactionForm', () => {
     // cost nothing
     await user.type(q1, '0');
 
-    expect(screen.getByText('Save')).not.toBeDisabled();
-    await user.click(screen.getByText('Save'));
+    expect(screen.getByText('add')).not.toBeDisabled();
+    await user.click(screen.getByText('add'));
 
     const tx = await Transaction.findOneOrFail({
       where: { description: 'Split STOCK' },
@@ -824,55 +824,39 @@ describe('TransactionForm', () => {
     );
     const mockSave = jest.fn();
 
-    const { rerender } = render(
-      <TransactionForm
-        action="add"
-        onSave={mockSave}
-        defaultValues={
-          {
-            guid: 'tx_guid',
-            date: DateTime.fromISO('2023-01-01').toISODate() as string,
-            description: 'description',
-            splits: [
-              Split.create({
-                valueNum: -100,
-                valueDenom: 1,
-                quantityNum: -100,
-                quantityDenom: 1,
-                fk_account: assetAccount,
-              }),
-              Split.create({
-                valueNum: 100,
-                valueDenom: 1,
-                quantityNum: 100,
-                quantityDenom: 1,
-                fk_account: expenseAccount,
-              }),
-            ],
-            fk_currency: assetAccount.commodity,
-          }
-        }
-      />,
-    );
-
-    expect(screen.getByText('Save')).toBeEnabled();
-    await user.click(screen.getByText('Save'));
+    await Transaction.create({
+      guid: 'tx_guid',
+      date: DateTime.fromISO('2023-01-01'),
+      description: 'description',
+      splits: [
+        Split.create({
+          valueNum: -100,
+          valueDenom: 1,
+          quantityNum: -100,
+          quantityDenom: 1,
+          fk_account: assetAccount,
+        }),
+        Split.create({
+          valueNum: 100,
+          valueDenom: 1,
+          quantityNum: 100,
+          quantityDenom: 1,
+          fk_account: expenseAccount,
+        }),
+      ],
+      fk_currency: assetAccount.commodity,
+    }).save();
 
     const tx = await Transaction.findOneOrFail({
       where: { description: 'description' },
       relations: {
         splits: {
-          fk_transaction: {
-            splits: {
-              fk_account: true,
-            },
-          },
           fk_account: true,
         },
       },
     });
 
-    rerender(
+    render(
       <TransactionForm
         action="update"
         onSave={mockSave}
@@ -880,7 +864,7 @@ describe('TransactionForm', () => {
           {
             ...tx,
             date: tx.date.toISODate() as string,
-            fk_currency: tx.currency as Commodity,
+            fk_currency: tx.currency,
           }
         }
       />,
@@ -889,7 +873,7 @@ describe('TransactionForm', () => {
     await user.clear(screen.getByLabelText('Description'));
     await user.type(screen.getByLabelText('Description'), 'New description');
 
-    await user.click(screen.getByText('Update'));
+    await user.click(screen.getByText('update'));
 
     const txs = await Transaction.find();
     expect(txs).toHaveLength(1);
@@ -952,8 +936,8 @@ describe('TransactionForm', () => {
       />,
     );
 
-    expect(screen.getByText('Save')).toBeEnabled();
-    await user.click(screen.getByText('Save'));
+    expect(screen.getByText('add')).toBeEnabled();
+    await user.click(screen.getByText('add'));
 
     const tx = await Transaction.findOneOrFail({
       where: { description: 'description' },
@@ -987,7 +971,7 @@ describe('TransactionForm', () => {
     const [, q1] = screen.getAllByRole('spinbutton');
     await user.type(q1, '200');
 
-    await user.click(screen.getByText('Update'));
+    await user.click(screen.getByText('update'));
 
     const splits = await Split.findBy({
       fk_transaction: IsNull(),
@@ -1037,8 +1021,8 @@ describe('TransactionForm', () => {
       />,
     );
 
-    expect(screen.getByText('Save')).toBeEnabled();
-    await user.click(screen.getByText('Save'));
+    expect(screen.getByText('add')).toBeEnabled();
+    await user.click(screen.getByText('add'));
 
     const tx = await Transaction.findOneOrFail({
       where: { description: 'description' },
@@ -1068,7 +1052,7 @@ describe('TransactionForm', () => {
       />,
     );
 
-    await user.click(screen.getByText('Delete'));
+    await user.click(screen.getByText('delete'));
 
     const txs = await Transaction.find();
     expect(txs).toHaveLength(0);

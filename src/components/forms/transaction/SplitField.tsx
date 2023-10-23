@@ -2,6 +2,7 @@ import React from 'react';
 import { DateTime } from 'luxon';
 import { Controller } from 'react-hook-form';
 import type { UseFormReturn } from 'react-hook-form';
+import classNames from 'classnames';
 
 import { isInvestment } from '@/book/helpers/accountType';
 import { getMainCurrency } from '@/lib/queries';
@@ -113,7 +114,16 @@ export default function SplitField({
       </div>
 
       <div className={`col-span-${showValueField ? 3 : 4}`}>
-        <div className="flex items-center rounded-md bg-gunmetal-800">
+        <div
+          className={
+            classNames(
+              'flex items-center rounded-none bg-light-100 dark:bg-dark-800',
+              {
+                'rounded-r-md': !showValueField,
+              },
+            )
+          }
+        >
           <input
             {...form.register(
               `splits.${index}.quantity`,
@@ -122,7 +132,7 @@ export default function SplitField({
               },
             )}
             aria-label={`splits.${index}.quantity`}
-            className="w-full text-right bg-gunmetal-800 border-none rounded-sm m-0"
+            className="w-full text-right m-0"
             type="number"
             step="0.001"
             disabled={disabled}
@@ -143,7 +153,7 @@ export default function SplitField({
         hidden={!showValueField}
         className="col-span-3"
       >
-        <div className="flex items-center rounded-md bg-gunmetal-800">
+        <div className="flex items-center rounded-r-md bg-light-100 dark:bg-dark-800">
           <input
             {...form.register(
               `splits.${index}.value`,
@@ -152,7 +162,7 @@ export default function SplitField({
               },
             )}
             aria-label={`splits.${index}.value`}
-            className="w-full text-right bg-gunmetal-800 border-none rounded-sm m-0"
+            className="w-full text-right m-0"
             type="number"
             step="0.001"
             disabled={disabled}

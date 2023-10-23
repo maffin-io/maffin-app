@@ -181,6 +181,43 @@ describe('AccountsTable', () => {
     expect((Table as jest.Mock).mock.calls[0][0].data[1].total.toString()).toEqual('100.00 EUR');
   });
 
+  it('ignores hidden accounts', async () => {
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+      {
+        data: {
+          root: {
+            guid: 'root',
+            name: 'Root',
+            type: 'ROOT',
+            childrenIds: ['a1'],
+          } as Account,
+          a1: {
+            guid: 'a1',
+            name: 'Assets',
+            description: 'description',
+            commodity: {
+              mnemonic: 'EUR',
+            },
+            type: 'ASSET',
+            childrenIds: [] as string[],
+            hidden: true,
+          },
+        },
+      } as SWRResponse,
+    );
+
+    render(<AccountsTable />);
+
+    await screen.findByTestId('Table');
+    expect(Table).toBeCalledTimes(1);
+    expect(Table).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        data: [],
+      }),
+      {},
+    );
+  });
+
   it('renders Name column as expected when expandable and not expandded', async () => {
     render(<AccountsTable />);
 

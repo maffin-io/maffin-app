@@ -16,7 +16,7 @@ export default function StatisticsWidget({
   statsTextClass = '',
 }: StatisticsWidgetProps): JSX.Element {
   return (
-    <div className={`${className} bg-gunmetal-700 rounded-sm p-6`}>
+    <div className={`card ${className} p-6`}>
       <p>
         {title}
       </p>

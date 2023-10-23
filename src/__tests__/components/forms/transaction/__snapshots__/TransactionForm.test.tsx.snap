@@ -32,7 +32,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
         Description
       </label>
       <span
-        class="badge"
+        class="badge ml-0.5"
         data-tooltip-id="description-help"
       >
         ?
@@ -60,11 +60,11 @@ exports[`TransactionForm renders as expected with action add 1`] = `
         class="flex w-1/2"
       >
         <div
-          class="flex items-center rounded-md bg-gunmetal-800"
+          class="flex items-center rounded-md bg-light-100 dark:bg-dark-800"
         >
           <input
             aria-label="splits.0.quantity"
-            class="w-full text-right bg-gunmetal-800 border-none m-0"
+            class="w-full text-right m-0"
             name="splits.0.quantity"
             step="0.001"
             type="number"
@@ -97,11 +97,11 @@ exports[`TransactionForm renders as expected with action add 1`] = `
             </svg>
           </span>
           <div
-            class="flex items-center rounded-md bg-gunmetal-800"
+            class="flex items-center rounded-md  bg-light-100 dark:bg-dark-800"
           >
             <input
               aria-label="splits.0.value"
-              class="w-full text-right bg-gunmetal-800 m-0"
+              class="w-full text-right m-0"
               hidden=""
               name="splits.0.value"
               step="0.001"
@@ -133,7 +133,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
               class="col-span-9"
             >
               <div
-                class=" css-b62m3t-container"
+                class="selector css-b62m3t-container"
                 id="splits.1.account"
               >
                 <span
@@ -147,7 +147,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                   class="css-1f43avz-a11yText-A11yText"
                 />
                 <div
-                  class="!h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none css-13cymwt-control"
+                  class="selector__control css-13cymwt-control"
                 >
                   <svg
                     class="absolute text-md left-[10px]"
@@ -164,16 +164,16 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                     />
                   </svg>
                   <div
-                    class=" css-1fdsijx-ValueContainer"
+                    class="selector__value-container css-1fdsijx-ValueContainer"
                   >
                     <div
-                      class=" css-1jqq78o-placeholder"
+                      class="selector__placeholder css-1jqq78o-placeholder"
                       id="react-select-2-placeholder"
                     >
                       &lt;account&gt;
                     </div>
                     <div
-                      class="!text-inherit css-qbdosj-Input"
+                      class="!text-inherit selector__input-container css-qbdosj-Input"
                       data-value=""
                     >
                       <input
@@ -185,7 +185,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                         autocapitalize="none"
                         autocomplete="off"
                         autocorrect="off"
-                        class=""
+                        class="selector__input"
                         id="react-select-2-input"
                         role="combobox"
                         spellcheck="false"
@@ -197,14 +197,14 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                     </div>
                   </div>
                   <div
-                    class=" css-1hb7zxy-IndicatorsContainer"
+                    class="selector__indicators css-1hb7zxy-IndicatorsContainer"
                   >
                     <span
-                      class="hidden css-1u9des2-indicatorSeparator"
+                      class="hidden selector__indicator-separator css-1u9des2-indicatorSeparator"
                     />
                     <div
                       aria-hidden="true"
-                      class=" css-1xc3v61-indicatorContainer"
+                      class="selector__indicator selector__dropdown-indicator css-1xc3v61-indicatorContainer"
                     >
                       <svg
                         aria-hidden="true"
@@ -235,11 +235,11 @@ exports[`TransactionForm renders as expected with action add 1`] = `
               class="col-span-4"
             >
               <div
-                class="flex items-center rounded-md bg-gunmetal-800"
+                class="flex items-center rounded-none bg-light-100 dark:bg-dark-800 rounded-r-md"
               >
                 <input
                   aria-label="splits.1.quantity"
-                  class="w-full text-right bg-gunmetal-800 border-none rounded-sm m-0"
+                  class="w-full text-right m-0"
                   name="splits.1.quantity"
                   step="0.001"
                   type="number"
@@ -254,11 +254,11 @@ exports[`TransactionForm renders as expected with action add 1`] = `
               hidden=""
             >
               <div
-                class="flex items-center rounded-md bg-gunmetal-800"
+                class="flex items-center rounded-r-md bg-light-100 dark:bg-dark-800"
               >
                 <input
                   aria-label="splits.1.value"
-                  class="w-full text-right bg-gunmetal-800 border-none rounded-sm m-0"
+                  class="w-full text-right m-0"
                   name="splits.1.value"
                   step="0.001"
                   type="number"
@@ -294,13 +294,13 @@ exports[`TransactionForm renders as expected with action add 1`] = `
       type="number"
     />
     <div
-      class="flex w-full gap-2 items-center justify-center"
+      class="flex w-full justify-center"
     >
       <button
-        class="btn-primary"
+        class="btn capitalize btn-primary"
         type="submit"
       >
-        Save
+        add
       </button>
     </div>
   </form>
@@ -340,7 +340,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
         Description
       </label>
       <span
-        class="badge"
+        class="badge ml-0.5"
         data-tooltip-id="description-help"
       >
         ?
@@ -369,11 +369,11 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
         class="flex w-1/2"
       >
         <div
-          class="flex items-center rounded-md bg-gunmetal-800"
+          class="flex items-center rounded-md bg-light-100 dark:bg-dark-800"
         >
           <input
             aria-label="splits.0.quantity"
-            class="w-full text-right bg-gunmetal-800 border-none m-0"
+            class="w-full text-right m-0"
             disabled=""
             name="splits.0.quantity"
             step="0.001"
@@ -407,11 +407,11 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
             </svg>
           </span>
           <div
-            class="flex items-center rounded-md bg-gunmetal-800"
+            class="flex items-center rounded-md  bg-light-100 dark:bg-dark-800"
           >
             <input
               aria-label="splits.0.value"
-              class="w-full text-right bg-gunmetal-800 m-0"
+              class="w-full text-right m-0"
               disabled=""
               hidden=""
               name="splits.0.value"
@@ -444,7 +444,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
               class="col-span-9"
             >
               <div
-                class=" css-3iigni-container"
+                class="selector selector--is-disabled css-3iigni-container"
                 id="splits.1.account"
               >
                 <span
@@ -459,7 +459,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                 />
                 <div
                   aria-disabled="true"
-                  class="opacity-50 !h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none css-16xfy0z-control"
+                  class="selector__control selector__control--is-disabled css-16xfy0z-control"
                 >
                   <svg
                     class="absolute text-md left-[10px]"
@@ -476,16 +476,16 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                     />
                   </svg>
                   <div
-                    class=" css-1fdsijx-ValueContainer"
+                    class="selector__value-container css-1fdsijx-ValueContainer"
                   >
                     <div
-                      class=" css-1jqq78o-placeholder"
+                      class="selector__placeholder css-1jqq78o-placeholder"
                       id="react-select-4-placeholder"
                     >
                       &lt;account&gt;
                     </div>
                     <div
-                      class="!text-inherit css-1h01tm3-Input"
+                      class="!text-inherit selector__input-container css-1h01tm3-Input"
                       data-value=""
                     >
                       <input
@@ -497,7 +497,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                         autocapitalize="none"
                         autocomplete="off"
                         autocorrect="off"
-                        class=""
+                        class="selector__input"
                         disabled=""
                         id="react-select-4-input"
                         role="combobox"
@@ -510,14 +510,14 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                     </div>
                   </div>
                   <div
-                    class=" css-1hb7zxy-IndicatorsContainer"
+                    class="selector__indicators css-1hb7zxy-IndicatorsContainer"
                   >
                     <span
-                      class="hidden css-894a34-indicatorSeparator"
+                      class="hidden selector__indicator-separator css-894a34-indicatorSeparator"
                     />
                     <div
                       aria-hidden="true"
-                      class=" css-1xc3v61-indicatorContainer"
+                      class="selector__indicator selector__dropdown-indicator css-1xc3v61-indicatorContainer"
                     >
                       <svg
                         aria-hidden="true"
@@ -545,11 +545,11 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
               class="col-span-4"
             >
               <div
-                class="flex items-center rounded-md bg-gunmetal-800"
+                class="flex items-center rounded-none bg-light-100 dark:bg-dark-800 rounded-r-md"
               >
                 <input
                   aria-label="splits.1.quantity"
-                  class="w-full text-right bg-gunmetal-800 border-none rounded-sm m-0"
+                  class="w-full text-right m-0"
                   disabled=""
                   name="splits.1.quantity"
                   step="0.001"
@@ -565,11 +565,11 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
               hidden=""
             >
               <div
-                class="flex items-center rounded-md bg-gunmetal-800"
+                class="flex items-center rounded-r-md bg-light-100 dark:bg-dark-800"
               >
                 <input
                   aria-label="splits.1.value"
-                  class="w-full text-right bg-gunmetal-800 border-none rounded-sm m-0"
+                  class="w-full text-right m-0"
                   disabled=""
                   name="splits.1.value"
                   step="0.001"
@@ -600,14 +600,14 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
       type="number"
     />
     <div
-      class="flex w-full gap-2 items-center justify-center"
+      class="flex w-full justify-center"
     >
       <button
-        class="btn-danger"
+        class="btn capitalize btn-danger"
         disabled=""
         type="submit"
       >
-        Delete
+        delete
       </button>
     </div>
   </form>
@@ -646,7 +646,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
         Description
       </label>
       <span
-        class="badge"
+        class="badge ml-0.5"
         data-tooltip-id="description-help"
       >
         ?
@@ -674,11 +674,11 @@ exports[`TransactionForm renders as expected with action update 1`] = `
         class="flex w-1/2"
       >
         <div
-          class="flex items-center rounded-md bg-gunmetal-800"
+          class="flex items-center rounded-md bg-light-100 dark:bg-dark-800"
         >
           <input
             aria-label="splits.0.quantity"
-            class="w-full text-right bg-gunmetal-800 border-none m-0"
+            class="w-full text-right m-0"
             name="splits.0.quantity"
             step="0.001"
             type="number"
@@ -711,11 +711,11 @@ exports[`TransactionForm renders as expected with action update 1`] = `
             </svg>
           </span>
           <div
-            class="flex items-center rounded-md bg-gunmetal-800"
+            class="flex items-center rounded-md  bg-light-100 dark:bg-dark-800"
           >
             <input
               aria-label="splits.0.value"
-              class="w-full text-right bg-gunmetal-800 m-0"
+              class="w-full text-right m-0"
               hidden=""
               name="splits.0.value"
               step="0.001"
@@ -747,7 +747,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
               class="col-span-9"
             >
               <div
-                class=" css-b62m3t-container"
+                class="selector css-b62m3t-container"
                 id="splits.1.account"
               >
                 <span
@@ -761,7 +761,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                   class="css-1f43avz-a11yText-A11yText"
                 />
                 <div
-                  class="!h-9 !min-h-fit text-sm pl-10 !bg-gunmetal-800 !border-none css-13cymwt-control"
+                  class="selector__control css-13cymwt-control"
                 >
                   <svg
                     class="absolute text-md left-[10px]"
@@ -778,16 +778,16 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                     />
                   </svg>
                   <div
-                    class=" css-1fdsijx-ValueContainer"
+                    class="selector__value-container css-1fdsijx-ValueContainer"
                   >
                     <div
-                      class=" css-1jqq78o-placeholder"
+                      class="selector__placeholder css-1jqq78o-placeholder"
                       id="react-select-3-placeholder"
                     >
                       &lt;account&gt;
                     </div>
                     <div
-                      class="!text-inherit css-qbdosj-Input"
+                      class="!text-inherit selector__input-container css-qbdosj-Input"
                       data-value=""
                     >
                       <input
@@ -799,7 +799,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                         autocapitalize="none"
                         autocomplete="off"
                         autocorrect="off"
-                        class=""
+                        class="selector__input"
                         id="react-select-3-input"
                         role="combobox"
                         spellcheck="false"
@@ -811,14 +811,14 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                     </div>
                   </div>
                   <div
-                    class=" css-1hb7zxy-IndicatorsContainer"
+                    class="selector__indicators css-1hb7zxy-IndicatorsContainer"
                   >
                     <span
-                      class="hidden css-1u9des2-indicatorSeparator"
+                      class="hidden selector__indicator-separator css-1u9des2-indicatorSeparator"
                     />
                     <div
                       aria-hidden="true"
-                      class=" css-1xc3v61-indicatorContainer"
+                      class="selector__indicator selector__dropdown-indicator css-1xc3v61-indicatorContainer"
                     >
                       <svg
                         aria-hidden="true"
@@ -851,11 +851,11 @@ exports[`TransactionForm renders as expected with action update 1`] = `
               class="col-span-4"
             >
               <div
-                class="flex items-center rounded-md bg-gunmetal-800"
+                class="flex items-center rounded-none bg-light-100 dark:bg-dark-800 rounded-r-md"
               >
                 <input
                   aria-label="splits.1.quantity"
-                  class="w-full text-right bg-gunmetal-800 border-none rounded-sm m-0"
+                  class="w-full text-right m-0"
                   name="splits.1.quantity"
                   step="0.001"
                   type="number"
@@ -870,11 +870,11 @@ exports[`TransactionForm renders as expected with action update 1`] = `
               hidden=""
             >
               <div
-                class="flex items-center rounded-md bg-gunmetal-800"
+                class="flex items-center rounded-r-md bg-light-100 dark:bg-dark-800"
               >
                 <input
                   aria-label="splits.1.value"
-                  class="w-full text-right bg-gunmetal-800 border-none rounded-sm m-0"
+                  class="w-full text-right m-0"
                   name="splits.1.value"
                   step="0.001"
                   type="number"
@@ -910,14 +910,14 @@ exports[`TransactionForm renders as expected with action update 1`] = `
       type="number"
     />
     <div
-      class="flex w-full gap-2 items-center justify-center"
+      class="flex w-full justify-center"
     >
       <button
-        class="btn-warn"
+        class="btn capitalize btn-warn"
         disabled=""
         type="submit"
       >
-        Update
+        update
       </button>
     </div>
   </form>

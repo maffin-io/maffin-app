@@ -5,6 +5,7 @@ import Topbar from '@/layout/Topbar';
 import { AccountSelector } from '@/components/selectors';
 import SaveButton from '@/components/buttons/SaveButton';
 import ProfileDropdown from '@/components/ProfileDropdown';
+import ThemeButton from '@/components/buttons/ThemeButton';
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
@@ -27,6 +28,10 @@ jest.mock('@/components/selectors/AccountSelector', () => jest.fn(
 ));
 const AccountSelectorMock = AccountSelector as jest.MockedFunction<typeof AccountSelector>;
 
+jest.mock('@/components/buttons/ThemeButton', () => jest.fn(
+  () => <div data-testid="ThemeButton" />,
+));
+
 describe('Topbar', () => {
   let mockRouterPush: jest.Mock;
 
@@ -42,12 +47,14 @@ describe('Topbar', () => {
 
     expect(ProfileDropdownMock).toHaveBeenLastCalledWith({}, {});
     expect(SaveButtonMock).toHaveBeenLastCalledWith({}, {});
+    expect(ThemeButton).toHaveBeenLastCalledWith({}, {});
     expect(AccountSelectorMock).toHaveBeenLastCalledWith(
       {
         id: 'globalSearch',
         className: 'py-5 pl-1',
         onChange: expect.any(Function),
         placeholder: 'Search (cmd + k)...',
+        ignoreHidden: false,
       },
       {},
     );

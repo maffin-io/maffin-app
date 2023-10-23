@@ -3,7 +3,7 @@
 exports[`StatisticsWidget renders as expected 1`] = `
 <div>
   <div
-    class=" bg-gunmetal-700 rounded-sm p-6"
+    class="card  p-6"
   >
     <p>
       Title
@@ -25,7 +25,7 @@ exports[`StatisticsWidget renders as expected 1`] = `
 exports[`StatisticsWidget renders as expected without optional params 1`] = `
 <div>
   <div
-    class=" bg-gunmetal-700 rounded-sm p-6"
+    class="card  p-6"
   >
     <p>
       Title

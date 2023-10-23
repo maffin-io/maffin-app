@@ -19,14 +19,14 @@ export default function DividendChart(): JSX.Element {
   const [yearData, monthlyData] = buildData(investments, selectedYear);
 
   return (
-    <div className="bg-gunmetal-700 rounded-sm m-6 p-4">
+    <div>
       <span className="text-lg">
         Dividends
       </span>
 
       <div className="grid grid-cols-12">
         <div className="col-span-4">
-          <div id="chart-year" className="text-slate-300">
+          <div id="chart-year">
             <Bar
               height="400"
               data={yearData}
@@ -82,7 +82,7 @@ export default function DividendChart(): JSX.Element {
         </div>
 
         <div className="col-span-8">
-          <div id="chart-year" className="text-slate-300">
+          <div id="chart-year">
             <Bar
               height="400"
               data={monthlyData}
