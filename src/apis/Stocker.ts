@@ -18,7 +18,7 @@ export default class Stocker {
         ids: [tickers].toString(),
       },
     };
-    const resp = await API.get(this.apiName, '/api/prices/live', options);
+    const resp = await API.get(this.apiName, '/api/prices', options);
 
     return resp;
   }

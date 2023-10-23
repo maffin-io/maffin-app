@@ -56,21 +56,13 @@ export async function getPrice(ticker: string, when?: number): Promise<Price> {
     );
   }
 
-  if (!result[0].indicators.quote[0].close) {
-    throw new YahooError(
-      `no historical data for '${ticker}' found`,
-      404,
-      'NOT_FOUND',
-    );
-  }
-
   const currency = toCurrency(result[0].meta.currency);
-  const closePrice = toStandardUnit(result[0].indicators.quote[0].close[0], currency);
+  const price = toStandardUnit(result[0].meta.regularMarketPrice, currency);
   const previousClose = toStandardUnit(result[0].meta.chartPreviousClose, currency);
-  const change = closePrice - previousClose;
+  const change = price - previousClose;
 
   return {
-    price: closePrice,
+    price: price,
     currency,
     changePct: parseFloat(((change / previousClose) * 100).toFixed(2)),
     changeAbs: parseFloat(change.toFixed(2)),
@@ -78,7 +70,7 @@ export async function getPrice(ticker: string, when?: number): Promise<Price> {
 }
 
 function toStandardUnit(n: number, currency: string) {
-  if (currency === 'GBp') {
+  if (currency === 'GBP') {
     return n * 0.01;
   }
 

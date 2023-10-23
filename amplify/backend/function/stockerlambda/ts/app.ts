@@ -12,15 +12,15 @@ app.use(awsServerlessExpressMiddleware.eventContext())
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (process.env.NODE_ENV === 'dev') {
+    if (process.env.ENV === 'dev') {
       callback(null, true);
     } else if (
-      process.env.NODE_ENV === 'staging'
+      process.env.ENV === 'staging'
       && origin === 'https://staging.d1w6jie2l5rnr4.amplifyapp.com'
     ) {
       callback(null, true);
     } else if (
-      process.env.NODE_ENV === 'prod'
+      process.env.ENV === 'master'
       && origin === 'https://app.maffin.io'
     ) {
       callback(null, true);
