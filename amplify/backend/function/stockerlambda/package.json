@@ -16,7 +16,8 @@
     "dev": "yarn build && NODE_ENV=dev node src/local.js",
     "lint": "yarn eslint --ext .js,.ts",
     "test": "yarn jest --coverage",
-    "test:events": "amplify mock function stockerlambda --event src/event.json"
+    "test:events": "amplify mock function stockerlambda --event src/event.json",
+    "lambda:build": "mkdir src && mv package.json src/package.json && yarn install --modules-folder src/node_modules && tsc -p ./tsconfig.json"
   },
   "jest": {
     "preset": "ts-jest",

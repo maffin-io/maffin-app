@@ -16,8 +16,7 @@
     "stocker:lint": "yarn workspace stockerlambda lint",
     "stocker:test": "yarn workspace stockerlambda test",
     "stocker:install": "yarn workspace stockerlambda install",
-    "stocker:test:events": "yarn workspace stockerlambda test:events",
-    "amplify:stockerlambda": "yarn stocker:build"
+    "stocker:test:events": "yarn workspace stockerlambda test:events"
   },
   "dependencies": {
     "@dinero.js/currencies": "^2.0.0-alpha.14",

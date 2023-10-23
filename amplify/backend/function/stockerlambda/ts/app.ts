@@ -25,12 +25,12 @@ app.use(cors({
     ) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   }
 }));
 
-app.get('/api/prices/live', async (req, res) => {
+app.get('/api/prices', async (req, res) => {
   let tickers = (req.query.ids as string || '').split(',');
   if (!tickers.length) {
     res.status(400).json({
