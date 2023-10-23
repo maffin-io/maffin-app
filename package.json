@@ -140,7 +140,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/react-table": "^7.7.15",
     "@types/react-test-renderer": "^18.0.5",
-    "@types/sql.js": "^1.4.4",
+    "@types/sql.js": "^1.4.7",
     "autoprefixer": "^10.4.16",
     "babel-preset-react-app": "^10.0.1",
     "eslint": "^8.48.0",

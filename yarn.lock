@@ -4356,19 +4356,7 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*":
-  version "18.16.3"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.16.3.tgz#6bda7819aae6ea0b386ebc5b24bdf602f1b42b01"
-  integrity sha512-OPs5WnnT1xkCBiuQrZA4+YAV4HEJejmHneyraIaxsbev5yCEr6KMwINNFP9wQeFIw8FWcoTqF3vQsa5CDaI+8Q==
-
-"@types/node@^20.8.4":
-  version "20.8.4"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.8.4.tgz#0e9ebb2ff29d5c3302fc84477d066fa7c6b441aa"
-  integrity sha512-ZVPnqU58giiCjSxjVUESDtdPk4QR5WQhhINbc9UBrKLU68MX5BF6kbQzTrkwbolyr0X8ChBpXfavr5mZFKZQ5A==
-  dependencies:
-    undici-types "~5.25.1"
-
-"@types/node@^20.8.7":
+"@types/node@*", "@types/node@^20.8.4", "@types/node@^20.8.7":
   version "20.8.7"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.8.7.tgz#ad23827850843de973096edfc5abc9e922492a25"
   integrity sha512-21TKHHh3eUHIi2MloeptJWALuCu5H7HQTdTrWIFReA8ad+aggoX+lRes3ex7/FtpC+sVUpFMQ+QTfYr74mruiQ==
@@ -4500,10 +4488,10 @@
     "@types/mime" "*"
     "@types/node" "*"
 
-"@types/sql.js@^1.4.4":
-  version "1.4.5"
-  resolved "https://registry.yarnpkg.com/@types/sql.js/-/sql.js-1.4.5.tgz#e69d1a1ca3515ca6dea209f1cb85b402839c568f"
-  integrity sha512-FxaKd4TLmXC2gGsV0Pe1fX0GJkfVP3fIFJCXOjNMOYHoTLCi0+FLsURQmCtJLwlhabryvN67RMzRxpAErpEBWw==
+"@types/sql.js@^1.4.7":
+  version "1.4.7"
+  resolved "https://registry.yarnpkg.com/@types/sql.js/-/sql.js-1.4.7.tgz#991a07279e0564d114cac72d008e64793cc9ecfd"
+  integrity sha512-6NsC/6ECtyVdkEAw1jJcY44uFagQtL9dj+RxN8WceGcbON/E53IP/+/7zah2NnfzNzLnjAViiGLccWuAuKotgw==
   dependencies:
     "@types/emscripten" "*"
     "@types/node" "*"
