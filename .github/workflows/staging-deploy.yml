@@ -1,0 +1,23 @@
+name: Staging Deploy
+
+on: [workflow_dispatch]
+
+jobs:
+  frontend-build:
+    uses: ./.github/workflows/frontend-ci.yml
+
+  backend-build:
+    uses: ./.github/workflows/backend-ci.yml
+
+  deploy:
+    needs: [frontend-build, backend-build]
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.17.0]
+
+    steps:
+      - name: deploy
+        run: |
+          curl -X POST -d {} "${{ secrets.STAGING_WEBHOOK_URL }}" -H "Content-Type: application/json"

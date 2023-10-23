@@ -2,6 +2,22 @@
   "name": "maffin",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "amplify/backend/function/stockerlambda"
+  ],
+  "scripts": {
+    "maffin:dev": "next dev",
+    "maffin:run": "next start",
+    "maffin:build": "next build",
+    "maffin:test": "jest --watchAll=false",
+    "maffin:lint": "yarn eslint . --ext .js,.jsx,.ts,.tsx",
+    "stocker:build": "yarn workspace stockerlambda build",
+    "stocker:dev": "yarn workspace stockerlambda dev",
+    "stocker:lint": "yarn workspace stockerlambda lint",
+    "stocker:test": "yarn workspace stockerlambda test",
+    "stocker:install": "yarn workspace stockerlambda install",
+    "stocker:test:events": "yarn workspace stockerlambda test:events"
+  },
   "dependencies": {
     "@dinero.js/currencies": "^2.0.0-alpha.14",
     "@fontsource/inter": "^5.0.13",
@@ -41,18 +57,6 @@
     "swr": "^2.2.4",
     "typeorm": "^0.3.17",
     "winston-react": "^1.0.0-RC.0"
-  },
-  "scripts": {
-    "maffin:dev": "next dev",
-    "maffin:run": "next start",
-    "maffin:build": "next build",
-    "maffin:test": "jest --watchAll=false",
-    "maffin:lint": "yarn eslint . --ext .js,.jsx,.ts,.tsx",
-    "stocker:dev": "node amplify/backend/function/stockerlambda/src/local.js",
-    "stocker:install": "cd amplify/backend/function/stockerlambda/src/ && yarn && cd -",
-    "stocker:lint": "cd amplify/backend/function/stockerlambda/src/ && yarn eslint --ext .js && cd -",
-    "stocker:test": "cd amplify/backend/function/stockerlambda/src/ && yarn jest --coverage && cd -",
-    "stocker:test:events": "amplify mock function stockerlambda --event src/event.json"
   },
   "eslintConfig": {
     "plugins": [

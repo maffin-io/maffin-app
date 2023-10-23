@@ -20,7 +20,7 @@ describe('Stocker', () => {
 
       expect(API.get).toHaveBeenCalledWith(
         'stocker',
-        '/api/prices/live',
+        '/api/prices',
         { queryStringParameters: { ids: 'A,B' } },
       );
       expect(result).toEqual({ price: 1.23456, currency: 'USD' });

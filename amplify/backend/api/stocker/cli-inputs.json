@@ -1,15 +1,15 @@
 {
   "version": 1,
   "paths": {
-    "/api/prices/live": {
-      "name": "/api/prices/live",
+    "/api/price": {
+      "name": "/api/price",
       "lambdaFunction": "stockerlambda",
       "permissions": {
         "setting": "open"
       }
     },
-    "/api/price": {
-      "name": "/api/price",
+    "/api/prices": {
+      "name": "/api/prices",
       "lambdaFunction": "stockerlambda",
       "permissions": {
         "setting": "open"
