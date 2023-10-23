@@ -3795,15 +3795,10 @@
   resolved "https://registry.yarnpkg.com/@types/gapi.client/-/gapi.client-1.0.5.tgz#a6eb97e664fe51656c5b52258bd0afef28c76308"
   integrity sha512-OTpbBMuzfC4lkvaomxqskI/iWRGW3zOZbDXZLNSyiuswTiSSGgILRLkg0POuZ4EgzEdaYaTlXpnXiCp07ri/Yw==
 
-"@types/gapi@*":
-  version "0.0.44"
-  resolved "https://registry.yarnpkg.com/@types/gapi/-/gapi-0.0.44.tgz#f097f7a0f59d63a59098a08a62a560ca168426fb"
-  integrity sha512-hsgJMfZ/pMwI15UlAYHMNwj8DRoigo1odhbPwEXdp19ZQwQAXbcRrpzaDsfc+9XM6RtGpvl4Ja7uW8A+KPCa7w==
-
-"@types/gapi@^0.0.45":
-  version "0.0.45"
-  resolved "https://registry.yarnpkg.com/@types/gapi/-/gapi-0.0.45.tgz#005ab29c31502e1b82d2a9c54a4dcc12dd1f0f58"
-  integrity sha512-xc8X9FrdZcWoOd4tMhLenYbnmaxCgy2FBt+SOI7xv9Efy/7Jk2V9gBZiufFBLIfDUUvpWY7DN3x4lrdL1I9y0Q==
+"@types/gapi@*", "@types/gapi@^0.0.46":
+  version "0.0.46"
+  resolved "https://registry.yarnpkg.com/@types/gapi/-/gapi-0.0.46.tgz#a40a34ce8a7dd9d903f93401a36a06ec828a99eb"
+  integrity sha512-lOSwnIOzx5CD+BtXlS7gPQWuiK8G0B7FNtYGPxF/FTNF3hfTPr5AwB077IebwS+yoeQxZu8pPIh2DI/x4rpAxQ==
 
 "@types/google.accounts@^0.0.12":
   version "0.0.12"
