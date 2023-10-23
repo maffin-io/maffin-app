@@ -3762,10 +3762,10 @@
   resolved "https://registry.yarnpkg.com/@types/emscripten/-/emscripten-1.39.6.tgz#698b90fe60d44acf93c31064218fbea93fbfd85a"
   integrity sha512-H90aoynNhhkQP6DRweEjJp5vfUVdIj7tdPLsu7pq89vODD/lcugKfZOsfgwpvM6XUewEp2N5dCg1Uf3Qe55Dcg==
 
-"@types/gapi.auth2@^0.0.58":
-  version "0.0.58"
-  resolved "https://registry.yarnpkg.com/@types/gapi.auth2/-/gapi.auth2-0.0.58.tgz#e72388eaeae7aaef954a08f7834cf35e18a72eee"
-  integrity sha512-o1T+6M0DDGPRI+WJBJTEdcF6TRQLL+2rjIzwXrmpqRCLmErYcP9E17ScZHXoNsXBc/Z3V3zSgM+sdfkey4xlxw==
+"@types/gapi.auth2@^0.0.59":
+  version "0.0.59"
+  resolved "https://registry.yarnpkg.com/@types/gapi.auth2/-/gapi.auth2-0.0.59.tgz#aedc5ac8b2309d0e7c3e8e2fc86985afa261103b"
+  integrity sha512-3M5LkrECm9XKFaY80IpjqpuqERMZIaJjuvC0atCfeALzUzm/RXmGfHTTazOQNYVIaiddfOkCPEWcrZfYIeh3Dg==
   dependencies:
     "@types/gapi" "*"
 
@@ -3795,12 +3795,7 @@
   resolved "https://registry.yarnpkg.com/@types/gapi.client/-/gapi.client-1.0.5.tgz#a6eb97e664fe51656c5b52258bd0afef28c76308"
   integrity sha512-OTpbBMuzfC4lkvaomxqskI/iWRGW3zOZbDXZLNSyiuswTiSSGgILRLkg0POuZ4EgzEdaYaTlXpnXiCp07ri/Yw==
 
-"@types/gapi@*":
-  version "0.0.44"
-  resolved "https://registry.yarnpkg.com/@types/gapi/-/gapi-0.0.44.tgz#f097f7a0f59d63a59098a08a62a560ca168426fb"
-  integrity sha512-hsgJMfZ/pMwI15UlAYHMNwj8DRoigo1odhbPwEXdp19ZQwQAXbcRrpzaDsfc+9XM6RtGpvl4Ja7uW8A+KPCa7w==
-
-"@types/gapi@^0.0.45":
+"@types/gapi@*", "@types/gapi@^0.0.45":
   version "0.0.45"
   resolved "https://registry.yarnpkg.com/@types/gapi/-/gapi-0.0.45.tgz#005ab29c31502e1b82d2a9c54a4dcc12dd1f0f58"
   integrity sha512-xc8X9FrdZcWoOd4tMhLenYbnmaxCgy2FBt+SOI7xv9Efy/7Jk2V9gBZiufFBLIfDUUvpWY7DN3x4lrdL1I9y0Q==
