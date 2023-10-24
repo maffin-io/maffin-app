@@ -31,6 +31,7 @@ export default function AccountFormButton({
 
   return (
     <>
+      {/* @ts-ignore */}
       <Modal
         isOpen={isModalOpen}
         overlayClassName="overlay"
