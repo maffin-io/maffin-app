@@ -38,6 +38,7 @@ export default function TransactionFormButton({
 
   return (
     <>
+      {/* @ts-ignore */}
       <Modal
         isOpen={isModalOpen}
         overlayClassName="overlay"
