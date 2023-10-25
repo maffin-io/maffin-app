@@ -133,7 +133,7 @@ describe('PriceDB', () => {
     let mockGetPrices = jest.fn() as jest.SpyInstance;
 
     beforeEach(async () => {
-      mockGetPrices = jest.spyOn(Stocker.prototype, 'getLiveSummary').mockResolvedValue({
+      mockGetPrices = jest.spyOn(Stocker.prototype, 'getPrices').mockResolvedValue({
         'EURUSD=X': {
           price: 0.9654,
           changePct: -1,
@@ -249,7 +249,7 @@ describe('PriceDB', () => {
     let mockGetPrices = jest.fn() as jest.SpyInstance;
 
     beforeEach(async () => {
-      mockGetPrices = jest.spyOn(Stocker.prototype, 'getLiveSummary').mockResolvedValue({
+      mockGetPrices = jest.spyOn(Stocker.prototype, 'getPrices').mockResolvedValue({
         GOOGL: {
           price: 2000,
           changePct: -1,

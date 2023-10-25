@@ -136,6 +136,10 @@ async function createEmptyBook() {
       mnemonic: 'USD',
       namespace: 'CURRENCY',
     }).save(),
+    Commodity.create({
+      mnemonic: 'SGD',
+      namespace: 'CURRENCY',
+    }).save(),
   ]);
 
   await Book.upsert(

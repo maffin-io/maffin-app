@@ -34,7 +34,6 @@ export default function CommoditySelector(
   const ref = React.useRef<HTMLDivElement>();
   const [isLoading, setIsLoading] = React.useState(false);
   let { data: commodities } = useCommodities();
-  console.log(commodities);
   commodities = commodities || [];
 
   if (namespace) {
@@ -74,7 +73,7 @@ export default function CommoditySelector(
       setIsLoading(false);
       return filteredDefaults;
     },
-    [commodities],
+    [commodities, namespace],
   );
 
   const debouncedSearch = debounce(loadCommodities, 1000);

@@ -31,13 +31,13 @@ export default class Stocker {
     }
   }
 
-  async getLiveSummary(tickers: string[]): Promise<{ [key: string]:LiveSummary; }> {
+  async getPrices(tickers: string[]): Promise<{ [key: string]:LiveSummary; }> {
     const options = {
       queryStringParameters: {
         ids: [tickers].toString(),
       },
     };
-    const resp = await API.get(this.apiName, '/api/prices/live', options);
+    const resp = await API.get(this.apiName, '/api/prices', options);
 
     return resp;
   }

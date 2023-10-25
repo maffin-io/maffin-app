@@ -33,15 +33,7 @@ export function useCommodities(): SWRResponse<Commodity[]> {
   return useSWRImmutable(
     key,
     // Needs to be encapsulated in arrow function or it doesnt work properly
-    fetcher(
-      async () => {
-        console.log('hahah');
-        const commodities = await Commodity.find();
-        console.log(commodities);
-        return commodities;
-      },
-      key,
-    ),
+    fetcher(async () => Commodity.find(), key),
   );
 }
 

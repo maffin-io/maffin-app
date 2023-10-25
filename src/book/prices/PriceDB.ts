@@ -98,7 +98,7 @@ async function getCurrencyQuotes(): Promise<Price[]> {
   const instances: Price[] = [];
   let prices: { [key: string]: LiveSummary } = {};
   if (currencyPairs.size) {
-    prices = await new Stocker().getLiveSummary(Array.from(currencyPairs));
+    prices = await new Stocker().getPrices(Array.from(currencyPairs));
   }
 
   Object.entries(prices).forEach(([currencyPair, priceObj]) => {
@@ -139,7 +139,7 @@ async function getInvestmentQuotes(): Promise<Price[]> {
 
   let prices: { [key: string]: LiveSummary } = {};
   if (tickers.size) {
-    prices = await new Stocker().getLiveSummary(Array.from(tickers));
+    prices = await new Stocker().getPrices(Array.from(tickers));
   }
 
   const instances = buildPrices(commodities, currencies, prices);

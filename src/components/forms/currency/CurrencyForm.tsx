@@ -9,6 +9,7 @@ import { CommoditySelector } from '@/components/selectors';
 const resolver = classValidatorResolver(Commodity, { validator: { stopAtFirstError: true } });
 
 export type FormValues = {
+  guid: string,
   namespace: string,
   mnemonic: string,
 };
@@ -38,6 +39,7 @@ export default function CurrencyForm({ onSave }: CurrencyFormProps): JSX.Element
                   if (newValue) {
                     field.onChange(newValue.mnemonic);
                     form.setValue('namespace', newValue.namespace);
+                    form.setValue('guid', newValue.guid);
                   }
                 }}
                 placeholder="Choose or search your currency"

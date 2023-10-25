@@ -1,9 +1,9 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import type { InitSqlJsStatic } from 'sql.js';
-import type { DataSource } from 'typeorm';
+import type { BaseEntity, DataSource } from 'typeorm';
 import * as swr from 'swr';
 
-import { Account, Book } from '@/book/entities';
+import { Account, Book, Commodity } from '@/book/entities';
 import useDataSource from '@/hooks/useDataSource';
 import * as storageHooks from '@/hooks/useBookStorage';
 import * as gnucash from '@/lib/gnucash';
@@ -45,6 +45,7 @@ jest.mock('typeorm', () => ({
       get isInitialized() {
         return mockInitialize.mock.calls.length > 0;
       },
+      runMigrations: jest.fn(),
       initialize: mockInitialize,
       sqljsManager: {
         loadDatabase: jest.fn(),
@@ -128,6 +129,7 @@ describe('useDataSource', () => {
     expect(datasource.initialize).toBeCalledTimes(1);
     expect(datasource.sqljsManager.loadDatabase).toBeCalledTimes(1);
     expect(datasource.sqljsManager.loadDatabase).toHaveBeenCalledWith(rawBook);
+    expect(datasource.runMigrations).toBeCalledTimes(1);
   });
 
   it('preloads data', async () => {
@@ -163,6 +165,8 @@ describe('useDataSource', () => {
   });
 
   it('creates empty book when no data from storage', async () => {
+    // @ts-ignore
+    jest.spyOn(Commodity, 'create').mockReturnValue({ save: jest.fn() });
     jest.spyOn(Account, 'create').mockImplementation((account) => account as Account);
     jest.spyOn(Account, 'upsert').mockImplementation();
     jest.spyOn(Book, 'upsert').mockImplementation();
@@ -200,6 +204,8 @@ describe('useDataSource', () => {
       },
       ['guid'],
     );
+
+    expect(Commodity.create).toBeCalledTimes(3);
   });
 
   it('initializes datasource only once', async () => {

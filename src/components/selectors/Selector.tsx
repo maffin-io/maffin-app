@@ -1,7 +1,6 @@
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import Select, { SingleValue, components } from 'react-select';
-import CreatableSelect from 'react-select/creatable';
 import { BiSearch } from 'react-icons/bi';
 
 export type SelectorProps<T> = {
@@ -14,7 +13,6 @@ export type SelectorProps<T> = {
   defaultValue?: T,
   className?: string,
   disabled?: boolean,
-  creatable?: boolean,
 };
 
 export default function Selector<T extends object = {}>(
@@ -27,7 +25,6 @@ export default function Selector<T extends object = {}>(
     id = 'selector',
     isClearable = true,
     className = '',
-    creatable = false,
     disabled = false,
   }: SelectorProps<T>,
 ): JSX.Element {
@@ -36,10 +33,8 @@ export default function Selector<T extends object = {}>(
     ref.current?.focus();
   });
 
-  const Component = creatable ? CreatableSelect : Select;
-
   return (
-    <Component
+    <Select
       // @ts-ignore
       ref={ref}
       id={id}
@@ -66,8 +61,6 @@ export default function Selector<T extends object = {}>(
       getOptionLabel={(option: T) => option[labelAttribute]}
       // @ts-ignore dunno how to set proper types here
       getOptionValue={(option: T) => option[labelAttribute]}
-      // @ts-ignore dunno how to set proper types here
-      getNewOptionData={(value) => ({ [labelAttribute]: value, __isNew__: true })}
       openMenuOnFocus
       components={{ Control }}
       className={`selector ${className}`}

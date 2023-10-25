@@ -8,7 +8,7 @@ import Link from 'next/link';
 import classNames from 'classnames';
 
 import { useLatestTxs } from '@/hooks/api';
-import { isAsset, isLiability } from '@/book/helpers/accountType';
+import { isAsset, isInvestment, isLiability } from '@/book/helpers/accountType';
 import type { Split, Transaction } from '@/book/entities';
 import { moneyToString } from '@/helpers/number';
 
@@ -74,7 +74,7 @@ export default function LatestTransactions(): JSX.Element {
 }
 
 function getAssetSplit(tx: Transaction): Split | undefined {
-  return tx.splits.find(split => isAsset(split.account));
+  return tx.splits.find(split => isAsset(split.account) && !isInvestment(split.account));
 }
 
 function getLiabilitySplit(tx: Transaction): Split | undefined {

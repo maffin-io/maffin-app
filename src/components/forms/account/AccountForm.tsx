@@ -23,8 +23,6 @@ import createEquityAccount from '@/lib/createEquityAccount';
 import { Tooltip } from 'react-tooltip';
 import type { FormValues } from '@/components/forms/account/types';
 import classNames from 'classnames';
-import CommodityFormButton from '@/components/buttons/CommodityFormButton';
-import {MonthlyTotals} from '@/lib/queries';
 
 const resolver = classValidatorResolver(Account, { validator: { stopAtFirstError: true } });
 
@@ -277,6 +275,8 @@ async function onSubmit(
   router: AppRouterInstance,
   onSave: Function,
 ) {
+  // TODO: check if currency exists, if not, calculate the rate
+  // against the parent and against main currency
   const account = Account.create({
     ...data,
     guid: data.guid || undefined,

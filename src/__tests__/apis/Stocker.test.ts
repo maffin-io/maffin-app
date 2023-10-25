@@ -10,17 +10,17 @@ describe('Stocker', () => {
     instance = new Stocker();
   });
 
-  describe('getLiveSummary', () => {
+  describe('getPrices', () => {
     beforeEach(() => {
       jest.spyOn(API, 'get').mockResolvedValue({ price: 1.23456, currency: 'USD' });
     });
 
     it('calls API with expected params', async () => {
-      const result = await instance.getLiveSummary(['A', 'B']);
+      const result = await instance.getPrices(['A', 'B']);
 
       expect(API.get).toHaveBeenCalledWith(
         'stocker',
-        '/api/prices/live',
+        '/api/prices',
         { queryStringParameters: { ids: 'A,B' } },
       );
       expect(result).toEqual({ price: 1.23456, currency: 'USD' });
