@@ -39,6 +39,11 @@ describe('Onboarding', () => {
       type: 'ROOT',
     }).save();
 
+    await Commodity.create({
+      mnemonic: 'EUR',
+      namespace: 'CURRENCY',
+    }).save();
+
     jest.spyOn(API, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
   });
 

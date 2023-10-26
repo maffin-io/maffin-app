@@ -1,37 +1,31 @@
 import React from 'react';
 import debounce from 'debounce-promise';
+import {
+  Props as SelectProps,
+  GroupBase,
+} from 'react-select';
 
 import { useCommodities } from '@/hooks/api';
 import { Commodity } from '@/book/entities';
-import { SingleValue, components } from 'react-select';
-import AsyncCreatableSelect from 'react-select/async-creatable';
-import { BiSearch } from 'react-icons/bi';
-import Stocker from '@/apis/Stocker';
+import { search } from '@/apis/Stocker';
+import Selector from '@/components/selectors/Selector';
 
-export type CommoditySelectorProps = {
-  placeholder?: string,
+export interface CommoditySelectorProps extends SelectProps<
+Commodity,
+false,
+GroupBase<Commodity>
+> {
   namespace?: 'EQUITY' | 'ETF' | 'MUTUALFUND' | 'CURRENCY' | undefined,
-  defaultValue?: Commodity,
-  id?: string,
-  isClearable?: boolean,
-  disabled?: boolean,
-  className?: string,
-  onChange?: Function,
-};
+}
 
 export default function CommoditySelector(
   {
-    placeholder,
     namespace,
-    defaultValue,
+    placeholder = 'Choose commodity',
     id = 'commoditySelector',
-    isClearable = true,
-    disabled = false,
-    className = '',
-    onChange = () => {},
+    ...props
   }: CommoditySelectorProps,
 ): JSX.Element {
-  const ref = React.useRef<HTMLDivElement>();
   const [isLoading, setIsLoading] = React.useState(false);
   let { data: commodities } = useCommodities();
   commodities = commodities || [];
@@ -42,9 +36,9 @@ export default function CommoditySelector(
     );
   }
 
+  const debouncedSearch = debounce(search, 1000);
   const loadCommodities = React.useCallback(
     async (inputValue: string) => {
-      setIsLoading(true);
       const filteredDefaults = [];
       let exactMatch = false;
 
@@ -58,7 +52,8 @@ export default function CommoditySelector(
       });
 
       if (!exactMatch) {
-        const result = await new Stocker().search(inputValue, namespace);
+        setIsLoading(true);
+        const result = await debouncedSearch(inputValue, namespace);
         if (result) {
           filteredDefaults.push(
             Commodity.create({
@@ -68,26 +63,24 @@ export default function CommoditySelector(
             }),
           );
         }
+        setIsLoading(false);
       }
 
-      setIsLoading(false);
       return filteredDefaults;
     },
-    [commodities, namespace],
+    [commodities, namespace, debouncedSearch],
   );
 
-  const debouncedSearch = debounce(loadCommodities, 1000);
-
   return (
-    <AsyncCreatableSelect<Commodity>
+    <Selector<Commodity>
+      {...props}
       id={id}
       cacheOptions
+      creatable
       isLoading={isLoading}
       defaultOptions={commodities}
-      loadOptions={debouncedSearch}
-      placeholder={placeholder || 'Choose commodity'}
-      isClearable={isClearable}
-      defaultValue={defaultValue}
+      loadOptions={loadCommodities}
+      placeholder={placeholder}
       getOptionLabel={
         (option: Commodity | { label: string, value: string, __isNew__: boolean }) => {
           if (!(option instanceof Commodity)) {
@@ -107,39 +100,7 @@ export default function CommoditySelector(
           return label;
         }
       }
-      onChange={(newValue: SingleValue<Commodity> | null) => {
-        if (onChange) {
-          onChange(newValue);
-        }
-        ref.current?.blur();
-      }}
-      isDisabled={disabled}
       getOptionValue={(option: Commodity) => option.mnemonic}
-      components={{ Control }}
-      className={`selector ${className}`}
-      classNamePrefix="selector"
-      styles={{
-        option: () => ({}),
-      }}
-      classNames={{
-        indicatorSeparator: () => 'hidden',
-        singleValue: () => '!text-inherit',
-        input: () => '!text-inherit',
-      }}
     />
-  );
-}
-
-function Control(
-  {
-    children,
-    ...props
-  }: any,
-): JSX.Element {
-  return (
-    <components.Control {...props}>
-      <BiSearch className="absolute text-md left-[10px]" />
-      {children}
-    </components.Control>
   );
 }

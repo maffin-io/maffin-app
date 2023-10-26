@@ -119,7 +119,7 @@ export default function AccountForm({
               <AccountSelector
                 id="parentInput"
                 showRoot
-                disabled={disabled}
+                isDisabled={disabled}
                 isClearable={false}
                 ignoreAccounts={['STOCK', 'MUTUAL']}
                 ignorePlaceholders={false}
@@ -143,7 +143,7 @@ export default function AccountForm({
               <AccountTypeSelector
                 id="typeInput"
                 placeholder={parent ? '<select account type>' : '<select parent first>'}
-                disabled={disabled || !parent}
+                isDisabled={disabled || !parent}
                 ignoreTypes={ignoreTypes}
                 onChange={field.onChange}
                 defaultValue={(defaultValues?.type && { type: defaultValues.type }) || undefined}
@@ -233,7 +233,7 @@ export default function AccountForm({
                 placeholder="Choose or search for a new commodity"
                 onChange={field.onChange}
                 defaultValue={defaultValues?.fk_commodity}
-                disabled={disabled || action !== 'add'}
+                isDisabled={disabled || action !== 'add'}
               />
               <p className="invalid-feedback">{fieldState.error?.message}</p>
             </>

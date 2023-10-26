@@ -1,66 +1,58 @@
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import Select, { SingleValue, components } from 'react-select';
+import Select, {
+  components,
+  Props as SelectProps,
+  SelectInstance,
+  GroupBase,
+} from 'react-select';
+import AsyncCreatableSelect, { AsyncCreatableProps } from 'react-select/async-creatable';
 import { BiSearch } from 'react-icons/bi';
 
-export type SelectorProps<T> = {
-  labelAttribute: string,
-  options: T[],
-  id?: string,
-  placeholder?: string,
-  onChange?: Function,
-  isClearable?: boolean,
-  defaultValue?: T,
-  className?: string,
-  disabled?: boolean,
-};
+type SelectorProps<T> = {
+  creatable?: boolean;
+} & (SelectProps<T, false, GroupBase<T>> | AsyncCreatableProps<T, false, GroupBase<T>>);
 
 export default function Selector<T extends object = {}>(
   {
-    labelAttribute,
-    options,
+    creatable = false,
     placeholder,
     onChange,
-    defaultValue,
-    id = 'selector',
-    isClearable = true,
     className = '',
-    disabled = false,
+    isClearable = true,
+    id = 'selector',
+    ...props
   }: SelectorProps<T>,
 ): JSX.Element {
-  const ref = React.useRef<HTMLDivElement>();
+  const ref = React.useRef<SelectInstance<T, false, GroupBase<T>>>();
   useHotkeys('meta+k', () => {
     ref.current?.focus();
   });
 
+  const Component = creatable ? AsyncCreatableSelect : Select;
+
   return (
-    <Select
-      // @ts-ignore
-      ref={ref}
+    <Component
+      {...props}
+      ref={ref as React.Ref<SelectInstance<T, false, GroupBase<T>>>}
       id={id}
       name={id}
       aria-label={id}
-      options={options}
+      options={props.options}
       placeholder={placeholder || 'Choose an option'}
-      onChange={(newValue: SingleValue<T> | null) => {
+      backspaceRemovesValue
+      onChange={(...args) => {
         if (onChange) {
-          onChange(newValue);
+          onChange(...args);
         }
         ref.current?.blur();
       }}
-      isClearable={isClearable}
-      isDisabled={disabled}
-      defaultValue={defaultValue}
-      backspaceRemovesValue
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Escape') {
           ref.current?.blur();
         }
       }}
-      // @ts-ignore dunno how to set proper types here
-      getOptionLabel={(option: T) => option[labelAttribute]}
-      // @ts-ignore dunno how to set proper types here
-      getOptionValue={(option: T) => option[labelAttribute]}
+      isClearable={isClearable}
       openMenuOnFocus
       components={{ Control }}
       className={`selector ${className}`}

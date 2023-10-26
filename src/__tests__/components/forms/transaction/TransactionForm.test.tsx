@@ -11,7 +11,6 @@ import { DataSource, IsNull } from 'typeorm';
 import * as swr from 'swr';
 import type { SWRResponse } from 'swr';
 
-import Stocker from '@/apis/Stocker';
 import {
   Account,
   Commodity,
@@ -22,6 +21,7 @@ import {
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import * as queries from '@/lib/queries';
 import * as apiHook from '@/hooks/api';
+import * as stocker from '@/apis/Stocker';
 
 jest.mock('swr');
 
@@ -33,6 +33,11 @@ jest.mock('@/lib/queries', () => ({
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
   ...jest.requireActual('@/hooks/api'),
+}));
+
+jest.mock('@/apis/Stocker', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/apis/Stocker'),
 }));
 
 describe('TransactionForm', () => {
@@ -137,7 +142,7 @@ describe('TransactionForm', () => {
   it.each([
     'update', 'delete',
   ])('does not override with exchangeRate when loaded with defaults for %s', async (action) => {
-    const mockGetPrice = jest.spyOn(Stocker.prototype, 'getPrice')
+    const mockGetPrice = jest.spyOn(stocker, 'getPrice')
       .mockResolvedValue({ price: 0.7, currency: '' });
     const now = DateTime.now().toISODate();
     expenseAccount.fk_commodity = sgd;
@@ -278,7 +283,7 @@ describe('TransactionForm', () => {
 
   it('creates transaction with mainSplit not being main currency', async () => {
     const user = userEvent.setup();
-    jest.spyOn(Stocker.prototype, 'getPrice')
+    jest.spyOn(stocker, 'getPrice')
       .mockResolvedValue({ price: 0.7, currency: '' });
     assetAccount.fk_commodity = sgd;
     await assetAccount.save();
@@ -375,7 +380,7 @@ describe('TransactionForm', () => {
 
   it('creates multiple splits transaction with mainSplit not being main currency', async () => {
     const user = userEvent.setup();
-    jest.spyOn(Stocker.prototype, 'getPrice')
+    jest.spyOn(stocker, 'getPrice')
       .mockResolvedValue({ price: 0.7, currency: '' });
     assetAccount.fk_commodity = sgd;
     await assetAccount.save();
@@ -518,7 +523,7 @@ describe('TransactionForm', () => {
 
   it('creates transaction with split not being main currency', async () => {
     const user = userEvent.setup();
-    jest.spyOn(Stocker.prototype, 'getPrice')
+    jest.spyOn(stocker, 'getPrice')
       .mockResolvedValue({ price: 1.42857, currency: '' });
     expenseAccount.fk_commodity = sgd;
     await expenseAccount.save();
@@ -615,7 +620,7 @@ describe('TransactionForm', () => {
 
   it('refreshes investments key when account is investment', async () => {
     const user = userEvent.setup();
-    jest.spyOn(Stocker.prototype, 'getPrice')
+    jest.spyOn(stocker, 'getPrice')
       .mockResolvedValue({ price: 90, currency: '' });
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
@@ -685,7 +690,7 @@ describe('TransactionForm', () => {
   // and then set the price to 1 / rate
   it('can create split transaction with stock being main split', async () => {
     const user = userEvent.setup();
-    jest.spyOn(Stocker.prototype, 'getPrice')
+    jest.spyOn(stocker, 'getPrice')
       .mockImplementation(async () => Promise.resolve({ price: 90, currency: 'SGD' }));
     const stockCommodity = await Commodity.create({
       guid: 'stock_guid',

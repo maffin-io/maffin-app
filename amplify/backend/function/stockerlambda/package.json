@@ -60,14 +60,6 @@
     "ignorePatterns": [
       "*.js",
       "*.d.ts"
-    ],
-    "overrides": [
-      {
-        "files": [
-          "src/**/*.ts?(x)",
-          "src/**/*.test.ts?(x)"
-        ]
-      }
     ]
   },
   "author": "",

@@ -4173,6 +4173,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/debounce-promise@^3.1.8":
+  version "3.1.8"
+  resolved "https://registry.yarnpkg.com/@types/debounce-promise/-/debounce-promise-3.1.8.tgz#79c679b48d97c121b36fad264dc62ffbc0d50d9f"
+  integrity sha512-xtglA5PhbH1XpWrzeiE+dUwuzZlhtICqq+IoXMIepMa39qM2YHhmsqCMG5ZTDX8i4G6833PZDgSbm0ALiZcngg==
+
 "@types/emscripten@*":
   version "1.39.6"
   resolved "https://registry.yarnpkg.com/@types/emscripten/-/emscripten-1.39.6.tgz#698b90fe60d44acf93c31064218fbea93fbfd85a"

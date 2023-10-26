@@ -8,10 +8,7 @@
     "skipLibCheck": true,
     "rootDir": "./ts",
     "outDir": "./src",
-    "baseUrl": "./",
-    "paths": {
-      "src": ["./lib"]
-    }
+    "baseUrl": "./"
   },
   "exclude": [
     "node_modules",

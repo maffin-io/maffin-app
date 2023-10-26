@@ -1,30 +1,27 @@
 import React from 'react';
-import Selector from '@/components/selectors/Selector';
-import { SingleValue } from 'react-select';
+import { Props as SelectProps, GroupBase, SingleValue } from 'react-select';
 
+import Selector from '@/components/selectors/Selector';
 import { Account } from '@/book/entities';
 
-export type AccountTypeSelectorProps = {
-  placeholder?: string,
-  ignoreTypes?: string[],
-  defaultValue?: { type: string },
-  id?: string,
-  isClearable?: boolean,
-  className?: string,
-  onChange?: Function,
-  disabled?: boolean,
+type AccountType = {
+  type: string;
 };
+
+export interface AccountTypeSelectorProps extends SelectProps<
+AccountType,
+false,
+GroupBase<AccountType>
+> {
+  ignoreTypes?: string[],
+}
 
 export default function AccountTypeSelector(
   {
-    placeholder,
     ignoreTypes = [],
-    defaultValue,
+    placeholder = 'Choose account type',
     id = 'typeSelector',
-    isClearable = true,
-    className = '',
-    onChange = () => {},
-    disabled = false,
+    ...props
   }: AccountTypeSelectorProps,
 ): JSX.Element {
   const types = Account.TYPES.slice(1).filter(
@@ -33,19 +30,19 @@ export default function AccountTypeSelector(
 
   return (
     <Selector<{ type: string }>
+      {...props}
       id={id}
-      labelAttribute="type"
-      options={types}
+      getOptionLabel={(option: AccountType) => option.type}
+      getOptionValue={(option: AccountType) => option.type}
       onChange={(newValue: SingleValue<{ type: string }> | null) => {
-        if (onChange) {
-          onChange(newValue?.type);
+        if (newValue && props.onChange) {
+          // @ts-ignore this is hacky as we are mixing onChange functions
+          // but I don't want to duplicate onChange listeners
+          props.onChange(newValue?.type, undefined);
         }
       }}
-      placeholder={placeholder || 'Choose account type'}
-      isClearable={isClearable}
-      defaultValue={defaultValue}
-      className={className}
-      disabled={disabled}
+      options={types}
+      placeholder={placeholder}
     />
   );
 }

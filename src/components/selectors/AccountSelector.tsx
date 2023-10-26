@@ -1,36 +1,26 @@
 import React from 'react';
+import { Props as SelectProps, GroupBase } from 'react-select';
 
 import Selector from '@/components/selectors/Selector';
 import { useAccounts } from '@/hooks/api';
 import { Account } from '@/book/entities';
 
-export type AccountSelectorProps = {
-  placeholder?: string,
+export interface AccountSelectorProps extends SelectProps<Account, false, GroupBase<Account>> {
   ignoreAccounts?: string[],
   ignorePlaceholders?: boolean,
   ignoreHidden?: boolean,
-  defaultValue?: Account,
-  id?: string,
   showRoot?: boolean,
-  isClearable?: boolean,
-  disabled?: boolean,
-  className?: string,
-  onChange?: Function,
-};
+}
 
 export default function AccountSelector(
   {
-    placeholder,
     ignoreAccounts = [],
     ignorePlaceholders = true,
     ignoreHidden = true,
-    defaultValue,
-    id = 'accountSelector',
     showRoot = false,
-    isClearable = true,
-    disabled = false,
-    className = '',
-    onChange = () => {},
+    id = 'accountSelector',
+    placeholder = 'Choose account',
+    ...props
   }: AccountSelectorProps,
 ): JSX.Element {
   let { data: accounts } = useAccounts();
@@ -60,15 +50,12 @@ export default function AccountSelector(
 
   return (
     <Selector<Account>
+      {...props}
       id={id}
-      labelAttribute="path"
+      getOptionLabel={(option: Account) => option.path}
+      getOptionValue={(option: Account) => option.path}
       options={options}
-      onChange={onChange}
       placeholder={placeholder || 'Choose account'}
-      isClearable={isClearable}
-      disabled={disabled}
-      defaultValue={defaultValue}
-      className={className}
     />
   );
 }

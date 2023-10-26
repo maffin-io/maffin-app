@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import type { InitSqlJsStatic } from 'sql.js';
-import type { BaseEntity, DataSource } from 'typeorm';
+import type { DataSource } from 'typeorm';
 import * as swr from 'swr';
 
 import { Account, Book, Commodity } from '@/book/entities';

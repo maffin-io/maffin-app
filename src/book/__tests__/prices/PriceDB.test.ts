@@ -9,8 +9,13 @@ import {
   Price,
   Split,
 } from '@/book/entities';
-import Stocker from '@/apis/Stocker';
+import * as stocker from '@/apis/Stocker';
 import { toFixed } from '@/helpers/number';
+
+jest.mock('@/apis/Stocker', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/apis/Stocker'),
+}));
 
 describe('PriceDB', () => {
   let datasource: DataSource;
@@ -133,7 +138,7 @@ describe('PriceDB', () => {
     let mockGetPrices = jest.fn() as jest.SpyInstance;
 
     beforeEach(async () => {
-      mockGetPrices = jest.spyOn(Stocker.prototype, 'getPrices').mockResolvedValue({
+      mockGetPrices = jest.spyOn(stocker, 'getPrices').mockResolvedValue({
         'EURUSD=X': {
           price: 0.9654,
           changePct: -1,
@@ -206,12 +211,14 @@ describe('PriceDB', () => {
             valueDenom: 10000,
             fk_commodity: {
               guid: expect.any(String),
+              fullname: '',
               cusip: null,
               mnemonic: 'EUR',
               namespace: 'CURRENCY',
             },
             fk_currency: {
               guid: expect.any(String),
+              fullname: '',
               cusip: null,
               mnemonic: 'USD',
               namespace: 'CURRENCY',
@@ -225,12 +232,14 @@ describe('PriceDB', () => {
             valueDenom: 100,
             fk_commodity: {
               guid: expect.any(String),
+              fullname: '',
               cusip: null,
               mnemonic: 'USD',
               namespace: 'CURRENCY',
             },
             fk_currency: {
               guid: expect.any(String),
+              fullname: '',
               cusip: null,
               mnemonic: 'EUR',
               namespace: 'CURRENCY',
@@ -249,7 +258,7 @@ describe('PriceDB', () => {
     let mockGetPrices = jest.fn() as jest.SpyInstance;
 
     beforeEach(async () => {
-      mockGetPrices = jest.spyOn(Stocker.prototype, 'getPrices').mockResolvedValue({
+      mockGetPrices = jest.spyOn(stocker, 'getPrices').mockResolvedValue({
         GOOGL: {
           price: 2000,
           changePct: -1,
@@ -351,12 +360,14 @@ describe('PriceDB', () => {
             valueDenom: 1,
             fk_commodity: {
               guid: expect.any(String),
+              fullname: '',
               cusip: null,
               mnemonic: 'GOOGL',
               namespace: 'NASDAQ',
             },
             fk_currency: {
               guid: expect.any(String),
+              fullname: '',
               cusip: null,
               mnemonic: 'USD',
               namespace: 'CURRENCY',

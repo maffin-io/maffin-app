@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 import { Not } from 'typeorm';
 
 import { toAmountWithScale } from '@/helpers/number';
-import Stocker, { LiveSummary } from '@/apis/Stocker';
+import { getPrices, LiveSummary } from '@/apis/Stocker';
 import { Price, Commodity } from '../entities';
 import PriceDBMap from './PriceDBMap';
 import Money from '../Money';
@@ -98,7 +98,7 @@ async function getCurrencyQuotes(): Promise<Price[]> {
   const instances: Price[] = [];
   let prices: { [key: string]: LiveSummary } = {};
   if (currencyPairs.size) {
-    prices = await new Stocker().getPrices(Array.from(currencyPairs));
+    prices = await getPrices(Array.from(currencyPairs));
   }
 
   Object.entries(prices).forEach(([currencyPair, priceObj]) => {
@@ -139,7 +139,7 @@ async function getInvestmentQuotes(): Promise<Price[]> {
 
   let prices: { [key: string]: LiveSummary } = {};
   if (tickers.size) {
-    prices = await new Stocker().getPrices(Array.from(tickers));
+    prices = await getPrices(Array.from(tickers));
   }
 
   const instances = buildPrices(commodities, currencies, prices);

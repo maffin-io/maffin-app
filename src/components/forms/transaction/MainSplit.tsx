@@ -6,7 +6,7 @@ import { Tooltip } from 'react-tooltip';
 import { BiRightArrowAlt } from 'react-icons/bi';
 
 import { isInvestment } from '@/book/helpers/accountType';
-import Stocker from '@/apis/Stocker';
+import { getPrice } from '@/apis/Stocker';
 import type { Account, Commodity } from '@/book/entities';
 import { toFixed } from '@/helpers/number';
 import { currencyToSymbol } from '@/helpers/currency';
@@ -156,7 +156,7 @@ async function getExchangeRate(
     ticker = account.commodity.mnemonic;
   }
 
-  const rate = await new Stocker().getPrice(ticker, when);
+  const rate = await getPrice(ticker, when);
   // TODO: We should check somewhere that the txCurrency is the same
   // as the stocks' currency to avoid price discrepancies.
   return rate.price;

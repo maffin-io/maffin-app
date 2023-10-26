@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 import { useForm } from 'react-hook-form';
 import type { SWRResponse } from 'swr';
 
-import Stocker from '@/apis/Stocker';
+import * as stocker from '@/apis/Stocker';
 import type { Account, Commodity } from '@/book/entities';
 import { Split } from '@/book/entities';
 import SplitField from '@/components/forms/transaction/SplitField';
@@ -17,6 +17,11 @@ import { toFixed } from '@/helpers/number';
 import type { FormValues } from '@/components/forms/transaction/types';
 import * as queries from '@/lib/queries';
 import * as apiHook from '@/hooks/api';
+
+jest.mock('@/apis/Stocker', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/apis/Stocker'),
+}));
 
 jest.mock('@/lib/queries', () => ({
   __esModule: true,
@@ -42,7 +47,7 @@ describe('SplitField', () => {
     jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
     jest.spyOn(apiHook, 'useAccounts')
       .mockReturnValue({ data: undefined } as SWRResponse);
-    jest.spyOn(Stocker.prototype, 'getPrice').mockResolvedValue({ price: EURSGD, currency: 'EUR' });
+    jest.spyOn(stocker, 'getPrice').mockResolvedValue({ price: EURSGD, currency: 'EUR' });
   });
 
   afterEach(() => {
@@ -94,7 +99,7 @@ describe('SplitField', () => {
   // When we load data through defaults, we want to keep it as
   // we are loading the split for deleting or updating
   it('loads with default and doesnt reset value', async () => {
-    const mockGetPrice = jest.spyOn(Stocker.prototype, 'getPrice')
+    const mockGetPrice = jest.spyOn(stocker, 'getPrice')
       .mockResolvedValue({ price: EURSGD, currency: '' });
 
     render(
@@ -241,7 +246,7 @@ describe('SplitField', () => {
 
   it('retrieves exchange rate for investment', async () => {
     const user = userEvent.setup();
-    const mockGetPrice = jest.spyOn(Stocker.prototype, 'getPrice')
+    const mockGetPrice = jest.spyOn(stocker, 'getPrice')
       .mockResolvedValue({ price: 100, currency: 'USD' });
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
@@ -276,7 +281,7 @@ describe('SplitField', () => {
 
   it('selects CURRENCY as tx currency when investment', async () => {
     const user = userEvent.setup();
-    jest.spyOn(Stocker.prototype, 'getPrice')
+    jest.spyOn(stocker, 'getPrice')
       .mockResolvedValueOnce({ price: 100, currency: 'USD' });
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
@@ -336,7 +341,7 @@ describe('SplitField', () => {
 
   it('recalculates quantity from value when date changes', async () => {
     const user = userEvent.setup();
-    const mockGetPrice = jest.spyOn(Stocker.prototype, 'getPrice')
+    const mockGetPrice = jest.spyOn(stocker, 'getPrice')
       .mockResolvedValueOnce({ price: EURSGD, currency: '' })
       // .mockResolvedValueOnce({ price: EURSGD, currency: '' })
       .mockResolvedValueOnce({ price: 1.30, currency: '' });
@@ -382,7 +387,7 @@ describe('SplitField', () => {
 
   it('recalculates when account changes', async () => {
     const user = userEvent.setup();
-    const mockGetPrice = jest.spyOn(Stocker.prototype, 'getPrice')
+    const mockGetPrice = jest.spyOn(stocker, 'getPrice')
       .mockResolvedValueOnce({ price: 1.30, currency: '' })
       .mockResolvedValueOnce({ price: 1.30, currency: '' });
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
