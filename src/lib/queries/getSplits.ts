@@ -46,6 +46,7 @@ export default async function getSplits(account: string): Promise<Split[]> {
     order: {
       fk_transaction: {
         date: 'DESC',
+        enterDate: 'DESC',
       },
       // This is so debit is always before credit
       // so we avoid negative amounts when display
