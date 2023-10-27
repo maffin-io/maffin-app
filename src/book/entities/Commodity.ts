@@ -40,6 +40,15 @@ export default class Commodity extends BaseEntity {
   @v.Length(2, 2048)
     mnemonic!: string;
 
+  @Column({
+    type: 'text',
+    length: 2048,
+    default: '',
+  })
+  @v.IsString()
+  @v.IsOptional()
+    fullname?: string;
+
   // We use this field as a way to identify the quote
   // in the exchange wherever we want to pull the price from
   // i.e. can be an ISIN, NVDA, etc. If this is not set, we fallback

@@ -100,7 +100,7 @@ describe('AccountForm', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('renders as expected with %s', async () => {
+  it('renders as expected with update', async () => {
     const { container } = render(
       <AccountForm
         action="update"
@@ -162,6 +162,7 @@ describe('AccountForm', () => {
     await user.type(screen.getByLabelText('Name'), 'ha');
 
     const button = await screen.findByText('add');
+    await user.click(button);
     expect(button).toBeDisabled();
   });
 

@@ -1,22 +1,33 @@
 import { API } from 'aws-amplify';
 import { DateTime } from 'luxon';
 
-import Stocker from '../../apis/Stocker';
+import * as stocker from '../../apis/Stocker';
 
 describe('Stocker', () => {
-  let instance: Stocker;
+  describe('search', () => {
+    beforeEach(() => {
+      jest.spyOn(API, 'get').mockResolvedValue({ ticker: 'ticker', namespace: 'namespace', name: 'name' });
+    });
 
-  beforeEach(() => {
-    instance = new Stocker();
+    it('calls API with expected params', async () => {
+      const result = await stocker.search('EUR', 'CURRENCY');
+
+      expect(API.get).toHaveBeenCalledWith(
+        'stocker',
+        '/api/search',
+        { queryStringParameters: { id: 'EUR', type: 'CURRENCY' } },
+      );
+      expect(result).toEqual({ ticker: 'ticker', namespace: 'namespace', name: 'name' });
+    });
   });
 
-  describe('getLiveSummary', () => {
+  describe('getPrices', () => {
     beforeEach(() => {
       jest.spyOn(API, 'get').mockResolvedValue({ price: 1.23456, currency: 'USD' });
     });
 
     it('calls API with expected params', async () => {
-      const result = await instance.getLiveSummary(['A', 'B']);
+      const result = await stocker.getPrices(['A', 'B']);
 
       expect(API.get).toHaveBeenCalledWith(
         'stocker',
@@ -33,7 +44,7 @@ describe('Stocker', () => {
     });
 
     it('calls API with expected params', async () => {
-      const result = await instance.getPrice('A', DateTime.fromISO('2023-01-01'));
+      const result = await stocker.getPrice('A', DateTime.fromISO('2023-01-01'));
 
       expect(API.get).toHaveBeenCalledWith(
         'stocker',

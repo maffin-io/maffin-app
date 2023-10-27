@@ -65,7 +65,7 @@ exports[`LeftSidebar renders as expected 1`] = `
                       href="/dashboard/accounts"
                     >
                       <span
-                        class="flex justify-center items-center w-20 text-white text-slate-400 hover:text-white"
+                        class="flex justify-center cursor-pointer items-center w-20 text-white text-slate-400 hover:text-white"
                       >
                         <svg
                           fill="currentColor"
@@ -91,7 +91,7 @@ exports[`LeftSidebar renders as expected 1`] = `
                       href="/dashboard/investments"
                     >
                       <span
-                        class="flex justify-center items-center w-20  text-slate-400 hover:text-white"
+                        class="flex justify-center cursor-pointer items-center w-20  text-slate-400 hover:text-white"
                       >
                         <svg
                           fill="currentColor"

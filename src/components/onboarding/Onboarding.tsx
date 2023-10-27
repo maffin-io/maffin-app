@@ -6,7 +6,7 @@ import { mutate } from 'swr';
 import { useMainCurrency } from '@/hooks/api';
 import { Account, Commodity, Split } from '@/book/entities';
 import AccountForm from '@/components/forms/account/AccountForm';
-import CommodityForm from '@/components/forms/commodity/CommodityForm';
+import CurrencyForm from '@/components/forms/currency/CurrencyForm';
 import CustomTooltip from '@/components/onboarding/CustomTooltip';
 import maffinLogo from '@/assets/images/maffin_logo_sm.png';
 import { DataSourceContext } from '@/hooks';
@@ -57,13 +57,15 @@ export default function Onboarding({
                   choose the right one for you!
                 </p>
               </span>
-              <CommodityForm
-                onSave={async (commodity: Commodity) => {
+              <CurrencyForm
+                onSave={async (currency: Commodity) => {
+                  mutate('/api/commodities');
                   mutate(
                     '/api/main-currency',
-                    commodity,
+                    currency,
+                    { revalidate: false },
                   );
-                  await createInitialAccounts(setAccounts);
+                  await createInitialAccounts(setAccounts, currency);
                   save();
                   setStepIndex(1);
                 }}
@@ -321,8 +323,7 @@ export default function Onboarding({
   );
 }
 
-async function createInitialAccounts(setAccounts: Function) {
-  const mainCommodity = await Commodity.findOneByOrFail({ namespace: 'CURRENCY' });
+async function createInitialAccounts(setAccounts: Function, currency: Commodity) {
   const root = await Account.findOneByOrFail({
     type: 'ROOT',
   });
@@ -334,7 +335,7 @@ async function createInitialAccounts(setAccounts: Function) {
       type: 'ASSET',
       description: 'Asset accounts are used for tracking things that are of value and can be used or sold to pay debts.',
       placeholder: true,
-      fk_commodity: mainCommodity,
+      fk_commodity: currency,
       parent: root,
     }).save(),
     type_expense: await Account.create({
@@ -342,7 +343,7 @@ async function createInitialAccounts(setAccounts: Function) {
       type: 'EXPENSE',
       description: 'Any expense such as food, clothing, taxes, etc.',
       placeholder: true,
-      fk_commodity: mainCommodity,
+      fk_commodity: currency,
       parent: root,
       children: [],
     }).save(),
@@ -353,7 +354,7 @@ async function createInitialAccounts(setAccounts: Function) {
     type: 'LIABILITY',
     description: 'Liability accounts are used for tracking debts or financial obligations.',
     placeholder: true,
-    fk_commodity: mainCommodity,
+    fk_commodity: currency,
     parent: root,
   });
 
@@ -362,7 +363,7 @@ async function createInitialAccounts(setAccounts: Function) {
     type: 'INCOME',
     description: 'Any income received from sources such as salary, interest, dividends, etc.',
     placeholder: true,
-    fk_commodity: mainCommodity,
+    fk_commodity: currency,
     parent: root,
   });
 
@@ -371,18 +372,18 @@ async function createInitialAccounts(setAccounts: Function) {
     type: 'EQUITY',
     description: 'Equity accounts are used to store the opening balances when you create new accounts',
     placeholder: true,
-    fk_commodity: mainCommodity,
+    fk_commodity: currency,
     parent: root,
   });
 
   await Account.insert([liabilitiesAccount, incomeAccount, equityAccount]);
 
   await Account.create({
-    name: `Opening balances - ${mainCommodity.mnemonic}`,
+    name: `Opening balances - ${currency.mnemonic}`,
     type: 'EQUITY',
-    description: `Opening balances for ${mainCommodity.mnemonic} accounts`,
+    description: `Opening balances for ${currency.mnemonic} accounts`,
     placeholder: false,
-    fk_commodity: mainCommodity,
+    fk_commodity: currency,
     parent: await Account.findOneByOrFail({ type: 'EQUITY' }),
   }).save();
 

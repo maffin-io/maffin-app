@@ -41,6 +41,7 @@ describe('Commodity', () => {
       expect(commodities).toEqual([
         {
           guid: expect.any(String),
+          fullname: '',
           cusip: null,
           mnemonic: 'mnemonic',
           namespace: 'namespace',

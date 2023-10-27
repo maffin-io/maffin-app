@@ -72,7 +72,7 @@ export default class Transaction extends BaseEntity {
     length: 2048,
     default: '',
   })
-  @v.Length(4, 2048)
+  @v.Length(1, 2048)
     description!: string;
 }
 

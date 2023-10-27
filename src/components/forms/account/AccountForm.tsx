@@ -119,7 +119,7 @@ export default function AccountForm({
               <AccountSelector
                 id="parentInput"
                 showRoot
-                disabled={disabled}
+                isDisabled={disabled}
                 isClearable={false}
                 ignoreAccounts={['STOCK', 'MUTUAL']}
                 ignorePlaceholders={false}
@@ -143,7 +143,7 @@ export default function AccountForm({
               <AccountTypeSelector
                 id="typeInput"
                 placeholder={parent ? '<select account type>' : '<select parent first>'}
-                disabled={disabled || !parent}
+                isDisabled={disabled || !parent}
                 ignoreTypes={ignoreTypes}
                 onChange={field.onChange}
                 defaultValue={(defaultValues?.type && { type: defaultValues.type }) || undefined}
@@ -230,10 +230,10 @@ export default function AccountForm({
             <>
               <CommoditySelector
                 id="commodityInput"
-                placeholder="<commodity>"
+                placeholder="Choose or search for a new commodity"
                 onChange={field.onChange}
                 defaultValue={defaultValues?.fk_commodity}
-                disabled={disabled || action !== 'add'}
+                isDisabled={disabled || action !== 'add'}
               />
               <p className="invalid-feedback">{fieldState.error?.message}</p>
             </>
@@ -275,6 +275,8 @@ async function onSubmit(
   router: AppRouterInstance,
   onSave: Function,
 ) {
+  // TODO: check if currency exists, if not, calculate the rate
+  // against the parent and against main currency
   const account = Account.create({
     ...data,
     guid: data.guid || undefined,
@@ -352,7 +354,6 @@ async function createBalance(data: FormValues, account: Account) {
     date: data.balanceDate ? DateTime.fromISO(data.balanceDate as string) : DateTime.now(),
   }).save();
 
-  // Opening balances affect net worth
   mutate('/api/monthly-totals', undefined);
   mutate('/api/txs/latest', undefined);
 }

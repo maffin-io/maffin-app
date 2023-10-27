@@ -128,7 +128,7 @@ const columns: ColumnDef<AccountsTableRow>[] = [
                   danger: row.original.account.type === 'EXPENSE',
                   info: isAsset(row.original.account),
                   warning: isLiability(row.original.account),
-                  'bg-violet-500/20 text-violet-300': isInvestment(row.original.account),
+                  misc: isInvestment(row.original.account),
                 })}
               >
                 {row.original.account.name}
@@ -142,7 +142,7 @@ const columns: ColumnDef<AccountsTableRow>[] = [
                 danger: row.original.account.type === 'EXPENSE',
                 info: isAsset(row.original.account),
                 warning: isLiability(row.original.account),
-                'bg-violet-500/20 text-violet-300': isInvestment(row.original.account),
+                misc: isInvestment(row.original.account),
               })}
               href={`/dashboard/accounts/${row.original.account.guid}`}
             >

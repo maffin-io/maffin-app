@@ -5,38 +5,54 @@ import awsExports from '../aws-exports';
 
 Amplify.configure(awsExports);
 
-export default class Stocker {
-  apiName: string;
+const API_NAME = 'stocker';
 
-  constructor() {
-    this.apiName = 'stocker';
-  }
+export async function search(
+  ticker: string,
+  type: 'EQUITY' | 'ETF' | 'MUTUALFUND' | 'CURRENCY' | undefined,
+): Promise<{ ticker: string, namespace: string, name: string } | undefined> {
+  const options = {
+    queryStringParameters: {
+      id: ticker,
+      type,
+    },
+  };
 
-  async getLiveSummary(tickers: string[]): Promise<{ [key: string]:LiveSummary; }> {
-    const options = {
-      queryStringParameters: {
-        ids: [tickers].toString(),
-      },
-    };
-    const resp = await API.get(this.apiName, '/api/prices', options);
-
+  try {
+    const resp = await API.get(API_NAME, '/api/search', options);
     return resp;
+  } catch (e) {
+    return undefined;
   }
+}
 
-  async getPrice(ticker: string, when: DateTime): Promise<{ price: number, currency: string }> {
-    const options = {
-      queryStringParameters: {
-        id: ticker,
-        when: Math.floor(when.toSeconds()),
-      },
-    };
-    const resp = await API.get(this.apiName, '/api/price', options);
+export async function getPrices(tickers: string[]): Promise<{ [key: string]:LiveSummary; }> {
+  const options = {
+    queryStringParameters: {
+      ids: [tickers].toString(),
+    },
+  };
+  const resp = await API.get(API_NAME, '/api/prices', options);
 
-    return {
-      price: Number(resp.price.toFixed(4)),
-      currency: resp.currency,
-    };
-  }
+  return resp;
+}
+
+export async function getPrice(
+  ticker: string,
+  when: DateTime,
+): Promise<{ price: number, currency: string }> {
+  const options = {
+    queryStringParameters: {
+      id: ticker,
+      when: Math.floor(when.toSeconds()),
+    },
+  };
+  const resp = await API.get(API_NAME, '/api/price', options);
+
+  return {
+    price: Number(resp.price.toFixed(4)),
+    currency: resp.currency,
+  };
 }
 
 export type LiveSummary = {

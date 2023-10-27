@@ -1,6 +1,5 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { SWRConfig } from 'swr';
 
 import Selector from '@/components/selectors/Selector';
 import { AccountTypeSelector } from '@/components/selectors';
@@ -8,29 +7,19 @@ import { AccountTypeSelector } from '@/components/selectors';
 jest.mock('@/components/selectors/Selector', () => jest.fn(
   () => <div data-testid="Selector" />,
 ));
-const SelectorMock = Selector as jest.MockedFunction<typeof Selector>;
 
 describe('AccountTypeSelector', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders as expected', async () => {
-    const { container } = render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <AccountTypeSelector />
-      </SWRConfig>,
-    );
+  it('creates Selector with defaults', async () => {
+    render(<AccountTypeSelector />);
 
     await screen.findByTestId('Selector');
     expect(Selector).toHaveBeenCalledWith(
       {
         id: 'typeSelector',
-        isClearable: true,
-        defaultValue: undefined,
-        className: '',
-        disabled: false,
-        labelAttribute: 'type',
         options: [
           { type: 'EQUITY' },
           { type: 'INCOME' },
@@ -46,73 +35,19 @@ describe('AccountTypeSelector', () => {
           { type: 'PAYABLE' },
         ],
         placeholder: 'Choose account type',
+        getOptionLabel: expect.any(Function),
+        getOptionValue: expect.any(Function),
         onChange: expect.any(Function),
       },
       {},
     );
-    expect(container).toMatchSnapshot();
-  });
 
-  it('passes data as expected', async () => {
-    const mockOnChange = jest.fn();
-    const { container } = render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <AccountTypeSelector
-          id="customId"
-          placeholder="My placeholder"
-          isClearable={false}
-          disabled
-          className="class"
-          defaultValue={{ type: 'ASSET' }}
-          onChange={mockOnChange}
-        />
-      </SWRConfig>,
-    );
-
-    await screen.findByTestId('Selector');
-    expect(Selector).toHaveBeenCalledWith(
-      {
-        id: 'customId',
-        isClearable: false,
-        disabled: true,
-        defaultValue: { type: 'ASSET' },
-        className: 'class',
-        labelAttribute: 'type',
-        options: [
-          { type: 'EQUITY' },
-          { type: 'INCOME' },
-          { type: 'EXPENSE' },
-          { type: 'ASSET' },
-          { type: 'BANK' },
-          { type: 'CASH' },
-          { type: 'STOCK' },
-          { type: 'MUTUAL' },
-          { type: 'RECEIVABLE' },
-          { type: 'LIABILITY' },
-          { type: 'CREDIT' },
-          { type: 'PAYABLE' },
-        ],
-        placeholder: 'My placeholder',
-        onChange: expect.any(Function),
-      },
-      {},
-    );
-    const { onChange } = SelectorMock.mock.calls[0][0];
-    if (onChange) {
-      onChange({ type: 'ASSET' });
-    }
-    expect(mockOnChange).toHaveBeenCalledWith('ASSET');
-    expect(container).toMatchSnapshot();
+    expect((Selector as jest.Mock).mock.calls[0][0].getOptionLabel({ type: 'type' })).toEqual('type');
+    expect((Selector as jest.Mock).mock.calls[0][0].getOptionValue({ type: 'type' })).toEqual('type');
   });
 
   it('filters types', async () => {
-    render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <AccountTypeSelector
-          ignoreTypes={['ASSET', 'BANK']}
-        />
-      </SWRConfig>,
-    );
+    render(<AccountTypeSelector ignoreTypes={['ASSET', 'BANK']} />);
 
     await screen.findByTestId('Selector');
     expect(Selector).toHaveBeenCalledWith(

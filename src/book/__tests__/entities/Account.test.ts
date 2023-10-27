@@ -111,7 +111,7 @@ describe('Account', () => {
   describe('validation', () => {
     it('fails if name not long enough', async () => {
       account = Account.create({
-        name: 'a',
+        name: '',
         type: 'ASSET',
         fk_commodity: eur,
         parent: root,

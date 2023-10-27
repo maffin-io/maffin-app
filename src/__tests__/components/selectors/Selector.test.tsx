@@ -18,7 +18,6 @@ describe('Selector', () => {
     const { container } = render(
       <Selector
         options={options}
-        labelAttribute="label"
       />,
     );
 
@@ -27,23 +26,21 @@ describe('Selector', () => {
   });
 
   it('renders as expected when disabled', async () => {
-    const { container } = render(
+    render(
       <Selector
         options={options}
-        labelAttribute="label"
-        disabled
+        isDisabled
       />,
     );
 
-    await screen.findByLabelText('selector');
-    expect(container).toMatchSnapshot();
+    const select = screen.getByLabelText('selector');
+    expect(select).toBeDisabled();
   });
 
   it('shows default placeholder', async () => {
     render(
       <Selector
         options={options}
-        labelAttribute="label"
       />,
     );
 
@@ -55,7 +52,6 @@ describe('Selector', () => {
       <Selector
         placeholder="My placeholder"
         options={options}
-        labelAttribute="label"
       />,
     );
 
@@ -67,32 +63,16 @@ describe('Selector', () => {
       <Selector
         id="testSelector"
         options={[]}
-        labelAttribute="label"
       />,
     );
 
     screen.getByLabelText('testSelector');
   });
 
-  it('can disable', async () => {
-    render(
-      <Selector
-        id="testSelector"
-        disabled
-        options={[]}
-        labelAttribute="label"
-      />,
-    );
-
-    const select = screen.getByLabelText('testSelector');
-    expect(select).toBeDisabled();
-  });
-
   it('works with no options', async () => {
     render(
       <Selector
         options={[]}
-        labelAttribute="label"
       />,
     );
 
@@ -106,7 +86,7 @@ describe('Selector', () => {
     render(
       <Selector
         options={options}
-        labelAttribute="label"
+        getOptionLabel={(option: { label: string }) => option.label}
       />,
     );
 
@@ -121,7 +101,7 @@ describe('Selector', () => {
     render(
       <Selector
         options={options}
-        labelAttribute="label"
+        getOptionLabel={(option: { label: string }) => option.label}
       />,
     );
 
@@ -140,7 +120,7 @@ describe('Selector', () => {
     render(
       <Selector
         options={options}
-        labelAttribute="label"
+        getOptionLabel={(option: { label: string }) => option.label}
       />,
     );
 
@@ -155,7 +135,8 @@ describe('Selector', () => {
     render(
       <Selector
         options={options}
-        labelAttribute="label"
+        getOptionLabel={(option: { label: string }) => option.label}
+        getOptionValue={(option: { label: string }) => option.label}
       />,
     );
 
@@ -169,13 +150,14 @@ describe('Selector', () => {
     screen.getByText('Choose an option');
   });
 
-  it('calls custom onChange, sets selected and blurs', async () => {
+  it('calls custom onChange', async () => {
     const mockOnChange = jest.fn();
     render(
       <Selector
         onChange={mockOnChange}
         options={options}
-        labelAttribute="label"
+        getOptionLabel={(option: { label: string }) => option.label}
+        getOptionValue={(option: { label: string }) => option.label}
       />,
     );
 
@@ -185,12 +167,27 @@ describe('Selector', () => {
 
     await userEvent.click(screen.getByText('label1'));
 
-    expect(mockOnChange).toHaveBeenCalledWith({
-      label: 'label1',
-    });
-    // This actually passes regardless of blur function being there or not.
-    // Need to find a way to retrieve the control element as it's the one
-    // affected
-    expect(select).not.toHaveFocus();
+    expect(mockOnChange).toBeCalledWith(
+      { label: 'label1' },
+      { action: 'select-option', name: 'selector', option: undefined },
+    );
+  });
+
+  it('creates new options', async () => {
+    render(
+      <Selector
+        creatable
+        defaultOptions={options}
+        getOptionLabel={(option: { label: string }) => option.label}
+        getOptionValue={(option: { label: string }) => option.label}
+      />,
+    );
+
+    const select = await screen.findByLabelText('selector');
+    await userEvent.click(select);
+    expect(select).toHaveFocus();
+
+    await userEvent.type(select, 'label3');
+    await userEvent.click(screen.getByText('Create "label3"'));
   });
 });

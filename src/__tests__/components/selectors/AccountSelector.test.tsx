@@ -25,66 +25,23 @@ describe('AccountSelector', () => {
     jest.clearAllMocks();
   });
 
-  it('renders as expected', async () => {
-    const { container } = render(<AccountSelector />);
+  it('creates Selector with defaults', async () => {
+    render(<AccountSelector />);
 
     await screen.findByTestId('Selector');
     expect(Selector).toHaveBeenCalledWith(
       {
         id: 'accountSelector',
-        isClearable: true,
-        disabled: false,
-        defaultValue: undefined,
-        className: '',
-        labelAttribute: 'path',
         options: [],
         placeholder: 'Choose account',
-        onChange: expect.any(Function),
+        getOptionLabel: expect.any(Function),
+        getOptionValue: expect.any(Function),
       },
       {},
     );
-    expect(container).toMatchSnapshot();
-  });
 
-  it('passes data as expected', async () => {
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: {
-          guid: {
-            guid: 'guid',
-            path: 'label1',
-          } as Account,
-        },
-      } as SWRResponse,
-    );
-    const mockOnSave = jest.fn();
-    const { container } = render(
-      <AccountSelector
-        id="customId"
-        placeholder="My placeholder"
-        isClearable={false}
-        className="class"
-        defaultValue={{ guid: 'guid', path: 'label1' } as Account}
-        onChange={mockOnSave}
-      />,
-    );
-
-    await screen.findByTestId('Selector');
-    expect(Selector).toHaveBeenCalledWith(
-      {
-        id: 'customId',
-        isClearable: false,
-        disabled: false,
-        defaultValue: { guid: 'guid', path: 'label1' },
-        className: 'class',
-        labelAttribute: 'path',
-        options: [{ guid: 'guid', path: 'label1' }],
-        placeholder: 'My placeholder',
-        onChange: mockOnSave,
-      },
-      {},
-    );
-    expect(container).toMatchSnapshot();
+    expect((Selector as jest.Mock).mock.calls[0][0].getOptionLabel({ path: 'path' })).toEqual('path');
+    expect((Selector as jest.Mock).mock.calls[0][0].getOptionValue({ path: 'path' })).toEqual('path');
   });
 
   it('loads accounts and passes as options', async () => {

@@ -8,6 +8,51 @@ export class YahooError extends HTTPError {}
 
 const HOST = 'https://query2.finance.yahoo.com';
 
+export async function search(ticker: string, type: 'EQUITY' | 'ETF' | 'MUTUALFUND' | 'CURRENCY') {
+  const url = `${HOST}/v1/finance/search?q=${ticker}&newsCount=0&enableFuzzyQuery=false`;
+
+  let resp: AxiosResponse;
+  try {
+    resp = await axios.get(url);
+  } catch (error: unknown) {
+    const e = error as AxiosError;
+    throw new YahooError(
+      `${url} failed: ${e.message}`,
+      e.response?.status || 0,
+      'UNKNOWN',
+    );
+  }
+
+  let typeFilter = ['EQUITY', 'ETF', 'MUTUALFUND', 'CURRENCY'];
+  if (type) {
+    typeFilter = [type];
+  }
+
+  const quotes = resp.data.quotes.filter(
+    (quote: any) => typeFilter.includes(quote.quoteType),
+  );
+
+  if (
+    quotes.length === 0
+  ) {
+    throw new YahooError(
+      `No results for ${ticker}`,
+      404,
+      'NOT_FOUND',
+    );
+  }
+
+  const info = quotes[0];
+  const symbol = info.quoteType === 'CURRENCY' ? info.symbol.substring(0, 3) : info.symbol;
+
+  const result = {
+    ticker: symbol,
+    namespace: info.quoteType || '',
+    name: info.quoteType === 'CURRENCY' ? '' : info.longname,
+  };
+  return result;
+}
+
 export async function getPrice(ticker: string, when?: number): Promise<Price> {
   if (ticker === 'SGDCAD=X') {
     ticker = 'SGDCAX=X';

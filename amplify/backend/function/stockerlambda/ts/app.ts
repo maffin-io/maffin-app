@@ -2,6 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import bodyParser from 'body-parser';
 import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware';
+import { AxiosError } from 'axios';
 
 import * as yahoo  from './yahoo';
 import { Price } from './types';
@@ -29,6 +30,35 @@ app.use(cors({
     }
   }
 }));
+
+app.get('/api/search', async (req, res) => {
+  const ticker = req.query.id as string;
+  const type = req.query.type as 'EQUITY' | 'ETF' | 'MUTUALFUND' | 'CURRENCY';
+  if (!ticker) {
+    res.status(400).json({
+      error: 'ID_REQUIRED',
+      description: 'You need to pass \'id\' queryparam to search for a quote',
+    });
+    return;
+  }
+
+  try {
+    const result = await yahoo.search(ticker, type);
+    res.json(result);
+  } catch (error) {
+    const e = error as AxiosError;
+    if (e.response?.status === 404) {
+      res.status(404).json(error);
+      return 
+    }
+    console.log(error);
+    res.status(500).json({
+      error: 'UNKNOWN_ERROR',
+      description: 'Failed to search',
+    });
+    return;
+  }
+});
 
 app.get('/api/prices', async (req, res) => {
   let tickers = (req.query.ids as string || '').split(',');

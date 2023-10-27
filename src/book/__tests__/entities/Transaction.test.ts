@@ -103,7 +103,7 @@ describe('Transaction', () => {
   describe('validation', () => {
     it('fails if description not long enough', async () => {
       const tx = Transaction.create({
-        description: 'des',
+        description: '',
         fk_currency: eur,
         date: DateTime.fromISO('2023-01-01'),
       });

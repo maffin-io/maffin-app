@@ -3,10 +3,11 @@ import { DateTime } from 'luxon';
 import { Controller } from 'react-hook-form';
 import type { UseFormReturn } from 'react-hook-form';
 import classNames from 'classnames';
+import type { SingleValue } from 'react-select';
 
 import { isInvestment } from '@/book/helpers/accountType';
 import { getMainCurrency } from '@/lib/queries';
-import Stocker from '@/apis/Stocker';
+import { getPrice } from '@/apis/Stocker';
 import { toFixed } from '@/helpers/number';
 import { AccountSelector } from '@/components/selectors';
 import { currencyToSymbol } from '@/helpers/currency';
@@ -84,9 +85,9 @@ export default function SplitField({
               <AccountSelector
                 id={`splits.${index}.account`}
                 isClearable={false}
-                disabled={disabled}
+                isDisabled={disabled}
                 placeholder="<account>"
-                onChange={async (newValue: Account) => {
+                onChange={async (newValue: SingleValue<Account>) => {
                   field.onChange(newValue);
                   const mainCurrency = await getMainCurrency();
                   const splits = form.getValues('splits');
@@ -201,7 +202,7 @@ async function getExchangeRate(
     ticker = to.mnemonic;
   }
 
-  const rate = await new Stocker().getPrice(ticker, when);
+  const rate = await getPrice(ticker, when);
 
   if (to.namespace !== 'CURRENCY') {
     if (rate.currency !== account.commodity.mnemonic) {

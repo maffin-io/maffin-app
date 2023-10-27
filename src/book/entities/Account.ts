@@ -54,7 +54,7 @@ export default class Account extends BaseEntity {
     length: 2048,
   })
   @v.Matches(/[a-zA-Z.]+/)
-  @v.Length(4, 2048)
+  @v.Length(1, 2048)
     name!: string;
 
   @Column({
@@ -102,7 +102,7 @@ export default class Account extends BaseEntity {
   @RelationId((account: Account) => account.children)
     childrenIds: string[];
 
-  @ManyToOne('Commodity', { eager: true })
+  @ManyToOne('Commodity', { eager: true, cascade: true })
   @JoinColumn({ name: 'commodity_guid' })
   @CheckCommodity()
   @v.ValidateIf(o => o.type !== 'ROOT')
