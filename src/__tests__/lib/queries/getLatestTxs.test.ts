@@ -15,6 +15,7 @@ describe('getLatestTsx', () => {
       },
       order: {
         date: 'DESC',
+        enterDate: 'DESC',
       },
       take: 5,
     });

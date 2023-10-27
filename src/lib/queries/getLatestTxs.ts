@@ -9,6 +9,7 @@ export default async function getLatestTxs(): Promise<Transaction[]> {
     },
     order: {
       date: 'DESC',
+      enterDate: 'DESC',
     },
     take: 5,
   });
