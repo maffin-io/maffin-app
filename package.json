@@ -137,7 +137,7 @@
     "@types/sql.js": "^1.4.7",
     "autoprefixer": "^10.4.16",
     "babel-preset-react-app": "^10.0.1",
-    "eslint": "^8.48.0",
+    "eslint": "^8.52.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.1.0",
     "eslint-config-next": "^13.5.6",
