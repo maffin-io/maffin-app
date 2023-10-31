@@ -10,4 +10,5 @@ updates:
     schedule:
       interval: "daily"
     open-pull-requests-limit: 20
-    target-branch: "staging"
+    target-branch: "master"
+    versioning-strategy: increase
