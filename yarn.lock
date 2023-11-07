@@ -4086,10 +4086,10 @@
   resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-8.10.125.tgz#c2ba86f7d98fe1827a7b048e0d31a65a8b5aed8c"
   integrity sha512-Vqw/WMlV4O1fJT6capim01v7VLDZkcX1n6Yhb52E7IfnMqYbNfwHfyDV8rRN42NLBtdDvfaqcCqs2K0fr5ljZw==
 
-"@types/aws-serverless-express@^3.3.7":
-  version "3.3.7"
-  resolved "https://registry.yarnpkg.com/@types/aws-serverless-express/-/aws-serverless-express-3.3.7.tgz#cd917fc9b14373a28ac6747f03a0f9e2c73606a4"
-  integrity sha512-/oKOd9GDAT6NHCUSJf70/2qq0xW33W6EZwQPUyBi6a2Nf/Y3HpVuzwa3xGU3VLaBRnXJBT6qTesGHmmRzFtHnA==
+"@types/aws-serverless-express@^3.3.8":
+  version "3.3.8"
+  resolved "https://registry.yarnpkg.com/@types/aws-serverless-express/-/aws-serverless-express-3.3.8.tgz#697e24c80d1dc2ab3cb6bbaee7aeb6c643907a96"
+  integrity sha512-wC7qcKzI5Ex+o5LV1EP6HVCCAwS7fkvUZy47bEUO6QdEPmTzb/2ajXUhz0z5KR/zJtDaRYH+l6GaQ8gb3TrlFQ==
   dependencies:
     "@types/aws-lambda" "*"
     "@types/express" "*"
@@ -4371,12 +4371,7 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*":
-  version "18.16.3"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.16.3.tgz#6bda7819aae6ea0b386ebc5b24bdf602f1b42b01"
-  integrity sha512-OPs5WnnT1xkCBiuQrZA4+YAV4HEJejmHneyraIaxsbev5yCEr6KMwINNFP9wQeFIw8FWcoTqF3vQsa5CDaI+8Q==
-
-"@types/node@^20.8.7":
+"@types/node@*", "@types/node@^20.8.7":
   version "20.8.7"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.8.7.tgz#ad23827850843de973096edfc5abc9e922492a25"
   integrity sha512-21TKHHh3eUHIi2MloeptJWALuCu5H7HQTdTrWIFReA8ad+aggoX+lRes3ex7/FtpC+sVUpFMQ+QTfYr74mruiQ==
