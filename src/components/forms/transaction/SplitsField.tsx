@@ -1,6 +1,7 @@
 import React from 'react';
 import { useFieldArray } from 'react-hook-form';
 import type { UseFormReturn } from 'react-hook-form';
+import { Tooltip } from 'react-tooltip';
 
 import { Split } from '@/book/entities';
 import type { FormValues } from './types';
@@ -91,6 +92,26 @@ export default function SplitsField({
             )}
           >
             Add split
+            <span
+              className="badge ml-0.5"
+              data-tooltip-id="add-split-help"
+            >
+              ?
+            </span>
+            <Tooltip
+              id="add-split-help"
+              className="tooltip"
+              disableStyleInjection
+            >
+              <p className="mb-2">
+                Adding extra splits to a transaction is helpful when you want to split
+                a transaction between different categories.
+              </p>
+              <p>
+                An example would be a transaction where you deduct 100 euros from your
+                Asset account and send 70 to Groceries and 30 to Restaurant.
+              </p>
+            </Tooltip>
           </button>
         )
       }

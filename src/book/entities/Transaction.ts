@@ -110,8 +110,7 @@ function CheckSplitsBalance(validationOptions?: v.ValidationOptions) {
             (acc, split) => acc + (split.value || 0),
             0,
           );
-          const money = new Money(total, tx.currency.mnemonic);
-          return `Your transaction has an imbalance of ${money.format()}. Make sure the amounts you've specified in your records equal to the total amount of your transaction!`;
+          return `Your transaction has an imbalance of ${toFixed(total, 4)}. Make sure the amounts you've specified in your records equal to the total amount of your transaction!`;
         },
       },
     });

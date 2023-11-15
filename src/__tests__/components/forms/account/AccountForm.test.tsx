@@ -151,6 +151,29 @@ describe('AccountForm', () => {
     screen.getByText('EUR');
   });
 
+  it('doesnt show defaults when specified', async () => {
+    render(
+      <AccountForm
+        defaultValues={{
+          name: 'Test account',
+          parent: assetAccount,
+          type: 'BANK',
+          fk_commodity: eur,
+        }}
+        hideDefaults
+        onSave={() => {}}
+      />,
+    );
+
+    await waitFor(() => expect(screen.getByLabelText('Name')).toHaveValue('Test account'));
+
+    const fieldsets = screen.getAllByRole('group');
+    // Can't check with toBeVisible due tailwindcss not being understood by jest
+    expect(fieldsets[2]).toHaveClass('hidden');
+    expect(fieldsets[3]).toHaveClass('hidden');
+    expect(fieldsets[5]).toHaveClass('hidden');
+  });
+
   it('button is disabled when form not valid', async () => {
     const user = userEvent.setup();
     render(

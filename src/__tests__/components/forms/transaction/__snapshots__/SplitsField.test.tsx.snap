@@ -242,6 +242,12 @@ exports[`SplitsField renders with default values 1`] = `
       type="button"
     >
       Add split
+      <span
+        class="badge ml-0.5"
+        data-tooltip-id="add-split-help"
+      >
+        ?
+      </span>
     </button>
   </form>
 </div>

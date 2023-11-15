@@ -122,6 +122,7 @@ export default function Onboarding({
                   });
                   setStepIndex(stepIndex + 1);
                 }}
+                hideDefaults
                 defaultValues={{
                   name: 'My bank account',
                   parent: accounts.type_asset as Account,
