@@ -67,7 +67,7 @@ export default function Onboarding({
                   );
                   await createInitialAccounts(setAccounts, currency);
                   save();
-                  setStepIndex(1);
+                  setStepIndex(stepIndex + 1);
                 }}
               />
             </div>
@@ -80,49 +80,22 @@ export default function Onboarding({
           content: (
             <div className="text-left leading-relaxed">
               <p className="mb-2">
-                We save the data automatically for you whenever you do changes.
-              </p>
-              <p className="mb-2">
-                The data is uploaded to your Google Drive, under the maffin.io folder. Make
-                sure you take good care of that file!
+                This represents your accounts tree. You can think of accounts as different
+                categories to organise your money. We have added some defaults but you can
+                add as many as you need.
               </p>
               <div className="flex justify-end">
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={() => setStepIndex(2)}
+                  onClick={() => setStepIndex(stepIndex + 1)}
                 >
                   Next
                 </button>
               </div>
             </div>
           ),
-          target: '#save-button',
-        },
-        {
-          spotlightClicks: true,
-          content: (
-            <div className="text-left leading-relaxed">
-              <p className="mb-2">
-                We know some people are very opinionated about dark vs light
-                themes.
-              </p>
-              <p className="mb-2">
-                In order for you not to suffer the whole tutorial with a theme you
-                don&apos;t like, feel free to change it by clicking here!
-              </p>
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={() => setStepIndex(3)}
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          ),
-          target: '#theme-button',
+          target: '#accounts-table',
         },
         {
           content: (
@@ -147,7 +120,7 @@ export default function Onboarding({
                     ...accounts,
                     bank: account,
                   });
-                  setStepIndex(4);
+                  setStepIndex(stepIndex + 1);
                 }}
                 defaultValues={{
                   name: 'My bank account',
@@ -166,22 +139,15 @@ export default function Onboarding({
           content: (
             <div className="text-left leading-relaxed">
               <p className="mb-2">
-                This represents your accounts tree. Once you add more accounts, this
-                widget becomes very useful to navigate through all your accounts.
-              </p>
-              <p className="mb-2">
-                You can see that your bank account is now there with the opening
-                balance you added and that your &quot;Assets&quot; parent account is
-                displaying that amount too.
-              </p>
-              <p>
-                This is because it accumulates the total of the sub accounts.
+                See that now your bank account appears in the accounts tree.
+                If you added an opening balance, you will see that your
+                total net worth has changed.
               </p>
               <div className="flex justify-end">
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={() => setStepIndex(5)}
+                  onClick={() => setStepIndex(stepIndex + 1)}
                 >
                   Next
                 </button>
@@ -189,42 +155,6 @@ export default function Onboarding({
             </div>
           ),
           target: '#accounts-table',
-        },
-        {
-          content: (
-            <div className="text-left leading-relaxed">
-              <span>
-                Let&apos; now add an
-                {' '}
-                <span className="badge danger">
-                  Expense
-                </span>
-                {' '}
-                account to track your expenses, say for example
-                Groceries. Note that we let you create as many accounts as you want.
-                Each account is like a category and allows you to visualise and report accordingly.
-                Some examples can be things like &quot;Rent&quot;, &quot;Electricity&quot;, etc.
-              </span>
-              <AccountForm
-                onSave={(account: Account) => {
-                  setAccounts({
-                    ...accounts,
-                    expense: account,
-                  });
-                  setStepIndex(6);
-                }}
-                defaultValues={{
-                  name: 'Groceries',
-                  parent: accounts.type_expense as Account,
-                  type: 'EXPENSE',
-                  fk_commodity: useMainCurrency().data as Commodity,
-                  balance: 0,
-                }}
-              />
-            </div>
-          ),
-          placement: 'center',
-          target: '#add-account',
         },
         {
           content: (
@@ -248,7 +178,7 @@ export default function Onboarding({
               <TransactionForm
                 onSave={() => {
                   save();
-                  setStepIndex(7);
+                  setStepIndex(stepIndex + 1);
                 }}
                 defaultValues={{
                   date: '',
@@ -262,7 +192,7 @@ export default function Onboarding({
                       valueDenom: 1,
                     }),
                     Split.create({
-                      fk_account: accounts.expense as Account,
+                      fk_account: accounts.groceries as Account,
                       quantityNum: 30,
                       quantityDenom: 1,
                       valueNum: 30,
@@ -276,6 +206,29 @@ export default function Onboarding({
           ),
           placement: 'center',
           target: '#add-account',
+        },
+        {
+          content: (
+            <div className="text-left leading-relaxed">
+              <p className="mb-2">
+                We save the data automatically for you whenever you do changes.
+              </p>
+              <p className="mb-2">
+                The data is uploaded to your Google Drive, under the maffin.io folder. Make
+                sure you take good care of that file!
+              </p>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => setStepIndex(stepIndex + 1)}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          ),
+          target: '#save-button',
         },
         {
           content: (
@@ -297,7 +250,7 @@ export default function Onboarding({
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={() => setStepIndex(8)}
+                  onClick={() => setStepIndex(stepIndex + 1)}
                 >
                   Agreed!
                 </button>
@@ -328,6 +281,17 @@ async function createInitialAccounts(setAccounts: Function, currency: Commodity)
     type: 'ROOT',
   });
 
+  const expensesAccount = await Account.create({
+    name: 'Expenses',
+    type: 'EXPENSE',
+    description: 'Any expense such as food, clothing, taxes, etc.',
+    placeholder: true,
+    fk_commodity: currency,
+    parent: root,
+    children: [],
+  }).save();
+  await expensesAccount.reload();
+
   // Preload needed accounts for tutorial
   setAccounts({
     type_asset: await Account.create({
@@ -338,54 +302,76 @@ async function createInitialAccounts(setAccounts: Function, currency: Commodity)
       fk_commodity: currency,
       parent: root,
     }).save(),
-    type_expense: await Account.create({
-      name: 'Expenses',
+    type_expense: expensesAccount,
+    groceries: await Account.create({
+      name: 'Groceries',
       type: 'EXPENSE',
-      description: 'Any expense such as food, clothing, taxes, etc.',
-      placeholder: true,
+      placeholder: false,
       fk_commodity: currency,
-      parent: root,
-      children: [],
+      parent: expensesAccount,
     }).save(),
   });
 
-  const liabilitiesAccount = Account.create({
-    name: 'Liabilities',
-    type: 'LIABILITY',
-    description: 'Liability accounts are used for tracking debts or financial obligations.',
-    placeholder: true,
-    fk_commodity: currency,
-    parent: root,
-  });
+  await Account.insert([
+    Account.create({
+      name: 'Liabilities',
+      type: 'LIABILITY',
+      description: 'Liability accounts are used for tracking debts or financial obligations.',
+      placeholder: true,
+      fk_commodity: currency,
+      parent: root,
+    }),
+    Account.create({
+      name: 'Income',
+      type: 'INCOME',
+      description: 'Any income received from sources such as salary, interest, dividends, etc.',
+      placeholder: true,
+      fk_commodity: currency,
+      parent: root,
+    }),
+    Account.create({
+      name: 'Equity',
+      type: 'EQUITY',
+      description: 'Equity accounts are used to store the opening balances when you create new accounts',
+      placeholder: true,
+      fk_commodity: currency,
+      parent: root,
+    }),
+  ]);
 
-  const incomeAccount = Account.create({
-    name: 'Income',
-    type: 'INCOME',
-    description: 'Any income received from sources such as salary, interest, dividends, etc.',
-    placeholder: true,
-    fk_commodity: currency,
-    parent: root,
-  });
-
-  const equityAccount = Account.create({
-    name: 'Equity',
-    type: 'EQUITY',
-    description: 'Equity accounts are used to store the opening balances when you create new accounts',
-    placeholder: true,
-    fk_commodity: currency,
-    parent: root,
-  });
-
-  await Account.insert([liabilitiesAccount, incomeAccount, equityAccount]);
-
-  await Account.create({
-    name: `Opening balances - ${currency.mnemonic}`,
-    type: 'EQUITY',
-    description: `Opening balances for ${currency.mnemonic} accounts`,
-    placeholder: false,
-    fk_commodity: currency,
-    parent: await Account.findOneByOrFail({ type: 'EQUITY' }),
-  }).save();
+  await Account.insert([
+    Account.create({
+      name: `Opening balances - ${currency.mnemonic}`,
+      type: 'EQUITY',
+      description: `Opening balances for ${currency.mnemonic} accounts`,
+      placeholder: false,
+      fk_commodity: currency,
+      parent: await Account.findOneByOrFail({ type: 'EQUITY' }),
+    }),
+    Account.create({
+      name: 'Salary',
+      type: 'INCOME',
+      placeholder: false,
+      fk_commodity: currency,
+      parent: await Account.findOneByOrFail({ type: 'INCOME' }),
+    }),
+    Account.create({
+      name: 'Electricity',
+      type: 'EXPENSE',
+      description: 'The spend on electricity bills',
+      placeholder: false,
+      fk_commodity: currency,
+      parent: expensesAccount,
+    }),
+    Account.create({
+      name: 'Water',
+      type: 'EXPENSE',
+      description: 'The spend on water bills',
+      placeholder: false,
+      fk_commodity: currency,
+      parent: expensesAccount,
+    }),
+  ]);
 
   mutate('/api/accounts');
 }
