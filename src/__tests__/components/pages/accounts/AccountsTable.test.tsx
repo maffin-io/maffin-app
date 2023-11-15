@@ -70,7 +70,7 @@ describe('AccountsTable', () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: {
-          root: {
+          type_root: {
             guid: 'root',
             name: 'Root',
             type: 'ROOT',
@@ -185,7 +185,7 @@ describe('AccountsTable', () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: {
-          root: {
+          type_root: {
             guid: 'root',
             name: 'Root',
             type: 'ROOT',

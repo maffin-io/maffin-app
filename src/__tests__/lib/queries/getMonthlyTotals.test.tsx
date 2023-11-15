@@ -116,7 +116,7 @@ describe('getMonthlyTotals', () => {
     }).save();
     const monthlyTotals = await getMonthlyTotals(
       {
-        root,
+        type_root: root,
         [assetAccount.guid]: assetAccount,
         [expensesAccount.guid]: expensesAccount,
       },
@@ -190,7 +190,7 @@ describe('getMonthlyTotals', () => {
 
     const monthlyTotals = await getMonthlyTotals(
       {
-        root,
+        type_root: root,
         [assetAccount.guid]: assetAccount,
         [expensesAccount.guid]: expensesAccount,
         [childAccount.guid]: childAccount,
@@ -264,7 +264,7 @@ describe('getMonthlyTotals', () => {
 
     const monthlyTotals = await getMonthlyTotals(
       {
-        root,
+        type_root: root,
         [assetAccount.guid]: assetAccount,
         [expensesAccount.guid]: expensesAccount,
         [childAccount.guid]: childAccount,
@@ -355,7 +355,7 @@ describe('getMonthlyTotals', () => {
 
     const monthlyTotals = await getMonthlyTotals(
       {
-        root,
+        type_root: root,
         [assetAccount.guid]: assetAccount,
         [brokerAccount.guid]: brokerAccount,
         [expensesAccount.guid]: expensesAccount,
