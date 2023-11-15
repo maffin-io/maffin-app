@@ -116,6 +116,7 @@ export default function Onboarding({
               </span>
               <AccountForm
                 onSave={(account: Account) => {
+                  mutate('/api/start-date');
                   setAccounts({
                     ...accounts,
                     bank: account,

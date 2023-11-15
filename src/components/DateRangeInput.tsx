@@ -67,6 +67,7 @@ export default function DateRangeInput({
       }}
       startWeekOn="mon"
       separator="-"
+      popoverDirection="down"
       showShortcuts
       configs={{
         shortcuts,

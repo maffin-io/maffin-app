@@ -34,6 +34,7 @@ describe('DateRangeInput', () => {
         minDate: undefined,
         onChange: expect.any(Function),
         placeholder: 'Select date range',
+        popoverDirection: 'down',
         primaryColor: 'cyan',
         separator: '-',
         showShortcuts: true,
