@@ -145,6 +145,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                   aria-live="polite"
                   aria-relevant="additions text"
                   class="css-1f43avz-a11yText-A11yText"
+                  role="log"
                 />
                 <div
                   class="selector__control css-13cymwt-control"
@@ -177,6 +178,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                       data-value=""
                     >
                       <input
+                        aria-activedescendant=""
                         aria-autocomplete="list"
                         aria-describedby="react-select-2-placeholder"
                         aria-expanded="false"
@@ -456,6 +458,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                   aria-live="polite"
                   aria-relevant="additions text"
                   class="css-1f43avz-a11yText-A11yText"
+                  role="log"
                 />
                 <div
                   aria-disabled="true"
@@ -489,6 +492,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                       data-value=""
                     >
                       <input
+                        aria-activedescendant=""
                         aria-autocomplete="list"
                         aria-describedby="react-select-4-placeholder"
                         aria-expanded="false"
@@ -759,6 +763,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                   aria-live="polite"
                   aria-relevant="additions text"
                   class="css-1f43avz-a11yText-A11yText"
+                  role="log"
                 />
                 <div
                   class="selector__control css-13cymwt-control"
@@ -791,6 +796,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                       data-value=""
                     >
                       <input
+                        aria-activedescendant=""
                         aria-autocomplete="list"
                         aria-describedby="react-select-3-placeholder"
                         aria-expanded="false"

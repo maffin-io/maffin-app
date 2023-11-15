@@ -48,7 +48,7 @@ export default async function getMonthlyTotals(
     );
   });
 
-  accounts.root?.childrenIds.forEach(
+  accounts.type_root?.childrenIds.forEach(
     (childId: string) => {
       aggregateChildrenTotals(
         accounts[childId],

@@ -58,7 +58,7 @@ describe('getAccounts', () => {
   it('returns accounts as expected', async () => {
     const accounts = await getAccounts();
 
-    expect(accounts.root.guid).toEqual('a');
+    expect(accounts.type_root.guid).toEqual('a');
     expect(accounts.a.guid).toEqual('a');
     expect(accounts.type_asset.guid).toEqual('abcdef');
     expect(accounts.type_expense.guid).toEqual('ghijk');

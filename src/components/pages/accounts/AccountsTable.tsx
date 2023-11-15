@@ -38,9 +38,9 @@ export default function AccountsTable(
   let { data: accounts } = API.useAccounts();
   const { data: monthlyTotals } = API.useAccountsMonthlyTotals();
 
-  accounts = accounts || { root: { childrenIds: [] } };
+  accounts = accounts || { type_root: { childrenIds: [] } };
 
-  const tree = getTreeTotals(accounts.root, accounts, monthlyTotals || {}, selectedDate);
+  const tree = getTreeTotals(accounts.type_root, accounts, monthlyTotals || {}, selectedDate);
 
   return (
     <Table<AccountsTableRow>
