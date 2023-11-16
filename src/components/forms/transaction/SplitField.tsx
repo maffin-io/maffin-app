@@ -68,7 +68,7 @@ export default function SplitField({
     if (value && form.formState.isDirty) {
       form.setValue(
         `splits.${index}.quantity`,
-        toFixed(value / exchangeRate, 2),
+        toFixed(value / exchangeRate, 3),
       );
     }
     form.trigger('splits');
@@ -140,7 +140,7 @@ export default function SplitField({
             onChange={(e) => {
               if (account.commodity.guid === txCurrency.guid) {
                 const quantity = Number(e.target.value);
-                form.setValue(`splits.${index}.value`, toFixed(quantity * exchangeRate, 2));
+                form.setValue(`splits.${index}.value`, toFixed(quantity * exchangeRate, 3));
               }
             }}
           />

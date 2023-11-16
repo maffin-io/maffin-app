@@ -30,6 +30,7 @@ export type AccountFormProps = {
   action?: 'add' | 'update' | 'delete',
   onSave: Function,
   defaultValues?: Partial<FormValues>,
+  hideDefaults?: boolean,
 };
 
 export type SplitFieldData = {
@@ -42,6 +43,7 @@ export default function AccountForm({
   action = 'add',
   defaultValues,
   onSave,
+  hideDefaults = false,
 }: AccountFormProps): JSX.Element {
   const router = useRouter();
   const form = useForm<FormValues>({
@@ -109,7 +111,14 @@ export default function AccountForm({
         </fieldset>
       </div>
 
-      <fieldset className="text-sm my-5">
+      <fieldset
+        className={classNames(
+          'text-sm my-5',
+          {
+            hidden: hideDefaults && defaultValues?.parent,
+          },
+        )}
+      >
         <label htmlFor="parent" className="inline-block mb-2">Parent</label>
         <Controller
           control={form.control}
@@ -133,7 +142,14 @@ export default function AccountForm({
         />
       </fieldset>
 
-      <fieldset className="text-sm my-5">
+      <fieldset
+        className={classNames(
+          'text-sm my-5',
+          {
+            hidden: hideDefaults && defaultValues?.type,
+          },
+        )}
+      >
         <label htmlFor="type" className="inline-block mb-2">Account type</label>
         <Controller
           control={form.control}
@@ -221,7 +237,14 @@ export default function AccountForm({
         </div>
       </fieldset>
 
-      <fieldset className="text-sm my-5">
+      <fieldset
+        className={classNames(
+          'text-sm my-5',
+          {
+            hidden: hideDefaults && defaultValues?.fk_commodity,
+          },
+        )}
+      >
         <label htmlFor="commodity" className="inline-block mb-2">Commodity</label>
         <Controller
           control={form.control}

@@ -236,7 +236,7 @@ describe('SplitField', () => {
     expect(q1).toBeVisible();
     expect(v1).toBeVisible();
     await user.type(v1, '200');
-    await waitFor(() => expect(q1).toHaveValue(toFixed(200 / EURSGD, 2)));
+    await waitFor(() => expect(q1).toHaveValue(toFixed(200 / EURSGD, 3)));
 
     user.clear(q1);
     await user.type(q1, '100');
@@ -373,14 +373,14 @@ describe('SplitField', () => {
 
     await user.type(v0, '100');
 
-    await waitFor(() => expect(q0).toHaveValue(toFixed(100 / EURSGD, 2)));
+    await waitFor(() => expect(q0).toHaveValue(toFixed(100 / EURSGD, 3)));
     await waitFor(() => expect(v0).toHaveValue(100));
 
     user.clear(dateField);
     // This creates act warning because we have nothing to wait for to check
     // that the exchange rate has been set
     await user.type(dateField, '2023-01-20');
-    await waitFor(() => expect(q0).toHaveValue(toFixed(100 / 1.30, 2)));
+    await waitFor(() => expect(q0).toHaveValue(toFixed(100 / 1.30, 3)));
     await waitFor(() => expect(v0).toHaveValue(100));
     expect(mockGetPrice).toHaveBeenLastCalledWith('SGDEUR=X', DateTime.fromISO('2023-01-20'));
   });
@@ -436,7 +436,7 @@ describe('SplitField', () => {
       () => expect(mockGetPrice).toHaveBeenLastCalledWith('SGDEUR=X', DateTime.fromISO('2023-01-01')),
     );
 
-    await waitFor(() => expect(q0).toHaveValue(toFixed(100 / 1.30, 2)));
+    await waitFor(() => expect(q0).toHaveValue(toFixed(100 / 1.30, 3)));
     await waitFor(() => expect(v0).toHaveValue(100));
     expect(v0).toBeVisible();
   });

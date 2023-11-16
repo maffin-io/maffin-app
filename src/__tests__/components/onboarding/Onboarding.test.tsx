@@ -61,7 +61,6 @@ describe('Onboarding', () => {
       </div>,
     );
 
-    // STEP 1
     // Select main currency and create initial accounts
     await screen.findByText('Welcome!', { exact: false });
 
@@ -81,15 +80,22 @@ describe('Onboarding', () => {
         fk_commodity: eur,
         parentId: 'root_account_guid',
         placeholder: true,
-        type: 'ASSET',
-        name: 'Assets',
+        type: 'EXPENSE',
+        name: 'Expenses',
       }),
       expect.objectContaining({
         fk_commodity: eur,
         parentId: 'root_account_guid',
         placeholder: true,
+        type: 'ASSET',
+        name: 'Assets',
+      }),
+      expect.objectContaining({
+        fk_commodity: eur,
+        parentId: accounts[1].guid,
+        placeholder: false,
         type: 'EXPENSE',
-        name: 'Expenses',
+        name: 'Groceries',
       }),
       expect.objectContaining({
         fk_commodity: eur,
@@ -114,24 +120,38 @@ describe('Onboarding', () => {
       }),
       expect.objectContaining({
         fk_commodity: eur,
-        parentId: accounts[5].guid,
+        parentId: accounts[6].guid,
         placeholder: false,
         type: 'EQUITY',
         name: 'Opening balances - EUR',
       }),
+      expect.objectContaining({
+        fk_commodity: eur,
+        parentId: accounts[5].guid,
+        placeholder: false,
+        type: 'INCOME',
+        name: 'Salary',
+      }),
+      expect.objectContaining({
+        fk_commodity: eur,
+        parentId: accounts[1].guid,
+        placeholder: false,
+        type: 'EXPENSE',
+        name: 'Electricity',
+      }),
+      expect.objectContaining({
+        fk_commodity: eur,
+        parentId: accounts[1].guid,
+        placeholder: false,
+        type: 'EXPENSE',
+        name: 'Water',
+      }),
     ]);
 
-    // STEP 2
-    // Shows about the Save button
-    await screen.findByText('We save the data automatically', { exact: false });
+    // Show accounts tree
+    await screen.findByText('This represents your accounts tree', { exact: false });
     await user.click(screen.getByText('Next'));
 
-    // STEP 3
-    // Shows about the Theme button
-    await screen.findByText('We know some people are very opinionated', { exact: false });
-    await user.click(screen.getByText('Next'));
-
-    // STEP 4
     // Adds a bank account, all data is prefilled except the opening balance
     await screen.findByText('Let\'s add your first', { exact: false });
     await screen.findByText('Assets');
@@ -145,31 +165,13 @@ describe('Onboarding', () => {
       placeholder: false,
       type: 'BANK',
       name: 'My bank account',
-      parentId: accounts[1].guid,
-    }));
-
-    // STEP 5
-    // Show accounts tree
-    await screen.findByText('This represents your accounts tree', { exact: false });
-    await user.click(screen.getByText('Next'));
-
-    // STEP 6
-    // Adds an expense account
-    await screen.findByText('account to track your expenses', { exact: false });
-    await screen.findByText('Expenses');
-
-    expect(screen.getByText('add')).toBeEnabled();
-    await user.click(screen.getByText('add'));
-    const expensesAccount = await Account.findOneByOrFail({ name: 'Groceries' });
-    expect(expensesAccount).toEqual(expect.objectContaining({
-      fk_commodity: eur,
-      placeholder: false,
-      type: 'EXPENSE',
-      name: 'Groceries',
       parentId: accounts[2].guid,
     }));
 
-    // STEP 7
+    // Show accounts tree again
+    await screen.findByText('See that now your bank account', { exact: false });
+    await user.click(screen.getByText('Next'));
+
     // Adds a transaction between bank account and groceries account
     await screen.findByText('add the first transaction', { exact: false });
     await user.type(screen.getByLabelText('Date'), DateTime.now().toISODate() as string);
@@ -194,7 +196,7 @@ describe('Onboarding', () => {
           valueDenom: 1,
         }),
         expect.objectContaining({
-          accountId: expensesAccount.guid,
+          accountId: (await Account.findOneByOrFail({ name: 'Groceries' })).guid,
           quantityNum: 30,
           quantityDenom: 1,
           valueNum: 30,
@@ -202,6 +204,10 @@ describe('Onboarding', () => {
         }),
       ],
     }));
+
+    // Shows about the Save button
+    await screen.findByText('We save the data automatically', { exact: false });
+    await user.click(screen.getByText('Next'));
 
     // STEP 8
     // Shows final disclaimer
