@@ -38,8 +38,8 @@ export default function CurrencyForm({ onSave }: CurrencyFormProps): JSX.Element
                 onChange={(newValue: SingleValue<Commodity> | null) => {
                   if (newValue) {
                     field.onChange(newValue.mnemonic);
-                    form.setValue('namespace', newValue.namespace);
-                    form.setValue('guid', newValue.guid);
+                    form.reset(newValue);
+                    form.trigger();
                   }
                 }}
                 placeholder="Choose or search your currency"
@@ -66,6 +66,6 @@ export default function CurrencyForm({ onSave }: CurrencyFormProps): JSX.Element
 }
 
 async function onSubmit(data: FormValues, onSave: Function) {
-  const mainCommodity = await Commodity.create({ ...data }).save();
+  const mainCommodity = Commodity.create({ ...data });
   await onSave(mainCommodity);
 }
