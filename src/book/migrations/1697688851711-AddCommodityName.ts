@@ -22,3 +22,5 @@ export class AddCommodityName1697688851711 implements MigrationInterface {
     'unimplemented';
   }
 }
+
+Object.defineProperty(AddCommodityName1697688851711, 'name', { value: 'AddCommodityName1697688851711' });
