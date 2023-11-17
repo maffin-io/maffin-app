@@ -1,6 +1,8 @@
 'use client';
 
 import {
+  BiBook,
+  BiCog,
   BiHomeAlt,
   BiLineChart,
 } from 'react-icons/bi';
@@ -9,7 +11,20 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-const MENU_ITEMS = [
+type ItemType = {
+  url: string;
+  icon: JSX.Element;
+  label: string;
+  target?: string;
+  submenu?: { label: string, url: string }[],
+};
+
+type MenuItemProps = {
+  item: ItemType,
+  className: string,
+};
+
+const MENU_ITEMS: ItemType[] = [
   {
     label: 'Home',
     icon: <BiHomeAlt className="text-xl" />,
@@ -22,21 +37,31 @@ const MENU_ITEMS = [
   },
 ];
 
-type MenuItemProps = {
-  item: {
-    url: string;
-    icon: JSX.Element;
-    label: string;
-    submenu?: { label: string, url: string }[],
+const BOTTOM_MENU: ItemType[] = [
+  {
+    label: 'Settings',
+    icon: <BiCog className="text-xl" />,
+    url: '',
+    submenu: [
+      {
+        label: 'Commodities',
+        url: '/dashboard/settings/commodities',
+      },
+    ],
   },
-  className: string,
-};
+  {
+    label: 'Docs',
+    icon: <BiBook className="text-xl" />,
+    url: 'https://blog.maffin.io/',
+    target: '_blank',
+  },
+];
 
 export default function DashboardMenu(): JSX.Element {
   const pathname = usePathname();
 
   return (
-    <ul>
+    <ul className="flex flex-col h-full">
       {MENU_ITEMS.map((item, idx) => (
         <MenuItem
           key={idx}
@@ -44,15 +69,27 @@ export default function DashboardMenu(): JSX.Element {
           className={pathname === item.url ? 'text-white' : ''}
         />
       ))}
+      <div className="mt-auto">
+        {BOTTOM_MENU.map((item, idx) => (
+          <MenuItem
+            key={idx}
+            item={item}
+            className={pathname === item.url ? 'text-white' : ''}
+          />
+        ))}
+      </div>
     </ul>
   );
 }
 
 function MenuItem({ item, className }: MenuItemProps): JSX.Element {
   return (
-    <li className="group h-12 text-slate-400 hover:bg-cyan-700 hover:text-white hover:w-64 hover:rounded-r-sm">
+    <li
+      className="group h-12 text-slate-400 hover:bg-cyan-700 hover:text-white hover:w-64 hover:rounded-r-sm"
+    >
       <Link
         href={item.url}
+        target={item.target}
         className="flex items-center text-inherit hover:text-inherit h-full px-8 py-4"
       >
         <span className={`mr-8 ${className}`}>
@@ -75,14 +112,16 @@ function SubMenu({
   if (items && items.length) {
     return (
       <ul className="hidden float-right w-44 bg-dark-700 shadow-md group-hover:inline-block">
-        <li className="text-sm ml-2 text-left py-2">
-          <Link
-            href="/settings/commodities"
-            className="text-slate-400 hover:text-white"
-          >
-            Commodities
-          </Link>
-        </li>
+        {items.map((item, idx) => (
+          <li key={idx} className="text-sm ml-2 text-left py-2">
+            <Link
+              href={item.url}
+              className="text-slate-400 hover:text-white"
+            >
+              {item.label}
+            </Link>
+          </li>
+        ))}
       </ul>
     );
   }

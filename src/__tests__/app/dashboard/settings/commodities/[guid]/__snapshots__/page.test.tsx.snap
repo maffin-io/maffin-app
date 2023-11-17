@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CommodityPage shows loading when loading data 1`] = `
+<div>
+  <div
+    class="header"
+  >
+    <span
+      class="title"
+    />
+  </div>
+  <div />
+</div>
+`;
