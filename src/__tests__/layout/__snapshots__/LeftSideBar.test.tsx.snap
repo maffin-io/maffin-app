@@ -25,119 +25,77 @@ exports[`LeftSidebar renders as expected 1`] = `
         />
       </span>
     </a>
-    <div
-      data-simplebar="init"
-      style="overflow-x: hidden; max-height: 100%;"
-    >
-      <div
-        class="simplebar-wrapper"
+    <ul>
+      <li
+        class="group h-12 text-slate-400 hover:bg-cyan-700 hover:text-white hover:w-64 hover:rounded-r-sm"
       >
-        <div
-          class="simplebar-height-auto-observer-wrapper"
+        <a
+          class="flex items-center text-inherit hover:text-inherit h-full px-8 py-4"
+          href="/dashboard/accounts"
         >
-          <div
-            class="simplebar-height-auto-observer"
-          />
-        </div>
-        <div
-          class="simplebar-mask"
-        >
-          <div
-            class="simplebar-offset"
-            style="right: 0px; bottom: 0px;"
+          <span
+            class="mr-8 text-white"
           >
-            <div
-              aria-label="scrollable content"
-              class="simplebar-content-wrapper"
-              role="region"
-              style="height: auto; overflow-x: hidden; overflow-y: hidden;"
-              tabindex="0"
+            <svg
+              class="text-xl"
+              fill="currentColor"
+              height="1em"
+              stroke="currentColor"
+              stroke-width="0"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              <div
-                class="simplebar-content"
-              >
-                <ul>
-                  <li
-                    class="relative hover:text-white"
-                  >
-                    <a
-                      class="block pt-3 pb-3"
-                      href="/dashboard/accounts"
-                    >
-                      <span
-                        class="flex justify-center cursor-pointer items-center w-20 text-white text-slate-400 hover:text-white"
-                      >
-                        <svg
-                          fill="currentColor"
-                          height="1.125em"
-                          stroke="currentColor"
-                          stroke-width="0"
-                          viewBox="0 0 24 24"
-                          width="1.125em"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M5 22h14a2 2 0 0 0 2-2v-9a1 1 0 0 0-.29-.71l-8-8a1 1 0 0 0-1.41 0l-8 8A1 1 0 0 0 3 11v9a2 2 0 0 0 2 2zm5-2v-5h4v5zm-5-8.59 7-7 7 7V20h-3v-5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v5H5z"
-                          />
-                        </svg>
-                      </span>
-                    </a>
-                  </li>
-                  <li
-                    class="relative hover:text-white"
-                  >
-                    <a
-                      class="block pt-3 pb-3"
-                      href="/dashboard/investments"
-                    >
-                      <span
-                        class="flex justify-center cursor-pointer items-center w-20  text-slate-400 hover:text-white"
-                      >
-                        <svg
-                          fill="currentColor"
-                          height="1.125em"
-                          stroke="currentColor"
-                          stroke-width="0"
-                          viewBox="0 0 24 24"
-                          width="1.125em"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M12 22c3.976 0 8-1.374 8-4V6c0-2.626-4.024-4-8-4S4 3.374 4 6v12c0 2.626 4.024 4 8 4zm0-2c-3.722 0-6-1.295-6-2v-1.268C7.541 17.57 9.777 18 12 18s4.459-.43 6-1.268V18c0 .705-2.278 2-6 2zm0-16c3.722 0 6 1.295 6 2s-2.278 2-6 2-6-1.295-6-2 2.278-2 6-2zM6 8.732C7.541 9.57 9.777 10 12 10s4.459-.43 6-1.268V10c0 .705-2.278 2-6 2s-6-1.295-6-2V8.732zm0 4C7.541 13.57 9.777 14 12 14s4.459-.43 6-1.268V14c0 .705-2.278 2-6 2s-6-1.295-6-2v-1.268z"
-                          />
-                        </svg>
-                      </span>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          class="simplebar-placeholder"
-          style="width: 0px; height: 0px;"
-        />
-      </div>
-      <div
-        class="simplebar-track simplebar-horizontal"
-        style="visibility: hidden;"
+              <path
+                d="M5 22h14a2 2 0 0 0 2-2v-9a1 1 0 0 0-.29-.71l-8-8a1 1 0 0 0-1.41 0l-8 8A1 1 0 0 0 3 11v9a2 2 0 0 0 2 2zm5-2v-5h4v5zm-5-8.59 7-7 7 7V20h-3v-5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v5H5z"
+              />
+            </svg>
+          </span>
+          <span
+            class="hidden group-hover:inline-block ml-1"
+          >
+            Home
+          </span>
+        </a>
+        <span />
+      </li>
+      <li
+        class="group h-12 text-slate-400 hover:bg-cyan-700 hover:text-white hover:w-64 hover:rounded-r-sm"
       >
-        <div
-          class="simplebar-scrollbar"
-          style="width: 0px; display: none;"
-        />
-      </div>
-      <div
-        class="simplebar-track simplebar-vertical"
-        style="visibility: hidden;"
-      >
-        <div
-          class="simplebar-scrollbar"
-          style="height: 0px; display: none;"
-        />
-      </div>
-    </div>
+        <a
+          class="flex items-center text-inherit hover:text-inherit h-full px-8 py-4"
+          href="/dashboard/investments"
+        >
+          <span
+            class="mr-8 "
+          >
+            <svg
+              class="text-xl"
+              fill="currentColor"
+              height="1em"
+              stroke="currentColor"
+              stroke-width="0"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M3 3v17a1 1 0 0 0 1 1h17v-2H5V3H3z"
+              />
+              <path
+                d="M15.293 14.707a.999.999 0 0 0 1.414 0l5-5-1.414-1.414L16 12.586l-2.293-2.293a.999.999 0 0 0-1.414 0l-5 5 1.414 1.414L13 12.414l2.293 2.293z"
+              />
+            </svg>
+          </span>
+          <span
+            class="hidden group-hover:inline-block ml-1"
+          >
+            Investments
+          </span>
+        </a>
+        <span />
+      </li>
+    </ul>
   </div>
 </div>
 `;

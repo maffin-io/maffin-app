@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import SimpleBar from 'simplebar-react';
 
 import maffinLogo from '@/assets/images/maffin_logo_sm.png';
 import Menu from './Menu';
@@ -15,9 +14,7 @@ export default function LeftSideBar(): JSX.Element {
         </span>
       </Link>
 
-      <SimpleBar style={{ overflowX: 'hidden', maxHeight: '100%' }} scrollbarMaxSize={320}>
-        <Menu />
-      </SimpleBar>
+      <Menu />
     </div>
   );
 }
