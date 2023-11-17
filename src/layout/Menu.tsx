@@ -1,6 +1,9 @@
 'use client';
 
-import { BiHomeAlt, BiCoinStack } from 'react-icons/bi';
+import {
+  BiHomeAlt,
+  BiLineChart,
+} from 'react-icons/bi';
 
 import React from 'react';
 import Link from 'next/link';
@@ -9,12 +12,12 @@ import { usePathname } from 'next/navigation';
 const MENU_ITEMS = [
   {
     label: 'Home',
-    icon: <BiHomeAlt size="1.125em" />,
+    icon: <BiHomeAlt className="text-xl" />,
     url: '/dashboard/accounts',
   },
   {
     label: 'Investments',
-    icon: <BiCoinStack size="1.125em" />,
+    icon: <BiLineChart className="text-xl" />,
     url: '/dashboard/investments',
   },
 ];
@@ -22,28 +25,12 @@ const MENU_ITEMS = [
 type MenuItemProps = {
   item: {
     url: string;
-    target?: string;
     icon: JSX.Element;
     label: string;
+    submenu?: { label: string, url: string }[],
   },
   className: string,
 };
-
-function MenuItem({ item, className }: MenuItemProps): JSX.Element {
-  return (
-    <li className="relative hover:text-white">
-      <Link
-        href={item.url}
-        target={item.target}
-        className="block pt-3 pb-3"
-      >
-        <span className={`flex justify-center cursor-pointer items-center w-20 ${className} text-slate-400 hover:text-white`}>
-          {item.icon}
-        </span>
-      </Link>
-    </li>
-  );
-}
 
 export default function DashboardMenu(): JSX.Element {
   const pathname = usePathname();
@@ -59,4 +46,46 @@ export default function DashboardMenu(): JSX.Element {
       ))}
     </ul>
   );
+}
+
+function MenuItem({ item, className }: MenuItemProps): JSX.Element {
+  return (
+    <li className="group h-12 text-slate-400 hover:bg-cyan-700 hover:text-white hover:w-64 hover:rounded-r-sm">
+      <Link
+        href={item.url}
+        className="flex items-center text-inherit hover:text-inherit h-full px-8 py-4"
+      >
+        <span className={`mr-8 ${className}`}>
+          {item.icon}
+        </span>
+        <span className="hidden group-hover:inline-block ml-1">
+          {item.label}
+        </span>
+      </Link>
+      <SubMenu items={item.submenu} />
+    </li>
+  );
+}
+
+function SubMenu({
+  items,
+}: {
+  items: { label: string, url: string }[] | undefined,
+}): JSX.Element {
+  if (items && items.length) {
+    return (
+      <ul className="hidden float-right w-44 bg-dark-700 shadow-md group-hover:inline-block">
+        <li className="text-sm ml-2 text-left py-2">
+          <Link
+            href="/settings/commodities"
+            className="text-slate-400 hover:text-white"
+          >
+            Commodities
+          </Link>
+        </li>
+      </ul>
+    );
+  }
+
+  return <span />;
 }
