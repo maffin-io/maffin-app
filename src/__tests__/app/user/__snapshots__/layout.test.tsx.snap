@@ -29,13 +29,5 @@ exports[`AccountLayout renders as expected 1`] = `
       </div>
     </div>
   </div>
-  <footer
-    class="bottom-0 w-full flex justify-end bg-white dark:bg-dark-700 text-sm px-5 z-1"
-  >
-    2023
-    ©
-     
-    maffin.io
-  </footer>
 </div>
 `;

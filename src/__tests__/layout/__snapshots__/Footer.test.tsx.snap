@@ -3,12 +3,16 @@
 exports[`Footer renders as expected 1`] = `
 <div>
   <footer
-    class="bottom-0 w-full flex justify-end bg-white dark:bg-dark-700 text-sm px-5 z-1"
+    class="fixed bottom-0 w-full"
   >
-    2023
-    ©
-     
-    maffin.io
+    <div
+      class="w-full flex justify-end bg-white dark:bg-dark-700 text-sm px-5"
+    >
+      2023
+      ©
+       
+      maffin.io
+    </div>
   </footer>
 </div>
 `;

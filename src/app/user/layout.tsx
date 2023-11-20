@@ -3,7 +3,6 @@
 import React from 'react';
 import Image from 'next/image';
 
-import Footer from '@/layout/Footer';
 import maffinLogo from '@/assets/images/maffin_logo_sm.png';
 import { useTheme } from '@/hooks/state';
 
@@ -23,14 +22,11 @@ export default function AccountLayout({
   });
 
   return (
-    <>
-      <div className="flex h-screen place-content-center place-items-center">
-        <div className="card flex items-center">
-          <Image className="m-0" src={maffinLogo} alt="" height="54" />
-          <div className="p-4">{children}</div>
-        </div>
+    <div className="flex h-screen place-content-center place-items-center">
+      <div className="card flex items-center">
+        <Image className="m-0" src={maffinLogo} alt="" height="54" />
+        <div className="p-4">{children}</div>
       </div>
-      <Footer />
-    </>
+    </div>
   );
 }

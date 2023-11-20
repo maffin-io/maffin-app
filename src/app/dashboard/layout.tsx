@@ -39,15 +39,13 @@ export default function DashboardLayout({
   return (
     <div className="w-full h-full overflow-hidden">
       <LeftSidebar />
-      <div className="mt-20 ml-20 p-3 z-0">
+      <div className="mt-20 ml-20 p-3 pb-7">
         <DataSourceContext.Provider value={hookData}>
           <Topbar />
           {children}
         </DataSourceContext.Provider>
       </div>
-      <div className="mt-2">
-        <Footer />
-      </div>
+      <Footer />
     </div>
   );
 }
