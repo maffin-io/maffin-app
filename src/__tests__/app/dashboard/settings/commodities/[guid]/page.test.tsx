@@ -1,9 +1,7 @@
 import React from 'react';
 import {
-  screen,
   render,
 } from '@testing-library/react';
-import type { SWRResponse } from 'swr';
 
 import { Commodity } from '@/book/entities';
 import CommodityPage from '@/app/dashboard/settings/commodities/[guid]/page';
