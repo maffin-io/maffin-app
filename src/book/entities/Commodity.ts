@@ -36,7 +36,8 @@ export default class Commodity extends BaseEntity {
     type: 'text',
     length: 2048,
   })
-  @v.IsString()
+  @CheckCurrencyCode()
+  @v.Matches(/[a-zA-Z0-9]+/)
   @v.Length(2, 2048)
     mnemonic!: string;
 
@@ -70,3 +71,31 @@ export default class Commodity extends BaseEntity {
 
 // https://github.com/typeorm/typeorm/issues/4714
 Object.defineProperty(Commodity, 'name', { value: 'Commodity' });
+
+/**
+ * If CURRENCY is selected as namespace, it checks that the code is 3 chars long
+ */
+function CheckCurrencyCode(validationOptions?: v.ValidationOptions) {
+  return function f(object: Commodity, propertyName: string) {
+    v.registerDecorator({
+      name: 'checkCurrencyCode',
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(mnemonic: string, args: v.ValidationArguments) {
+          const account = args.object as Commodity;
+          if (account.namespace === 'CURRENCY') {
+            return mnemonic.length === 3;
+          }
+
+          return true;
+        },
+
+        defaultMessage() {
+          return 'Currencies must have 3 characters';
+        },
+      },
+    });
+  };
+}

@@ -29,12 +29,12 @@ export default function AccountTypeSelector(
   ).map(type => ({ type }));
 
   return (
-    <Selector<{ type: string }>
+    <Selector<AccountType>
       {...props}
       id={id}
       getOptionLabel={(option: AccountType) => option.type}
       getOptionValue={(option: AccountType) => option.type}
-      onChange={(newValue: SingleValue<{ type: string }> | null) => {
+      onChange={(newValue: SingleValue<AccountType> | null) => {
         if (newValue && props.onChange) {
           // @ts-ignore this is hacky as we are mixing onChange functions
           // but I don't want to duplicate onChange listeners

@@ -61,4 +61,15 @@ describe('Commodity', () => {
       expect(instance.stockerId).toEqual('cusip');
     });
   });
+
+  describe('validation', () => {
+    it('fails if currency with not correct length', async () => {
+      const c = Commodity.create({
+        mnemonic: 'EU',
+        namespace: 'CURRENCY',
+      });
+
+      await expect(c.save()).rejects.toThrow('checkCurrencyCode');
+    });
+  });
 });
