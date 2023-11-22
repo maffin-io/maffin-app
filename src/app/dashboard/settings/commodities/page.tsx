@@ -29,8 +29,8 @@ export default function CommoditiesPage(): JSX.Element {
   commodities = commodities || [];
 
   const currencies = commodities.filter(c => c.namespace === 'CURRENCY');
-  const investments = commodities.filter(c => ['STOCK', 'MUTUAL'].includes(c.namespace));
-  const custom = commodities.filter(c => (!(['CURRENCY', 'STOCK', 'MUTUAL'].includes(c.namespace))));
+  const investments = commodities.filter(c => ['STOCK', 'FUND'].includes(c.namespace));
+  const custom = commodities.filter(c => (!(['CURRENCY', 'STOCK', 'FUND'].includes(c.namespace))));
 
   return (
     <>

@@ -106,4 +106,48 @@ describe('CommodityForm', () => {
       cusip: null,
     });
   });
+
+  it('updates Commodity and saves', async () => {
+    const user = userEvent.setup();
+    const mockSave = jest.fn();
+    const eur = await Commodity.create({
+      mnemonic: 'EUR',
+      fullname: 'Euro',
+      namespace: 'CURRENCY',
+    }).save();
+
+    render(
+      <CommodityForm
+        action="update"
+        defaultValues={{ ...eur }}
+        onSave={mockSave}
+      />,
+    );
+
+    const nameInput = screen.getByLabelText('Name');
+
+    await user.clear(nameInput);
+    await user.type(nameInput, 'Eurooo');
+
+    expect(screen.getByText('update')).not.toBeDisabled();
+    await user.click(screen.getByText('update'));
+
+    const commodities = await Commodity.find();
+    expect(commodities).toEqual([
+      {
+        guid: expect.any(String),
+        mnemonic: 'EUR',
+        fullname: 'Eurooo',
+        namespace: 'CURRENCY',
+        cusip: null,
+      },
+    ]);
+    expect(mockSave).toBeCalledWith({
+      guid: expect.any(String),
+      mnemonic: 'EUR',
+      fullname: 'Eurooo',
+      namespace: 'CURRENCY',
+      cusip: null,
+    });
+  });
 });
