@@ -115,6 +115,9 @@ async function onSubmit(
   if (action === 'add') {
     await commodity.save();
     mutate('/api/commodities');
+  } else if (action === 'update') {
+    await commodity.save();
+    mutate(`/api/commodities/${data.guid}`);
   }
 
   onSave(commodity);
