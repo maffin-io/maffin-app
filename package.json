@@ -49,7 +49,7 @@
     "react-modal": "^3.16.1",
     "react-select": "^5.8.0",
     "react-tailwindcss-datepicker": "^1.6.6",
-    "react-tooltip": "^5.23.0",
+    "react-tooltip": "^5.24.0",
     "reflect-metadata": "^0.1.13",
     "sharp": "^0.32.6",
     "sql.js": "^1.8.0",
