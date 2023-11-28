@@ -1,0 +1,108 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CommodityPage renders as expected with commodity 1`] = `
+<div>
+  <div
+    class="header"
+  >
+    <span
+      class="title"
+    >
+      EUR
+    </span>
+    <div
+      class="ml-auto mr-3"
+    >
+      <div
+        data-testid="CommodityFormButton"
+      />
+    </div>
+  </div>
+  <div>
+    <div>
+      <div
+        class="header"
+      >
+        <span
+          class="title text-lg"
+        >
+          EUR - USD price data
+        </span>
+      </div>
+      <div
+        class="grid grid-cols-12 card"
+      >
+        <div
+          class="col-span-7"
+        >
+          <div
+            data-testid="PricesChart"
+          />
+        </div>
+        <div
+          class="col-span-5"
+        >
+          <div
+            data-testid="PricesTable"
+          />
+        </div>
+      </div>
+    </div>
+    <div>
+      <div
+        class="header"
+      >
+        <span
+          class="title text-lg"
+        >
+          EUR - SGD price data
+        </span>
+      </div>
+      <div
+        class="grid grid-cols-12 card"
+      >
+        <div
+          class="col-span-7"
+        >
+          <div
+            data-testid="PricesChart"
+          />
+        </div>
+        <div
+          class="col-span-5"
+        >
+          <div
+            data-testid="PricesTable"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`CommodityPage shows commodity not found message 1`] = `
+<div>
+  <div
+    class="flex h-screen text-sm place-content-center place-items-center"
+  >
+    Commodity unknown does not exist
+  </div>
+</div>
+`;
+
+exports[`CommodityPage shows loading when loading data 1`] = `
+<div>
+  <div
+    class="h-screen"
+  >
+    <div
+      class="flex text-sm h-3/4 place-content-center place-items-center"
+    >
+      <div
+        data-testid="Loading"
+      />
+    </div>
+  </div>
+</div>
+`;

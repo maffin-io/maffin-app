@@ -16,7 +16,6 @@ import type Commodity from './Commodity';
 import Split from './Split';
 import BaseEntity from './BaseEntity';
 import { DateTimeTransformer } from './transformers';
-import Money from '../Money';
 
 /**
  * https://wiki.gnucash.org/wiki/SQL#Tables

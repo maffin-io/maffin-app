@@ -35,7 +35,7 @@ export default function Table<T extends object = {}>(
     columns,
     data,
     initialSort,
-    pageSize = 10,
+    pageSize,
     showHeader = true,
     showPagination = true,
     tdClassName = 'px-6 py-4',
@@ -53,7 +53,7 @@ export default function Table<T extends object = {}>(
     getSubRows,
     initialState: {
       pagination: {
-        pageSize,
+        pageSize: pageSize || 10,
       },
       sorting: (initialSort && [initialSort]) || undefined,
       expanded: isExpanded as ExpandedState,
@@ -140,7 +140,7 @@ export default function Table<T extends object = {}>(
 
       {
         showPagination
-        && <Pagination<T> table={table} />
+        && <Pagination<T> table={table} showPageSize={!pageSize} />
       }
     </>
   );

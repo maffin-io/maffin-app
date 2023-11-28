@@ -39,13 +39,13 @@ const MENU_ITEMS: ItemType[] = [
 
 const BOTTOM_MENU: ItemType[] = [
   {
-    label: 'Settings',
+    label: 'Tools',
     icon: <BiCog className="text-xl" />,
     url: '',
     submenu: [
       {
         label: 'Commodities',
-        url: '/dashboard/settings/commodities',
+        url: '/dashboard/commodities',
       },
     ],
   },

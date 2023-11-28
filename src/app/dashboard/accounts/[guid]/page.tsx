@@ -169,7 +169,6 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
       </div>
       <div className="grid grid-cols-12">
         <div className="col-span-6">
-
           <div className="grid grid-cols-12">
             <div className="col-span-6">
               <StatisticsWidget

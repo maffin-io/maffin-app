@@ -51,7 +51,7 @@ export default function CommoditiesPage(): JSX.Element {
         {currencies.map(commodity => (
           <Link
             key={commodity.guid}
-            href={`/dashboard/settings/commodities/${commodity.guid}`}
+            href={`/dashboard/commodities/${commodity.guid}`}
             className="card col-span-1 cursor-pointer hover:shadow-lg text-slate-400 dark:hover:text-white"
           >
             <div className="flex items-center">
@@ -74,7 +74,7 @@ export default function CommoditiesPage(): JSX.Element {
               {investments.map(commodity => (
                 <Link
                   key={commodity.guid}
-                  href={`/dashboard/settings/commodities/${commodity.guid}`}
+                  href={`/dashboard/commodities/${commodity.guid}`}
                   className="card col-span-2 cursor-pointer hover:shadow-lg text-slate-400 dark:hover:text-white"
                 >
                   <div className="flex items-center">
@@ -100,7 +100,7 @@ export default function CommoditiesPage(): JSX.Element {
               {custom.map(commodity => (
                 <Link
                   key={commodity.guid}
-                  href={`/dashboard/settings/commodities/${commodity.guid}`}
+                  href={`/dashboard/commodities/${commodity.guid}`}
                   className="card col-span-2 cursor-pointer hover:shadow-lg text-slate-400 dark:hover:text-white"
                 >
                   <div className="flex items-center">
