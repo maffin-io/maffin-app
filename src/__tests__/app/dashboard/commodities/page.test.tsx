@@ -6,7 +6,7 @@ import {
 import type { SWRResponse } from 'swr';
 
 import * as apiHook from '@/hooks/api';
-import CommoditiesPage from '@/app/dashboard/settings/commodities/page';
+import CommoditiesPage from '@/app/dashboard/commodities/page';
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,

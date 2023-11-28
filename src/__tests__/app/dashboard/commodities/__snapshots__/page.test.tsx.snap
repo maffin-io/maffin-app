@@ -53,7 +53,7 @@ exports[`CommoditiesPage shows commodities by namespace 1`] = `
   >
     <a
       class="card col-span-1 cursor-pointer hover:shadow-lg text-slate-400 dark:hover:text-white"
-      href="/dashboard/settings/commodities/eur"
+      href="/dashboard/commodities/eur"
     >
       <div
         class="flex items-center"
@@ -93,7 +93,7 @@ exports[`CommoditiesPage shows commodities by namespace 1`] = `
   >
     <a
       class="card col-span-2 cursor-pointer hover:shadow-lg text-slate-400 dark:hover:text-white"
-      href="/dashboard/settings/commodities/googl"
+      href="/dashboard/commodities/googl"
     >
       <div
         class="flex items-center"
@@ -133,7 +133,7 @@ exports[`CommoditiesPage shows commodities by namespace 1`] = `
   >
     <a
       class="card col-span-2 cursor-pointer hover:shadow-lg text-slate-400 dark:hover:text-white"
-      href="/dashboard/settings/commodities/loy"
+      href="/dashboard/commodities/loy"
     >
       <div
         class="flex items-center"

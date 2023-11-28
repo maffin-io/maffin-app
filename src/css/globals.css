@@ -134,7 +134,7 @@
   }
 
   .header {
-    @apply flex items-center m-2;
+    @apply flex items-center m-2 mb-4;
   }
 
   .title {

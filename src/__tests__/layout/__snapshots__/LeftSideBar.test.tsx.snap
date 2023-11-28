@@ -131,7 +131,7 @@ exports[`LeftSidebar renders as expected 1`] = `
             <span
               class="hidden group-hover:inline-block ml-1"
             >
-              Settings
+              Tools
             </span>
           </a>
           <ul
@@ -142,7 +142,7 @@ exports[`LeftSidebar renders as expected 1`] = `
             >
               <a
                 class="text-slate-400 hover:text-white"
-                href="/dashboard/settings/commodities"
+                href="/dashboard/commodities"
               >
                 Commodities
               </a>
