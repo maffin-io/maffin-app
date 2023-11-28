@@ -86,5 +86,13 @@ describe('Price', () => {
         changePct: 1.1,
       });
     });
+
+    it('can set value', async () => {
+      const prices = await Price.find();
+      const price = prices[0];
+      price.value = 1000;
+      expect(price.valueNum).toEqual(1000);
+      expect(price.valueDenom).toEqual(1);
+    });
   });
 });

@@ -1,10 +1,6 @@
-import type { Commodity, Split } from '@/book/entities';
+import type { Commodity, Split, Transaction } from '@/book/entities';
 
-export type FormValues = {
-  guid?: string,
+export type FormValues = Omit<Transaction, 'date' | 'fk_currency'> & {
   date: string,
-  description: string,
-  splits: Split[],
   fk_currency: Commodity,
-  exchangeRate?: { [key: string]: number },
 };

@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PriceFormButton opens modal when clicking the button 1`] = `
+<div
+  data-testid="Modal"
+>
+  <button
+    class="float-right"
+    type="button"
+  >
+    X
+  </button>
+  <span>
+    Add price
+  </span>
+  <div
+    data-testid="PriceForm"
+  />
+</div>
+`;

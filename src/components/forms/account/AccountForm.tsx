@@ -5,9 +5,11 @@ import { DateTime } from 'luxon';
 import { mutate } from 'swr';
 import { useRouter } from 'next/navigation';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import classNames from 'classnames';
 
 import {
   Account,
+  Commodity,
   Split,
   Transaction,
 } from '@/book/entities';
@@ -22,7 +24,6 @@ import type { AccountsMap } from '@/types/book';
 import createEquityAccount from '@/lib/createEquityAccount';
 import { Tooltip } from 'react-tooltip';
 import type { FormValues } from '@/components/forms/account/types';
-import classNames from 'classnames';
 
 const resolver = classValidatorResolver(Account, { validator: { stopAtFirstError: true } });
 
@@ -255,7 +256,7 @@ export default function AccountForm({
                 id="commodityInput"
                 placeholder="Choose or search for a new commodity"
                 onChange={field.onChange}
-                defaultValue={defaultValues?.fk_commodity}
+                defaultValue={defaultValues?.fk_commodity as Commodity}
                 isDisabled={disabled || action !== 'add'}
               />
               <p className="invalid-feedback">{fieldState.error?.message}</p>

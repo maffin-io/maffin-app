@@ -1,11 +1,6 @@
-export type FormValues = {
-  guid?: string,
-  name: string,
-  parent: Account,
-  fk_commodity: Commodity,
-  type: string,
+import type { Account } from '@/book/entities';
+
+export type FormValues = Account & {
   balance?: number,
   balanceDate?: string,
-  hidden: boolean,
-  placeholder: boolean,
 };

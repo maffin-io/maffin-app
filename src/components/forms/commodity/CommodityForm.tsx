@@ -4,9 +4,7 @@ import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 import { mutate } from 'swr';
 import classNames from 'classnames';
 
-import {
-  Commodity,
-} from '@/book/entities';
+import { Commodity } from '@/book/entities';
 import { NamespaceSelector } from '@/components/selectors';
 
 const resolver = classValidatorResolver(Commodity, { validator: { stopAtFirstError: true } });
