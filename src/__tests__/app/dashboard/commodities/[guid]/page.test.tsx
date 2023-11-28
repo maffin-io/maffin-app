@@ -4,11 +4,13 @@ import {
   screen,
 } from '@testing-library/react';
 import type { SWRResponse } from 'swr';
+import { SWRConfig } from 'swr';
 
 import { Commodity, Price } from '@/book/entities';
 import CommodityPage from '@/app/dashboard/commodities/[guid]/page';
 import { PricesTable, PricesChart } from '@/components/pages/commodity';
 import CommodityFormButton from '@/components/buttons/CommodityFormButton';
+import PriceFormButton from '@/components/buttons/PriceFormButton';
 import * as apiHook from '@/hooks/api';
 
 jest.mock('@/hooks/api', () => ({
@@ -22,6 +24,10 @@ jest.mock('@/components/pages/commodity/PricesTable', () => jest.fn(
 
 jest.mock('@/components/pages/commodity/PricesChart', () => jest.fn(
   () => <div data-testid="PricesChart" />,
+));
+
+jest.mock('@/components/buttons/PriceFormButton', () => jest.fn(
+  () => <div data-testid="PriceFormButton" />,
 ));
 
 jest.mock('@/components/buttons/CommodityFormButton', () => jest.fn(
@@ -89,7 +95,11 @@ describe('CommodityPage', () => {
       } as Price,
     ];
     jest.spyOn(Price, 'findBy').mockResolvedValue(prices);
-    const { container } = render(<CommodityPage params={{ guid: 'guid' }} />);
+    const { container } = render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <CommodityPage params={{ guid: 'guid' }} />
+      </SWRConfig>,
+    );
 
     await screen.findByText('EUR');
     expect(CommodityFormButton).toBeCalledWith(
@@ -100,6 +110,18 @@ describe('CommodityPage', () => {
           mnemonic: 'EUR',
         },
       }),
+      {},
+    );
+    expect(PriceFormButton).toBeCalledWith(
+      {
+        defaultValues: {
+          fk_commodity: {
+            guid: 'guid',
+            mnemonic: 'EUR',
+          },
+          fk_currency: undefined,
+        },
+      },
       {},
     );
     expect(PricesTable).toHaveBeenNthCalledWith(
@@ -139,5 +161,52 @@ describe('CommodityPage', () => {
       {},
     );
     expect(container).toMatchSnapshot();
+  });
+
+  it('calls PriceButton with fk_currency when not CURRENCY', async () => {
+    jest.spyOn(apiHook, 'useCommodities').mockReturnValue(
+      { data: [{ guid: 'guid', mnemonic: 'GOOGL', namespace: 'STOCK' } as Commodity] } as SWRResponse,
+    );
+    const prices = [
+      {
+        guid: '1',
+        value: 100,
+        fk_currency: {
+          guid: 'c1',
+          mnemonic: 'USD',
+        },
+        currency: {
+          guid: 'c1',
+          mnemonic: 'USD',
+        },
+        commodity: {
+          mnemonic: 'GOOGL',
+        },
+      } as Price,
+    ];
+    jest.spyOn(Price, 'findBy').mockResolvedValue(prices);
+    render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <CommodityPage params={{ guid: 'guid' }} />
+      </SWRConfig>,
+    );
+
+    await screen.findByText('GOOGL');
+    expect(PriceFormButton).toBeCalledWith(
+      {
+        defaultValues: {
+          fk_commodity: {
+            guid: 'guid',
+            mnemonic: 'GOOGL',
+            namespace: 'STOCK',
+          },
+          fk_currency: {
+            guid: 'c1',
+            mnemonic: 'USD',
+          },
+        },
+      },
+      {},
+    );
   });
 });

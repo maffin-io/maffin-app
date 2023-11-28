@@ -11,11 +11,18 @@ exports[`CommodityPage renders as expected with commodity 1`] = `
       EUR
     </span>
     <div
-      class="ml-auto mr-3"
+      class="ml-auto"
     >
       <div
-        data-testid="CommodityFormButton"
-      />
+        class="flex gap-1"
+      >
+        <div
+          data-testid="PriceFormButton"
+        />
+        <div
+          data-testid="CommodityFormButton"
+        />
+      </div>
     </div>
   </div>
   <div>

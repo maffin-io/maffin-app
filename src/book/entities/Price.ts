@@ -11,6 +11,7 @@ import type Commodity from './Commodity';
 import { DateTimeTransformer } from './transformers';
 import BaseEntity from './BaseEntity';
 import type { QuoteInfo } from '../types';
+import { toAmountWithScale } from '../../helpers/number';
 
 /**
  * https://wiki.gnucash.org/wiki/SQL#Tables
@@ -82,6 +83,12 @@ export default class Price extends BaseEntity {
 
   get value(): number {
     return this.valueNum / this.valueDenom;
+  }
+
+  set value(n: number) {
+    const { amount, scale } = toAmountWithScale(n);
+    this.valueNum = amount;
+    this.valueDenom = parseInt('1'.padEnd(scale + 1, '0'), 10);
   }
 
   get id(): string {

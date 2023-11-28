@@ -6,6 +6,7 @@ import useSWRImmutable from 'swr/immutable';
 
 import { useCommodities } from '@/hooks/api';
 import CommodityFormButton from '@/components/buttons/CommodityFormButton';
+import PriceFormButton from '@/components/buttons/PriceFormButton';
 import Loading from '@/components/Loading';
 import { PricesTable, PricesChart } from '@/components/pages/commodity';
 import { Price } from '@/book/entities';
@@ -56,6 +57,7 @@ export default function CommodityPage({ params }: CommodityPageProps): JSX.Eleme
       byCurrency[price.currency.guid].push(price);
     });
   }
+  const commodityCurrency = commodity.namespace !== 'CURRENCY' ? prices?.[0].fk_currency || undefined : undefined;
 
   return (
     <>
@@ -67,15 +69,23 @@ export default function CommodityPage({ params }: CommodityPageProps): JSX.Eleme
             && ` - ${commodity.fullname}`
           }
         </span>
-        <div className="ml-auto mr-3">
-          <CommodityFormButton
-            defaultValues={{
-              ...commodity,
-            }}
-            action="update"
-          >
-            <BiEdit />
-          </CommodityFormButton>
+        <div className="ml-auto">
+          <div className="flex gap-1">
+            <PriceFormButton
+              defaultValues={{
+                fk_commodity: commodity,
+                fk_currency: commodityCurrency,
+              }}
+            />
+            <CommodityFormButton
+              defaultValues={{
+                ...commodity,
+              }}
+              action="update"
+            >
+              <BiEdit />
+            </CommodityFormButton>
+          </div>
         </div>
       </div>
       <div>
