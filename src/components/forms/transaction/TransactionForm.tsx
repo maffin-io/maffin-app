@@ -19,13 +19,13 @@ const resolver = classValidatorResolver(Transaction, { validator: { stopAtFirstE
 
 export type TransactionFormProps = {
   action?: 'add' | 'update' | 'delete',
-  onSave: Function,
+  onSave?: Function,
   defaultValues?: Partial<FormValues>,
 };
 
 export default function TransactionForm({
   action = 'add',
-  onSave,
+  onSave = () => {},
   defaultValues,
 }: TransactionFormProps): JSX.Element {
   const form = useForm<FormValues>({

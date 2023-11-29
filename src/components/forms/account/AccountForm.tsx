@@ -29,7 +29,7 @@ const resolver = classValidatorResolver(Account, { validator: { stopAtFirstError
 
 export type AccountFormProps = {
   action?: 'add' | 'update' | 'delete',
-  onSave: Function,
+  onSave?: Function,
   defaultValues?: Partial<FormValues>,
   hideDefaults?: boolean,
 };
@@ -43,7 +43,7 @@ export type SplitFieldData = {
 export default function AccountForm({
   action = 'add',
   defaultValues,
-  onSave,
+  onSave = () => {},
   hideDefaults = false,
 }: AccountFormProps): JSX.Element {
   const router = useRouter();

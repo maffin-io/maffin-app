@@ -33,14 +33,26 @@ exports[`AccountPage renders as expected with account 1`] = `
         class="flex gap-1"
       >
         <div
-          data-testid="TransactionFormButton"
-        />
+          data-testid="FormButton"
+        >
+          <div
+            data-testid="TransactionForm"
+          />
+        </div>
         <div
-          data-testid="AccountFormButton"
-        />
+          data-testid="FormButton"
+        >
+          <div
+            data-testid="AccountForm"
+          />
+        </div>
         <div
-          data-testid="AccountFormButton"
-        />
+          data-testid="FormButton"
+        >
+          <div
+            data-testid="AccountForm"
+          />
+        </div>
       </div>
     </div>
   </div>

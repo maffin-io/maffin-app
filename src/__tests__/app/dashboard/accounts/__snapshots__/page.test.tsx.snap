@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AccountsPage shows onboarding when no data 1`] = `
+exports[`AccountsPage renders as expected when no data showing onboarding 1`] = `
 <div>
   <div
     data-testid="Onboarding"
@@ -22,8 +22,12 @@ exports[`AccountsPage shows onboarding when no data 1`] = `
     </span>
     <div>
       <div
-        data-testid="AccountFormButton"
-      />
+        data-testid="FormButton"
+      >
+        <div
+          data-testid="AccountForm"
+        />
+      </div>
     </div>
   </div>
   <div

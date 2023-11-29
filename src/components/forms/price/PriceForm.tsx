@@ -13,7 +13,7 @@ const resolver = classValidatorResolver(Price, { validator: { stopAtFirstError: 
 
 export type PriceFormProps = {
   action?: 'add' | 'update' | 'delete',
-  onSave: Function,
+  onSave?: Function,
   defaultValues?: Partial<FormValues>,
   hideDefaults?: boolean,
 };
@@ -21,7 +21,7 @@ export type PriceFormProps = {
 export default function PriceForm({
   action = 'add',
   defaultValues,
-  onSave,
+  onSave = () => {},
   hideDefaults = false,
 }: PriceFormProps): JSX.Element {
   const form = useForm<FormValues>({

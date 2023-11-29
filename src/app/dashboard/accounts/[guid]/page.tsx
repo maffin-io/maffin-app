@@ -3,7 +3,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
-import { BiEdit, BiXCircle } from 'react-icons/bi';
+import { BiEdit, BiXCircle, BiPlusCircle } from 'react-icons/bi';
 import { Tooltip } from 'react-tooltip';
 
 import Money from '@/book/Money';
@@ -13,8 +13,9 @@ import {
   TransactionsTable,
 } from '@/components/pages/account';
 import StatisticsWidget from '@/components/StatisticsWidget';
-import TransactionFormButton from '@/components/buttons/TransactionFormButton';
-import AccountFormButton from '@/components/buttons/AccountFormButton';
+import FormButton from '@/components/buttons/FormButton';
+import AccountForm from '@/components/forms/account/AccountForm';
+import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import { useAccounts, useSplits } from '@/hooks/api';
 import Loading from '@/components/Loading';
 import {
@@ -22,7 +23,7 @@ import {
   isAsset,
   isLiability,
 } from '@/book/helpers/accountType';
-import type { Account } from '@/book/entities';
+import { Account, Split } from '@/book/entities';
 
 export type AccountPageProps = {
   params: {
@@ -115,38 +116,56 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
         </span>
         <div className="ml-auto">
           <div className="flex gap-1">
-            <TransactionFormButton
-              account={account}
-              defaultValues={
-                {
-                  date: (latestDate || DateTime.now()).toISODate() as string,
-                  description: '',
-                  splits: [],
-                  fk_currency: account.commodity,
-                }
-              }
-            />
-            <AccountFormButton
-              defaultValues={{
-                ...account,
-                parent: accounts[account.parentId],
-              }}
-              action="update"
+            <FormButton
+              id="add-tx"
+              modalTitle={`Add transaction to ${account?.name}`}
+              buttonContent={(
+                <>
+                  <BiPlusCircle className="mr-1" />
+                  Add transaction
+                </>
+              )}
             >
-              <BiEdit />
-            </AccountFormButton>
-            <AccountFormButton
-              defaultValues={{
-                ...account,
-                parent: accounts[account.parentId],
-              }}
-              disabled={splits.length > 0}
+              <TransactionForm
+                defaultValues={
+                  {
+                    date: (latestDate || DateTime.now()).toISODate() as string,
+                    description: '',
+                    splits: [Split.create({ fk_account: account }), new Split()],
+                    fk_currency: account.commodity,
+                  }
+                }
+              />
+            </FormButton>
+            <FormButton
+              id="edit-account"
+              modalTitle="Edit account"
+              buttonContent={<BiEdit />}
+            >
+              <AccountForm
+                action="update"
+                defaultValues={{
+                  ...account,
+                  parent: accounts[account.parentId],
+                }}
+              />
+            </FormButton>
+            <FormButton
+              id="delete-account"
+              modalTitle="Confirm you want to remove this account"
+              buttonContent={<BiXCircle />}
               className="btn btn-danger"
-              action="delete"
+              disabled={splits.length > 0}
               data-tooltip-id="delete-help"
             >
-              <BiXCircle />
-            </AccountFormButton>
+              <AccountForm
+                action="delete"
+                defaultValues={{
+                  ...account,
+                  parent: accounts[account.parentId],
+                }}
+              />
+            </FormButton>
             {
               splits.length > 0
               && (

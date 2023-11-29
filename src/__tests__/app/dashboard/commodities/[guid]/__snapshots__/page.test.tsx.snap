@@ -17,11 +17,19 @@ exports[`CommodityPage renders as expected with commodity 1`] = `
         class="flex gap-1"
       >
         <div
-          data-testid="PriceFormButton"
-        />
+          data-testid="FormButton"
+        >
+          <div
+            data-testid="PriceForm"
+          />
+        </div>
         <div
-          data-testid="CommodityFormButton"
-        />
+          data-testid="FormButton"
+        >
+          <div
+            data-testid="CommodityForm"
+          />
+        </div>
       </div>
     </div>
   </div>

@@ -9,9 +9,10 @@ import { SWRConfig } from 'swr';
 import { Commodity, Price } from '@/book/entities';
 import CommodityPage from '@/app/dashboard/commodities/[guid]/page';
 import { PricesTable, PricesChart } from '@/components/pages/commodity';
-import CommodityFormButton from '@/components/buttons/CommodityFormButton';
-import PriceFormButton from '@/components/buttons/PriceFormButton';
+import FormButton from '@/components/buttons/FormButton';
 import * as apiHook from '@/hooks/api';
+import PriceForm from '@/components/forms/price/PriceForm';
+import CommodityForm from '@/components/forms/commodity/CommodityForm';
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
@@ -26,12 +27,20 @@ jest.mock('@/components/pages/commodity/PricesChart', () => jest.fn(
   () => <div data-testid="PricesChart" />,
 ));
 
-jest.mock('@/components/buttons/PriceFormButton', () => jest.fn(
-  () => <div data-testid="PriceFormButton" />,
+jest.mock('@/components/buttons/FormButton', () => jest.fn(
+  (props: React.PropsWithChildren) => (
+    <div data-testid="FormButton">
+      {props.children}
+    </div>
+  ),
 ));
 
-jest.mock('@/components/buttons/CommodityFormButton', () => jest.fn(
-  () => <div data-testid="CommodityFormButton" />,
+jest.mock('@/components/forms/price/PriceForm', () => jest.fn(
+  () => <div data-testid="PriceForm" />,
+));
+
+jest.mock('@/components/forms/commodity/CommodityForm', () => jest.fn(
+  () => <div data-testid="CommodityForm" />,
 ));
 
 jest.mock('@/components/Loading', () => jest.fn(
@@ -51,7 +60,7 @@ describe('CommodityPage', () => {
     const { container } = render(<CommodityPage params={{ guid: 'guid' }} />);
 
     await screen.findByTestId('Loading');
-    expect(CommodityFormButton).toHaveBeenCalledTimes(0);
+    expect(FormButton).toHaveBeenCalledTimes(0);
     expect(container).toMatchSnapshot();
   });
 
@@ -62,7 +71,7 @@ describe('CommodityPage', () => {
     const { container } = render(<CommodityPage params={{ guid: 'unknown' }} />);
 
     screen.getByText('does not exist', { exact: false });
-    expect(CommodityFormButton).toHaveBeenCalledTimes(0);
+    expect(FormButton).toHaveBeenCalledTimes(0);
     expect(container).toMatchSnapshot();
   });
 
@@ -102,17 +111,16 @@ describe('CommodityPage', () => {
     );
 
     await screen.findByText('EUR');
-    expect(CommodityFormButton).toBeCalledWith(
+    expect(FormButton).toHaveBeenNthCalledWith(
+      1,
       expect.objectContaining({
-        action: 'update',
-        defaultValues: {
-          guid: 'guid',
-          mnemonic: 'EUR',
-        },
+        modalTitle: 'Add price',
+        id: 'add-price',
       }),
       {},
     );
-    expect(PriceFormButton).toBeCalledWith(
+    expect(PriceForm).toHaveBeenNthCalledWith(
+      1,
       {
         defaultValues: {
           fk_commodity: {
@@ -120,6 +128,25 @@ describe('CommodityPage', () => {
             mnemonic: 'EUR',
           },
           fk_currency: undefined,
+        },
+      },
+      {},
+    );
+    expect(FormButton).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        modalTitle: 'Edit EUR',
+        id: 'edit-commodity',
+      }),
+      {},
+    );
+    expect(CommodityForm).toHaveBeenNthCalledWith(
+      1,
+      {
+        action: 'update',
+        defaultValues: {
+          guid: 'guid',
+          mnemonic: 'EUR',
         },
       },
       {},
@@ -192,7 +219,7 @@ describe('CommodityPage', () => {
     );
 
     await screen.findByText('GOOGL');
-    expect(PriceFormButton).toBeCalledWith(
+    expect(PriceForm).toBeCalledWith(
       {
         defaultValues: {
           fk_commodity: {

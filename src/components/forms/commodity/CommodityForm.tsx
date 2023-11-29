@@ -11,14 +11,14 @@ const resolver = classValidatorResolver(Commodity, { validator: { stopAtFirstErr
 
 export type CommodityFormProps = {
   action?: 'add' | 'update' | 'delete',
-  onSave: Function,
+  onSave?: Function,
   defaultValues?: Partial<Commodity>,
 };
 
 export default function CommodityForm({
   action = 'add',
   defaultValues,
-  onSave,
+  onSave = () => {},
 }: CommodityFormProps): JSX.Element {
   const form = useForm<Commodity>({
     defaultValues,
