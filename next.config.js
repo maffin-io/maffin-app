@@ -1,4 +1,5 @@
 const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -29,6 +30,14 @@ const nextConfig = {
 
     config.plugins = [
       ...config.plugins,
+      // Copies the wasm file required for sql.js into the public directory so it
+      // is accessible
+      new CopyPlugin({
+        patterns: [{
+          from: require.resolve('sql.js/dist/sql-wasm.wasm'),
+          to: '../public/',
+        }],
+      }),
       // This helps typeorm find sql.js driver. If we remove this then we
       // need to pass the driver in datasource initialization.
       new webpack.ProvidePlugin({
