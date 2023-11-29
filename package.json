@@ -52,7 +52,7 @@
     "react-tooltip": "^5.23.0",
     "reflect-metadata": "^0.1.13",
     "sharp": "^0.32.6",
-    "sql.js": "^1.8.0",
+    "sql.js": "^1.9.0",
     "swr": "^2.2.4",
     "typeorm": "^0.3.17",
     "winston-react": "^1.0.0-RC.0"
