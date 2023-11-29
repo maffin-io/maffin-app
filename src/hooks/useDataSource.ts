@@ -51,7 +51,7 @@ export default function useDataSource(): DataSourceContextType {
       let rawBook: Uint8Array;
       if (storage && !DATASOURCE.isInitialized) {
         ([, rawBook] = await Promise.all([
-          initSqlJs({ locateFile: file => `https://sql.js.org/dist/${file}` }),
+          initSqlJs({ locateFile: file => `/${file}` }),
           storage.get(),
         ]));
 
