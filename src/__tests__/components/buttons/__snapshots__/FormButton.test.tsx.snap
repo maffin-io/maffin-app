@@ -1,6 +1,29 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`TransactionFormButton renders as expected by default 1`] = `
+exports[`FormButton opens modal when clicking the button 1`] = `
+<div
+  data-testid="Modal"
+>
+  <button
+    class="float-right"
+    type="button"
+  >
+    X
+  </button>
+  <span>
+    Add
+  </span>
+  <div>
+    <button
+      type="button"
+    >
+      submit form
+    </button>
+  </div>
+</div>
+`;
+
+exports[`FormButton renders hidden modal on mount 1`] = `
 <div>
   <div
     data-testid="Modal"
@@ -12,15 +35,18 @@ exports[`TransactionFormButton renders as expected by default 1`] = `
       X
     </button>
     <span>
-      Add transaction to account
+      Add
     </span>
-    <div
-      data-testid="TransactionForm"
-    />
+    <div>
+      <button
+        type="button"
+      >
+        submit form
+      </button>
+    </div>
   </div>
   <button
     class="btn btn-primary"
-    id="add-tx"
     type="button"
   >
     <svg
@@ -40,9 +66,7 @@ exports[`TransactionFormButton renders as expected by default 1`] = `
         d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"
       />
     </svg>
-    <span>
-      Add Transaction
-    </span>
+    New
   </button>
 </div>
 `;

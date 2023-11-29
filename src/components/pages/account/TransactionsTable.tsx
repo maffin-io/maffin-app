@@ -6,7 +6,8 @@ import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { BiEdit, BiXCircle } from 'react-icons/bi';
 import { Tooltip } from 'react-tooltip';
 
-import TransactionFormButton from '@/components/buttons/TransactionFormButton';
+import FormButton from '@/components/buttons/FormButton';
+import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import Table from '@/components/Table';
 import Money from '@/book/Money';
 import {
@@ -15,6 +16,7 @@ import {
 } from '@/book/entities';
 import type { AccountsMap } from '@/types/book';
 import * as API from '@/hooks/api';
+import type { Commodity } from '@/book/entities';
 
 export type TransactionsTableProps = {
   account: Account,
@@ -81,38 +83,49 @@ const columns: ColumnDef<Split>[] = [
   {
     header: 'Actions',
     enableSorting: false,
-    cell: ({ row }) => (
-      <>
-        <TransactionFormButton
-          action="update"
-          defaultValues={
-            {
-              ...row.original.transaction,
-              date: row.original.transaction.date.toISODate() as string,
-              // At this point tx currency is not loaded
-              fk_currency: undefined,
-            }
-          }
-          className="link"
-        >
-          <BiEdit className="flex" />
-        </TransactionFormButton>
-        <TransactionFormButton
-          action="delete"
-          defaultValues={
-            {
-              ...row.original.transaction,
-              date: row.original.transaction.date.toISODate() as string,
-              // At this point tx currency is not loaded
-              fk_currency: undefined,
-            }
-          }
-          className="link"
-        >
-          <BiXCircle className="flex" />
-        </TransactionFormButton>
-      </>
-    ),
+    cell: ({ row }) => {
+      const tx = row.original.transaction;
+      const defaultValues = {
+        ...tx,
+        date: tx.date.toISODate() as string,
+        fk_currency: tx.fk_currency as Commodity,
+        // This is hacky but if we pass the Split
+        // class to the form, then we have reference errors as when
+        // we update the form, it also updates the defaultValues
+        // which means formState.isDirty is not triggered properly
+        splits: tx.splits.map(split => ({
+          ...split,
+          value: split.value,
+          quantity: split.quantity,
+        } as Split)),
+      };
+      return (
+        <>
+          <FormButton
+            id="edit-tx"
+            modalTitle="Edit transaction"
+            buttonContent={<BiEdit className="flex" />}
+            className="link"
+          >
+            <TransactionForm
+              action="update"
+              defaultValues={defaultValues}
+            />
+          </FormButton>
+          <FormButton
+            id="delete-tx"
+            modalTitle="Confirm you want to remove this transaction"
+            buttonContent={<BiXCircle className="flex" />}
+            className="link"
+          >
+            <TransactionForm
+              action="delete"
+              defaultValues={defaultValues}
+            />
+          </FormButton>
+        </>
+      );
+    },
   },
 ];
 

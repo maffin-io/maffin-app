@@ -5,6 +5,7 @@ import {
   BiLineChart,
   BiMoney,
   BiSolidGhost,
+  BiPlusCircle,
 } from 'react-icons/bi';
 
 import { useCommodities } from '@/hooks/api';
@@ -40,7 +41,16 @@ export default function CommoditiesPage(): JSX.Element {
           Commodities
         </span>
         <div className="ml-auto mr-3">
-          <FormButton>
+          <FormButton
+            id="add-commodity"
+            modalTitle="Add commodity"
+            buttonContent={(
+              <>
+                <BiPlusCircle className="mr-1" />
+                New
+              </>
+            )}
+          >
             <CommodityForm />
           </FormButton>
         </div>

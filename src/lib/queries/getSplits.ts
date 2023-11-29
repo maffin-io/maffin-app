@@ -8,7 +8,6 @@ import { Split } from '@/book/entities';
  */
 export default async function getSplits(account: string): Promise<Split[]> {
   const splits = await Split.find({
-    loadEagerRelations: false,
     where: {
       fk_account: {
         guid: account,
@@ -21,27 +20,6 @@ export default async function getSplits(account: string): Promise<Split[]> {
         },
       },
       fk_account: true,
-    },
-    // @ts-ignore the date field is giving an error and cant figure out why
-    select: {
-      valueNum: true,
-      valueDenom: true,
-      quantityNum: true,
-      quantityDenom: true,
-      fk_account: {
-        guid: true,
-      },
-      fk_transaction: {
-        guid: true,
-        date: true,
-        description: true,
-        splits: {
-          guid: true,
-          fk_account: {
-            guid: true,
-          },
-        },
-      },
     },
     order: {
       fk_transaction: {

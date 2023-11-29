@@ -1,12 +1,13 @@
 'use client';
 
 import React from 'react';
-import { BiEdit } from 'react-icons/bi';
+import { BiEdit, BiPlusCircle } from 'react-icons/bi';
 import useSWRImmutable from 'swr/immutable';
 
 import { useCommodities } from '@/hooks/api';
-import CommodityFormButton from '@/components/buttons/CommodityFormButton';
-import PriceFormButton from '@/components/buttons/PriceFormButton';
+import FormButton from '@/components/buttons/FormButton';
+import CommodityForm from '@/components/forms/commodity/CommodityForm';
+import PriceForm from '@/components/forms/price/PriceForm';
 import Loading from '@/components/Loading';
 import { PricesTable, PricesChart } from '@/components/pages/commodity';
 import { Price } from '@/book/entities';
@@ -71,20 +72,35 @@ export default function CommodityPage({ params }: CommodityPageProps): JSX.Eleme
         </span>
         <div className="ml-auto">
           <div className="flex gap-1">
-            <PriceFormButton
-              defaultValues={{
-                fk_commodity: commodity,
-                fk_currency: commodityCurrency,
-              }}
-            />
-            <CommodityFormButton
-              defaultValues={{
-                ...commodity,
-              }}
-              action="update"
+            <FormButton
+              id="add-price"
+              modalTitle="Add price"
+              buttonContent={(
+                <>
+                  <BiPlusCircle className="mr-1" />
+                  Add price
+                </>
+              )}
             >
-              <BiEdit />
-            </CommodityFormButton>
+              <PriceForm
+                defaultValues={{
+                  fk_commodity: commodity,
+                  fk_currency: commodityCurrency,
+                }}
+              />
+            </FormButton>
+            <FormButton
+              id="edit-commodity"
+              modalTitle={`Edit ${commodity.mnemonic}`}
+              buttonContent={<BiEdit />}
+            >
+              <CommodityForm
+                defaultValues={{
+                  ...commodity,
+                }}
+                action="update"
+              />
+            </FormButton>
           </div>
         </div>
       </div>

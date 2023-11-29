@@ -5,18 +5,17 @@ import {
   screen,
 } from '@testing-library/react';
 import type { LinkProps } from 'next/link';
-import { BiEdit, BiXCircle } from 'react-icons/bi';
 import type { SWRResponse } from 'swr';
 
 import {
-  Account,
   Commodity,
   Split,
   Transaction,
 } from '@/book/entities';
 import Table from '@/components/Table';
 import { TransactionsTable } from '@/components/pages/account';
-import TransactionFormButton from '@/components/buttons/TransactionFormButton';
+import FormButton from '@/components/buttons/FormButton';
+import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import type { AccountsMap } from '@/types/book';
 import * as apiHook from '@/hooks/api';
 
@@ -33,12 +32,16 @@ jest.mock('@/components/Table', () => jest.fn(
 ));
 const TableMock = Table as jest.MockedFunction<typeof Table>;
 
-jest.mock('@/components/buttons/TransactionFormButton', () => jest.fn(
+jest.mock('@/components/buttons/FormButton', () => jest.fn(
   (props: React.PropsWithChildren) => (
-    <div data-testid="TransactionFormButton">
+    <div data-testid="FormButton">
       {props.children}
     </div>
   ),
+));
+
+jest.mock('@/components/forms/transaction/TransactionForm', () => jest.fn(
+  () => <div data-testid="TransactionForm" />,
 ));
 
 jest.mock('@/hooks/api', () => ({
@@ -49,7 +52,7 @@ jest.mock('@/hooks/api', () => ({
 describe('TransactionsTable', () => {
   let eur: Commodity;
   let accounts: AccountsMap;
-  let splits1: Split[];
+  let split: Split;
 
   beforeEach(async () => {
     eur = {
@@ -75,45 +78,36 @@ describe('TransactionsTable', () => {
       },
     };
 
-    splits1 = [
-      {
-        guid: 'split_guid_1',
-        action: '',
-        value: -100,
-        quantity: -100,
-        transaction: {
-          guid: 'tx_guid',
-          description: 'random expense',
-          date: DateTime.fromISO('2023-01-01'),
-          splits: [
-            {
-              guid: 'splits_guid_1',
-              action: '',
-              account: {
-                // splits here are not ordered consistently
-                guid: 'account_guid_1',
-                childrenIds: [] as string[],
-              } as Account,
-            } as Split,
-            {
-              guid: 'splits_guid_2',
-              action: '',
-              account: {
-                guid: 'account_guid_2',
-                childrenIds: [] as string[],
-              } as Account,
-            } as Split,
-          ],
-        } as Transaction,
-        account: {
-          guid: 'account_guid_1',
-          childrenIds: [] as string[],
-        } as Account,
-      } as Split,
-    ];
+    split = new Split();
+    split.fk_account = accounts.account_guid_1;
+    split.guid = 'split_guid_1';
+    split.value = 100;
+    split.quantity = 100;
+
+    const splitA = new Split();
+    splitA.fk_account = split.fk_account;
+    splitA.guid = split.guid;
+    splitA.value = split.value;
+    splitA.quantity = split.quantity;
+
+    const splitB = new Split();
+    splitB.fk_account = accounts.account_guid_2;
+    splitB.guid = 'splits_guid_2';
+    splitB.value = -100;
+    splitB.quantity = -100;
+
+    split.fk_transaction = {
+      guid: 'tx_guid',
+      description: 'random expense',
+      date: DateTime.fromISO('2023-01-01'),
+      fk_currency: {
+        mnemonic: 'EUR',
+      } as Commodity,
+      splits: [splitA, splitB],
+    } as Transaction;
 
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: accounts } as SWRResponse);
-    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: splits1 } as SWRResponse);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: [split] } as SWRResponse);
   });
 
   afterEach(async () => {
@@ -217,7 +211,7 @@ describe('TransactionsTable', () => {
           cell: expect.any(Function),
         },
       ],
-      data: splits1,
+      data: [split],
     }, {});
   });
 
@@ -237,7 +231,7 @@ describe('TransactionsTable', () => {
       // @ts-ignore
       dateCol.cell({
         row: {
-          original: splits1[0],
+          original: split,
         },
       }),
     );
@@ -256,7 +250,7 @@ describe('TransactionsTable', () => {
       // @ts-ignore
       fromToCol.cell({
         row: {
-          original: splits1[0],
+          original: split,
         },
       }),
     );
@@ -275,7 +269,7 @@ describe('TransactionsTable', () => {
       // @ts-ignore
       amountCol.cell({
         row: {
-          original: splits1[0],
+          original: split,
         },
       }),
     );
@@ -286,7 +280,7 @@ describe('TransactionsTable', () => {
       // @ts-ignore
       amountCol.cell({
         row: {
-          original: splits1[0],
+          original: split,
         },
       }),
     ));
@@ -349,36 +343,57 @@ describe('TransactionsTable', () => {
       // @ts-ignore
       actionsCol.cell({
         row: {
-          original: splits1[0],
+          original: split,
         },
       }),
     );
 
-    expect(TransactionFormButton).toBeCalledTimes(2);
-    expect(TransactionFormButton).toHaveBeenNthCalledWith(
+    expect(FormButton).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        className: 'link',
+        id: 'edit-tx',
+        modalTitle: 'Edit transaction',
+      }),
+      {},
+    );
+    expect(TransactionForm).toHaveBeenNthCalledWith(
       1,
       {
         action: 'update',
-        className: 'link',
-        children: <BiEdit className="flex" />,
         defaultValues: {
-          ...splits1[0].transaction,
+          ...split.transaction,
           date: '2023-01-01',
-          fk_currency: undefined,
+          splits: split.transaction.splits.map(s => ({
+            ...s,
+            value: s.value,
+            quantity: s.quantity,
+          })),
         },
       },
       {},
     );
-    expect(TransactionFormButton).toHaveBeenNthCalledWith(
+    expect(FormButton).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        className: 'link',
+        id: 'delete-tx',
+        modalTitle: 'Confirm you want to remove this transaction',
+      }),
+      {},
+    );
+    expect(TransactionForm).toHaveBeenNthCalledWith(
       2,
       {
         action: 'delete',
-        className: 'link',
-        children: <BiXCircle className="flex" />,
         defaultValues: {
-          ...splits1[0].transaction,
+          ...split.transaction,
           date: '2023-01-01',
-          fk_currency: undefined,
+          splits: split.transaction.splits.map(s => ({
+            ...s,
+            value: s.value,
+            quantity: s.quantity,
+          })),
         },
       },
       {},

@@ -7,8 +7,9 @@ import {
 import type { SWRResponse } from 'swr';
 
 import AccountPage from '@/app/dashboard/accounts/[guid]/page';
-import TransactionFormButton from '@/components/buttons/TransactionFormButton';
-import AccountFormButton from '@/components/buttons/AccountFormButton';
+import FormButton from '@/components/buttons/FormButton';
+import AccountForm from '@/components/forms/account/AccountForm';
+import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import { Account, Split } from '@/book/entities';
 import * as apiHook from '@/hooks/api';
 import {
@@ -22,12 +23,20 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
-jest.mock('@/components/buttons/TransactionFormButton', () => jest.fn(
-  () => <div data-testid="TransactionFormButton" />,
+jest.mock('@/components/buttons/FormButton', () => jest.fn(
+  (props: React.PropsWithChildren) => (
+    <div data-testid="FormButton">
+      {props.children}
+    </div>
+  ),
 ));
 
-jest.mock('@/components/buttons/AccountFormButton', () => jest.fn(
-  () => <div data-testid="AccountFormButton" />,
+jest.mock('@/components/forms/account/AccountForm', () => jest.fn(
+  () => <div data-testid="AccountForm" />,
+));
+
+jest.mock('@/components/forms/transaction/TransactionForm', () => jest.fn(
+  () => <div data-testid="TransactionForm" />,
 ));
 
 jest.mock('@/components/pages/account/TransactionsTable', () => jest.fn(
@@ -48,6 +57,7 @@ jest.mock('@/components/Loading', () => jest.fn(
 
 describe('AccountPage', () => {
   beforeEach(() => {
+    jest.spyOn(Split, 'create').mockReturnValue({ guid: 'createdSplit' } as Split);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
     jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as SWRResponse);
   });
@@ -60,8 +70,8 @@ describe('AccountPage', () => {
     const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
 
     await screen.findByTestId('Loading');
-    expect(AccountFormButton).toHaveBeenCalledTimes(0);
-    expect(TransactionFormButton).toHaveBeenCalledTimes(0);
+    expect(FormButton).toHaveBeenCalledTimes(0);
+    expect(FormButton).toHaveBeenCalledTimes(0);
     expect(TransactionsTable).toHaveBeenCalledTimes(0);
     expect(container).toMatchSnapshot();
   });
@@ -73,8 +83,8 @@ describe('AccountPage', () => {
     render(<AccountPage params={{ guid: 'guid' }} />);
 
     screen.getByText('does not exist', { exact: false });
-    expect(AccountFormButton).toHaveBeenCalledTimes(0);
-    expect(TransactionFormButton).toHaveBeenCalledTimes(0);
+    expect(FormButton).toHaveBeenCalledTimes(0);
+    expect(FormButton).toHaveBeenCalledTimes(0);
     expect(TransactionsTable).toHaveBeenCalledTimes(0);
   });
 
@@ -113,53 +123,70 @@ describe('AccountPage', () => {
     const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
 
     await screen.findByTestId('TransactionsTable');
-    expect(TransactionFormButton).toHaveBeenLastCalledWith(
+    expect(FormButton).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        id: 'add-tx',
+        modalTitle: 'Add transaction to undefined',
+      }),
+      {},
+    );
+    expect(TransactionForm).toBeCalledWith(
       {
-        account: accounts.guid,
         defaultValues: {
           date: '2023-01-01',
           description: '',
           fk_currency: {
             mnemonic: 'EUR',
           },
-          splits: [],
+          splits: [
+            { guid: 'createdSplit' },
+            {
+              action: '',
+              guid: expect.any(String),
+            },
+          ],
         },
       },
       {},
     );
-    expect(AccountFormButton).toHaveBeenNthCalledWith(
-      1,
+    expect(FormButton).toHaveBeenNthCalledWith(
+      2,
       expect.objectContaining({
-        action: 'update',
-        defaultValues: {
-          commodity: {
-            mnemonic: 'EUR',
-          },
-          guid: 'guid',
-          parent: undefined,
-          path: 'path',
-          type: 'TYPE',
-        },
+        id: 'edit-account',
+        modalTitle: 'Edit account',
       }),
       {},
     );
-    expect(AccountFormButton).toHaveBeenNthCalledWith(
-      2,
+    expect(AccountForm).toHaveBeenNthCalledWith(
+      1,
+      {
+        action: 'update',
+        defaultValues: {
+          ...accounts.guid,
+        },
+      },
+      {},
+    );
+    expect(FormButton).toHaveBeenNthCalledWith(
+      3,
       expect.objectContaining({
-        action: 'delete',
         className: 'btn btn-danger',
         'data-tooltip-id': 'delete-help',
         disabled: true,
-        defaultValues: {
-          commodity: {
-            mnemonic: 'EUR',
-          },
-          guid: 'guid',
-          parent: undefined,
-          path: 'path',
-          type: 'TYPE',
-        },
+        id: 'delete-account',
+        modalTitle: 'Confirm you want to remove this account',
       }),
+      {},
+    );
+    expect(AccountForm).toHaveBeenNthCalledWith(
+      2,
+      {
+        action: 'delete',
+        defaultValues: {
+          ...accounts.guid,
+        },
+      },
       {},
     );
     expect(TransactionsTable).toHaveBeenLastCalledWith(

@@ -2,8 +2,10 @@
 
 import React from 'react';
 import { DateTime } from 'luxon';
+import { BiPlusCircle } from 'react-icons/bi';
 
-import AccountFormButton from '@/components/buttons/AccountFormButton';
+import FormButton from '@/components/buttons/FormButton';
+import AccountForm from '@/components/forms/account/AccountForm';
 import {
   AccountsTable,
   NetWorthPie,
@@ -55,7 +57,18 @@ export default function AccountsPage(): JSX.Element {
           />
         </span>
         <div>
-          <AccountFormButton />
+          <FormButton
+            id="add-account"
+            modalTitle="Add account"
+            buttonContent={(
+              <>
+                <BiPlusCircle className="mr-1" />
+                Add Account
+              </>
+            )}
+          >
+            <AccountForm />
+          </FormButton>
         </div>
       </div>
       <div className="grid grid-cols-12 items-start items-top">

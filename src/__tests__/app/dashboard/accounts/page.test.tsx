@@ -8,7 +8,8 @@ import type { SWRResponse } from 'swr';
 
 import type { Account } from '@/book/entities';
 import AccountsPage from '@/app/dashboard/accounts/page';
-import AccountFormButton from '@/components/buttons/AccountFormButton';
+import FormButton from '@/components/buttons/FormButton';
+import AccountForm from '@/components/forms/account/AccountForm';
 import DateRangeInput from '@/components/DateRangeInput';
 import Onboarding from '@/components/onboarding/Onboarding';
 import {
@@ -25,8 +26,16 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
-jest.mock('@/components/buttons/AccountFormButton', () => jest.fn(
-  () => <div data-testid="AccountFormButton" />,
+jest.mock('@/components/buttons/FormButton', () => jest.fn(
+  (props: React.PropsWithChildren) => (
+    <div data-testid="FormButton">
+      {props.children}
+    </div>
+  ),
+));
+
+jest.mock('@/components/forms/account/AccountForm', () => jest.fn(
+  () => <div data-testid="AccountForm" />,
 ));
 
 jest.mock('@/components/pages/accounts/AccountsTable', () => jest.fn(
@@ -79,13 +88,23 @@ describe('AccountsPage', () => {
     await screen.findByTestId('Loading');
   });
 
-  it('shows onboarding when no data', async () => {
+  it('renders as expected when no data showing onboarding', async () => {
     const date = DateTime.fromISO('2022-01-01');
     jest.spyOn(apiHook, 'useStartDate').mockReturnValueOnce({ data: date } as SWRResponse);
     const { container } = render(<AccountsPage />);
 
-    await screen.findByTestId('AccountFormButton');
-    expect(AccountFormButton).toHaveBeenLastCalledWith({}, {});
+    await screen.findByTestId('FormButton');
+    expect(FormButton).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        modalTitle: 'Add account',
+        id: 'add-account',
+      }),
+      {},
+    );
+    expect(AccountForm).toHaveBeenLastCalledWith(
+      {},
+      {},
+    );
 
     await screen.findByTestId('Onboarding');
     expect(Onboarding).toHaveBeenLastCalledWith(

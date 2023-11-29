@@ -2,27 +2,25 @@ import React from 'react';
 import Modal from 'react-modal';
 
 import { DataSourceContext } from '@/hooks';
-import type CommodityForm from '@/components/forms/commodity/CommodityForm';
 
-export interface AccountFormButtonProps extends Omit<
+export interface FormButtonProps extends Omit<
 React.ButtonHTMLAttributes<HTMLButtonElement>,
 'children'
 > {
-  action?: 'add' | 'update' | 'delete',
-  buttonText?: string,
-  children: React.ReactElement<typeof CommodityForm>,
+  buttonContent: string | React.ReactElement,
+  modalTitle: string,
+  children: React.ReactElement,
 }
 
-export default function AccountFormButton({
-  buttonText = 'save',
+export default function FormButton({
+  buttonContent,
+  modalTitle,
   children,
   className = 'btn btn-primary',
   ...props
-}: AccountFormButtonProps): JSX.Element {
+}: FormButtonProps): JSX.Element {
   const { save } = React.useContext(DataSourceContext);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
-
-  const title = 'Add commodity';
 
   return (
     <>
@@ -39,27 +37,28 @@ export default function AccountFormButton({
         >
           X
         </button>
-        <span>{title}</span>
-        {
-          React.cloneElement(
-            children,
-            {
-              onSave: () => {
-                save();
-                setIsModalOpen(false);
+        <span>{modalTitle}</span>
+        <div>
+          {
+            React.cloneElement(
+              children,
+              {
+                onSave: () => {
+                  save();
+                  setIsModalOpen(false);
+                },
               },
-            },
-          )
-        }
+            )
+          }
+        </div>
       </Modal>
       <button
-        id="add-commodity"
         type="button"
         onClick={() => setIsModalOpen(!isModalOpen)}
         className={className}
         {...props}
       >
-        {buttonText}
+        {buttonContent}
       </button>
     </>
   );

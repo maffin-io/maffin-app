@@ -7,6 +7,8 @@ import type { SWRResponse } from 'swr';
 
 import * as apiHook from '@/hooks/api';
 import CommoditiesPage from '@/app/dashboard/commodities/page';
+import FormButton from '@/components/buttons/FormButton';
+import CommodityForm from '@/components/forms/commodity/CommodityForm';
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
@@ -15,6 +17,18 @@ jest.mock('@/hooks/api', () => ({
 
 jest.mock('@/components/Loading', () => jest.fn(
   () => <div data-testid="Loading" />,
+));
+
+jest.mock('@/components/buttons/FormButton', () => jest.fn(
+  (props: React.PropsWithChildren) => (
+    <div data-testid="FormButton">
+      {props.children}
+    </div>
+  ),
+));
+
+jest.mock('@/components/forms/commodity/CommodityForm', () => jest.fn(
+  () => <div data-testid="CommodityForm" />,
 ));
 
 describe('CommoditiesPage', () => {
@@ -33,7 +47,7 @@ describe('CommoditiesPage', () => {
     await screen.findByTestId('Loading');
   });
 
-  it('shows commodities by namespace', async () => {
+  it('renders as expected', async () => {
     jest.spyOn(apiHook, 'useCommodities').mockReturnValue({
       data: [
         {
@@ -60,6 +74,18 @@ describe('CommoditiesPage', () => {
     screen.getByText('Currencies');
     screen.getByText('Investments');
     screen.getByText('Custom');
+
+    expect(FormButton).toBeCalledWith(
+      expect.objectContaining({
+        modalTitle: 'Add commodity',
+        id: 'add-commodity',
+      }),
+      {},
+    );
+    expect(CommodityForm).toBeCalledWith(
+      {},
+      {},
+    );
     expect(container).toMatchSnapshot();
   });
 });
