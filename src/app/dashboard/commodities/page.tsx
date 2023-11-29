@@ -10,7 +10,8 @@ import {
 import { useCommodities } from '@/hooks/api';
 import Link from 'next/link';
 import Loading from '@/components/Loading';
-import CommodityFormButton from '@/components/buttons/CommodityFormButton';
+import FormButton from '@/components/buttons/FormButton';
+import CommodityForm from '@/components/forms/commodity/CommodityForm';
 
 export default function CommoditiesPage(): JSX.Element {
   let { data: commodities } = useCommodities();
@@ -39,7 +40,9 @@ export default function CommoditiesPage(): JSX.Element {
           Commodities
         </span>
         <div className="ml-auto mr-3">
-          <CommodityFormButton />
+          <FormButton>
+            <CommodityForm />
+          </FormButton>
         </div>
       </div>
       <div className="header">
