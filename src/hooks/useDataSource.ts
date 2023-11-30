@@ -127,21 +127,6 @@ async function createEmptyBook() {
   });
   await Account.upsert(rootAccount, ['guid']);
 
-  await Promise.all([
-    Commodity.create({
-      mnemonic: 'EUR',
-      namespace: 'CURRENCY',
-    }).save(),
-    Commodity.create({
-      mnemonic: 'USD',
-      namespace: 'CURRENCY',
-    }).save(),
-    Commodity.create({
-      mnemonic: 'SGD',
-      namespace: 'CURRENCY',
-    }).save(),
-  ]);
-
   await Book.upsert(
     {
       guid: 'maffinBook',

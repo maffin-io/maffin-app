@@ -254,7 +254,7 @@ export default function AccountForm({
             <>
               <CommoditySelector
                 id="commodityInput"
-                placeholder="Choose or search for a new commodity"
+                placeholder="Choose a commodity for the account"
                 onChange={field.onChange}
                 defaultValue={defaultValues?.fk_commodity as Commodity}
                 isDisabled={disabled || action !== 'add'}

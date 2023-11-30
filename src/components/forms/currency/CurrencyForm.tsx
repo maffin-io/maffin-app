@@ -2,26 +2,32 @@ import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 import { SingleValue } from 'react-select';
+import { mutate } from 'swr';
 
 import { Commodity } from '@/book/entities';
-import { CommoditySelector } from '@/components/selectors';
+import Selector from '@/components/selectors/Selector';
 
 const resolver = classValidatorResolver(Commodity, { validator: { stopAtFirstError: true } });
 
-export type FormValues = {
-  guid: string,
-  namespace: string,
-  mnemonic: string,
-};
+const CURRENCIES = [
+  { label: 'EUR' },
+  { label: 'USD' },
+  { label: 'SGD' },
+];
+
+type CurrencyOption = { [code: string]: string };
 
 export type CurrencyFormProps = {
   onSave: Function,
 };
 
 export default function CurrencyForm({ onSave }: CurrencyFormProps): JSX.Element {
-  const form = useForm<FormValues>({
+  const form = useForm<Commodity>({
     mode: 'onChange',
     resolver,
+    defaultValues: {
+      namespace: 'CURRENCY',
+    },
   });
   const { errors } = form.formState;
 
@@ -33,18 +39,18 @@ export default function CurrencyForm({ onSave }: CurrencyFormProps): JSX.Element
           name="mnemonic"
           render={({ field, fieldState }) => (
             <>
-              <CommoditySelector
-                id="mnemonicInput"
-                onChange={(newValue: SingleValue<Commodity> | null) => {
-                  if (newValue) {
-                    field.onChange(newValue.mnemonic);
-                    form.reset(newValue);
-                    form.trigger();
-                  }
-                }}
-                placeholder="Choose or search your currency"
+              <Selector<CurrencyOption>
+                className="min-w-[322px]"
+                id="currency-selector"
+                creatable
                 isClearable={false}
-                namespace="CURRENCY"
+                getOptionLabel={(option: CurrencyOption) => option.label}
+                getOptionValue={(option: CurrencyOption) => option.label}
+                onChange={(newValue: SingleValue<CurrencyOption> | null) => {
+                  field.onChange(newValue?.label, undefined);
+                }}
+                defaultOptions={CURRENCIES}
+                placeholder="Choose or type your currency"
               />
               <p className="invalid-feedback">{fieldState.error?.message}</p>
             </>
@@ -65,7 +71,10 @@ export default function CurrencyForm({ onSave }: CurrencyFormProps): JSX.Element
   );
 }
 
-async function onSubmit(data: FormValues, onSave: Function) {
-  const mainCommodity = Commodity.create({ ...data });
+async function onSubmit(data: Commodity, onSave: Function) {
+  const mainCommodity = await Commodity.create({
+    ...data,
+  }).save();
+  mutate('/api/commodities');
   await onSave(mainCommodity);
 }

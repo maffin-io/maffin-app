@@ -2,6 +2,7 @@ import * as v from 'class-validator';
 import {
   Column,
   Entity,
+  Index,
 } from 'typeorm';
 
 import BaseEntity from './BaseEntity';
@@ -23,6 +24,7 @@ import BaseEntity from './BaseEntity';
  */
 
 @Entity('commodities')
+@Index(['mnemonic', 'namespace'], { unique: true })
 export default class Commodity extends BaseEntity {
   @Column({
     type: 'text',

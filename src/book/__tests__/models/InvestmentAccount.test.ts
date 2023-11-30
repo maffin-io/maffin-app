@@ -274,10 +274,14 @@ describe('InvestmentAccount', () => {
         mnemonic: 'STOCK',
       }).save();
 
-      stockCurrency = await Commodity.create({
-        namespace: 'CURRENCY',
-        mnemonic: currency,
-      }).save();
+      if (currency === mainCurrency) {
+        stockCurrency = mainCommodity;
+      } else {
+        stockCurrency = await Commodity.create({
+          namespace: 'CURRENCY',
+          mnemonic: currency,
+        }).save();
+      }
 
       rootAccount = await Account.create({
         name: 'Root',
@@ -901,18 +905,18 @@ describe('InvestmentAccount', () => {
        * in the currency of the account
        */
       it('supports dividend in different currency than account\'s currency', async () => {
-        const usd = await Commodity.create({
+        const sgd = Commodity.create({
           namespace: 'CURRENCY',
-          mnemonic: 'USD',
-        }).save();
-        // The dividend is received in USD although the account's currency is EUR
-        brokerAccount.fk_commodity = usd;
+          mnemonic: 'SGD',
+        });
+        // The dividend is received in SGD although the account's currency is EUR
+        brokerAccount.fk_commodity = sgd;
         await brokerAccount.save();
 
-        const eur = await Commodity.create({
+        const eur = await Commodity.findOneByOrFail({
           namespace: 'CURRENCY',
           mnemonic: 'EUR',
-        }).save();
+        });
         incomeAccount.fk_commodity = eur;
         await incomeAccount.save();
 
@@ -970,7 +974,7 @@ describe('InvestmentAccount', () => {
           new PriceDBMap([stockPrice, currencyPrice]),
         );
 
-        expect(instance.realizedDividends.toString()).toEqual('176.12 USD');
+        expect(instance.realizedDividends.toString()).toEqual('176.12 SGD');
         expect(instance.realizedDividendsInCurrency.toString()).toEqual('170.00 EUR');
       });
 

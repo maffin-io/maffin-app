@@ -5,26 +5,12 @@ import {
 } from '@testing-library/react';
 import { DataSource } from 'typeorm';
 import userEvent from '@testing-library/user-event';
-import type { SWRResponse } from 'swr';
 
 import CurrencyForm from '@/components/forms/currency/CurrencyForm';
 import { Commodity } from '@/book/entities';
-import * as apiHook from '@/hooks/api';
-import * as stocker from '@/apis/Stocker';
-
-jest.mock('@/apis/Stocker', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/apis/Stocker'),
-}));
-
-jest.mock('@/hooks/api', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/api'),
-}));
 
 describe('CurrencyForm', () => {
   let datasource: DataSource;
-  let eur: Commodity;
 
   beforeEach(async () => {
     datasource = new DataSource({
@@ -35,14 +21,6 @@ describe('CurrencyForm', () => {
       logging: false,
     });
     await datasource.initialize();
-
-    eur = await Commodity.create({
-      namespace: 'CURRENCY',
-      mnemonic: 'EUR',
-    }).save();
-
-    jest.spyOn(stocker, 'search').mockImplementation();
-    jest.spyOn(apiHook, 'useCommodities').mockReturnValue({ data: [eur] } as SWRResponse);
   });
 
   afterEach(async () => {
@@ -56,12 +34,12 @@ describe('CurrencyForm', () => {
       />,
     );
 
-    await screen.findByText('Choose or search your currency');
-    screen.getByRole('combobox', { name: 'mnemonicInput' });
+    await screen.findByText('Choose or type your currency');
+    screen.getByRole('combobox', { name: 'currency-selector' });
     expect(container).toMatchSnapshot();
   });
 
-  it('calls on save', async () => {
+  it('creates selected currency and calls on save', async () => {
     const mockSave = jest.fn();
     const user = userEvent.setup();
     render(
@@ -70,14 +48,21 @@ describe('CurrencyForm', () => {
       />,
     );
 
-    const input = await screen.findByRole('combobox', { name: 'mnemonicInput' });
+    const input = await screen.findByRole('combobox', { name: 'currency-selector' });
     await user.click(input);
-    await user.type(input, 'EU');
-    const eurOption = await screen.findByText('EUR');
-    await user.click(eurOption);
-
+    await user.click(screen.getByText('EUR'));
     await user.click(screen.getByText('Save'));
 
-    expect(mockSave).toBeCalledWith(eur);
+    const commodities = await Commodity.find();
+    expect(commodities).toEqual([
+      {
+        guid: expect.any(String),
+        mnemonic: 'EUR',
+        fullname: '',
+        namespace: 'CURRENCY',
+        cusip: null,
+      },
+    ]);
+    expect(mockSave).toBeCalledWith(commodities[0]);
   });
 });

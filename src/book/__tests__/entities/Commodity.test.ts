@@ -60,6 +60,13 @@ describe('Commodity', () => {
       instance.cusip = 'cusip';
       expect(instance.stockerId).toEqual('cusip');
     });
+
+    it('cannot create same commodity', async () => {
+      await expect(Commodity.create({
+        namespace: 'namespace',
+        mnemonic: 'mnemonic',
+      }).save()).rejects.toThrow('UNIQUE constraint failed');
+    });
   });
 
   describe('validation', () => {
