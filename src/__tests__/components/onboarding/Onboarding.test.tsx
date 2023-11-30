@@ -39,11 +39,6 @@ describe('Onboarding', () => {
       type: 'ROOT',
     }).save();
 
-    await Commodity.create({
-      mnemonic: 'EUR',
-      namespace: 'CURRENCY',
-    }).save();
-
     jest.spyOn(API, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
@@ -64,7 +59,7 @@ describe('Onboarding', () => {
     // Select main currency and create initial accounts
     await screen.findByText('Welcome!', { exact: false });
 
-    await user.click(screen.getByRole('combobox', { name: 'mnemonicInput' }));
+    await user.click(screen.getByRole('combobox', { name: 'currency-selector' }));
     await user.click(screen.getByText('EUR'));
 
     await user.click(screen.getByText('Save'));

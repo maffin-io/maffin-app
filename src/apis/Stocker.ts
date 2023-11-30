@@ -7,25 +7,6 @@ Amplify.configure(awsExports);
 
 const API_NAME = 'stocker';
 
-export async function search(
-  ticker: string,
-  type: 'EQUITY' | 'ETF' | 'MUTUALFUND' | 'CURRENCY' | undefined,
-): Promise<{ ticker: string, namespace: string, name: string } | undefined> {
-  const options = {
-    queryStringParameters: {
-      id: ticker,
-      type,
-    },
-  };
-
-  try {
-    const resp = await API.get(API_NAME, '/api/search', options);
-    return resp;
-  } catch (e) {
-    return undefined;
-  }
-}
-
 export async function getPrices(tickers: string[]): Promise<{ [key: string]:LiveSummary; }> {
   const options = {
     queryStringParameters: {

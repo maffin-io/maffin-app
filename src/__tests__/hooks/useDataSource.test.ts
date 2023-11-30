@@ -204,8 +204,6 @@ describe('useDataSource', () => {
       },
       ['guid'],
     );
-
-    expect(Commodity.create).toBeCalledTimes(3);
   });
 
   it('initializes datasource only once', async () => {

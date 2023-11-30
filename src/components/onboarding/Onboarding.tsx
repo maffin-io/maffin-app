@@ -57,19 +57,20 @@ export default function Onboarding({
                   choose the right one for you!
                 </p>
               </span>
-              <CurrencyForm
-                onSave={async (currency: Commodity) => {
-                  mutate('/api/commodities');
-                  mutate(
-                    '/api/main-currency',
-                    currency,
-                    { revalidate: false },
-                  );
-                  await createInitialAccounts(setAccounts, currency);
-                  save();
-                  setStepIndex(stepIndex + 1);
-                }}
-              />
+              <div className="flex justify-center">
+                <CurrencyForm
+                  onSave={async (currency: Commodity) => {
+                    mutate(
+                      '/api/main-currency',
+                      currency,
+                      { revalidate: false },
+                    );
+                    await createInitialAccounts(setAccounts, currency);
+                    save();
+                    setStepIndex(stepIndex + 1);
+                  }}
+                />
+              </div>
             </div>
           ),
           placement: 'center',

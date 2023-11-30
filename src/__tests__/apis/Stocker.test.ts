@@ -4,23 +4,6 @@ import { DateTime } from 'luxon';
 import * as stocker from '../../apis/Stocker';
 
 describe('Stocker', () => {
-  describe('search', () => {
-    beforeEach(() => {
-      jest.spyOn(API, 'get').mockResolvedValue({ ticker: 'ticker', namespace: 'namespace', name: 'name' });
-    });
-
-    it('calls API with expected params', async () => {
-      const result = await stocker.search('EUR', 'CURRENCY');
-
-      expect(API.get).toHaveBeenCalledWith(
-        'stocker',
-        '/api/search',
-        { queryStringParameters: { id: 'EUR', type: 'CURRENCY' } },
-      );
-      expect(result).toEqual({ ticker: 'ticker', namespace: 'namespace', name: 'name' });
-    });
-  });
-
   describe('getPrices', () => {
     beforeEach(() => {
       jest.spyOn(API, 'get').mockResolvedValue({ price: 1.23456, currency: 'USD' });

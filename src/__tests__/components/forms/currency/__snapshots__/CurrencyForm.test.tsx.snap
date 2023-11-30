@@ -7,8 +7,8 @@ exports[`CurrencyForm renders as expected 1`] = `
       class="text-sm my-5"
     >
       <div
-        class="selector css-b62m3t-container"
-        id="mnemonicInput"
+        class="selector min-w-[322px] css-b62m3t-container"
+        id="currency-selector"
       >
         <span
           class="css-1f43avz-a11yText-A11yText"
@@ -45,7 +45,7 @@ exports[`CurrencyForm renders as expected 1`] = `
               class="selector__placeholder css-1jqq78o-placeholder"
               id="react-select-2-placeholder"
             >
-              Choose or search your currency
+              Choose or type your currency
             </div>
             <div
               class="!text-inherit selector__input-container css-qbdosj-Input"
@@ -57,7 +57,7 @@ exports[`CurrencyForm renders as expected 1`] = `
                 aria-describedby="react-select-2-placeholder"
                 aria-expanded="false"
                 aria-haspopup="true"
-                aria-label="mnemonicInput"
+                aria-label="currency-selector"
                 autocapitalize="none"
                 autocomplete="off"
                 autocorrect="off"
@@ -98,7 +98,7 @@ exports[`CurrencyForm renders as expected 1`] = `
           </div>
         </div>
         <input
-          name="mnemonicInput"
+          name="currency-selector"
           type="hidden"
           value=""
         />

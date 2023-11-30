@@ -368,7 +368,7 @@ exports[`AccountForm renders as expected with add 1`] = `
               class="selector__placeholder css-1jqq78o-placeholder"
               id="react-select-4-placeholder"
             >
-              Choose or search for a new commodity
+              Choose a commodity for the account
             </div>
             <div
               class="!text-inherit selector__input-container css-qbdosj-Input"
@@ -818,7 +818,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
               class="selector__placeholder css-1jqq78o-placeholder"
               id="react-select-10-placeholder"
             >
-              Choose or search for a new commodity
+              Choose a commodity for the account
             </div>
             <div
               class="!text-inherit selector__input-container css-1h01tm3-Input"
@@ -1264,7 +1264,7 @@ exports[`AccountForm renders as expected with update 1`] = `
               class="selector__placeholder css-1jqq78o-placeholder"
               id="react-select-7-placeholder"
             >
-              Choose or search for a new commodity
+              Choose a commodity for the account
             </div>
             <div
               class="!text-inherit selector__input-container css-1h01tm3-Input"
