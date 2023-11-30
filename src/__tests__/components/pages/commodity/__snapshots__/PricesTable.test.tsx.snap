@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PricesTable renders Actions column as expected 1`] = `
+<div>
+  <div
+    data-testid="FormButton"
+  >
+    <div
+      data-testid="PriceForm"
+    />
+  </div>
+  <div
+    data-testid="FormButton"
+  >
+    <div
+      data-testid="PriceForm"
+    />
+  </div>
+</div>
+`;

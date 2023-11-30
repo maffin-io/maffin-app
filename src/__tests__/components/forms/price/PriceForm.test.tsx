@@ -253,4 +253,37 @@ describe('PriceForm', () => {
       source: null,
     });
   });
+
+  it('deletes Price and saves', async () => {
+    const user = userEvent.setup();
+    const mockSave = jest.fn();
+    const price = await Price.create({
+      fk_currency: usd,
+      fk_commodity: eur,
+      date: DateTime.fromISO('2023-01-01'),
+      valueNum: 150,
+      valueDenom: 1,
+    }).save();
+
+    render(
+      <PriceForm
+        action="delete"
+        defaultValues={{
+          ...price,
+          date: price.date.toISODate() as string,
+          value: price.value,
+        }}
+        onSave={mockSave}
+      />,
+    );
+
+    await user.click(screen.getByText('delete'));
+
+    const prices = await Price.find();
+    expect(prices).toEqual([]);
+    expect(mockSave).toBeCalledWith({
+      ...price,
+      guid: undefined,
+    });
+  });
 });

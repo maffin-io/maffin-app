@@ -7,6 +7,7 @@ import classNames from 'classnames';
 
 import { Price } from '@/book/entities';
 import { CommoditySelector } from '@/components/selectors';
+import type { Commodity } from '@/book/entities';
 import { FormValues } from './types';
 
 const resolver = classValidatorResolver(Price, { validator: { stopAtFirstError: true } });
@@ -66,6 +67,7 @@ export default function PriceForm({
                 placeholder="Convert from"
                 onChange={field.onChange}
                 isDisabled={disabled || action !== 'add'}
+                defaultValue={defaultValues?.fk_commodity as Commodity}
               />
               <p className="invalid-feedback">{fieldState.error?.message}</p>
             </>
@@ -94,6 +96,7 @@ export default function PriceForm({
                   onChange={field.onChange}
                   namespace="CURRENCY"
                   isDisabled={disabled || action !== 'add'}
+                  defaultValue={defaultValues?.fk_currency as Commodity}
                 />
                 <p className="invalid-feedback">{fieldState.error?.message}</p>
               </>
@@ -152,8 +155,10 @@ async function onSubmit(
         conflictPaths: ['fk_commodity', 'fk_currency', 'date'],
       },
     );
-    mutate(`/api/prices/${price.commodity.guid}`);
+  } else if (action === 'delete') {
+    await Price.remove(price);
   }
+  mutate(`/api/prices/${price.commodity.guid}`);
 
   onSave(price);
 }
