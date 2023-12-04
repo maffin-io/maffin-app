@@ -136,7 +136,7 @@
     "autoprefixer": "^10.4.16",
     "babel-preset-react-app": "^10.0.1",
     "copy-webpack-plugin": "^11.0.0",
-    "eslint": "^8.54.0",
+    "eslint": "^8.55.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.1.0",
     "eslint-config-next": "^13.5.6",
