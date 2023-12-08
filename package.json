@@ -37,7 +37,7 @@
     "debounce-promise": "^3.1.2",
     "dinero.js": "^2.0.0-alpha.14",
     "luxon": "^3.4.4",
-    "next": "^14.0.3",
+    "next": "^14.0.4",
     "pako": "^2.1.0",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
