@@ -203,7 +203,13 @@ export default function AccountForm({
             id="balanceInput"
             disabled={disabled}
             className="block w-full h-[38px] m-0 rounded-r-none"
-            {...form.register('balance')}
+            {...form.register(
+              'balance',
+              {
+                valueAsNumber: true,
+              },
+            )}
+            step="0.001"
             type="number"
           />
           <p className="invalid-feedback">{errors.balance?.message}</p>

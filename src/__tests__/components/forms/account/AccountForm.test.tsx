@@ -364,7 +364,7 @@ describe('AccountForm', () => {
     await user.click(screen.getByRole('combobox', { name: 'typeInput' }));
     await user.click(screen.getByText('BANK'));
 
-    await user.type(screen.getByLabelText('Opening balance'), '1000');
+    await user.type(screen.getByLabelText('Opening balance'), '1000.10');
     await user.clear(screen.getByLabelText('When'));
     await user.type(screen.getByLabelText('When'), '2023-01-01');
 
@@ -406,19 +406,19 @@ describe('AccountForm', () => {
         accountId: account.guid,
         action: '',
         guid: expect.any(String),
-        quantityDenom: 1,
-        quantityNum: 1000,
-        valueDenom: 1,
-        valueNum: 1000,
+        quantityDenom: 10,
+        quantityNum: 10001,
+        valueDenom: 10,
+        valueNum: 10001,
       },
       {
         accountId: equity.guid,
         action: '',
         guid: expect.any(String),
-        quantityDenom: 1,
-        quantityNum: -1000,
-        valueDenom: 1,
-        valueNum: -1000,
+        quantityDenom: 10,
+        quantityNum: -10001,
+        valueDenom: 10,
+        valueNum: -10001,
       },
     ]);
 
