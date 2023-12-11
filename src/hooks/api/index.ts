@@ -69,11 +69,14 @@ export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
   return result;
 }
 
-export function useInvestments(): SWRResponse<InvestmentAccount[]> {
-  const key = '/api/investments';
+export function useInvestments(guid?: string): SWRResponse<InvestmentAccount[]> {
+  let key = '/api/investments';
+  if (guid) {
+    key = `${key}/${guid}`;
+  }
   const result = useSWRImmutable(
     key,
-    fetcher(queries.getInvestments, key),
+    fetcher(() => queries.getInvestments(guid), key),
   );
   if (result.error) {
     throw new Error(result.error);
