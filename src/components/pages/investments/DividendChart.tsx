@@ -174,10 +174,10 @@ function buildData(
   if (allDividends.length) {
     startDate = DateTime.fromMillis(
       Math.min(...(allDividends.map(dividend => dividend.when.toMillis()))),
-    );
+    ) as DateTime<true>;
     endDate = DateTime.fromMillis(
       Math.max(...(allDividends.map(dividend => dividend.when.toMillis()))),
-    );
+    ) as DateTime<true>;
   }
 
   const interval = Interval.fromDateTimes(startDate, endDate);

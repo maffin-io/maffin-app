@@ -287,6 +287,7 @@ exports[`AccountForm renders as expected with add 1`] = `
           class="block w-full h-[38px] m-0 rounded-r-none"
           id="balanceInput"
           name="balance"
+          step="0.001"
           type="number"
         />
         <p
@@ -736,6 +737,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
           disabled=""
           id="balanceInput"
           name="balance"
+          step="0.001"
           type="number"
         />
         <p
@@ -1182,6 +1184,7 @@ exports[`AccountForm renders as expected with update 1`] = `
           class="block w-full h-[38px] m-0 rounded-r-none"
           id="balanceInput"
           name="balance"
+          step="0.001"
           type="number"
         />
         <p
