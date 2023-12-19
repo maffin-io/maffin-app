@@ -22,12 +22,12 @@ export default class PriceDBMap {
 
   getPrice(from: string, to: string, when: DateTime): Price {
     if (from === to) {
-      return Price.create({
-        guid: 'tmp_guid',
-        date: DateTime.now(),
-        valueNum: 1,
-        valueDenom: 1,
-      });
+      const p = new Price();
+      p.guid = 'tmp_guid';
+      p.date = DateTime.now();
+      p.valueNum = 1;
+      p.valueDenom = 1;
+      return p;
     }
 
     let key = `${from}.${to}.${when.toISODate()}`;

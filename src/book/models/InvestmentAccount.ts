@@ -138,7 +138,7 @@ export default class InvestmentAccount {
     );
   }
 
-  processSplits(): void {
+  processSplits(date?: DateTime): void {
     this._avgPrice = 0;
     this._avgPriceInCurrency = 0;
     this.quantity = new Money(0, this.account.commodity.mnemonic);
@@ -148,7 +148,9 @@ export default class InvestmentAccount {
       (a, b) => a.transaction.date.toMillis() - b.transaction.date.toMillis(),
     );
 
-    sortedSplits.forEach((split) => {
+    sortedSplits.filter(
+      split => split.transaction.date <= (date || DateTime.now()),
+    ).forEach((split) => {
       const numSplits = split.transaction.splits.length;
 
       if (InvestmentAccount.isBuy(numSplits, split)) {

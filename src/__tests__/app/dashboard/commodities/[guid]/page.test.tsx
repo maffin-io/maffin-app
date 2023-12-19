@@ -129,6 +129,7 @@ describe('CommodityPage', () => {
           },
           fk_currency: undefined,
         },
+        hideDefaults: true,
       },
       {},
     );
@@ -232,6 +233,7 @@ describe('CommodityPage', () => {
             mnemonic: 'USD',
           },
         },
+        hideDefaults: true,
       },
       {},
     );

@@ -87,6 +87,7 @@ export default function CommodityPage({ params }: CommodityPageProps): JSX.Eleme
                   fk_commodity: commodity,
                   fk_currency: commodityCurrency,
                 }}
+                hideDefaults
               />
             </FormButton>
             <FormButton

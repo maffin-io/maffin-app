@@ -1,0 +1,50 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AccountInfo renders as expected when no splits 1`] = `
+<div>
+  <div
+    class="grid grid-cols-12"
+  >
+    <div
+      class="col-span-6"
+    >
+      <div
+        class="grid grid-cols-12"
+      >
+        <div
+          class="col-span-6"
+        >
+          <div
+            data-testid="StatisticsWidget"
+          />
+        </div>
+        <div
+          class="col-span-6"
+        >
+          <div
+            data-testid="StatisticsWidget"
+          />
+        </div>
+        <div
+          class="card col-span-12"
+        >
+          <div
+            data-testid="TotalLineChart"
+          />
+        </div>
+      </div>
+    </div>
+    <div
+      class="card col-span-6"
+    >
+      <div
+        class="flex h-full items-center"
+      >
+        <div
+          data-testid="SplitsHistogram"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;

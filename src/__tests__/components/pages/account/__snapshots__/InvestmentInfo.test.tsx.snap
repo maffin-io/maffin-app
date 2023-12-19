@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`InvestmentInfo renders as expected 1`] = `
+<div>
+  <div
+    class="grid grid-cols-12"
+  >
+    <div
+      class="card col-span-8"
+    >
+      <div
+        data-testid="InvestmentChart"
+      />
+    </div>
+  </div>
+</div>
+`;
