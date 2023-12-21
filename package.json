@@ -22,7 +22,7 @@
     "@dinero.js/currencies": "^2.0.0-alpha.14",
     "@fontsource/inter": "^5.0.16",
     "@hookform/resolvers": "^3.3.2",
-    "@tanstack/react-table": "^8.10.7",
+    "@tanstack/react-table": "^8.11.2",
     "@testing-library/jest-dom": "^6.1.5",
     "aws-amplify": "^5.3.12",
     "chart.js": "^4.4.1",
