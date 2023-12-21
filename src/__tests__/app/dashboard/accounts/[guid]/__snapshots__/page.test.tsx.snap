@@ -57,77 +57,8 @@ exports[`AccountPage renders as expected with account 1`] = `
     </div>
   </div>
   <div
-    class="grid grid-cols-12"
-  >
-    <div
-      class="col-span-6"
-    >
-      <div
-        class="grid grid-cols-12"
-      >
-        <div
-          class="col-span-6"
-        >
-          <div
-            class="card mr-2 p-6"
-          >
-            <p>
-              You have a total of
-            </p>
-            <p
-              class=" text-2xl font-semibold my-3"
-            >
-              €100.00
-            </p>
-            <span
-              class="text-sm"
-            >
-              with an average of €100.00 per month
-            </span>
-          </div>
-        </div>
-        <div
-          class="col-span-6"
-        >
-          <div
-            class="card  p-6"
-          >
-            <p>
-              This year you have
-            </p>
-            <p
-              class=" text-2xl font-semibold my-3"
-            >
-              €100.00
-            </p>
-            <span
-              class="text-sm"
-            >
-              in this account
-            </span>
-          </div>
-        </div>
-        <div
-          class="card col-span-12"
-        >
-          <div
-            data-testid="TotalLineChart"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      class="card col-span-6"
-    >
-      <div
-        class="flex h-full items-center"
-      >
-        <div
-          data-testid="SplitsHistogram"
-        />
-      </div>
-    </div>
-  </div>
+    data-testid="AccountInfo"
+  />
   <div
     class="card p-0 mt-4 bg-light-100 dark:bg-dark-800"
   >

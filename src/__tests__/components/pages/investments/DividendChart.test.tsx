@@ -22,7 +22,7 @@ describe('DividendChart', () => {
   const now = DateTime.fromISO('2023-01-02');
 
   beforeEach(() => {
-    jest.spyOn(DateTime, 'now').mockReturnValue(now);
+    jest.spyOn(DateTime, 'now').mockReturnValue(now as DateTime<true>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as SWRResponse);
     jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as SWRResponse);
   });

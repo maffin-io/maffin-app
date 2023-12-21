@@ -5656,6 +5656,11 @@ chartjs-chart-treemap@^2.3.0:
   resolved "https://registry.yarnpkg.com/chartjs-chart-treemap/-/chartjs-chart-treemap-2.3.0.tgz#3351a5524d4bd84bbda294dc3e43e0607e859a92"
   integrity sha512-Q7jyqSXSg1OfmaOUOKtk7+JCu/gsb1AIXhW+JgKnmuYvu0runzgne77HVSVjb+LN93wSKylmR2J4HL2flgEHEw==
 
+chartjs-plugin-annotation@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/chartjs-plugin-annotation/-/chartjs-plugin-annotation-3.0.1.tgz#4cf51d9797bf3202788ca0beae8694404621ad19"
+  integrity sha512-hlIrXXKqSDgb+ZjVYHefmlZUXK8KbkCPiynSVrTb/HjTMkT62cOInaT1NTQCKtxKKOm9oHp958DY3RTAFKtkHg==
+
 chartjs-plugin-autocolors@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/chartjs-plugin-autocolors/-/chartjs-plugin-autocolors-0.2.2.tgz#33cfbe21645125b1572dc7cc7c7d92dc7806acd3"

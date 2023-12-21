@@ -50,9 +50,11 @@ export default function PricesChart({
           x: {
             type: 'time',
             time: {
-              unit: 'day',
-              round: 'day',
+              unit: 'month',
               tooltipFormat: 'dd MMMM yyyy',
+              displayFormats: {
+                month: 'MMM-yy',
+              },
             },
             grid: {
               display: false,

@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import * as swrImmutable from 'swr/immutable';
 
-import { Commodity } from '@/book/entities';
+import { Commodity, Price } from '@/book/entities';
 import { PriceDB, PriceDBMap } from '@/book/prices';
 import * as API from '@/hooks/api';
 import * as queries from '@/lib/queries';
@@ -129,5 +129,35 @@ describe('API', () => {
     );
 
     expect(getUserModule.default).toBeCalledTimes(1);
+  });
+
+  it('calls useSWRImmutable with expected params for usePrices', () => {
+    const priceMock = jest.spyOn(Price, 'find').mockImplementation();
+    renderHook(() => API.usePrices('guid'));
+
+    expect(swrImmutable.default).toBeCalledWith(
+      '/api/prices/guid',
+      expect.any(Function),
+    );
+    expect(priceMock).toBeCalledWith({
+      order: {
+        date: 'ASC',
+      },
+      where: {
+        fk_commodity: {
+          guid: 'guid',
+        },
+      },
+    });
+  });
+
+  it('calls useSWRImmutable with expected params for useInvestments when guid passed', () => {
+    renderHook(() => API.useInvestments('guid'));
+
+    expect(swrImmutable.default).toBeCalledWith(
+      '/api/investments/guid',
+      expect.any(Function),
+    );
+    expect(queries.getInvestments).toBeCalledWith('guid');
   });
 });

@@ -13,8 +13,7 @@ import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import { Account, Split } from '@/book/entities';
 import * as apiHook from '@/hooks/api';
 import {
-  SplitsHistogram,
-  TotalLineChart,
+  AccountInfo,
   TransactionsTable,
 } from '@/components/pages/account';
 
@@ -43,12 +42,12 @@ jest.mock('@/components/pages/account/TransactionsTable', () => jest.fn(
   () => <div data-testid="TransactionsTable" />,
 ));
 
-jest.mock('@/components/pages/account/SplitsHistogram', () => jest.fn(
-  () => <div data-testid="SplitsHistogram" />,
+jest.mock('@/components/pages/account/AccountInfo', () => jest.fn(
+  () => <div data-testid="AccountInfo" />,
 ));
 
-jest.mock('@/components/pages/account/TotalLineChart', () => jest.fn(
-  () => <div data-testid="TotalLineChart" />,
+jest.mock('@/components/pages/account/InvestmentInfo', () => jest.fn(
+  () => <div data-testid="InvestmentInfo" />,
 ));
 
 jest.mock('@/components/Loading', () => jest.fn(
@@ -195,18 +194,32 @@ describe('AccountPage', () => {
       },
       {},
     );
-    expect(SplitsHistogram).toHaveBeenLastCalledWith(
-      {
-        account: accounts.guid,
-      },
-      {},
-    );
-    expect(TotalLineChart).toHaveBeenLastCalledWith(
+    expect(AccountInfo).toHaveBeenLastCalledWith(
       {
         account: accounts.guid,
       },
       {},
     );
     expect(container).toMatchSnapshot();
+  });
+
+  it('shows investment info when account is stock', async () => {
+    const accounts = {
+      guid: {
+        guid: 'guid',
+        path: 'path',
+        type: 'STOCK',
+        commodity: {
+          mnemonic: 'EUR',
+        },
+      } as Account,
+    };
+
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValueOnce({ data: accounts } as SWRResponse);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValueOnce({ data: [] } as SWRResponse);
+
+    render(<AccountPage params={{ guid: 'guid' }} />);
+
+    await screen.findByTestId('InvestmentInfo');
   });
 });

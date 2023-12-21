@@ -3,13 +3,13 @@ import { InvestmentAccount } from '@/book/models';
 import { PriceDB, PriceDBMap } from '@/book/prices';
 import getMainCurrency from '@/lib/queries/getMainCurrency';
 
-export default async function getInvestments(): Promise<InvestmentAccount[]> {
+export default async function getInvestments(guid?: string): Promise<InvestmentAccount[]> {
   const mainCurrency = (await getMainCurrency()).mnemonic;
   const [accounts, todayPrices, mainCurrencyPrices] = await Promise.all([
     Account.find({
       where: [
-        { type: 'STOCK' },
-        { type: 'MUTUAL' },
+        { guid, type: 'STOCK' },
+        { guid, type: 'MUTUAL' },
       ],
       relations: {
         // This is very similar to `getSplits` query. In the future

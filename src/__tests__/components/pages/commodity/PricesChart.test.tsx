@@ -63,9 +63,11 @@ describe('TotalLineChart', () => {
                 display: false,
               },
               time: {
-                round: 'day',
-                unit: 'day',
+                unit: 'month',
                 tooltipFormat: 'dd MMMM yyyy',
+                displayFormats: {
+                  month: 'MMM-yy',
+                },
               },
               type: 'time',
             },

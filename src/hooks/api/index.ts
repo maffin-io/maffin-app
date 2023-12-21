@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 import { SWRResponse } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
-import { Commodity } from '@/book/entities';
+import { Commodity, Price } from '@/book/entities';
 import { PriceDB, PriceDBMap } from '@/book/prices';
 import { InvestmentAccount } from '@/book/models';
 import * as queries from '@/lib/queries';
@@ -69,11 +69,14 @@ export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
   return result;
 }
 
-export function useInvestments(): SWRResponse<InvestmentAccount[]> {
-  const key = '/api/investments';
+export function useInvestments(guid?: string): SWRResponse<InvestmentAccount[]> {
+  let key = '/api/investments';
+  if (guid) {
+    key = `${key}/${guid}`;
+  }
   const result = useSWRImmutable(
     key,
-    fetcher(queries.getInvestments, key),
+    fetcher(() => queries.getInvestments(guid), key),
   );
   if (result.error) {
     throw new Error(result.error);
@@ -87,6 +90,29 @@ export function useSplits(guid: string): SWRResponse<Split[]> {
   return useSWRImmutable(
     key,
     fetcher(async () => queries.getSplits(guid), key),
+  );
+}
+
+/**
+ * Returns prices for a given commodity
+ */
+export function usePrices(guid: string): SWRResponse<Price[]> {
+  const key = `/api/prices/${guid}`;
+  return useSWRImmutable(
+    key,
+    fetcher(
+      async () => Price.find({
+        where: {
+          fk_commodity: {
+            guid,
+          },
+        },
+        order: {
+          date: 'ASC',
+        },
+      }),
+      key,
+    ),
   );
 }
 

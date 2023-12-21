@@ -124,4 +124,42 @@ describe('getInvestments', () => {
     expect(mockGetHistory).toHaveBeenCalledWith('EUR');
     expect(InvestmentAccount).toHaveBeenCalledWith(account, 'EUR', new PriceDBMap([price2, price1]));
   });
+
+  it('retrieves specific account when guid passed', async () => {
+    const account = Account.create({
+      guid: 'guid',
+      name: 'TICKER',
+      type: 'STOCK',
+      fk_commodity: {
+        mnemonic: 'EUR',
+      },
+      parent: jest.fn(),
+    });
+    mockAccountFind = jest.spyOn(Account, 'find').mockResolvedValue([account]);
+
+    await getInvestments('guid');
+
+    expect(mockAccountFind).toHaveBeenCalledWith({
+      where: [
+        { guid: 'guid', type: 'STOCK' },
+        { guid: 'guid', type: 'MUTUAL' },
+      ],
+      relations: {
+        splits: {
+          fk_transaction: {
+            splits: {
+              fk_account: true,
+            },
+          },
+        },
+      },
+      order: {
+        splits: {
+          fk_transaction: {
+            date: 'ASC',
+          },
+        },
+      },
+    });
+  });
 });

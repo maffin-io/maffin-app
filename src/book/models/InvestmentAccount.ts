@@ -138,7 +138,7 @@ export default class InvestmentAccount {
     );
   }
 
-  processSplits(): void {
+  processSplits(date?: DateTime): void {
     this._avgPrice = 0;
     this._avgPriceInCurrency = 0;
     this.quantity = new Money(0, this.account.commodity.mnemonic);
@@ -148,20 +148,22 @@ export default class InvestmentAccount {
       (a, b) => a.transaction.date.toMillis() - b.transaction.date.toMillis(),
     );
 
-    sortedSplits.forEach((split) => {
+    sortedSplits.filter(
+      split => split.transaction.date <= (date || DateTime.now()),
+    ).forEach((split) => {
       const numSplits = split.transaction.splits.length;
 
-      if (numSplits > 1 && split.value > 0 && split.quantity > 0) {
+      if (InvestmentAccount.isBuy(numSplits, split)) {
         this._buy(split);
         return;
       }
 
-      if (numSplits > 1 && split.value < 0 && split.quantity < 0) {
+      if (InvestmentAccount.isSell(numSplits, split)) {
         this._sell(split);
         return;
       }
 
-      if (numSplits === 1 && split.value === 0 && split.quantity > 0) {
+      if (InvestmentAccount.isSplit(numSplits, split)) {
         this._split(split);
         return;
       }
@@ -181,6 +183,18 @@ export default class InvestmentAccount {
 
       throw new Error(`Dont know how to process ${this.account.name} transaction '${split.transaction.guid}'`);
     });
+  }
+
+  static isBuy(numSplits: number, split: Split): boolean {
+    return numSplits > 1 && split.value > 0 && split.quantity > 0;
+  }
+
+  static isSell(numSplits: number, split: Split): boolean {
+    return numSplits > 1 && split.value < 0 && split.quantity < 0;
+  }
+
+  static isSplit(numSplits: number, split: Split): boolean {
+    return numSplits === 1 && split.value === 0 && split.quantity > 0;
   }
 
   /**
