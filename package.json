@@ -33,7 +33,7 @@
     "chartjs-plugin-datalabels": "^2.2.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
-    "classnames": "^2.3.1",
+    "classnames": "^2.4.0",
     "dayjs": "^1.11.10",
     "debounce-promise": "^3.1.2",
     "dinero.js": "^2.0.0-alpha.14",
