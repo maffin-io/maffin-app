@@ -1,10 +1,47 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`InvestmentInfo renders as expected 1`] = `
+exports[`InvestmentInfo renders as expected with data 1`] = `
 <div>
   <div
     class="grid grid-cols-12"
   >
+    <div
+      class="col-span-4"
+    >
+      <div
+        class="card text-lg"
+      >
+        <span>
+          You currently owe
+        </span>
+        <span
+          class="badge text-xl font-semibold mx-1"
+        >
+          10 titles
+        </span>
+        <span>
+          at an average price of
+        </span>
+        <span
+          class="badge text-xl font-semibold mx-1"
+        >
+          €10.00
+        </span>
+      </div>
+      <div
+        class="grid grid-cols-12"
+      >
+        <div
+          data-testid="StatisticsWidget"
+        />
+        <div
+          data-testid="StatisticsWidget"
+        />
+        <div
+          data-testid="StatisticsWidget"
+        />
+      </div>
+    </div>
     <div
       class="card col-span-8"
     >
