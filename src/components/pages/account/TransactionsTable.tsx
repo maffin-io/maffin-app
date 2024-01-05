@@ -85,6 +85,7 @@ const columns: ColumnDef<Split>[] = [
     enableSorting: false,
     cell: ({ row }) => {
       const tx = row.original.transaction;
+      const originalSplit = tx.splits.find(split => split.guid === row.original.guid) as Split;
       const defaultValues = {
         ...tx,
         date: tx.date.toISODate() as string,
@@ -93,11 +94,18 @@ const columns: ColumnDef<Split>[] = [
         // class to the form, then we have reference errors as when
         // we update the form, it also updates the defaultValues
         // which means formState.isDirty is not triggered properly
-        splits: tx.splits.map(split => ({
-          ...split,
-          value: split.value,
-          quantity: split.quantity,
-        } as Split)),
+        splits: [
+          {
+            ...originalSplit,
+            value: originalSplit.value,
+            quantity: originalSplit.quantity,
+          },
+          ...tx.splits.filter(split => split.guid !== originalSplit.guid).map(split => ({
+            ...split,
+            value: split.value,
+            quantity: split.quantity,
+          } as Split)),
+        ] as Split[],
       };
       return (
         <>
