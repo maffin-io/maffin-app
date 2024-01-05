@@ -40,6 +40,9 @@ exports[`InvestmentInfo renders as expected with data 1`] = `
         <div
           data-testid="StatisticsWidget"
         />
+        <div
+          data-testid="StatisticsWidget"
+        />
       </div>
     </div>
     <div
