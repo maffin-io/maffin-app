@@ -124,7 +124,7 @@
     "@types/gapi.client.people": "^1.0.5",
     "@types/google.accounts": "^0.0.14",
     "@types/jest": "^29.5.5",
-    "@types/luxon": "^3.3.7",
+    "@types/luxon": "^3.3.8",
     "@types/node": "^20.10.6",
     "@types/pako": "^2.0.3",
     "@types/react": "18.2.46",
