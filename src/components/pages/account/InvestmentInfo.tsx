@@ -24,11 +24,6 @@ export default function InvestmentInfo({
   }
 
   prices = prices || [];
-
-  const profitAbsWithDividends = investment.profitAbs.add(investment.realizedDividends);
-  const profitPctWithDividends = (
-    profitAbsWithDividends.toNumber() / investment.cost.toNumber()
-  ) * 100;
   const latestPrice = prices[prices.length - 1];
 
   return (
@@ -63,16 +58,21 @@ export default function InvestmentInfo({
             }
           />
           <StatisticsWidget
-            className="col-span-8"
+            className="col-span-7"
             statsTextClass={classNames({
               'amount-positive': investment.profitPct >= 0,
               'amount-negative': investment.profitPct < 0,
             })}
             title="Unrealized Profit"
             stats={`${investment.profitAbs.format()} (${toFixed(investment.profitPct)}%)`}
-            description={
-              `${profitAbsWithDividends.format()} (${toFixed(profitPctWithDividends)}%) with dividends`
-            }
+            description=""
+          />
+          <StatisticsWidget
+            className="col-span-5"
+            title="Total Dividends"
+            stats={investment.realizedDividends.format()}
+            statsTextClass="badge"
+            description=""
           />
         </div>
       </div>
