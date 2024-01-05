@@ -8,7 +8,7 @@ exports[`Footer renders as expected 1`] = `
     <div
       class="w-full flex justify-end bg-white dark:bg-dark-700 text-sm px-5"
     >
-      2023
+      2024
       ©
        
       maffin.io

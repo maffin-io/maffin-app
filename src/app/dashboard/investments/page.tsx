@@ -87,7 +87,7 @@ export default function InvestmentsPage(): JSX.Element {
               <StatisticsWidget
                 className="mr-2"
                 title="Value/Cost"
-                stats={`${totalValue.format()}`}
+                stats={totalValue.format()}
                 description={
                   `${totalCost.format()} total invested`
                 }

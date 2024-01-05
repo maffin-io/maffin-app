@@ -20,6 +20,7 @@ jest.mock('@/hooks/api', () => ({
 describe('SplitsHistogram', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-12-31') as DateTime<true>);
   });
 
   afterEach(() => {

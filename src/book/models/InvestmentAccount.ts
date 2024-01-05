@@ -143,6 +143,7 @@ export default class InvestmentAccount {
     this._avgPriceInCurrency = 0;
     this.quantity = new Money(0, this.account.commodity.mnemonic);
     this.realizedProfit = new Money(0, this.currency);
+    this.dividends.splice(0, this.dividends.length);
 
     const sortedSplits = this.account.splits.sort(
       (a, b) => a.transaction.date.toMillis() - b.transaction.date.toMillis(),

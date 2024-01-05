@@ -1,6 +1,7 @@
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import classNames from 'classnames';
+import Link from 'next/link';
 
 import { toFixed, moneyToString } from '@/helpers/number';
 import Table from '@/components/Table';
@@ -41,9 +42,12 @@ const columns: ColumnDef<InvestmentAccount>[] = [
     enableSorting: false,
     cell: ({ row, getValue }) => (
       <p className="m-0 d-inline-block align-middle font-18">
-        <span className="badge bg-light">
+        <Link
+          href={`/dashboard/accounts/${row.original.account.guid}`}
+          className="badge hover:text-slate-300 bg-light"
+        >
           {getValue<string>()}
-        </span>
+        </Link>
         <br />
         <span className="font-14">
           {row.original.quantity.toNumber()}
