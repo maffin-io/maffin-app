@@ -58,7 +58,7 @@ export default function CommodityPage({ params }: CommodityPageProps): JSX.Eleme
       byCurrency[price.currency.guid].push(price);
     });
   }
-  const commodityCurrency = commodity.namespace !== 'CURRENCY' ? prices?.[0].fk_currency || undefined : undefined;
+  const commodityCurrency = commodity.namespace !== 'CURRENCY' ? prices?.[0]?.fk_currency || undefined : undefined;
 
   return (
     <>

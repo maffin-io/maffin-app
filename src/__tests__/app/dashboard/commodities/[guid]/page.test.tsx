@@ -75,6 +75,21 @@ describe('CommodityPage', () => {
     expect(container).toMatchSnapshot();
   });
 
+  it('loads when no prices', async () => {
+    jest.spyOn(apiHook, 'useCommodities').mockReturnValue(
+      { data: [{ guid: 'guid', mnemonic: 'EUR' } as Commodity] } as SWRResponse,
+    );
+    jest.spyOn(Price, 'findBy').mockResolvedValue([]);
+
+    render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <CommodityPage params={{ guid: 'guid' }} />
+      </SWRConfig>,
+    );
+
+    await screen.findByText('EUR');
+  });
+
   it('renders as expected with commodity', async () => {
     jest.spyOn(apiHook, 'useCommodities').mockReturnValue(
       { data: [{ guid: 'guid', mnemonic: 'EUR' } as Commodity] } as SWRResponse,

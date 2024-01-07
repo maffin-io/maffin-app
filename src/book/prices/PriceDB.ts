@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { Not } from 'typeorm';
+import { Not, In } from 'typeorm';
 
 import { toAmountWithScale } from '@/helpers/number';
 import { getPrices, LiveSummary } from '@/apis/Stocker';
@@ -127,9 +127,9 @@ async function getCurrencyQuotes(): Promise<Price[]> {
 }
 
 async function getInvestmentQuotes(): Promise<Price[]> {
-  const commodities = await Commodity.findBy({
-    namespace: Not('CURRENCY'),
-  });
+  const commodities = await Commodity.findBy(
+    { namespace: Not(In(['CURRENCY', 'CUSTOM'])) },
+  );
   const currencies = await Commodity.findBy({
     namespace: 'CURRENCY',
   });
