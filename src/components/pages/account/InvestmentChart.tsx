@@ -26,6 +26,14 @@ export default function InvestmentChart({
     return <Loading />;
   }
 
+  if (!investment.account.splits.length) {
+    return (
+      <div className="flex h-full text-sm place-content-center place-items-center">
+        <span>You don&apos;t have any transactions for this investment yet!</span>
+      </div>
+    );
+  }
+
   const startDate = investment.account.splits[0].transaction.date;
   prices = prices || [];
   const currency = (prices.length && prices[0].currency.mnemonic) || '';
