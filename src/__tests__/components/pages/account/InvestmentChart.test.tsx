@@ -51,6 +51,60 @@ describe('InvestmentChart', () => {
     await screen.findByTestId('Loading');
   });
 
+  it('displays no txs message when no splits', async () => {
+    const eur = {
+      guid: 'eur_guid',
+      mnemonic: 'EUR',
+    };
+    jest.spyOn(apiHook, 'usePrices').mockReturnValue({
+      data: [
+        {
+          date: DateTime.fromISO('2023-01-01'),
+          value: 100,
+          currency: eur,
+        },
+      ],
+    } as SWRResponse);
+
+    const account = {
+      guid: 'guid',
+      commodity: {
+        guid: 'googl_guid',
+        mnemonic: 'GOOGL',
+      },
+      splits: [] as Split[],
+    } as Account;
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({
+      data: [
+        new InvestmentAccount(
+          account,
+          'EUR',
+          new PriceDBMap([
+            // @ts-ignore
+            {
+              date: DateTime.now(),
+              value: 100,
+              fk_commodity: account.commodity,
+              commodity: account.commodity,
+              fk_currency: eur,
+              currency: eur,
+              quoteInfo: 'maffin::',
+            } as Price,
+          ]),
+        ),
+      ],
+    } as SWRResponse);
+    jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-02-02') as DateTime<true>);
+
+    render(
+      <InvestmentChart
+        account={account}
+      />,
+    );
+
+    await screen.findByText('You don\'t have any transactions for this investment yet!');
+  });
+
   it('builds chart with expected data', () => {
     const eur = {
       guid: 'eur_guid',
