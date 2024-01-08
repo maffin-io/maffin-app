@@ -1,5 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import * as swrImmutable from 'swr/immutable';
+import * as swr from 'swr';
+import { BareFetcher, SWRResponse } from 'swr';
 
 import { Commodity, Price } from '@/book/entities';
 import { PriceDB, PriceDBMap } from '@/book/prices';
@@ -7,7 +9,9 @@ import * as API from '@/hooks/api';
 import * as queries from '@/lib/queries';
 import * as gapiHooks from '@/hooks/useGapiClient';
 import * as getUserModule from '@/lib/getUser';
-import { BareFetcher, SWRResponse } from 'swr';
+import { InvestmentAccount } from '@/book/models';
+
+jest.mock('swr');
 
 jest.mock('@/lib/queries');
 
@@ -58,7 +62,6 @@ describe('API', () => {
     ['useLatestTxs', '/api/txs/latest', queries.getLatestTxs],
     ['useAccounts', '/api/accounts', queries.getAccounts],
     ['useInvestments', '/api/investments', queries.getInvestments],
-    ['useTodayPrices', '/api/prices/today', jest.spyOn(PriceDB, 'getTodayQuotes')],
   ])('calls useSWRImmutable with expected params for %s', (name, key, f) => {
     // @ts-ignore
     renderHook(() => API[name]());
@@ -132,23 +135,26 @@ describe('API', () => {
   });
 
   it('calls useSWRImmutable with expected params for usePrices', () => {
-    const priceMock = jest.spyOn(Price, 'find').mockImplementation();
     renderHook(() => API.usePrices('guid'));
 
     expect(swrImmutable.default).toBeCalledWith(
       '/api/prices/guid',
       expect.any(Function),
     );
-    expect(priceMock).toBeCalledWith({
-      order: {
-        date: 'ASC',
-      },
-      where: {
-        fk_commodity: {
-          guid: 'guid',
-        },
-      },
-    });
+    expect(queries.getPrices).toBeCalledWith('guid');
+  });
+
+  it('useInvestments mutates keys when no guid is passed', () => {
+    jest.spyOn(swrImmutable, 'default').mockReturnValue({
+      data: [
+        { account: { guid: '1' } } as InvestmentAccount,
+        { account: { guid: '2' } } as InvestmentAccount,
+      ],
+    } as SWRResponse);
+    renderHook(() => API.useInvestments());
+
+    expect(swr.mutate).toBeCalledWith('/api/investments/1', [{ account: { guid: '1' } }]);
+    expect(swr.mutate).toBeCalledWith('/api/investments/2', [{ account: { guid: '2' } }]);
   });
 
   it('calls useSWRImmutable with expected params for useInvestments when guid passed', () => {

@@ -24,6 +24,7 @@ export default class InvestmentAccount {
   private _priceDBMap: PriceDBMap;
 
   constructor(account: Account, mainCurrency: string, priceDBMap: PriceDBMap) {
+    console.log(priceDBMap.map);
     this.account = account;
     this.mainCurrency = mainCurrency;
 

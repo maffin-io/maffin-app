@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { SWRResponse } from 'swr';
+import { mutate, SWRResponse } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
 import { Commodity, Price } from '@/book/entities';
@@ -55,7 +55,10 @@ export function useAccounts(): SWRResponse<AccountsMap> {
 
 export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
   const { data: accounts } = useAccounts();
-  const { data: todayPrices } = useTodayPrices();
+  const { data: todayPrices } = useSWRImmutable(
+    '/api/prices/today',
+    fetcher(PriceDB.getTodayQuotes, '/api/prices/today'),
+  );
 
   const key = '/api/monthly-totals';
   const result = useSWRImmutable(
@@ -78,8 +81,15 @@ export function useInvestments(guid?: string): SWRResponse<InvestmentAccount[]> 
     key,
     fetcher(() => queries.getInvestments(guid), key),
   );
+
   if (result.error) {
     throw new Error(result.error);
+  }
+
+  if (result.data && !guid) {
+    result.data.forEach(
+      (investment: InvestmentAccount) => mutate(`/api/investments/${investment.account.guid}`, [investment]),
+    );
   }
 
   return result;
@@ -100,27 +110,7 @@ export function usePrices(guid: string): SWRResponse<Price[]> {
   const key = `/api/prices/${guid}`;
   return useSWRImmutable(
     key,
-    fetcher(
-      async () => Price.find({
-        where: {
-          fk_commodity: {
-            guid,
-          },
-        },
-        order: {
-          date: 'ASC',
-        },
-      }),
-      key,
-    ),
-  );
-}
-
-export function useTodayPrices(): SWRResponse<PriceDBMap> {
-  const key = '/api/prices/today';
-  return useSWRImmutable(
-    key,
-    fetcher(PriceDB.getTodayQuotes, key),
+    fetcher(async () => queries.getPrices(guid), key),
   );
 }
 

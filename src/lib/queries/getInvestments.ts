@@ -2,6 +2,7 @@ import { Account } from '@/book/entities';
 import { InvestmentAccount } from '@/book/models';
 import { PriceDB, PriceDBMap } from '@/book/prices';
 import getMainCurrency from '@/lib/queries/getMainCurrency';
+import getPrices from '@/lib/queries/getPrices';
 
 export default async function getInvestments(guid?: string): Promise<InvestmentAccount[]> {
   const mainCurrency = (await getMainCurrency()).mnemonic;
