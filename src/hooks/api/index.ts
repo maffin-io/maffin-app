@@ -136,17 +136,11 @@ export function useInvestment(guid: string): SWRResponse<InvestmentAccount> {
 
   const result = useSWRImmutable(
     key,
-    fetcher(() => queries.getInvestments(guid), key),
+    fetcher(() => queries.getInvestment(guid), key),
   );
 
   if (result.error) {
     throw new Error(result.error);
-  }
-
-  if (result.data && !guid) {
-    result.data.forEach(
-      (investment: InvestmentAccount) => mutate(`/api/investments/${investment.account.guid}`, [investment]),
-    );
   }
 
   return result;
@@ -192,7 +186,7 @@ export function usePrices(guid: string): SWRResponse<Price[]> {
   const key = `/api/prices/${guid}`;
   return useSWRImmutable(
     key,
-    fetcher(async () => queries.getPrices(guid), key),
+    fetcher(async () => queries.getPrices({ from: guid }), key),
   );
 }
 

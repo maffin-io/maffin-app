@@ -26,28 +26,6 @@ export async function getTodayQuotes(): Promise<PriceDBMap> {
   ]);
 }
 
-/**
- * Scans Price data to return all the historical data for a given commodity
- * specified as 'from'.
- *
- * @param to - the commodity to convert to
- * @returns - object where key is from.to.date and value is the Price object
- */
-export async function getHistory(to: string): Promise<PriceDBMap> {
-  const start = performance.now();
-  const prices = await Price
-    .createQueryBuilder('prices')
-    .leftJoinAndSelect('prices.fk_commodity', 'commodity')
-    .leftJoinAndSelect('prices.fk_currency', 'currency')
-    .where('currency.mnemonic = :to', { to })
-    .getMany();
-
-  const end = performance.now();
-  console.log(`get currency exchange history: ${end - start}ms`);
-
-  return new PriceDBMap(prices);
-}
-
 async function getCurrencyQuotes(): Promise<Price[]> {
   const currencies = await Commodity.findBy({
     namespace: 'CURRENCY',

@@ -17,7 +17,6 @@ jest.mock('@/book/prices', () => ({
   ...jest.requireActual('@/book/prices'),
   PriceDB: {
     getTodayQuotes: jest.fn(),
-    getHistory: jest.fn(),
   },
 }));
 
@@ -35,7 +34,6 @@ describe('InvestmentAccount', () => {
     await datasource.initialize();
 
     jest.spyOn(PriceDB, 'getTodayQuotes').mockResolvedValue(new PriceDBMap([]));
-    jest.spyOn(PriceDB, 'getHistory').mockResolvedValue(new PriceDBMap([]));
   });
 
   afterEach(async () => {

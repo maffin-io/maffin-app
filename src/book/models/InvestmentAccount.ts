@@ -24,7 +24,6 @@ export default class InvestmentAccount {
   private _priceDBMap: PriceDBMap;
 
   constructor(account: Account, mainCurrency: string, priceDBMap: PriceDBMap) {
-    console.log(priceDBMap.map);
     this.account = account;
     this.mainCurrency = mainCurrency;
 
@@ -33,11 +32,15 @@ export default class InvestmentAccount {
       this.account.commodity.mnemonic,
       DateTime.now(),
     );
-    if (!price.quoteInfo) {
-      throw new Error(`No quote info found in price '${price.id}'`);
-    }
     this.currency = price.currency.mnemonic;
-    this.setTodayQuoteInfo(price.quoteInfo);
+    this.setTodayQuoteInfo(
+      price.quoteInfo || {
+        changePct: 0,
+        changeAbs: 0,
+        price: price.value,
+        currency: this.currency,
+      },
+    );
 
     this.quantity = new Money(0, this.account.commodity.mnemonic);
     this.realizedProfit = new Money(0, this.currency);
