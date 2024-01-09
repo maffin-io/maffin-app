@@ -2,9 +2,8 @@
 
 import React from 'react';
 import { BiEdit, BiPlusCircle } from 'react-icons/bi';
-import useSWRImmutable from 'swr/immutable';
 
-import { useCommodities } from '@/hooks/api';
+import { useCommodity, usePrices } from '@/hooks/api';
 import FormButton from '@/components/buttons/FormButton';
 import CommodityForm from '@/components/forms/commodity/CommodityForm';
 import PriceForm from '@/components/forms/price/PriceForm';
@@ -19,18 +18,10 @@ export type CommodityPageProps = {
 };
 
 export default function CommodityPage({ params }: CommodityPageProps): JSX.Element {
-  const { data: commodities } = useCommodities();
-  const { isLoading } = useCommodities();
-  const { data: prices } = useSWRImmutable(
-    `/api/prices/${params.guid}`,
-    async () => Price.findBy({
-      fk_commodity: {
-        guid: params.guid,
-      },
-    }),
-  );
+  const { data: commodity, isLoading } = useCommodity(params.guid);
+  const { data: prices } = usePrices(params.guid);
 
-  if (!commodities || isLoading) {
+  if (isLoading) {
     return (
       <div className="h-screen">
         <div className="flex text-sm h-3/4 place-content-center place-items-center">
@@ -40,7 +31,6 @@ export default function CommodityPage({ params }: CommodityPageProps): JSX.Eleme
     );
   }
 
-  const commodity = commodities.find(c => c.guid === params.guid);
   if (!commodity) {
     return (
       <div className="flex h-screen text-sm place-content-center place-items-center">

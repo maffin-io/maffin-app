@@ -8,9 +8,8 @@ import {
   AccountInfo,
   InvestmentInfo,
 } from '@/components/pages/account';
-import { useAccounts } from '@/hooks/api';
+import { useAccount } from '@/hooks/api';
 import Loading from '@/components/Loading';
-import { Account } from '@/book/entities';
 import { isInvestment } from '@/book/helpers';
 
 export type AccountPageProps = {
@@ -20,14 +19,9 @@ export type AccountPageProps = {
 };
 
 export default function AccountPage({ params }: AccountPageProps): JSX.Element {
-  let { data: accounts } = useAccounts();
+  const { data: account, isLoading } = useAccount(params.guid);
 
-  // We cant use fallback data to set a default as SWR treats
-  // fallback data as stale data which means with immutable we will
-  // never refresh the data.
-  accounts = accounts || {};
-
-  if (!Object.keys(accounts).length) {
+  if (isLoading) {
     return (
       <div>
         <Loading />
@@ -35,7 +29,6 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
     );
   }
 
-  const account = accounts[params.guid] as Account;
   if (!account) {
     return (
       <div className="flex h-screen text-sm place-content-center place-items-center">

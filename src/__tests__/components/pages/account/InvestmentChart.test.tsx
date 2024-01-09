@@ -26,7 +26,7 @@ jest.mock('@/hooks/api', () => ({
 describe('InvestmentChart', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: undefined } as SWRResponse);
-    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestment').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
   afterEach(() => {
@@ -74,25 +74,23 @@ describe('InvestmentChart', () => {
       },
       splits: [] as Split[],
     } as Account;
-    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({
-      data: [
-        new InvestmentAccount(
-          account,
-          'EUR',
-          new PriceDBMap([
-            // @ts-ignore
-            {
-              date: DateTime.now(),
-              value: 100,
-              fk_commodity: account.commodity,
-              commodity: account.commodity,
-              fk_currency: eur,
-              currency: eur,
-              quoteInfo: 'maffin::',
-            } as Price,
-          ]),
-        ),
-      ],
+    jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
+      data: new InvestmentAccount(
+        account,
+        'EUR',
+        new PriceDBMap([
+          // @ts-ignore
+          {
+            date: DateTime.now(),
+            value: 100,
+            fk_commodity: account.commodity,
+            commodity: account.commodity,
+            fk_currency: eur,
+            currency: eur,
+            quoteInfo: 'maffin::',
+          } as Price,
+        ]),
+      ),
     } as SWRResponse);
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-02-02') as DateTime<true>);
 
@@ -155,25 +153,23 @@ describe('InvestmentChart', () => {
         },
       ],
     } as SWRResponse);
-    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({
-      data: [
-        new InvestmentAccount(
-          account,
-          'EUR',
-          new PriceDBMap([
-            // @ts-ignore
-            {
-              date: DateTime.now(),
-              value: 100,
-              fk_commodity: account.commodity,
-              commodity: account.commodity,
-              fk_currency: eur,
-              currency: eur,
-              quoteInfo: 'maffin::',
-            } as Price,
-          ]),
-        ),
-      ],
+    jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
+      data: new InvestmentAccount(
+        account,
+        'EUR',
+        new PriceDBMap([
+          // @ts-ignore
+          {
+            date: DateTime.now(),
+            value: 100,
+            fk_commodity: account.commodity,
+            commodity: account.commodity,
+            fk_currency: eur,
+            currency: eur,
+            quoteInfo: 'maffin::',
+          } as Price,
+        ]),
+      ),
     } as SWRResponse);
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-02-02') as DateTime<true>);
 
