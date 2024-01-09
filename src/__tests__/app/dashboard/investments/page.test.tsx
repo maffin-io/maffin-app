@@ -58,6 +58,7 @@ describe('InvestmentsPage', () => {
   });
 
   it('renders while loading data', async () => {
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: [] } as SWRResponse);
     render(<InvestmentsPage />);
     await screen.findByText('You have no investments yet!');
   });

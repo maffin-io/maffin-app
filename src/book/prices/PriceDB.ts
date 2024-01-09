@@ -5,39 +5,6 @@ import { toAmountWithScale } from '@/helpers/number';
 import { getPrices, LiveSummary } from '@/apis/Stocker';
 import { Price, Commodity } from '../entities';
 import PriceDBMap from './PriceDBMap';
-import Money from '../Money';
-
-/**
- * Returns Money containg the rate to convert from to to.
- * If date not passed it returns the latest price. If passed,
- * it finds any rate between -1 +1 day
- *
- * If no rate is found it throws an error.
- */
-export async function getRate(from: string, to: string, when?: DateTime): Promise<Money> {
-  if (from === to) {
-    return new Money(1, to);
-  }
-
-  let query = Price
-    .createQueryBuilder('prices')
-    .leftJoinAndSelect('prices.fk_commodity', 'commodity')
-    .leftJoinAndSelect('prices.fk_currency', 'currency')
-    .where('commodity.mnemonic = :from', { from })
-    .andWhere('currency.mnemonic = :to', { to });
-
-  if (when) {
-    query = query
-      .andWhere('date(prices.date) >= :dateStart', { dateStart: when.minus({ days: 1 }).toISODate() })
-      .andWhere('date(prices.date) <= :dateEnd', { dateEnd: when.plus({ days: 1 }).toISODate() });
-  }
-
-  const rate = await query
-    .orderBy({ date: 'DESC' })
-    .getOneOrFail();
-
-  return new Money(rate.value, to);
-}
 
 /**
  * Retrieves todays quotes from stocker and returns them plus storing them

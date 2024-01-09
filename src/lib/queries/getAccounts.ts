@@ -7,9 +7,15 @@ import type { AccountsMap } from '@/types/book';
  *
  * For first level accounts, the key is also the type of the account prefixed
  * with type, same for the root account.
+ *
+ * If a guid is passed, we return that account instead
  */
-export default async function getAccounts(): Promise<AccountsMap> {
-  const accounts = await Account.find();
+export default async function getAccounts(guid?: string): Promise<AccountsMap | Account> {
+  const accounts = await Account.findBy({ guid });
+
+  if (guid) {
+    return accounts[0];
+  }
 
   const accountsMap: AccountsMap = {};
   accounts.forEach(account => {

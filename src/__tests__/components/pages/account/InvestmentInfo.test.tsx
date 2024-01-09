@@ -30,7 +30,7 @@ jest.mock('@/components/Loading', () => jest.fn(
 describe('InvestmentInfo', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: undefined } as SWRResponse);
-    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestment').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
   afterEach(() => {
@@ -81,20 +81,18 @@ describe('InvestmentInfo', () => {
         },
       ],
     } as SWRResponse);
-    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({
-      data: [
-        {
-          cost: new Money(100, 'EUR'),
-          value: new Money(150, 'EUR'),
-          profitAbs: new Money(50, 'EUR'),
-          profitPct: 50,
-          avgPrice: 10,
-          quantity: new Money(10, 'GOOGL'),
-          account,
-          currency: 'EUR',
-          realizedDividends: new Money(20, 'EUR'),
-        },
-      ],
+    jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
+      data: {
+        cost: new Money(100, 'EUR'),
+        value: new Money(150, 'EUR'),
+        profitAbs: new Money(50, 'EUR'),
+        profitPct: 50,
+        avgPrice: 10,
+        quantity: new Money(10, 'GOOGL'),
+        account,
+        currency: 'EUR',
+        realizedDividends: new Money(20, 'EUR'),
+      },
     } as SWRResponse);
 
     const { container } = render(
@@ -184,20 +182,18 @@ describe('InvestmentInfo', () => {
         },
       ],
     } as SWRResponse);
-    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({
-      data: [
-        {
-          cost: new Money(100, 'EUR'),
-          value: new Money(150, 'EUR'),
-          profitAbs: new Money(50, 'EUR'),
-          profitPct: 50,
-          avgPrice: 10,
-          quantity: new Money(10, 'GOOGL'),
-          account,
-          currency: 'EUR',
-          realizedDividends: new Money(20, 'USD'),
-        },
-      ],
+    jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
+      data: {
+        cost: new Money(100, 'EUR'),
+        value: new Money(150, 'EUR'),
+        profitAbs: new Money(50, 'EUR'),
+        profitPct: 50,
+        avgPrice: 10,
+        quantity: new Money(10, 'GOOGL'),
+        account,
+        currency: 'EUR',
+        realizedDividends: new Money(20, 'USD'),
+      },
     } as SWRResponse);
 
     render(

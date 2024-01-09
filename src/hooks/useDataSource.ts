@@ -19,6 +19,7 @@ import {
 } from '@/book/entities';
 import type BookStorage from '@/apis/BookStorage';
 import { MIGRATIONS } from '@/book/migrations';
+import type { AccountsMap } from '@/types/book';
 
 export type DataSourceContextType = {
   datasource: DataSource | null,
@@ -149,7 +150,7 @@ async function preloadData() {
     queries.getAccounts(),
     PriceDB.getTodayQuotes(),
   ]);
-  mutate('/api/main-currency', accounts.type_asset?.commodity);
+  mutate('/api/main-currency', (accounts as AccountsMap).type_asset?.commodity);
   mutate(
     '/api/monthly-totals',
     async () => queries.getMonthlyTotals(accounts, todayPrices),

@@ -57,7 +57,7 @@ jest.mock('@/components/Loading', () => jest.fn(
 describe('AccountPage', () => {
   beforeEach(() => {
     jest.spyOn(Split, 'create').mockReturnValue({ guid: 'createdSplit' } as Split);
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccount').mockReturnValue({ data: undefined } as SWRResponse);
     jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
@@ -66,6 +66,7 @@ describe('AccountPage', () => {
   });
 
   it('displays loading while accounts is empty', async () => {
+    jest.spyOn(apiHook, 'useAccount').mockReturnValue({ isLoading: true } as SWRResponse);
     const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
 
     await screen.findByTestId('Loading');
@@ -76,9 +77,6 @@ describe('AccountPage', () => {
   });
 
   it('displays message when account not found', async () => {
-    jest.spyOn(apiHook, 'useAccounts')
-      .mockReturnValueOnce({ data: [{ guid: 'other' }] } as SWRResponse);
-
     render(<AccountPage params={{ guid: 'guid' }} />);
 
     screen.getByText('does not exist', { exact: false });
@@ -88,16 +86,15 @@ describe('AccountPage', () => {
   });
 
   it('renders as expected with account', async () => {
-    const accounts = {
-      guid: {
-        guid: 'guid',
-        path: 'path',
-        type: 'TYPE',
-        commodity: {
-          mnemonic: 'EUR',
-        },
-      } as Account,
-    };
+    const account = {
+      guid: 'guid',
+      path: 'path',
+      type: 'TYPE',
+      parentId: 'parent',
+      commodity: {
+        mnemonic: 'EUR',
+      },
+    } as Account;
     const splits = [
       {
         guid: 'split_guid',
@@ -116,7 +113,7 @@ describe('AccountPage', () => {
       } as Split,
     ];
 
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValueOnce({ data: accounts } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccount').mockReturnValueOnce({ data: account } as SWRResponse);
     jest.spyOn(apiHook, 'useSplits').mockReturnValueOnce({ data: splits } as SWRResponse);
 
     const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
@@ -162,7 +159,7 @@ describe('AccountPage', () => {
       {
         action: 'update',
         defaultValues: {
-          ...accounts.guid,
+          ...account,
         },
       },
       {},
@@ -183,20 +180,20 @@ describe('AccountPage', () => {
       {
         action: 'delete',
         defaultValues: {
-          ...accounts.guid,
+          ...account,
         },
       },
       {},
     );
     expect(TransactionsTable).toHaveBeenLastCalledWith(
       {
-        account: accounts.guid,
+        account,
       },
       {},
     );
     expect(AccountInfo).toHaveBeenLastCalledWith(
       {
-        account: accounts.guid,
+        account,
       },
       {},
     );
@@ -204,18 +201,17 @@ describe('AccountPage', () => {
   });
 
   it('shows investment info when account is stock', async () => {
-    const accounts = {
-      guid: {
-        guid: 'guid',
-        path: 'path',
-        type: 'STOCK',
-        commodity: {
-          mnemonic: 'EUR',
-        },
-      } as Account,
-    };
+    const account = {
+      guid: 'guid',
+      path: 'path',
+      type: 'STOCK',
+      commodity: {
+        mnemonic: 'GOOGL',
+      },
+      parentId: 'parent',
+    } as Account;
 
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValueOnce({ data: accounts } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccount').mockReturnValueOnce({ data: account } as SWRResponse);
     jest.spyOn(apiHook, 'useSplits').mockReturnValueOnce({ data: [] } as SWRResponse);
 
     render(<AccountPage params={{ guid: 'guid' }} />);

@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 
 import type { Account } from '@/book/entities';
-import { useInvestments, usePrices } from '@/hooks/api';
+import { useInvestment, usePrices } from '@/hooks/api';
 import Loading from '@/components/Loading';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import { toFixed } from '@/helpers/number';
@@ -16,9 +16,8 @@ export type InvestmentInfoProps = {
 export default function InvestmentInfo({
   account,
 }: InvestmentInfoProps): JSX.Element {
-  const { data: investments } = useInvestments(account.guid);
+  const { data: investment } = useInvestment(account.guid);
   let { data: prices } = usePrices(account.commodity.guid);
-  const investment = investments?.[0];
   if (!investment || !prices) {
     return <Loading />;
   }
