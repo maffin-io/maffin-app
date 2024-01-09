@@ -9,7 +9,7 @@ import * as queries from '@/lib/queries';
 import getUser from '@/lib/getUser';
 import useGapiClient from '@/hooks/useGapiClient';
 import type { AccountsMap } from '@/types/book';
-import type { Split, Transaction } from '@/book/entities';
+import type { Account, Split, Transaction } from '@/book/entities';
 import type { User } from '@/types/user';
 
 export function useStartDate(): SWRResponse<DateTime> {
@@ -28,13 +28,44 @@ export function useMainCurrency(): SWRResponse<Commodity> {
   );
 }
 
+export function useCommodity(guid: string): SWRResponse<Commodity> {
+  const key = `/api/commodities/${guid}`;
+
+  const result = useSWRImmutable(
+    key,
+    fetcher(() => Commodity.findOneByOrFail({ guid }), key),
+  );
+
+  if (result.error) {
+    throw new Error(result.error);
+  }
+
+  return result;
+}
+
 export function useCommodities(): SWRResponse<Commodity[]> {
   const key = '/api/commodities';
-  return useSWRImmutable(
+
+  const result = useSWRImmutable(
     key,
-    // Needs to be encapsulated in arrow function or it doesnt work properly
-    fetcher(async () => Commodity.find(), key),
+    fetcher(() => Commodity.find(), key),
   );
+
+  if (result.error) {
+    throw new Error(result.error);
+  }
+
+  if (result.data) {
+    result.data.forEach(
+      (commodity: Commodity) => mutate(
+        `/api/commodities/${commodity.guid}`,
+        commodity,
+        { revalidate: false },
+      ),
+    );
+  }
+
+  return result;
 }
 
 export function useLatestTxs(): SWRResponse<Transaction[]> {
@@ -45,12 +76,40 @@ export function useLatestTxs(): SWRResponse<Transaction[]> {
   );
 }
 
+export function useAccount(guid: string): SWRResponse<Account> {
+  const key = `/api/accounts/${guid}`;
+
+  const result = useSWRImmutable(
+    key,
+    fetcher(() => queries.getAccounts(guid), key),
+  );
+
+  if (result.error) {
+    throw new Error(result.error);
+  }
+
+  return result;
+}
+
 export function useAccounts(): SWRResponse<AccountsMap> {
   const key = '/api/accounts';
-  return useSWRImmutable(
+
+  const result = useSWRImmutable(
     key,
-    fetcher(queries.getAccounts, key),
+    fetcher(() => queries.getAccounts(), key),
   );
+
+  if (result.error) {
+    throw new Error(result.error);
+  }
+
+  if (result.data) {
+    Object.values(result.data as AccountsMap).forEach(
+      (account: Account) => mutate(`/api/accounts/${account.guid}`, account, { revalidate: false }),
+    );
+  }
+
+  return result;
 }
 
 export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
@@ -72,11 +131,9 @@ export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
   return result;
 }
 
-export function useInvestments(guid?: string): SWRResponse<InvestmentAccount[]> {
-  let key = '/api/investments';
-  if (guid) {
-    key = `${key}/${guid}`;
-  }
+export function useInvestment(guid: string): SWRResponse<InvestmentAccount> {
+  const key = `/api/investments/${guid}`;
+
   const result = useSWRImmutable(
     key,
     fetcher(() => queries.getInvestments(guid), key),
@@ -89,6 +146,31 @@ export function useInvestments(guid?: string): SWRResponse<InvestmentAccount[]> 
   if (result.data && !guid) {
     result.data.forEach(
       (investment: InvestmentAccount) => mutate(`/api/investments/${investment.account.guid}`, [investment]),
+    );
+  }
+
+  return result;
+}
+
+export function useInvestments(): SWRResponse<InvestmentAccount[]> {
+  const key = '/api/investments';
+
+  const result = useSWRImmutable(
+    key,
+    fetcher(() => queries.getInvestments(), key),
+  );
+
+  if (result.error) {
+    throw new Error(result.error);
+  }
+
+  if (result.data) {
+    result.data.forEach(
+      (investment: InvestmentAccount) => mutate(
+        `/api/investments/${investment.account.guid}`,
+        investment,
+        { revalidate: false },
+      ),
     );
   }
 

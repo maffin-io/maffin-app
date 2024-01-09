@@ -4,7 +4,9 @@ import { PriceDB, PriceDBMap } from '@/book/prices';
 import getMainCurrency from '@/lib/queries/getMainCurrency';
 import getPrices from '@/lib/queries/getPrices';
 
-export default async function getInvestments(guid?: string): Promise<InvestmentAccount[]> {
+export default async function getInvestments(
+  guid?: string,
+): Promise<InvestmentAccount[] | InvestmentAccount> {
   const mainCurrency = (await getMainCurrency()).mnemonic;
   const [accounts, todayPrices, mainCurrencyPrices] = await Promise.all([
     Account.find({
@@ -50,5 +52,8 @@ export default async function getInvestments(guid?: string): Promise<InvestmentA
     },
   );
 
+  if (guid) {
+    return investments[0];
+  }
   return investments;
 }

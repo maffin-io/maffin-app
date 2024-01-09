@@ -6,7 +6,7 @@ import { Price } from '@/book/entities';
 import Line from '@/components/charts/Line';
 import { moneyToString } from '@/helpers/number';
 import type { Account } from '@/book/entities';
-import { useInvestments, usePrices } from '@/hooks/api';
+import { useInvestment, usePrices } from '@/hooks/api';
 import Loading from '@/components/Loading';
 
 Chart.register(Filler);
@@ -18,10 +18,9 @@ export type InvestmentChartProps = {
 export default function InvestmentChart({
   account,
 }: InvestmentChartProps): JSX.Element {
-  const { data: investments } = useInvestments(account.guid);
+  const { data: investment } = useInvestment(account.guid);
   let { data: prices } = usePrices(account.commodity.guid);
 
-  const investment = investments?.[0];
   if (!investment || !prices) {
     return <Loading />;
   }

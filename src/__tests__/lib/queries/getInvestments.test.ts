@@ -96,8 +96,9 @@ describe('getInvestments', () => {
     });
     mockAccountFind = jest.spyOn(Account, 'find').mockResolvedValue([account]);
 
-    await getInvestments();
+    const investments = await getInvestments();
 
+    expect(investments).toEqual([{ guid: 'investment_guid' }]);
     expect(mockAccountFind).toHaveBeenCalledWith({
       where: [
         { type: 'STOCK' },
@@ -137,8 +138,9 @@ describe('getInvestments', () => {
     });
     mockAccountFind = jest.spyOn(Account, 'find').mockResolvedValue([account]);
 
-    await getInvestments('guid');
+    const i = await getInvestments('guid');
 
+    expect(i).toEqual({ guid: 'investment_guid' });
     expect(mockAccountFind).toHaveBeenCalledWith({
       where: [
         { guid: 'guid', type: 'STOCK' },

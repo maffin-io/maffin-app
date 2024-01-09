@@ -8,6 +8,7 @@ import {
   Transaction,
 } from '@/book/entities';
 import { getAccounts } from '@/lib/queries';
+import type { AccountsMap } from '@/types/book';
 
 describe('getAccounts', () => {
   let datasource: DataSource;
@@ -56,7 +57,7 @@ describe('getAccounts', () => {
   });
 
   it('returns accounts as expected', async () => {
-    const accounts = await getAccounts();
+    const accounts = await getAccounts() as AccountsMap;
 
     expect(accounts.type_root.guid).toEqual('a');
     expect(accounts.a.guid).toEqual('a');
@@ -64,5 +65,11 @@ describe('getAccounts', () => {
     expect(accounts.type_expense.guid).toEqual('ghijk');
     expect(accounts.abcdef.guid).toEqual('abcdef');
     expect(accounts.ghijk.guid).toEqual('ghijk');
+  });
+
+  it('returns single account when guid is passed', async () => {
+    const account = await getAccounts('abcdef') as Account;
+
+    expect(account.guid).toEqual('abcdef');
   });
 });

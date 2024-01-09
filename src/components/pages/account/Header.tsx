@@ -13,7 +13,7 @@ import {
   isLiability,
 } from '@/book/helpers/accountType';
 import { Account, Split } from '@/book/entities';
-import { useAccounts, useSplits } from '@/hooks/api';
+import { useAccount, useSplits } from '@/hooks/api';
 
 export type HeaderProps = {
   account: Account,
@@ -22,11 +22,10 @@ export type HeaderProps = {
 export default function Header({
   account,
 }: HeaderProps): JSX.Element {
-  const { data: accounts } = useAccounts();
+  const { data: parent } = useAccount(account.parentId);
   const { data: splits } = useSplits(account.guid);
 
   const latestDate = splits?.[0]?.transaction?.date;
-  const parent = accounts?.[account.parentId];
   const deletable = splits?.length === 0;
 
   return (

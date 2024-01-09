@@ -15,8 +15,7 @@ import Money from '@/book/Money';
 import * as API from '@/hooks/api';
 
 export default function InvestmentsPage(): JSX.Element {
-  let { data: investments } = API.useInvestments();
-  const { isLoading } = API.useInvestments();
+  const { data: investments, isLoading } = API.useInvestments();
   const { data: currency } = API.useMainCurrency();
   const mainCurrency = currency?.mnemonic || 'EUR';
 
@@ -30,9 +29,7 @@ export default function InvestmentsPage(): JSX.Element {
     );
   }
 
-  investments = investments || [];
-
-  if (investments.length === 0) {
+  if (!investments || investments.length === 0) {
     return (
       <div className="h-screen">
         <div className="flex text-sm h-3/4 place-content-center place-items-center">

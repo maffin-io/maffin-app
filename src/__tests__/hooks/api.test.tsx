@@ -3,7 +3,7 @@ import * as swrImmutable from 'swr/immutable';
 import * as swr from 'swr';
 import { BareFetcher, SWRResponse } from 'swr';
 
-import { Commodity, Price } from '@/book/entities';
+import { Account, Commodity } from '@/book/entities';
 import { PriceDB, PriceDBMap } from '@/book/prices';
 import * as API from '@/hooks/api';
 import * as queries from '@/lib/queries';
@@ -40,14 +40,18 @@ jest.mock('@/hooks/useGapiClient', () => ({
 
 describe('API', () => {
   beforeEach(() => {
+    jest.spyOn(Commodity, 'findOneByOrFail').mockImplementation();
     jest.spyOn(Commodity, 'find').mockImplementation();
     jest.spyOn(PriceDB, 'getTodayQuotes').mockImplementation();
     jest.spyOn(getUserModule, 'default').mockImplementation();
     jest.spyOn(swrImmutable, 'default').mockImplementation(
-      jest.fn((key, f: BareFetcher | null) => ({
-        data: f && f(key),
-        error: undefined,
-      } as SWRResponse)),
+      jest.fn((key, f: BareFetcher | null) => {
+        f?.(key);
+        return {
+          data: [],
+          error: undefined,
+        } as SWRResponse;
+      }),
     );
   });
 
@@ -56,12 +60,12 @@ describe('API', () => {
   });
 
   it.each([
-    ['useStartDate', '/api/start-date', queries.getEarliestDate],
-    ['useMainCurrency', '/api/main-currency', queries.getMainCurrency],
     ['useCommodities', '/api/commodities', jest.spyOn(Commodity, 'find')],
-    ['useLatestTxs', '/api/txs/latest', queries.getLatestTxs],
     ['useAccounts', '/api/accounts', queries.getAccounts],
     ['useInvestments', '/api/investments', queries.getInvestments],
+    ['useStartDate', '/api/start-date', queries.getEarliestDate],
+    ['useMainCurrency', '/api/main-currency', queries.getMainCurrency],
+    ['useLatestTxs', '/api/txs/latest', queries.getLatestTxs],
   ])('calls useSWRImmutable with expected params for %s', (name, key, f) => {
     // @ts-ignore
     renderHook(() => API[name]());
@@ -72,98 +76,156 @@ describe('API', () => {
     );
 
     expect(f).toBeCalledTimes(1);
+    expect(f).toBeCalledWith();
   });
 
   it.each([
+    ['useAccount', '/api/accounts/guid', queries.getAccounts],
+    ['useInvestment', '/api/investments/guid', queries.getInvestments],
+    ['usePrices', '/api/prices/guid', queries.getPrices],
+    ['useSplits', '/api/splits/guid', queries.getSplits],
+  ])('calls useSWRImmutable with expected params for %s', (name, key, f) => {
+    // @ts-ignore
+    renderHook(() => API[name]('guid'));
+
+    expect(swrImmutable.default).toBeCalledWith(
+      key,
+      expect.any(Function),
+    );
+
+    expect(f).toBeCalledTimes(1);
+    expect(f).toBeCalledWith('guid');
+  });
+
+  it('calls useSWRImmutable with expected params for useCommodity', () => {
+    const f = jest.spyOn(Commodity, 'findOneByOrFail');
+    // @ts-ignore
+    renderHook(() => API.useCommodity('guid'));
+
+    expect(swrImmutable.default).toBeCalledWith(
+      '/api/commodities/guid',
+      expect.any(Function),
+    );
+
+    expect(f).toBeCalledTimes(1);
+    expect(f).toBeCalledWith({ guid: 'guid' });
+  });
+
+  it.each([
+    'useAccount',
+    'useAccounts',
+    'useInvestment',
     'useInvestments',
+    'useCommodity',
+    'useCommodities',
   ])('propagates error for %s', (name) => {
     jest.spyOn(swrImmutable, 'default').mockReturnValue({ error: 'error' } as SWRResponse);
     // @ts-ignore
     renderHook(() => expect(() => API[name]()).toThrow('error'));
   });
 
-  it('calls useSWRImmutable with expected params for useSplits', () => {
-    renderHook(() => API.useSplits('guid'));
+  describe('useAccountsMonthlyTotals', () => {
+    it('calls useSWRImmutable with expected params for useAccountsMonthlyTotals', () => {
+      const accounts = { a: { guid: 'a' } };
+      const todayPrices = new PriceDBMap();
+      jest.spyOn(swrImmutable, 'default')
+        .mockReturnValueOnce({ data: accounts } as SWRResponse)
+        .mockReturnValueOnce({ data: todayPrices } as SWRResponse);
+      renderHook(() => API.useAccountsMonthlyTotals());
 
-    expect(swrImmutable.default).toBeCalledWith(
-      '/api/splits/guid',
-      expect.any(Function),
-    );
-
-    expect(queries.getSplits).toBeCalledTimes(1);
-    expect(queries.getSplits).toBeCalledWith('guid');
+      expect(swrImmutable.default).toHaveBeenNthCalledWith(
+        3,
+        '/api/monthly-totals',
+        expect.any(Function),
+      );
+      expect(queries.getMonthlyTotals).toBeCalledWith(accounts, todayPrices);
+    });
   });
 
-  it('calls useSWRImmutable with expected params for useAccountsMonthlyTotals', () => {
-    const accounts = { a: { guid: 'a' } };
-    const todayPrices = new PriceDBMap();
-    jest.spyOn(swrImmutable, 'default')
-      .mockReturnValueOnce({ data: accounts } as SWRResponse)
-      .mockReturnValueOnce({ data: todayPrices } as SWRResponse);
-    renderHook(() => API.useAccountsMonthlyTotals());
+  describe('useUser', () => {
+    it('calls useSWRImmutable with null key for useUser when no gapi', () => {
+      jest.spyOn(gapiHooks, 'default').mockReturnValue([false]);
+      renderHook(() => API.useUser());
 
-    expect(swrImmutable.default).toHaveBeenNthCalledWith(
-      3,
-      '/api/monthly-totals',
-      expect.any(Function),
-    );
-    expect(queries.getMonthlyTotals).toBeCalledWith(accounts, todayPrices);
+      expect(swrImmutable.default).toBeCalledWith(
+        null,
+        expect.any(Function),
+        { refreshInterval: 100000, revalidateOnMount: true },
+      );
+    });
+
+    it('calls useSWRImmutable with expected params for useUser when gapi', () => {
+      jest.spyOn(gapiHooks, 'default').mockReturnValue([true]);
+      renderHook(() => API.useUser());
+
+      expect(swrImmutable.default).toBeCalledWith(
+        '/api/user',
+        expect.any(Function),
+        { refreshInterval: 100000, revalidateOnMount: true },
+      );
+
+      expect(getUserModule.default).toBeCalledTimes(1);
+    });
   });
 
-  it('calls useSWRImmutable with null key for useUser when no gapi', () => {
-    jest.spyOn(gapiHooks, 'default').mockReturnValue([false]);
-    renderHook(() => API.useUser());
+  describe('useCommodities', () => {
+    it('mutates detail keys', () => {
+      jest.spyOn(swrImmutable, 'default').mockReturnValue({
+        data: [
+          { guid: '1' } as Commodity,
+          { guid: '2' } as Commodity,
+        ],
+      } as SWRResponse);
+      renderHook(() => API.useCommodities());
 
-    expect(swrImmutable.default).toBeCalledWith(
-      null,
-      expect.any(Function),
-      { refreshInterval: 100000, revalidateOnMount: true },
-    );
+      expect(swr.mutate).toBeCalledWith('/api/commodities/1', { guid: '1' }, { revalidate: false });
+      expect(swr.mutate).toBeCalledWith('/api/commodities/2', { guid: '2' }, { revalidate: false });
+    });
   });
 
-  it('calls useSWRImmutable with expected params for useUser when gapi', () => {
-    jest.spyOn(gapiHooks, 'default').mockReturnValue([true]);
-    renderHook(() => API.useUser());
+  describe('useAccounts', () => {
+    it('mutates detail keys', () => {
+      jest.spyOn(swrImmutable, 'default').mockReturnValue({
+        data: {
+          1: { guid: '1' } as Account,
+          2: { guid: '2' } as Account,
+        },
+      } as SWRResponse);
+      renderHook(() => API.useAccounts());
 
-    expect(swrImmutable.default).toBeCalledWith(
-      '/api/user',
-      expect.any(Function),
-      { refreshInterval: 100000, revalidateOnMount: true },
-    );
-
-    expect(getUserModule.default).toBeCalledTimes(1);
+      expect(swrImmutable.default).toBeCalledWith(
+        '/api/accounts',
+        expect.any(Function),
+      );
+      expect(swr.mutate).toBeCalledWith('/api/accounts/1', { guid: '1' }, { revalidate: false });
+      expect(swr.mutate).toBeCalledWith('/api/accounts/2', { guid: '2' }, { revalidate: false });
+    });
   });
 
-  it('calls useSWRImmutable with expected params for usePrices', () => {
-    renderHook(() => API.usePrices('guid'));
+  describe('useInvestments', () => {
+    it('mutates detail keys', () => {
+      jest.spyOn(swrImmutable, 'default').mockReturnValue({
+        data: [
+          { account: { guid: '1' } } as InvestmentAccount,
+          { account: { guid: '2' } } as InvestmentAccount,
+        ],
+      } as SWRResponse);
+      renderHook(() => API.useInvestments());
 
-    expect(swrImmutable.default).toBeCalledWith(
-      '/api/prices/guid',
-      expect.any(Function),
-    );
-    expect(queries.getPrices).toBeCalledWith('guid');
-  });
-
-  it('useInvestments mutates keys when no guid is passed', () => {
-    jest.spyOn(swrImmutable, 'default').mockReturnValue({
-      data: [
-        { account: { guid: '1' } } as InvestmentAccount,
-        { account: { guid: '2' } } as InvestmentAccount,
-      ],
-    } as SWRResponse);
-    renderHook(() => API.useInvestments());
-
-    expect(swr.mutate).toBeCalledWith('/api/investments/1', [{ account: { guid: '1' } }]);
-    expect(swr.mutate).toBeCalledWith('/api/investments/2', [{ account: { guid: '2' } }]);
-  });
-
-  it('calls useSWRImmutable with expected params for useInvestments when guid passed', () => {
-    renderHook(() => API.useInvestments('guid'));
-
-    expect(swrImmutable.default).toBeCalledWith(
-      '/api/investments/guid',
-      expect.any(Function),
-    );
-    expect(queries.getInvestments).toBeCalledWith('guid');
+      expect(swrImmutable.default).toBeCalledWith(
+        '/api/investments',
+        expect.any(Function),
+      );
+      expect(swr.mutate).toBeCalledWith(
+        '/api/investments/1',
+        { account: { guid: '1' } },
+        { revalidate: false },
+      );
+      expect(swr.mutate).toBeCalledWith(
+        '/api/investments/2',
+        { account: { guid: '2' } },
+        { revalidate: false },
+      );
+    });
   });
 });
