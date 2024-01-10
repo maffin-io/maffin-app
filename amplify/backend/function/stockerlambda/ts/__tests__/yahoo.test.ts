@@ -99,6 +99,39 @@ describe('getPrice', () => {
     );
   });
 
+  /**
+   * Yahoo finance sometimes returns 0 for previousClosePrice and it breaks our numbers. This is
+   * a patch for it
+   */
+  it('sets previous close same as current price when previous close is 0', async () => {
+    mockAxiosGet.mockImplementation(() => Promise.resolve({
+      data: {
+        chart: {
+          result: [
+            {
+              meta: {
+                currency: 'EUR',
+                chartPreviousClose: 0,
+                regularMarketPrice: 212.5,
+              },
+            },
+          ],
+          error: null,
+        },
+      },
+      status: 404,
+    }));
+
+    const resp = await yh.getPrice('ticker');
+
+    expect(resp).toEqual({
+      price: 212.5,
+      changePct: 0,
+      changeAbs: 0,
+      currency: 'EUR',
+    });
+  });
+
   it('queries for previous day when on Sunday', async () => {
     await yh.getPrice('ticker', 1696089600);
 
