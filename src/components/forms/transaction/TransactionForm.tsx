@@ -152,6 +152,7 @@ async function onSubmit(data: FormValues, action: 'add' | 'update' | 'delete', o
   transaction.splits.forEach(split => {
     if (isInvestment(split.account)) {
       mutate('/api/investments');
+      mutate(`/api/investments/${split.account.guid}`);
     }
     mutate(`/api/splits/${split.account.guid}`);
   });
