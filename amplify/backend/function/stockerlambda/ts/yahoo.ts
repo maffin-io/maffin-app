@@ -58,7 +58,7 @@ export async function getPrice(ticker: string, when?: number): Promise<Price> {
 
   const currency = toCurrency(result[0].meta.currency);
   const price = toStandardUnit(result[0].meta.regularMarketPrice, currency);
-  const previousClose = toStandardUnit(result[0].meta.chartPreviousClose, currency);
+  const previousClose = toStandardUnit(result[0].meta.chartPreviousClose, currency) || price;
   const change = price - previousClose;
 
   return {

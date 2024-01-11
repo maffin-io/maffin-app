@@ -37,7 +37,7 @@ describe('AccountForm', () => {
   let expenseAccount: Account;
 
   beforeEach(async () => {
-    jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-30'));
+    jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-30') as DateTime<true>);
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
@@ -273,8 +273,9 @@ describe('AccountForm', () => {
       hidden: false,
     });
     expect(mockSave).toHaveBeenCalledTimes(1);
-    expect(swr.mutate).toBeCalledTimes(1);
-    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/accounts');
+    expect(swr.mutate).toBeCalledTimes(2);
+    expect(swr.mutate).toHaveBeenNthCalledWith(1, `/api/accounts/${account.guid}`);
+    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/accounts');
   });
 
   it('updates account', async () => {
@@ -422,11 +423,12 @@ describe('AccountForm', () => {
       },
     ]);
 
-    expect(swr.mutate).toBeCalledTimes(4);
-    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/accounts');
-    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/accounts', expect.any(Function), { revalidate: false });
-    expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/monthly-totals', undefined);
-    expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/txs/latest', undefined);
+    expect(swr.mutate).toBeCalledTimes(5);
+    expect(swr.mutate).toHaveBeenNthCalledWith(1, `/api/accounts/${account.guid}`);
+    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/accounts');
+    expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/accounts', expect.any(Function), { revalidate: false });
+    expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/monthly-totals', undefined);
+    expect(swr.mutate).toHaveBeenNthCalledWith(5, '/api/txs/latest', undefined);
   });
 
   it.each([
