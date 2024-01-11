@@ -317,15 +317,18 @@ async function onSubmit(
 
   if (action === 'add') {
     await account.save();
+    mutate(`/api/accounts/${account.guid}`);
     mutate('/api/accounts');
     if (data.balance) {
       await createBalance(data, account);
     }
   } else if (action === 'update') {
     await account.save();
+    mutate(`/api/accounts/${account.guid}`);
     mutate('/api/accounts');
   } else if (action === 'delete') {
     await Account.remove(account);
+    mutate(`/api/accounts/${account.guid}`);
     mutate('/api/accounts');
     router.replace('/dashboard/accounts');
   }

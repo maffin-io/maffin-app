@@ -5,9 +5,12 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DataSource } from 'typeorm';
+import * as swr from 'swr';
 
 import CommodityForm from '@/components/forms/commodity/CommodityForm';
 import { Commodity } from '@/book/entities';
+
+jest.mock('swr');
 
 describe('CommodityForm', () => {
   let datasource: DataSource;
@@ -149,5 +152,8 @@ describe('CommodityForm', () => {
       namespace: 'CURRENCY',
       cusip: null,
     });
+    expect(swr.mutate).toBeCalledTimes(2);
+    expect(swr.mutate).toHaveBeenNthCalledWith(1, `/api/commodities/${commodities[0].guid}`);
+    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/commodities');
   });
 });
