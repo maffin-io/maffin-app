@@ -1,7 +1,7 @@
 import React from 'react';
 import { DataSource } from 'typeorm';
 import initSqlJs from 'sql.js';
-import { mutate } from 'swr';
+import { useSWRConfig, mutate, Cache } from 'swr';
 import pako from 'pako';
 
 import * as queries from '@/lib/queries';
@@ -45,6 +45,7 @@ export const DataSourceContext = React.createContext<DataSourceContextType>({
 
 export default function useDataSource(): DataSourceContextType {
   const { storage } = useBookStorage();
+  const { cache } = useSWRConfig();
   const [isLoaded, setIsLoaded] = React.useState(DATASOURCE.isInitialized);
 
   React.useEffect(() => {
@@ -91,7 +92,7 @@ export default function useDataSource(): DataSourceContextType {
   return {
     datasource: DATASOURCE,
     save: () => save(storage),
-    importBook: (rawData: Uint8Array) => importBook(storage, rawData),
+    importBook: (rawData: Uint8Array) => importBook(storage, rawData, cache),
     isLoaded,
   };
 }
@@ -103,7 +104,7 @@ async function save(storage: BookStorage | null) {
   mutate('/state/save', false, { revalidate: false });
 }
 
-async function importBook(storage: BookStorage | null, rawData: Uint8Array) {
+async function importBook(storage: BookStorage | null, rawData: Uint8Array, cache: Cache) {
   let parsedData;
   try {
     parsedData = pako.ungzip(rawData);
@@ -114,8 +115,12 @@ async function importBook(storage: BookStorage | null, rawData: Uint8Array) {
   const rawBook = await importGnucashBook(parsedData);
   await DATASOURCE.sqljsManager.loadDatabase(rawBook);
 
-  // Remove all previous data from the state
-  mutate((key: string) => key.startsWith('/api'), undefined);
+  Array.from(cache.keys()).forEach(key => {
+    if (key.startsWith('/api/accounts/')) {
+      cache.delete(key);
+    }
+  });
+  mutate((key: string) => key?.startsWith('/api'), undefined);
   await preloadData();
   await save(storage);
 }

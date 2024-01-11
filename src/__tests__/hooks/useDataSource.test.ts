@@ -11,7 +11,16 @@ import BookStorage from '@/apis/BookStorage';
 import { PriceDB } from '@/book/prices';
 import * as queries from '@/lib/queries';
 
-jest.mock('swr');
+jest.mock('swr', () => ({
+  __esModule: true,
+  useSWRConfig: jest.fn().mockReturnValue({
+    cache: {
+      keys: jest.fn(),
+      delete: jest.fn(),
+    },
+  }),
+  mutate: jest.fn(),
+}));
 
 jest.mock('@/hooks/useBookStorage', () => ({
   __esModule: true,
@@ -283,6 +292,15 @@ describe('useDataSource', () => {
       });
 
       it('loads datasource database, mutates and saves', async () => {
+        const mockCacheDelete = jest.fn();
+        jest.spyOn(swr, 'useSWRConfig').mockReturnValue({
+          cache: {
+            keys: jest.fn().mockReturnValue(['/api/accounts/account1', 'key2']),
+            delete: mockCacheDelete,
+            get: jest.fn(),
+            set: jest.fn(),
+          },
+        });
         const { result } = renderHook(() => useDataSource());
 
         await waitFor(() => expect(result.current.isLoaded).toBe(true));
@@ -300,6 +318,9 @@ describe('useDataSource', () => {
         expect(mockMutate.mock.calls[2][0]('/api/test')).toBe(true);
         expect(mockMutate.mock.calls[2][0]('/api/asd/asd')).toBe(true);
         expect(mockMutate.mock.calls[2][0]('/state')).toBe(false);
+
+        expect(mockCacheDelete).toBeCalledTimes(1);
+        expect(mockCacheDelete).toBeCalledWith('/api/accounts/account1');
 
         // First happens when we load the hook
         expect(swr.mutate).toHaveBeenNthCalledWith(
