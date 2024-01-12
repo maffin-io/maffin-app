@@ -28,10 +28,13 @@ export default class InvestmentAccount {
     this.mainCurrency = mainCurrency;
 
     this._priceDBMap = priceDBMap;
-    const price = this._priceDBMap.getStockPrice(
+    const price = this._priceDBMap.getInvestmentPrice(
       this.account.commodity.mnemonic,
       DateTime.now(),
     );
+    if (price.guid === 'missing_price') {
+      throw new Error(`No price found for ${this.account.commodity.mnemonic}`);
+    }
     this.currency = price.currency.mnemonic;
     this.setTodayQuoteInfo(
       price.quoteInfo || {

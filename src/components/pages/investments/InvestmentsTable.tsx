@@ -59,8 +59,8 @@ const columns: ColumnDef<InvestmentAccount>[] = [
   },
   {
     accessorFn: (row: InvestmentAccount) => row.quoteInfo.changePct,
-    id: 'today',
-    header: 'Today',
+    id: 'latest',
+    header: 'Latest',
     cell: ({ row, getValue }) => (
       <p className="m-0 d-inline-block align-middle font-16">
         {moneyToString(row.original.quoteInfo.price, row.original.currency)}

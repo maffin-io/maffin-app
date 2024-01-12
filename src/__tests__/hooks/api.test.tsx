@@ -81,7 +81,7 @@ describe('API', () => {
 
   it.each([
     ['useAccount', '/api/accounts/guid', queries.getAccounts],
-    ['useInvestment', '/api/investments/guid', queries.getInvestments],
+    ['useInvestment', '/api/investments/guid', queries.getInvestment],
     ['useSplits', '/api/splits/guid', queries.getSplits],
   ])('calls useSWRImmutable with expected params for %s', (name, key, f) => {
     // @ts-ignore
@@ -98,7 +98,7 @@ describe('API', () => {
 
   it('calls useSWRImmutable with expected params for usePrices', () => {
     // @ts-ignore
-    renderHook(() => API.usePrices('guid'));
+    renderHook(() => API.usePrices({ guid: 'guid' }));
 
     expect(swrImmutable.default).toBeCalledWith(
       '/api/prices/guid',
@@ -106,7 +106,7 @@ describe('API', () => {
     );
 
     expect(queries.getPrices).toBeCalledTimes(1);
-    expect(queries.getPrices).toBeCalledWith({ from: 'guid' });
+    expect(queries.getPrices).toBeCalledWith({ from: { guid: 'guid' } });
   });
 
   it('calls useSWRImmutable with expected params for useCommodity', () => {

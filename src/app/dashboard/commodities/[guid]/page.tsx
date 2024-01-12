@@ -19,7 +19,7 @@ export type CommodityPageProps = {
 
 export default function CommodityPage({ params }: CommodityPageProps): JSX.Element {
   const { data: commodity, isLoading } = useCommodity(params.guid);
-  const { data: prices } = usePrices(params.guid);
+  const { data: prices } = usePrices(commodity);
 
   if (isLoading) {
     return (
@@ -41,14 +41,14 @@ export default function CommodityPage({ params }: CommodityPageProps): JSX.Eleme
 
   const byCurrency: { [guid: string]: Price[] } = {};
   if (prices) {
-    prices.forEach(price => {
+    prices.prices.forEach(price => {
       if (!(price.currency.guid in byCurrency)) {
         byCurrency[price.currency.guid] = [];
       }
       byCurrency[price.currency.guid].push(price);
     });
   }
-  const commodityCurrency = commodity.namespace !== 'CURRENCY' ? prices?.[0]?.fk_currency || undefined : undefined;
+  const commodityCurrency = commodity.namespace !== 'CURRENCY' ? prices?.prices[0]?.fk_currency || undefined : undefined;
 
   return (
     <>

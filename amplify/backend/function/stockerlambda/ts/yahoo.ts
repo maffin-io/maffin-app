@@ -56,28 +56,28 @@ export async function getPrice(ticker: string, when?: number): Promise<Price> {
     );
   }
 
-  const currency = toCurrency(result[0].meta.currency);
+  const currency = result[0].meta.currency;
   const price = toStandardUnit(result[0].meta.regularMarketPrice, currency);
   const previousClose = toStandardUnit(result[0].meta.chartPreviousClose, currency) || price;
   const change = price - previousClose;
 
   return {
     price: price,
-    currency,
+    currency: toStandardCurrency(currency),
     changePct: parseFloat(((change / previousClose) * 100).toFixed(2)),
     changeAbs: parseFloat(change.toFixed(2)),
   };
 }
 
 function toStandardUnit(n: number, currency: string) {
-  if (currency === 'GBP') {
+  if (currency === 'GBp') {
     return n * 0.01;
   }
 
   return n;
 }
 
-function toCurrency(currency: string) {
+function toStandardCurrency(currency: string) {
   if (currency === 'GBp') {
     return 'GBP';
   }

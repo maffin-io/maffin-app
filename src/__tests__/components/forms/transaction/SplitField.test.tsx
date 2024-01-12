@@ -9,19 +9,17 @@ import userEvent from '@testing-library/user-event';
 import { useForm } from 'react-hook-form';
 import type { SWRResponse } from 'swr';
 
-import * as stocker from '@/apis/Stocker';
-import type { Account, Commodity } from '@/book/entities';
-import { Split } from '@/book/entities';
+import {
+  Account,
+  Commodity,
+  Price,
+  Split,
+} from '@/book/entities';
 import SplitField from '@/components/forms/transaction/SplitField';
-import { toFixed } from '@/helpers/number';
 import type { FormValues } from '@/components/forms/transaction/types';
 import * as queries from '@/lib/queries';
 import * as apiHook from '@/hooks/api';
-
-jest.mock('@/apis/Stocker', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/apis/Stocker'),
-}));
+import { PriceDBMap } from '@/book/prices';
 
 jest.mock('@/lib/queries', () => ({
   __esModule: true,
@@ -35,7 +33,6 @@ jest.mock('@/hooks/api', () => ({
 
 describe('SplitField', () => {
   let eur: Commodity;
-  const EURSGD = 1.44;
 
   beforeEach(() => {
     eur = {
@@ -45,9 +42,12 @@ describe('SplitField', () => {
     } as Commodity;
 
     jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
+    jest.spyOn(apiHook, 'usePrices')
+      .mockReturnValue({ data: undefined } as SWRResponse);
     jest.spyOn(apiHook, 'useAccounts')
       .mockReturnValue({ data: undefined } as SWRResponse);
-    jest.spyOn(stocker, 'getPrice').mockResolvedValue({ price: EURSGD, currency: 'EUR' });
+    // @ts-ignore
+    jest.spyOn(Price, 'create').mockReturnValue({ value: 1 });
   });
 
   afterEach(() => {
@@ -96,12 +96,9 @@ describe('SplitField', () => {
     expect(screen.getByRole('spinbutton', { name: 'splits.1.value' })).toBeVisible();
   });
 
-  // When we load data through defaults, we want to keep it as
+  // When we load data with defaults, we want to keep it as
   // we are loading the split for deleting or updating
   it('loads with default and doesnt reset value', async () => {
-    const mockGetPrice = jest.spyOn(stocker, 'getPrice')
-      .mockResolvedValue({ price: EURSGD, currency: '' });
-
     render(
       <FormWrapper
         defaults={{
@@ -129,316 +126,632 @@ describe('SplitField', () => {
 
     expect(screen.getByRole('spinbutton', { name: 'splits.1.value' })).toHaveValue(100);
     expect(screen.getByRole('spinbutton', { name: 'splits.1.quantity' })).toHaveValue(50);
-    expect(mockGetPrice).not.toBeCalled();
   });
 
-  it('sets currency on account selection if it matches main currency', async () => {
-    const sgd = {
-      guid: 'sgd',
-      mnemonic: 'SGD',
+  describe('txCurrency on account selection', () => {
+    beforeEach(() => {
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [
+            {
+              guid: 'account_guid_2',
+              path: 'path2',
+              type: 'ASSET',
+              commodity: eur,
+            } as Account,
+          ],
+        } as SWRResponse,
+      );
+    });
+
+    /**
+     * If any account on one of the splits has a commodity which is not a currency, we set that as
+     * txCurrency. An example would be buying GOOGL stock. Say we deduct 2000 euros from our bank
+     * to buy. The GOOGL commodity is associated to USD so in the split with GOOGL account we will
+     * see quantity with GOOGL and value with USD respectively. For the bank account we will see EUR
+     * for quantity and USD for value.
+     */
+    it('sets txCurrency to currency of the account\'s commodity if not a currency', async () => {
+      const user = userEvent.setup();
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [
+            {
+              guid: 'account_guid_2',
+              path: 'path2',
+              type: 'ASSET',
+              commodity: {
+                namespace: 'CUSTOM',
+                mnemonic: 'TICKER',
+                guid: 'ticker_guid',
+              },
+            } as Account,
+          ],
+        } as SWRResponse,
+      );
+      jest.spyOn(Price, 'findOneByOrFail').mockResolvedValue({
+        // @ts-ignore
+        currency: {
+          guid: 'usd',
+          mnemonic: 'USD',
+          namespace: 'CURRENCY',
+        },
+      });
+      const mockSubmit = jest.fn();
+
+      render(<FormWrapper submit={mockSubmit} />);
+
+      await user.click(screen.getByLabelText('splits.1.account'));
+      await user.click(screen.getByText('path2'));
+
+      await user.click(screen.getByText('submit'));
+
+      expect(Price.findOneByOrFail).toBeCalledWith({ fk_commodity: { guid: 'ticker_guid' } });
+      expect(mockSubmit).toBeCalledWith(expect.objectContaining({
+        fk_currency: {
+          guid: 'usd',
+          mnemonic: 'USD',
+          namespace: 'CURRENCY',
+        },
+      }));
+
+      // We show the value field so we see the conversion from commodity to currency
+      expect(screen.getByRole('spinbutton', { name: 'splits.1.value' })).toBeVisible();
+    });
+
+    /**
+     * Same as above but now with mainSplit being the one having the non currency commodity
+     */
+    it('sets txCurrency to currency of main split account\'s commodity if not a currency', async () => {
+      const user = userEvent.setup();
+      jest.spyOn(Price, 'findOneByOrFail').mockResolvedValue({
+        // @ts-ignore
+        currency: {
+          guid: 'usd',
+          mnemonic: 'USD',
+          namespace: 'CURRENCY',
+        },
+      });
+      const mockSubmit = jest.fn();
+
+      render(
+        <FormWrapper
+          defaults={{
+            splits: [
+              {
+                value: 0,
+                quantity: 0,
+                fk_account: {
+                  name: 'path1',
+                  guid: 'account_guid_1',
+                  path: 'path1',
+                  type: 'ASSET',
+                  commodity: {
+                    namespace: 'CUSTOM',
+                    mnemonic: 'TICKER',
+                    guid: 'ticker_guid',
+                  },
+                } as Account,
+              } as Split,
+              {
+                value: 0,
+                quantity: 0,
+              } as Split,
+            ],
+          }}
+          submit={mockSubmit}
+        />,
+      );
+
+      await user.click(screen.getByLabelText('splits.1.account'));
+      await user.click(screen.getByText('path2'));
+
+      await user.click(screen.getByText('submit'));
+
+      expect(Price.findOneByOrFail).toBeCalledWith({ fk_commodity: { guid: 'ticker_guid' } });
+      expect(mockSubmit).toBeCalledWith(expect.objectContaining({
+        fk_currency: {
+          guid: 'usd',
+          mnemonic: 'USD',
+          namespace: 'CURRENCY',
+        },
+      }));
+
+      // We show the value field so we see the conversion from commodity to currency
+      expect(screen.getByRole('spinbutton', { name: 'splits.1.value' })).toBeVisible();
+    });
+
+    /**
+     * If all of the splits have CURRENCY as namespace and txCurrency is different than
+     * mainCurrency, we check if the new account we selected is mainCurrency, if so, we set
+     * txCurrency to that
+     */
+    it('sets txCurrency to account commodity if it matches main currency', async () => {
+      const usd = {
+        guid: 'usd',
+        mnemonic: 'USD',
+        namespace: 'CURRENCY',
+      } as Commodity;
+      jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(usd);
+
+      const user = userEvent.setup();
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [
+            {
+              guid: 'account_guid_2',
+              path: 'path2',
+              type: 'ASSET',
+              commodity: usd,
+            } as Account,
+          ],
+        } as SWRResponse,
+      );
+      const mockSubmit = jest.fn();
+
+      render(<FormWrapper submit={mockSubmit} />);
+
+      await user.click(screen.getByLabelText('splits.1.account'));
+      await user.click(screen.getByText('path2'));
+
+      await user.click(screen.getByText('submit'));
+
+      expect(mockSubmit).toBeCalledWith(expect.objectContaining({
+        fk_currency: {
+          guid: 'usd',
+          mnemonic: 'USD',
+          namespace: 'CURRENCY',
+        },
+      }));
+    });
+
+    /**
+     * If all of the splits have CURRENCY as namespace and txCurrency is different than
+     * mainCurrency, but the account we selected is not mainCurrency, we set txCurrency
+     * to the currency of the first split
+     */
+    it('sets txCurrency to mainSplit commodity if currency', async () => {
+      const usd = {
+        guid: 'usd',
+        mnemonic: 'USD',
+        namespace: 'CURRENCY',
+      } as Commodity;
+      jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(usd);
+
+      const user = userEvent.setup();
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [
+            {
+              guid: 'account_guid_2',
+              path: 'path2',
+              type: 'ASSET',
+              commodity: {
+                guid: 'sgd',
+                mnemonic: 'SGD',
+                namespace: 'CURRENCY',
+              },
+            } as Account,
+          ],
+        } as SWRResponse,
+      );
+      const mockSubmit = jest.fn();
+
+      render(<FormWrapper submit={mockSubmit} />);
+
+      await user.click(screen.getByLabelText('splits.1.account'));
+      await user.click(screen.getByText('path2'));
+
+      await user.click(screen.getByText('submit'));
+
+      expect(mockSubmit).toBeCalledWith(expect.objectContaining({
+        fk_currency: {
+          guid: 'eur',
+          mnemonic: 'EUR',
+          namespace: 'CURRENCY',
+        },
+      }));
+    });
+  });
+
+  describe('exchange rate', () => {
+    /**
+     * If the account has the same commodity as txCurrency, then we override
+     * value field with the value of quantity field when this one changes
+     */
+    it('overrides value with quantity when same currency', async () => {
+      const user = userEvent.setup();
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [
+            {
+              guid: 'account_guid_2',
+              path: 'path2',
+              type: 'EXPENSE',
+              commodity: {
+                guid: 'eur',
+                mnemonic: 'EUR',
+                namespace: 'CURRENCY',
+              },
+            } as Account,
+          ],
+        } as SWRResponse,
+      );
+
+      render(<FormWrapper />);
+
+      await user.click(screen.getByLabelText('splits.1.account'));
+      await user.click(screen.getByText('path2'));
+
+      const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
+      const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value', hidden: true });
+
+      expect(q1).toBeVisible();
+      expect(v1).not.toBeVisible();
+      await user.type(v1, '200');
+      await waitFor(() => expect(q1).toHaveValue(200));
+
+      user.clear(q1);
+      await waitFor(() => expect(v1).toHaveValue(0));
+      await user.type(q1, '100');
+      await waitFor(() => expect(q1).toHaveValue(100));
+      await waitFor(() => expect(v1).toHaveValue(100));
+    });
+
+    /**
+     * Check that quantity field gets autopouplated with value / exchangeRate
+     * when the account's commodity is different from txCurrency
+     */
+    it('sets value * exchangeRate for quantity when different currency', async () => {
+      const user = userEvent.setup();
+      const usd = {
+        guid: 'usd',
+        mnemonic: 'USD',
+        namespace: 'CURRENCY',
+      } as Commodity;
+      jest.spyOn(apiHook, 'usePrices')
+        .mockReturnValue({
+          data: new PriceDBMap([{
+            fk_currency: eur,
+            currency: eur,
+            fk_commodity: usd,
+            commodity: usd,
+            value: 0.987,
+          } as Price]),
+        } as SWRResponse);
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [
+            {
+              guid: 'account_guid_2',
+              path: 'path2',
+              type: 'EXPENSE',
+              commodity: usd,
+            } as Account,
+          ],
+        } as SWRResponse,
+      );
+
+      render(<FormWrapper />);
+
+      await user.click(screen.getByLabelText('splits.1.account'));
+      await user.click(screen.getByText('path2'));
+
+      const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
+      const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value', hidden: true });
+
+      expect(q1).toBeVisible();
+      expect(v1).toBeVisible();
+      await user.type(v1, '200');
+      await waitFor(() => expect(q1).toHaveValue(202.634));
+    });
+
+    /**
+     * Check that quantity field gets autopouplated with value / exchangeRate
+     * when the account's commodity is not a currency
+     */
+    it('sets value * exchangeRate for quantity when account commodity is not currency', async () => {
+      const user = userEvent.setup();
+      const ticker = {
+        guid: 'ticker_guid',
+        mnemonic: 'TICKER',
+        namespace: 'CUSTOM',
+      };
+      // @ts-ignore
+      jest.spyOn(Price, 'findOneByOrFail').mockResolvedValue({ currency: eur });
+      jest.spyOn(apiHook, 'usePrices')
+        .mockReturnValue({
+          data: new PriceDBMap([{
+            fk_commodity: ticker,
+            commodity: ticker,
+            fk_currency: eur,
+            currency: eur,
+            value: 500,
+          } as Price]),
+        } as SWRResponse);
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [
+            {
+              guid: 'account_guid_2',
+              path: 'path2',
+              type: 'EXPENSE',
+              commodity: ticker,
+            } as Account,
+          ],
+        } as SWRResponse,
+      );
+
+      render(<FormWrapper />);
+
+      await user.click(screen.getByLabelText('splits.1.account'));
+      await user.click(screen.getByText('path2'));
+
+      const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
+      const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value', hidden: true });
+
+      expect(q1).toBeVisible();
+      expect(v1).toBeVisible();
+      await user.type(v1, '500');
+      await waitFor(() => expect(q1).toHaveValue(1));
+    });
+
+    /**
+     * Checks that when we have a given exchangeRate and then we change back to
+     * txCurrency being the same as the split's account, that the exchangeRate is back
+     * to 1 which means value field and quantity field are equal
+     */
+    it('sets exchange rate back to 1 when txCurrency and account commodity are the same', async () => {
+      const user = userEvent.setup();
+      const usd = {
+        guid: 'usd',
+        mnemonic: 'USD',
+        namespace: 'CURRENCY',
+      } as Commodity;
+      jest.spyOn(apiHook, 'usePrices')
+        .mockReturnValue({
+          data: new PriceDBMap([{
+            fk_currency: eur,
+            currency: eur,
+            fk_commodity: usd,
+            commodity: usd,
+            value: 0.987,
+          } as Price]),
+        } as SWRResponse);
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [
+            {
+              guid: 'account_guid_2',
+              path: 'path2',
+              type: 'EXPENSE',
+              commodity: usd,
+            } as Account,
+            {
+              guid: 'account_guid_3',
+              path: 'path3',
+              type: 'EXPENSE',
+              commodity: eur,
+            } as Account,
+          ],
+        } as SWRResponse,
+      );
+
+      render(<FormWrapper />);
+
+      await user.click(screen.getByLabelText('splits.1.account'));
+      await user.click(screen.getByText('path2'));
+
+      const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
+      const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value', hidden: true });
+
+      expect(q1).toBeVisible();
+      expect(v1).toBeVisible();
+      await user.type(v1, '200');
+      await waitFor(() => expect(q1).toHaveValue(202.634));
+
+      await user.click(screen.getByLabelText('splits.1.account'));
+      await user.click(screen.getByText('path3'));
+
+      await waitFor(() => expect(v1).toHaveValue(200));
+      await waitFor(() => expect(q1).toHaveValue(200));
+    });
+
+    /**
+     * When the mainSplit commodity is not a currency, we find the commodity's currency
+     * and set that as the txCurrency. Then we need to find also the exchange rate between
+     * the current split account currency and the txCurrency and set that accordingly
+     *
+     * In the test below we simulate this by setting the mainSplit account commodity to TICKER
+     * which is related to EUR currency. Then the second split is for an account in USD.
+     * This results in the quantity field being in USD and the value field being in EUR.
+     */
+    it('sets value * exchangeRate for quantity when mainSplit commodity is not a currency', async () => {
+      const user = userEvent.setup();
+      const ticker = {
+        guid: 'ticker_guid',
+        mnemonic: 'TICKER',
+        namespace: 'CUSTOM',
+      };
+      const usd = {
+        guid: 'usd',
+        mnemonic: 'USD',
+        namespace: 'CURRENCY',
+      };
+      // @ts-ignore
+      jest.spyOn(Price, 'findOneByOrFail').mockResolvedValue({ currency: eur });
+      jest.spyOn(apiHook, 'usePrices')
+        .mockReturnValue({
+          data: new PriceDBMap([{
+            fk_commodity: usd,
+            commodity: usd,
+            fk_currency: eur,
+            currency: eur,
+            value: 0.987,
+          } as Price]),
+        } as SWRResponse);
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [
+            {
+              guid: 'account_guid_2',
+              path: 'path2',
+              type: 'EXPENSE',
+              commodity: usd,
+            } as Account,
+          ],
+        } as SWRResponse,
+      );
+
+      render(
+        <FormWrapper
+          defaults={{
+            splits: [
+              {
+                value: 0,
+                quantity: 0,
+                fk_account: {
+                  name: 'path1',
+                  guid: 'account_guid_1',
+                  path: 'path1',
+                  type: 'ASSET',
+                  commodity: ticker,
+                } as Account,
+              } as Split,
+              {
+                value: 0,
+                quantity: 0,
+              } as Split,
+            ],
+          }}
+        />,
+      );
+
+      await user.click(screen.getByLabelText('splits.1.account'));
+      await user.click(screen.getByText('path2'));
+
+      const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
+      const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value', hidden: true });
+
+      expect(q1).toBeVisible();
+      expect(v1).toBeVisible();
+      await user.type(v1, '200');
+      await waitFor(() => expect(q1).toHaveValue(202.634));
+    });
+
+    it('recalculates when date changes', async () => {
+      const user = userEvent.setup();
+      const usd = {
+        guid: 'usd',
+        mnemonic: 'USD',
+        namespace: 'CURRENCY',
+      } as Commodity;
+      jest.spyOn(apiHook, 'usePrices')
+        .mockReturnValue({
+          data: new PriceDBMap([
+            {
+              date: DateTime.fromISO('2023-01-01'),
+              fk_commodity: usd,
+              commodity: usd,
+              fk_currency: eur,
+              currency: eur,
+              value: 0.987,
+            } as Price,
+            {
+              date: DateTime.fromISO('2023-01-10'),
+              fk_commodity: usd,
+              commodity: usd,
+              fk_currency: eur,
+              currency: eur,
+              value: 1.05,
+            } as Price,
+          ]),
+        } as SWRResponse);
+
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [
+            {
+              guid: 'account_guid_2',
+              path: 'path2',
+              type: 'EXPENSE',
+              commodity: usd,
+            } as Account,
+          ],
+        } as SWRResponse,
+      );
+
+      render(<FormWrapper />);
+
+      await user.click(screen.getByLabelText('splits.1.account'));
+      await user.click(screen.getByText('path2'));
+
+      const dateField = screen.getByTestId('date');
+      const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
+      const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value', hidden: true });
+
+      expect(q1).toBeVisible();
+      expect(v1).toBeVisible();
+      await user.type(v1, '200');
+      await waitFor(() => expect(q1).toHaveValue(202.634));
+
+      user.clear(dateField);
+      await user.type(dateField, '2023-01-11');
+      await waitFor(() => expect(q1).toHaveValue(190.476));
+      await waitFor(() => expect(v1).toHaveValue(200));
+    });
+  });
+
+  /**
+   * When a user customises the quantity field for a transaction with different currencies
+   * it means it is setting the exchangeRate explicitly and thus, we keep the value field
+   * untouched.
+   */
+  it('keeps quantity when different commodities', async () => {
+    const user = userEvent.setup();
+    const usd = {
+      guid: 'usd',
+      mnemonic: 'USD',
       namespace: 'CURRENCY',
-    } as Commodity;
-    jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(sgd);
-
-    const user = userEvent.setup();
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [
-          {
-            guid: 'account_guid_2',
-            path: 'path2',
-            type: 'ASSET',
-            commodity: sgd,
-          } as Account,
-        ],
-      } as SWRResponse,
-    );
-
-    render(<FormWrapper />);
-
-    await user.click(screen.getByLabelText('splits.1.account'));
-    await user.click(screen.getByText('path2'));
-
-    // If we don't show value field it means the currency of the account matches
-    // the transaction currency
-    expect(screen.getByRole('spinbutton', { name: 'splits.1.value', hidden: true })).not.toBeVisible();
-  });
-
-  // If the split has the same currency as the transactions' one, value and quantity
-  // have to match
-  it('overrides value with quantity when same currency', async () => {
-    const user = userEvent.setup();
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [
-          {
-            guid: 'account_guid_3',
-            path: 'path3',
-            type: 'EXPENSE',
-            commodity: {
-              guid: 'eur',
-              mnemonic: 'EUR',
-            },
-          } as Account,
-        ],
-      } as SWRResponse,
-    );
-
-    render(<FormWrapper />);
-
-    await user.click(screen.getByLabelText('splits.1.account'));
-    await user.click(screen.getByText('path3'));
-
-    const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
-    const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value', hidden: true });
-
-    expect(q1).toBeVisible();
-    expect(v1).not.toBeVisible();
-    await user.type(v1, '200');
-    await waitFor(() => expect(q1).toHaveValue(200));
-
-    user.clear(q1);
-    await waitFor(() => expect(v1).toHaveValue(0));
-    await user.type(q1, '100');
-    await waitFor(() => expect(q1).toHaveValue(100));
-    await waitFor(() => expect(v1).toHaveValue(100));
-  });
-
-  // We do automatic currency exchange so if the user changes the value
-  // on purpose it means they want custom exchange rate.
-  it('converts quantity, keeps value when quantity changes if currency is different', async () => {
-    const user = userEvent.setup();
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [
-          {
-            guid: 'account_guid_3',
-            path: 'path3',
-            type: 'EXPENSE',
-            commodity: {
-              guid: 'sgd',
-              mnemonic: 'SGD',
-              namespace: 'CURRENCY',
-            },
-          } as Account,
-        ],
-      } as SWRResponse,
-    );
-
-    render(<FormWrapper />);
-
-    await user.click(screen.getByLabelText('splits.1.account'));
-    await user.click(screen.getByText('path3'));
-
-    const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
-    const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value' });
-
-    expect(q1).toBeVisible();
-    expect(v1).toBeVisible();
-    await user.type(v1, '200');
-    await waitFor(() => expect(q1).toHaveValue(toFixed(200 / EURSGD, 3)));
-
-    user.clear(q1);
-    await user.type(q1, '100');
-    await waitFor(() => expect(q1).toHaveValue(100));
-    await waitFor(() => expect(v1).toHaveValue(200));
-  });
-
-  it('retrieves exchange rate for investment', async () => {
-    const user = userEvent.setup();
-    const mockGetPrice = jest.spyOn(stocker, 'getPrice')
-      .mockResolvedValue({ price: 100, currency: 'USD' });
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [
-          {
-            name: 'GOOGL',
-            guid: 'account_guid_3',
-            path: 'googl',
-            type: 'STOCK',
-            commodity: {
-              guid: 'googl',
-              mnemonic: 'GOOGL',
-            },
-          } as Account,
-        ],
-      } as SWRResponse,
-    );
-
-    render(<FormWrapper />);
-    await user.click(screen.getByLabelText('splits.1.account'));
-    await user.click(screen.getByText('googl'));
-
-    const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
-    const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value' });
-
-    expect(q1).toBeEnabled();
-    expect(v1).toBeEnabled();
-    await user.type(v1, '200');
-    await waitFor(() => expect(q1).toHaveValue(2));
-    expect(mockGetPrice).toHaveBeenLastCalledWith('GOOGL', DateTime.fromISO('2023-01-01'));
-  });
-
-  it('selects CURRENCY as tx currency when investment', async () => {
-    const user = userEvent.setup();
-    jest.spyOn(stocker, 'getPrice')
-      .mockResolvedValueOnce({ price: 100, currency: 'USD' });
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [
-          {
-            name: 'path1',
-            guid: 'account_guid_1',
-            path: 'path1',
-            type: 'ASSET',
-            commodity: {
-              guid: 'usd',
-              mnemonic: 'USD',
-              namespace: 'CURRENCY',
-            } as Commodity,
-          } as Account,
-        ],
-      } as SWRResponse,
-    );
-
-    const account = {
-      name: 'GOOGL',
-      guid: 'account_guid_3',
-      path: 'googl',
-      type: 'STOCK',
-      commodity: {
-        guid: 'googl',
-        mnemonic: 'GOOGL',
-        namespace: 'STOCK',
-      },
     };
 
     render(
       <FormWrapper
         defaults={{
-          fk_currency: { mnemonic: 'GOOGL' } as Commodity,
           splits: [
             {
-              quantity: 50,
+              value: 0,
+              quantity: 0,
+              fk_account: {
+                name: 'path1',
+                guid: 'account_guid_1',
+                path: 'path1',
+                type: 'ASSET',
+                commodity: eur,
+              } as Account,
+            } as Split,
+            {
               value: 100,
-              fk_account: account,
-              account,
-            },
-            new Split(),
+              quantity: 200,
+              fk_account: {
+                guid: 'account_guid_2',
+                path: 'path2',
+                type: 'EXPENSE',
+                commodity: usd,
+              } as Account,
+            } as Split,
           ],
-        } as FormValues}
+        }}
       />,
     );
 
-    await user.click(screen.getByLabelText('splits.1.account'));
-    await user.click(screen.getByText('path1'));
+    const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
+    const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value' });
 
-    expect(screen.getByLabelText('splits.1.quantity')).toBeVisible();
-    // if value is not visible on the split, it means the tx currency
-    // is the same as the split's account
-    await waitFor(() => expect(screen.getByLabelText('splits.1.value')).not.toBeVisible());
-  });
-
-  it('recalculates quantity from value when date changes', async () => {
-    const user = userEvent.setup();
-    const mockGetPrice = jest.spyOn(stocker, 'getPrice')
-      .mockResolvedValueOnce({ price: EURSGD, currency: '' })
-      // .mockResolvedValueOnce({ price: EURSGD, currency: '' })
-      .mockResolvedValueOnce({ price: 1.30, currency: '' });
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [
-          {
-            guid: 'account_guid_3',
-            path: 'path3',
-            type: 'EXPENSE',
-            commodity: {
-              guid: 'sgd',
-              mnemonic: 'SGD',
-              namespace: 'CURRENCY',
-            },
-          } as Account,
-        ],
-      } as SWRResponse,
-    );
-
-    render(<FormWrapper />);
-
-    await user.click(screen.getByLabelText('splits.1.account'));
-    await user.click(screen.getByText('path3'));
-
-    const dateField = screen.getByTestId('date');
-    const q0 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
-    const v0 = screen.getByRole('spinbutton', { name: 'splits.1.value' });
-
-    await user.type(v0, '100');
-
-    await waitFor(() => expect(q0).toHaveValue(toFixed(100 / EURSGD, 3)));
-    await waitFor(() => expect(v0).toHaveValue(100));
-
-    user.clear(dateField);
-    // This creates act warning because we have nothing to wait for to check
-    // that the exchange rate has been set
-    await user.type(dateField, '2023-01-20');
-    await waitFor(() => expect(q0).toHaveValue(toFixed(100 / 1.30, 3)));
-    await waitFor(() => expect(v0).toHaveValue(100));
-    expect(mockGetPrice).toHaveBeenLastCalledWith('SGDEUR=X', DateTime.fromISO('2023-01-20'));
-  });
-
-  it('recalculates when account changes', async () => {
-    const user = userEvent.setup();
-    const mockGetPrice = jest.spyOn(stocker, 'getPrice')
-      .mockResolvedValueOnce({ price: 1.30, currency: '' })
-      .mockResolvedValueOnce({ price: 1.30, currency: '' });
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [
-          {
-            guid: 'account_guid_2',
-            path: 'path2',
-            type: 'EXPENSE',
-            commodity: {
-              guid: 'eur',
-              mnemonic: 'EUR',
-            },
-          } as Account,
-          {
-            guid: 'account_guid_3',
-            path: 'path3',
-            type: 'EXPENSE',
-            commodity: {
-              guid: 'sgd',
-              mnemonic: 'SGD',
-              namespace: 'CURRENCY',
-            },
-          } as Account,
-        ],
-      } as SWRResponse,
-    );
-
-    render(<FormWrapper />);
-
-    await user.click(screen.getByLabelText('splits.1.account'));
-    await user.click(screen.getByText('path2'));
-
-    const q0 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
-    const v0 = screen.getByRole('spinbutton', { name: 'splits.1.value', hidden: true });
-    await user.type(v0, '100');
-
-    expect(v0).toHaveValue(100);
-    expect(v0).not.toBeVisible();
-    await waitFor(() => expect(q0).toHaveValue(100));
-
-    await user.click(screen.getByLabelText('splits.1.account'));
-    await user.click(screen.getByText('path3'));
-
-    await waitFor(
-      () => expect(mockGetPrice).toHaveBeenLastCalledWith('SGDEUR=X', DateTime.fromISO('2023-01-01')),
-    );
-
-    await waitFor(() => expect(q0).toHaveValue(toFixed(100 / 1.30, 3)));
-    await waitFor(() => expect(v0).toHaveValue(100));
-    expect(v0).toBeVisible();
+    user.clear(q1);
+    await user.type(q1, '102');
+    await waitFor(() => expect(q1).toHaveValue(102));
+    await waitFor(() => expect(v1).toHaveValue(100));
   });
 });
 
@@ -446,9 +759,11 @@ function FormWrapper(
   {
     disabled = false,
     defaults = {} as FormValues,
+    submit,
   }: {
     disabled?: boolean,
-    defaults?: FormValues,
+    defaults?: Partial<FormValues>,
+    submit?: Function,
   },
 ): JSX.Element {
   const account = {
@@ -492,7 +807,7 @@ function FormWrapper(
   form.trigger = jest.fn();
 
   return (
-    <>
+    <form onSubmit={form.handleSubmit((data) => submit?.(data))}>
       <input
         id="dateInput"
         data-testid="date"
@@ -501,6 +816,9 @@ function FormWrapper(
         type="date"
       />
       <SplitField index={1} form={form} disabled={disabled} />
-    </>
+      <button type="submit">
+        submit
+      </button>
+    </form>
   );
 }

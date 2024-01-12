@@ -1,4 +1,4 @@
-import { Account, Commodity, Price } from '@/book/entities';
+import { Account, Commodity } from '@/book/entities';
 import { InvestmentAccount } from '@/book/models';
 import { PriceDBMap } from '@/book/prices';
 import getMainCurrency from '@/lib/queries/getMainCurrency';
@@ -63,21 +63,21 @@ async function initInvestment(
   account: Account,
   mainCurrency: Commodity,
 ): Promise<InvestmentAccount> {
-  const todayPrices = await getPrices({ from: account.commodity.guid });
+  const prices = await getPrices({ from: account.commodity });
 
-  let mainCurrencyPrices: Price[] = [];
-  if (todayPrices[0].currency.guid !== mainCurrency.guid) {
+  let mainCurrencyPrices = new PriceDBMap();
+  const investmentCurrency = prices.getInvestmentPrice(account.commodity.mnemonic).currency;
+  if (investmentCurrency.guid !== mainCurrency.guid) {
     mainCurrencyPrices = await getPrices({
-      from: todayPrices[0].currency.guid,
-      to: mainCurrency.guid,
+      from: investmentCurrency,
+      to: mainCurrency,
     });
   }
 
   const pricesMap = new PriceDBMap([
-    ...mainCurrencyPrices,
-    ...todayPrices,
+    ...mainCurrencyPrices.prices,
+    ...prices.prices,
   ]);
-  console.log(pricesMap);
   const investment = new InvestmentAccount(
     account,
     mainCurrency.mnemonic,

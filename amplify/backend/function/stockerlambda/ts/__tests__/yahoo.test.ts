@@ -141,7 +141,7 @@ describe('getPrice', () => {
     );
   });
 
-  it('returns price *100 from http request call when GBP', async () => {
+  it('returns price *100 from http request call when GBp', async () => {
     mockAxiosGet.mockImplementation(() => Promise.resolve({
       data: {
         chart: {
@@ -151,6 +151,36 @@ describe('getPrice', () => {
                 currency: 'GBp',
                 chartPreviousClose: 210,
                 regularMarketPrice: 212.5,
+              },
+            },
+          ],
+          error: null,
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+    }));
+
+    const resp = await yh.getPrice('ticker');
+
+    expect(resp).toEqual({
+      price: 2.125,
+      changePct: 1.19,
+      changeAbs: 0.02,
+      currency: 'GBP',
+    });
+  });
+
+  it('does not return price *100 from http request call when GBP', async () => {
+    mockAxiosGet.mockImplementation(() => Promise.resolve({
+      data: {
+        chart: {
+          result: [
+            {
+              meta: {
+                currency: 'GBP',
+                chartPreviousClose: 2.1,
+                regularMarketPrice: 2.125,
               },
             },
           ],

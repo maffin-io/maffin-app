@@ -12,6 +12,7 @@ import { getInvestment, getInvestments } from '@/lib/queries';
 import { PriceDBMap } from '@/book/prices';
 import { InvestmentAccount } from '@/book/models';
 import * as getPrices from '@/lib/queries/getPrices';
+import * as getMainCurrency from '@/lib/queries/getMainCurrency';
 
 jest.mock('@/book/models', () => ({
   InvestmentAccount: jest.fn(),
@@ -19,10 +20,7 @@ jest.mock('@/book/models', () => ({
 
 jest.mock('@/lib/queries/getMainCurrency', () => ({
   __esModule: true,
-  default: async () => ({
-    guid: 'eur',
-    mnemonic: 'EUR',
-  }) as Commodity,
+  ...jest.requireActual('@/lib/queries/getMainCurrency'),
 }));
 
 jest.mock('@/lib/queries/getPrices', () => ({
@@ -40,6 +38,7 @@ describe('getInvestments', () => {
   let mockGetPrices: jest.SpyInstance;
   let price1: Price;
   let price2: Price;
+  let eur: Commodity;
 
   beforeEach(async () => {
     datasource = new DataSource({
@@ -51,24 +50,28 @@ describe('getInvestments', () => {
     });
     await datasource.initialize();
 
+    eur = await Commodity.create({
+      guid: 'eur_guid',
+      mnemonic: 'EUR',
+      namespace: 'CURRENCY',
+    }).save();
+
     price1 = Price.create({
       fk_commodity: {
-        mnemonic: 'TICKER',
+        mnemonic: 'TICKER1',
       },
-      fk_currency: {
-        mnemonic: 'EUR',
-      },
-      date: DateTime.now(),
+      fk_currency: eur,
+      date: DateTime.fromISO('2023-01-01'),
     });
     price2 = Price.create({
       fk_commodity: {
-        mnemonic: 'TICKER',
+        mnemonic: 'TICKER2',
       },
-      fk_currency: {
-        mnemonic: 'EUR',
-      },
-      date: DateTime.now(),
+      fk_currency: eur,
+      date: DateTime.fromISO('2023-01-01'),
     });
+
+    jest.spyOn(getMainCurrency, 'default').mockResolvedValue(eur);
 
     // @ts-ignore
     (InvestmentAccount as jest.Mock).mockReturnValue({ guid: 'investment_guid' });
@@ -94,17 +97,15 @@ describe('getInvestments', () => {
 
     it('creates investment account with expected params', async () => {
       mockGetPrices = jest.spyOn(getPrices, 'default')
-        .mockResolvedValueOnce([price1])
-        .mockResolvedValueOnce([price2])
-        .mockResolvedValueOnce([price1])
-        .mockResolvedValueOnce([price2]);
+        .mockResolvedValueOnce(new PriceDBMap([price1]))
+        .mockResolvedValueOnce(new PriceDBMap([price2]));
 
       const account1 = Account.create({
         name: 'TICKER1',
         type: 'STOCK',
         fk_commodity: {
-          guid: 'googl_guid',
-          mnemonic: 'GOOGL',
+          guid: 'ticker_guid_1',
+          mnemonic: 'TICKER1',
         },
         parent: jest.fn(),
       });
@@ -112,8 +113,8 @@ describe('getInvestments', () => {
         name: 'TICKER2',
         type: 'STOCK',
         fk_commodity: {
-          guid: 'nvda_guid',
-          mnemonic: 'NVDA',
+          guid: 'ticker_guid_2',
+          mnemonic: 'TICKER2',
         },
         parent: jest.fn(),
       });
@@ -144,12 +145,11 @@ describe('getInvestments', () => {
           },
         },
       });
-      expect(mockGetPrices).toHaveBeenNthCalledWith(1, { from: account1.commodity.guid });
-      expect(mockGetPrices).toHaveBeenNthCalledWith(2, { to: 'eur' });
-      expect(mockGetPrices).toHaveBeenNthCalledWith(3, { from: account2.commodity.guid });
-      expect(mockGetPrices).toHaveBeenNthCalledWith(4, { to: 'eur' });
-      expect(InvestmentAccount).toHaveBeenCalledWith(account1, 'EUR', new PriceDBMap([price2, price1]));
-      expect(InvestmentAccount).toHaveBeenCalledWith(account2, 'EUR', new PriceDBMap([price2, price1]));
+      expect(mockGetPrices).toBeCalledTimes(2);
+      expect(mockGetPrices).toHaveBeenNthCalledWith(1, { from: account1.commodity });
+      expect(mockGetPrices).toHaveBeenNthCalledWith(2, { from: account2.commodity });
+      expect(InvestmentAccount).toHaveBeenNthCalledWith(1, account1, 'EUR', new PriceDBMap([price1]));
+      expect(InvestmentAccount).toHaveBeenNthCalledWith(2, account2, 'EUR', new PriceDBMap([price2]));
     });
   });
 
@@ -168,15 +168,14 @@ describe('getInvestments', () => {
 
     it('returns investment as expected', async () => {
       mockGetPrices = jest.spyOn(getPrices, 'default')
-        .mockResolvedValueOnce([price1])
-        .mockResolvedValueOnce([price2]);
+        .mockResolvedValueOnce(new PriceDBMap([price1]));
 
       const account1 = Account.create({
         name: 'TICKER1',
         type: 'STOCK',
         fk_commodity: {
-          guid: 'googl_guid',
-          mnemonic: 'GOOGL',
+          guid: 'ticker_guid_1',
+          mnemonic: 'TICKER1',
         },
         parent: jest.fn(),
       });
@@ -198,8 +197,64 @@ describe('getInvestments', () => {
         },
       });
 
-      expect(mockGetPrices).toHaveBeenNthCalledWith(1, { from: account1.commodity.guid });
-      expect(mockGetPrices).toHaveBeenNthCalledWith(2, { to: 'eur' });
+      expect(mockGetPrices).toBeCalledTimes(1);
+      expect(mockGetPrices).toHaveBeenNthCalledWith(1, { from: account1.commodity });
+      expect(InvestmentAccount).toHaveBeenCalledWith(account1, 'EUR', new PriceDBMap([price1]));
+    });
+
+    it('retrieves prices for currency when it is not main currency', async () => {
+      const usd = await Commodity.create({
+        mnemonic: 'USD',
+        guid: 'usd_guid',
+        namespace: 'CURRENCY',
+      }).save();
+      price1 = Price.create({
+        fk_commodity: {
+          guid: 'ticker_guid_1',
+          mnemonic: 'TICKER1',
+        },
+        fk_currency: usd,
+        date: DateTime.fromISO('2023-01-01'),
+      });
+      price2 = Price.create({
+        fk_commodity: usd,
+        fk_currency: eur,
+        date: DateTime.fromISO('2023-01-01'),
+      });
+      mockGetPrices = jest.spyOn(getPrices, 'default')
+        .mockResolvedValueOnce(new PriceDBMap([price1]))
+        .mockResolvedValueOnce(new PriceDBMap([price2]));
+
+      const account1 = Account.create({
+        name: 'TICKER1',
+        type: 'STOCK',
+        fk_commodity: {
+          guid: 'ticker_guid_1',
+          mnemonic: 'TICKER1',
+        },
+        parent: jest.fn(),
+      });
+      mockAccountFindOne.mockResolvedValue(account1);
+
+      const investments = await getInvestment('guid');
+
+      expect(investments).toEqual({ guid: 'investment_guid' });
+      expect(mockAccountFindOne).toHaveBeenCalledWith({
+        where: { guid: 'guid' },
+        relations: {
+          splits: {
+            fk_transaction: {
+              splits: {
+                fk_account: true,
+              },
+            },
+          },
+        },
+      });
+
+      expect(mockGetPrices).toBeCalledTimes(2);
+      expect(mockGetPrices).toHaveBeenNthCalledWith(1, { from: account1.commodity });
+      expect(mockGetPrices).toHaveBeenNthCalledWith(2, { from: usd, to: eur });
       expect(InvestmentAccount).toHaveBeenCalledWith(account1, 'EUR', new PriceDBMap([price2, price1]));
     });
   });

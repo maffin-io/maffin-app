@@ -6,9 +6,11 @@ import type { SWRResponse } from 'swr';
 import { InvestmentInfo } from '@/components/pages/account';
 import InvestmentChart from '@/components/pages/account/InvestmentChart';
 import StatisticsWidget from '@/components/StatisticsWidget';
-import type { Account } from '@/book/entities';
+import type { Account, Commodity } from '@/book/entities';
+import { Price } from '@/book/entities';
 import Money from '@/book/Money';
 import * as apiHook from '@/hooks/api';
+import { PriceDBMap } from '@/book/prices';
 
 jest.mock('@/components/pages/account/InvestmentChart', () => jest.fn(
   () => <div data-testid="InvestmentChart" />,
@@ -28,9 +30,25 @@ jest.mock('@/components/Loading', () => jest.fn(
 ));
 
 describe('InvestmentInfo', () => {
+  let eur: Commodity;
+  let ticker: Commodity;
+
   beforeEach(() => {
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: undefined } as SWRResponse);
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(Price, 'create').mockImplementation();
+
+    eur = {
+      guid: 'eur_guid',
+      mnemonic: 'EUR',
+      namespace: 'CURRENCY',
+    } as Commodity;
+
+    ticker = {
+      guid: 'ticker_guid',
+      mnemonic: 'TICKER',
+      namespace: 'CUSTOM',
+    } as Commodity;
   });
 
   afterEach(() => {
@@ -43,10 +61,7 @@ describe('InvestmentInfo', () => {
         account={
           {
             guid: 'guid',
-            commodity: {
-              guid: 'eur_guid',
-              mnemonic: 'EUR',
-            },
+            commodity: eur,
           } as Account
         }
       />,
@@ -56,30 +71,25 @@ describe('InvestmentInfo', () => {
   });
 
   it('renders as expected with data', async () => {
-    const eur = {
-      guid: 'eur_guid',
-      mnemonic: 'EUR',
-    };
     const account = {
       guid: 'guid',
-      commodity: {
-        guid: 'googl_guid',
-        mnemonic: 'GOOGL',
-      },
+      commodity: ticker,
     } as Account;
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({
-      data: [
+      data: new PriceDBMap([
         {
           date: DateTime.fromISO('2023-01-01'),
           value: 10,
           currency: eur,
-        },
+          commodity: ticker,
+        } as Price,
         {
           date: DateTime.fromISO('2023-02-01'),
           value: 15,
           currency: eur,
-        },
-      ],
+          commodity: ticker,
+        } as Price,
+      ]),
     } as SWRResponse);
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
       data: {
@@ -88,7 +98,7 @@ describe('InvestmentInfo', () => {
         profitAbs: new Money(50, 'EUR'),
         profitPct: 50,
         avgPrice: 10,
-        quantity: new Money(10, 'GOOGL'),
+        quantity: new Money(10, 'TICKER'),
         account,
         currency: 'EUR',
         realizedDividends: new Money(20, 'EUR'),
@@ -157,30 +167,25 @@ describe('InvestmentInfo', () => {
   });
 
   it('renders as expected when dividend with different currency', async () => {
-    const eur = {
-      guid: 'eur_guid',
-      mnemonic: 'EUR',
-    };
     const account = {
       guid: 'guid',
-      commodity: {
-        guid: 'googl_guid',
-        mnemonic: 'GOOGL',
-      },
+      commodity: ticker,
     } as Account;
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({
-      data: [
+      data: new PriceDBMap([
         {
           date: DateTime.fromISO('2023-01-01'),
           value: 10,
           currency: eur,
-        },
+          commodity: ticker,
+        } as Price,
         {
           date: DateTime.fromISO('2023-02-01'),
           value: 15,
           currency: eur,
-        },
-      ],
+          commodity: ticker,
+        } as Price,
+      ]),
     } as SWRResponse);
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
       data: {
@@ -189,7 +194,7 @@ describe('InvestmentInfo', () => {
         profitAbs: new Money(50, 'EUR'),
         profitPct: 50,
         avgPrice: 10,
-        quantity: new Money(10, 'GOOGL'),
+        quantity: new Money(10, 'TICKER'),
         account,
         currency: 'EUR',
         realizedDividends: new Money(20, 'USD'),

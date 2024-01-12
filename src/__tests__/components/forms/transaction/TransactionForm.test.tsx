@@ -1,7 +1,6 @@
 import { DateTime } from 'luxon';
 import React from 'react';
 import {
-  act,
   waitFor,
   render,
   screen,
@@ -21,7 +20,7 @@ import {
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import * as queries from '@/lib/queries';
 import * as apiHook from '@/hooks/api';
-import * as stocker from '@/apis/Stocker';
+import { PriceDBMap } from '@/book/prices';
 
 jest.mock('swr');
 
@@ -33,11 +32,6 @@ jest.mock('@/lib/queries', () => ({
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
   ...jest.requireActual('@/hooks/api'),
-}));
-
-jest.mock('@/apis/Stocker', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/apis/Stocker'),
 }));
 
 describe('TransactionForm', () => {
@@ -72,6 +66,8 @@ describe('TransactionForm', () => {
 
     jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: [] } as SWRResponse);
+    jest.spyOn(apiHook, 'usePrices')
+      .mockReturnValue({ data: undefined } as SWRResponse);
 
     root = await Account.create({
       guid: 'root_account_guid',
@@ -142,8 +138,6 @@ describe('TransactionForm', () => {
   it.each([
     'update', 'delete',
   ])('does not override with exchangeRate when loaded with defaults for %s', async (action) => {
-    const mockGetPrice = jest.spyOn(stocker, 'getPrice')
-      .mockResolvedValue({ price: 0.7, currency: '' });
     const now = DateTime.now().toISODate();
     expenseAccount.fk_commodity = sgd;
     await expenseAccount.save();
@@ -185,443 +179,807 @@ describe('TransactionForm', () => {
     expect(screen.getByLabelText('splits.0.value')).toHaveValue(-100);
     expect(screen.getByLabelText('splits.1.quantity')).toHaveValue(150);
     expect(screen.getByLabelText('splits.1.value')).toHaveValue(100);
-
-    expect(mockGetPrice).not.toBeCalled();
   });
 
-  it('creates transaction, mutates and saves with expected params when both same currency', async () => {
-    const user = userEvent.setup();
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [assetAccount, expenseAccount],
-      } as SWRResponse,
-    );
-    const mockSave = jest.fn();
+  /**
+   * Cases for when both mainSplit and other splits have the same currency
+   */
+  describe('same commodity', () => {
+    it('creates transaction, mutates and saves with expected params when both same currency', async () => {
+      const user = userEvent.setup();
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [assetAccount, expenseAccount],
+        } as SWRResponse,
+      );
+      const mockSave = jest.fn();
 
-    render(
-      <TransactionForm
-        onSave={mockSave}
-        defaultValues={
-          {
-            date: '',
-            description: '',
-            splits: [
-              Split.create({
-                fk_account: assetAccount,
-              }),
-              new Split(),
-            ],
-            fk_currency: assetAccount.commodity,
+      render(
+        <TransactionForm
+          onSave={mockSave}
+          defaultValues={
+            {
+              date: '',
+              description: '',
+              splits: [
+                Split.create({
+                  fk_account: assetAccount,
+                }),
+                new Split(),
+              ],
+              fk_currency: assetAccount.commodity,
+            }
           }
-        }
-      />,
-    );
+        />,
+      );
 
-    await user.type(screen.getByLabelText('Date'), '2023-01-01');
-    await user.type(screen.getByLabelText('Description'), 'My expense');
+      await user.type(screen.getByLabelText('Date'), '2023-01-01');
+      await user.type(screen.getByLabelText('Description'), 'My expense');
 
-    const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
-    await user.type(q0, '-100');
-    await waitFor(() => expect(q0).toHaveValue(-100));
+      const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
+      await user.type(q0, '-100');
+      await waitFor(() => expect(q0).toHaveValue(-100));
 
-    await user.click(screen.getByRole('combobox', { name: 'splits.1.account' }));
-    await user.click(screen.getByText('Expenses:random'));
+      await user.click(screen.getByRole('combobox', { name: 'splits.1.account' }));
+      await user.click(screen.getByText('Expenses:random'));
 
-    const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
-    await waitFor(() => expect(q1).toHaveValue(100));
+      const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
+      await waitFor(() => expect(q1).toHaveValue(100));
 
-    expect(screen.getByText('add')).not.toBeDisabled();
-    await user.click(screen.getByText('add'));
+      expect(screen.getByText('add')).not.toBeDisabled();
+      await user.click(screen.getByText('add'));
 
-    const tx = await Transaction.findOneOrFail({
-      where: { description: 'My expense' },
-      relations: {
-        splits: {
-          fk_account: true,
-        },
-      },
-    });
-
-    expect(tx).toMatchObject({
-      guid: expect.any(String),
-      date: DateTime.fromISO('2023-01-01'),
-      description: 'My expense',
-      fk_currency: eur,
-      splits: [
-        {
-          guid: expect.any(String),
-          action: '',
-          fk_account: {
-            guid: 'account_guid_1',
+      const tx = await Transaction.findOneOrFail({
+        where: { description: 'My expense' },
+        relations: {
+          splits: {
+            fk_account: true,
           },
-          quantityNum: -100,
-          quantityDenom: 1,
-          valueNum: -100,
-          valueDenom: 1,
         },
-        {
-          guid: expect.any(String),
-          action: '',
-          fk_account: {
-            guid: 'account_guid_2',
+      });
+
+      expect(tx).toMatchObject({
+        guid: expect.any(String),
+        date: DateTime.fromISO('2023-01-01'),
+        description: 'My expense',
+        fk_currency: eur,
+        splits: [
+          {
+            guid: expect.any(String),
+            action: '',
+            fk_account: {
+              guid: 'account_guid_1',
+            },
+            quantityNum: -100,
+            quantityDenom: 1,
+            valueNum: -100,
+            valueDenom: 1,
           },
-          quantityNum: 100,
-          quantityDenom: 1,
-          valueNum: 100,
-          valueDenom: 1,
-        },
-      ],
+          {
+            guid: expect.any(String),
+            action: '',
+            fk_account: {
+              guid: 'account_guid_2',
+            },
+            quantityNum: 100,
+            quantityDenom: 1,
+            valueNum: 100,
+            valueDenom: 1,
+          },
+        ],
+      });
+      expect(tx.guid.length).toEqual(31);
+      expect(mockSave).toHaveBeenCalledTimes(1);
+      expect(swr.mutate).toBeCalledTimes(4);
+      expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/account_guid_1');
+      expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/splits/account_guid_2');
+      expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/monthly-totals', undefined);
+      expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/txs/latest', undefined);
     });
-    expect(tx.guid.length).toEqual(31);
-    expect(mockSave).toHaveBeenCalledTimes(1);
-    expect(swr.mutate).toBeCalledTimes(4);
-    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/account_guid_1');
-    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/splits/account_guid_2');
-    expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/monthly-totals', undefined);
-    expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/txs/latest', undefined);
   });
 
-  it('creates transaction with mainSplit not being main currency', async () => {
-    const user = userEvent.setup();
-    jest.spyOn(stocker, 'getPrice')
-      .mockResolvedValue({ price: 0.7, currency: '' });
-    assetAccount.fk_commodity = sgd;
-    await assetAccount.save();
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [assetAccount, expenseAccount],
-      } as SWRResponse,
-    );
-    const mockSave = jest.fn();
+  /**
+   * Cases for when the main split commodity is different than other splits
+   */
+  describe('different commodity', () => {
+    beforeEach(() => {
+      jest.spyOn(apiHook, 'usePrices')
+        .mockReturnValue({
+          data: new PriceDBMap([
+            {
+              fk_commodity: eur,
+              commodity: eur,
+              fk_currency: sgd,
+              currency: sgd,
+              value: 1 / 0.7,
+            } as Price,
+            {
+              fk_commodity: sgd,
+              commodity: sgd,
+              fk_currency: eur,
+              currency: eur,
+              value: 0.7,
+            } as Price,
+          ]),
+        } as SWRResponse);
+    });
 
-    render(
-      <TransactionForm
-        onSave={mockSave}
-        defaultValues={
-          {
-            date: '',
-            description: '',
-            splits: [
-              Split.create({
-                value: 0,
-                quantity: 0,
-                fk_account: assetAccount,
-              }),
-              new Split(),
-            ],
-            fk_currency: assetAccount.commodity,
+    /**
+     * Check that we create a transaction with the right splits values and quantities.
+     * txCurrency is EUR but we've selected an account for the mainSplit in SGD currency.
+     *
+     * When we select the account in EUR for splits[1], then txCurrency becomes EUR and then
+     * the exchange rates come into play.
+     */
+    it('creates tx with mainSplit not being main currency', async () => {
+      const user = userEvent.setup();
+      assetAccount.fk_commodity = sgd;
+      await assetAccount.save();
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [assetAccount, expenseAccount],
+        } as SWRResponse,
+      );
+      const mockSave = jest.fn();
+
+      render(
+        <TransactionForm
+          onSave={mockSave}
+          defaultValues={
+            {
+              date: '',
+              description: '',
+              splits: [
+                Split.create({
+                  value: 0,
+                  quantity: 0,
+                  fk_account: assetAccount,
+                }),
+                new Split(),
+              ],
+              fk_currency: assetAccount.commodity,
+            }
           }
-        }
-      />,
-    );
+        />,
+      );
 
-    await user.type(screen.getByLabelText('Date'), '2023-01-01');
-    await user.type(screen.getByLabelText('Description'), 'My expense');
+      await user.type(screen.getByLabelText('Date'), '2023-01-01');
+      await user.type(screen.getByLabelText('Description'), 'My expense');
 
-    const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
-    await user.type(q0, '-100');
-    await waitFor(() => expect(q0).toHaveValue(-100));
+      const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
+      await user.type(q0, '-100');
+      await waitFor(() => expect(q0).toHaveValue(-100));
 
-    const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
-    // We haven't selected an account so txCurrency here is SGD
-    await waitFor(() => expect(q1).toHaveValue(100));
+      const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
+      // We haven't selected an account so txCurrency here is SGD (because assetAccount)
+      await waitFor(() => expect(q1).toHaveValue(100));
 
-    await user.click(screen.getByRole('combobox', { name: 'splits.1.account' }));
-    await user.click(screen.getByText('Expenses:random'));
+      await user.click(screen.getByRole('combobox', { name: 'splits.1.account' }));
+      await user.click(screen.getByText('Expenses:random'));
 
-    // We have selected an EUR account here which is our mainCurrency
-    await waitFor(() => expect(q1).toHaveValue(70));
+      // At this point v0 becomes available because txCurrency is EUR
+      const v0 = screen.getByRole('spinbutton', { name: 'splits.0.value' });
+      const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value', hidden: true });
 
-    expect(screen.getByText('add')).not.toBeDisabled();
-    await user.click(screen.getByText('add'));
+      await waitFor(() => expect(q0).toHaveValue(-100)); // 100 SGD
+      await waitFor(() => expect(v0).toHaveValue(-70)); // 70 EUR
+      await waitFor(() => expect(v1).toHaveValue(70)); // 70 EUR
+      await waitFor(() => expect(q1).toHaveValue(70)); // 70 EUR
 
-    const tx = await Transaction.findOneOrFail({
-      where: { description: 'My expense' },
-      relations: {
-        splits: {
-          fk_account: true,
+      expect(screen.getByText('add')).not.toBeDisabled();
+      await user.click(screen.getByText('add'));
+
+      const tx = await Transaction.findOneOrFail({
+        where: { description: 'My expense' },
+        relations: {
+          splits: {
+            fk_account: true,
+          },
         },
-      },
+      });
+
+      expect(tx).toMatchObject({
+        guid: expect.any(String),
+        date: DateTime.fromISO('2023-01-01'),
+        description: 'My expense',
+        fk_currency: eur,
+        splits: [
+          {
+            guid: expect.any(String),
+            action: '',
+            fk_account: {
+              guid: 'account_guid_1',
+              fk_commodity: sgd,
+            },
+            quantityNum: -100,
+            quantityDenom: 1,
+            valueNum: -70,
+            valueDenom: 1,
+          },
+          {
+            guid: expect.any(String),
+            action: '',
+            fk_account: {
+              guid: 'account_guid_2',
+              fk_commodity: eur,
+            },
+            quantityNum: 70,
+            quantityDenom: 1,
+            valueNum: 70,
+            valueDenom: 1,
+          },
+        ],
+      });
+      expect(tx.guid.length).toEqual(31);
+      expect(mockSave).toHaveBeenCalledTimes(1);
     });
 
-    expect(tx).toMatchObject({
-      guid: expect.any(String),
-      date: DateTime.fromISO('2023-01-01'),
-      description: 'My expense',
-      fk_currency: eur,
-      splits: [
+    /**
+     * Same as above but with the mainSplit commodity being same with mainCurrency and split[1]
+     * being different.
+     */
+    it('creates tx with split not being main currency', async () => {
+      const user = userEvent.setup();
+      expenseAccount.fk_commodity = sgd;
+      await expenseAccount.save();
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
-          guid: expect.any(String),
-          action: '',
-          fk_account: {
-            guid: 'account_guid_1',
+          data: [assetAccount, expenseAccount],
+        } as SWRResponse,
+      );
+      const mockSave = jest.fn();
+
+      render(
+        <TransactionForm
+          onSave={mockSave}
+          defaultValues={
+            {
+              date: '',
+              description: '',
+              splits: [
+                Split.create({
+                  value: 0,
+                  quantity: 0,
+                  fk_account: assetAccount,
+                }),
+                new Split(),
+              ],
+              fk_currency: assetAccount.commodity,
+            }
+          }
+        />,
+      );
+
+      await user.type(screen.getByLabelText('Date'), '2023-01-01');
+      await user.type(screen.getByLabelText('Description'), 'My expense');
+
+      const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
+      await user.type(q0, '-100');
+      await waitFor(() => expect(q0).toHaveValue(-100));
+
+      const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
+      // We haven't selected an account so txCurrency here is EUR (because assetAccount)
+      await waitFor(() => expect(q1).toHaveValue(100));
+
+      await user.click(screen.getByRole('combobox', { name: 'splits.1.account' }));
+      await user.click(screen.getByText('Expenses:random'));
+
+      // At this point v1 becomes available because txCurrency is EUR
+      const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value' });
+
+      await waitFor(() => expect(q0).toHaveValue(-100)); // 100 EUR
+      await waitFor(() => expect(v1).toHaveValue(100)); // 100 EUR
+      await waitFor(() => expect(q1).toHaveValue(142.857)); // 142.857 SGD
+
+      expect(screen.getByText('add')).not.toBeDisabled();
+      await user.click(screen.getByText('add'));
+
+      const tx = await Transaction.findOneOrFail({
+        where: { description: 'My expense' },
+        relations: {
+          splits: {
+            fk_account: true,
           },
-          quantityNum: -100,
-          quantityDenom: 1,
-          valueNum: -70,
-          valueDenom: 1,
         },
-        {
-          guid: expect.any(String),
-          action: '',
-          fk_account: {
-            guid: 'account_guid_2',
+      });
+
+      expect(tx).toMatchObject({
+        guid: expect.any(String),
+        date: DateTime.fromISO('2023-01-01'),
+        description: 'My expense',
+        fk_currency: eur,
+        splits: [
+          {
+            guid: expect.any(String),
+            action: '',
+            fk_account: {
+              guid: 'account_guid_1',
+            },
+            quantityNum: -100,
+            quantityDenom: 1,
+            valueNum: -100,
+            valueDenom: 1,
           },
-          quantityNum: 70,
-          quantityDenom: 1,
-          valueNum: 70,
-          valueDenom: 1,
-        },
-      ],
+          {
+            guid: expect.any(String),
+            action: '',
+            fk_account: {
+              guid: 'account_guid_2',
+            },
+            quantityNum: 142857,
+            quantityDenom: 1000,
+            valueNum: 100,
+            valueDenom: 1,
+          },
+        ],
+      });
+      expect(tx.guid.length).toEqual(31);
+      expect(mockSave).toHaveBeenCalledTimes(1);
     });
-    expect(tx.guid.length).toEqual(31);
-    expect(mockSave).toHaveBeenCalledTimes(1);
+
+    /**
+     * Check that we create a transaction that buys 2 titles of commodity "TICKER". The
+     * mainSplit is associated to the "TICKER" account which sets the currency of the transaction
+     * to SGD as TICKER is paid in SGD.
+     *
+     * When we select an account in EUR as the Asset one to transfer the money from, we check
+     * that all fields are displayed accordingly with the correct quantities accordingly to
+     * exchange rates.
+     */
+    it('creates tx with mainSplit commodity not being CURRENCY', async () => {
+      const user = userEvent.setup();
+      const ticker = await Commodity.create({
+        guid: 'ticker',
+        mnemonic: 'TICKER',
+        namespace: 'CUSTOM',
+      }).save();
+
+      const tickerPrice = await Price.create({
+        date: DateTime.fromISO('2023-01-01'),
+        fk_commodity: ticker,
+        commodity: ticker,
+        fk_currency: sgd,
+        currency: sgd,
+        valueNum: 500,
+        valueDenom: 1,
+      }).save();
+
+      jest.spyOn(apiHook, 'usePrices')
+        .mockReturnValue({
+          data: new PriceDBMap([
+            tickerPrice,
+            {
+              fk_commodity: eur,
+              commodity: eur,
+              fk_currency: sgd,
+              currency: sgd,
+              value: 1 / 0.7,
+            } as Price,
+          ]),
+        } as SWRResponse);
+
+      const tickerAccount = await Account.create({
+        guid: 'account_guid_3',
+        name: 'Asset3',
+        type: 'ASSET',
+        fk_commodity: ticker,
+        parent: root,
+      }).save();
+
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [assetAccount, tickerAccount],
+        } as SWRResponse,
+      );
+      const mockSave = jest.fn();
+
+      render(
+        <TransactionForm
+          onSave={mockSave}
+          defaultValues={
+            {
+              date: '',
+              description: '',
+              splits: [
+                Split.create({
+                  value: 0,
+                  quantity: 0,
+                  fk_account: tickerAccount,
+                }),
+                new Split(),
+              ],
+              fk_currency: assetAccount.commodity,
+            }
+          }
+        />,
+      );
+
+      await user.type(screen.getByLabelText('Date'), '2023-01-01');
+      await user.type(screen.getByLabelText('Description'), 'Buy TICKER');
+
+      const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
+      await user.type(q0, '2');
+      await waitFor(() => expect(q0).toHaveValue(2));
+
+      const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
+      // We haven't selected an account so txCurrency here is SGD because TICKER's
+      // currency is SGD
+      await waitFor(() => expect(q1).toHaveValue(-1000));
+
+      await user.click(screen.getByRole('combobox', { name: 'splits.1.account' }));
+      await user.click(screen.getByText('Assets:asset1'));
+
+      // At this point v1 becomes available because txCurrency is SGD
+      const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value' });
+      const v0 = screen.getByRole('spinbutton', { name: 'splits.0.value' });
+
+      await waitFor(() => expect(q0).toHaveValue(2)); // 2 TICKER
+      await waitFor(() => expect(v0).toHaveValue(1000)); // 1000 SGD
+      await waitFor(() => expect(v1).toHaveValue(-1000)); // -1000 SGD
+      await waitFor(() => expect(q1).toHaveValue(-700)); // -700 EUR
+
+      expect(screen.getByText('add')).not.toBeDisabled();
+      await user.click(screen.getByText('add'));
+
+      const tx = await Transaction.findOneOrFail({
+        where: { description: 'Buy TICKER' },
+        relations: {
+          splits: {
+            fk_account: true,
+          },
+        },
+      });
+
+      expect(tx).toMatchObject({
+        guid: expect.any(String),
+        date: DateTime.fromISO('2023-01-01'),
+        description: 'Buy TICKER',
+        fk_currency: sgd,
+        splits: [
+          {
+            guid: expect.any(String),
+            action: '',
+            fk_account: {
+              guid: 'account_guid_3',
+            },
+            quantityNum: 2,
+            quantityDenom: 1,
+            valueNum: 1000,
+            valueDenom: 1,
+          },
+          {
+            guid: expect.any(String),
+            action: '',
+            fk_account: {
+              guid: 'account_guid_1',
+            },
+            quantityNum: -700,
+            quantityDenom: 1,
+            valueNum: -1000,
+            valueDenom: 1,
+          },
+        ],
+      });
+      expect(tx.guid.length).toEqual(31);
+      expect(mockSave).toHaveBeenCalledTimes(1);
+    });
+
+    /**
+     * Same as above but the mainSplit is now the asset account and the other split
+     * is the one with the non currency commodity
+     */
+    it('creates tx with split commodity not being CURRENCY', async () => {
+      const user = userEvent.setup();
+      const ticker = await Commodity.create({
+        guid: 'ticker',
+        mnemonic: 'TICKER',
+        namespace: 'CUSTOM',
+      }).save();
+
+      const tickerPrice = await Price.create({
+        date: DateTime.fromISO('2023-01-01'),
+        fk_commodity: ticker,
+        commodity: ticker,
+        fk_currency: sgd,
+        currency: sgd,
+        valueNum: 500,
+        valueDenom: 1,
+      }).save();
+
+      jest.spyOn(apiHook, 'usePrices')
+        .mockReturnValue({
+          data: new PriceDBMap([
+            tickerPrice,
+            {
+              fk_commodity: eur,
+              commodity: eur,
+              fk_currency: sgd,
+              currency: sgd,
+              value: 1 / 0.7,
+            } as Price,
+          ]),
+        } as SWRResponse);
+
+      const tickerAccount = await Account.create({
+        guid: 'account_guid_3',
+        name: 'Asset3',
+        type: 'ASSET',
+        fk_commodity: ticker,
+        parent: root,
+      }).save();
+      tickerAccount.path = 'Assets:asset3';
+
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [assetAccount, tickerAccount],
+        } as SWRResponse,
+      );
+      const mockSave = jest.fn();
+
+      render(
+        <TransactionForm
+          onSave={mockSave}
+          defaultValues={
+            {
+              date: '',
+              description: '',
+              splits: [
+                Split.create({
+                  value: 0,
+                  quantity: 0,
+                  fk_account: assetAccount,
+                }),
+                new Split(),
+              ],
+              fk_currency: assetAccount.commodity,
+            }
+          }
+        />,
+      );
+
+      await user.type(screen.getByLabelText('Date'), '2023-01-01');
+      await user.type(screen.getByLabelText('Description'), 'Buy TICKER');
+
+      const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
+      await user.type(q0, '-700');
+      await waitFor(() => expect(q0).toHaveValue(-700));
+
+      const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
+      // We haven't selected an account so txCurrency here is SGD because TICKER's
+      // currency is SGD
+      await waitFor(() => expect(q1).toHaveValue(700));
+
+      await user.click(screen.getByRole('combobox', { name: 'splits.1.account' }));
+      await user.click(screen.getByText('Assets:asset3'));
+
+      // At this point v1 becomes available because txCurrency is SGD
+      const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value' });
+      const v0 = screen.getByRole('spinbutton', { name: 'splits.0.value' });
+
+      await waitFor(() => expect(q0).toHaveValue(-700)); // -700 EUR
+      await waitFor(() => expect(v0).toHaveValue(-1000)); // -1000 SGD
+      await waitFor(() => expect(v1).toHaveValue(1000)); // 1000 SGD
+      await waitFor(() => expect(q1).toHaveValue(2)); // 2 TICKER
+
+      expect(screen.getByText('add')).not.toBeDisabled();
+      await user.click(screen.getByText('add'));
+
+      const tx = await Transaction.findOneOrFail({
+        where: { description: 'Buy TICKER' },
+        relations: {
+          splits: {
+            fk_account: true,
+          },
+        },
+      });
+
+      expect(tx).toMatchObject({
+        guid: expect.any(String),
+        date: DateTime.fromISO('2023-01-01'),
+        description: 'Buy TICKER',
+        fk_currency: sgd,
+        splits: [
+          {
+            guid: expect.any(String),
+            action: '',
+            fk_account: {
+              guid: 'account_guid_1',
+            },
+            quantityNum: -700,
+            quantityDenom: 1,
+            valueNum: -1000,
+            valueDenom: 1,
+          },
+          {
+            guid: expect.any(String),
+            action: '',
+            fk_account: {
+              guid: 'account_guid_3',
+            },
+            quantityNum: 2,
+            quantityDenom: 1,
+            valueNum: 1000,
+            valueDenom: 1,
+          },
+        ],
+      });
+      expect(tx.guid.length).toEqual(31);
+      expect(mockSave).toHaveBeenCalledTimes(1);
+    });
+
+    /**
+     * Check that we can create a transaction with multiple splits with different commodities
+     * each. The main split is a non currency commodity while the other splits 1 is deducting
+     * an amount from an ASSET account and the other an EXPENSE. This transaction simulates
+     * buying a stock in SGD and paying fees in EUR.
+     */
+    it('creates tx with multiple splits', async () => {
+      const user = userEvent.setup();
+      const ticker = await Commodity.create({
+        guid: 'ticker',
+        mnemonic: 'TICKER',
+        namespace: 'CUSTOM',
+      }).save();
+
+      const tickerPrice = await Price.create({
+        date: DateTime.fromISO('2023-01-01'),
+        fk_commodity: ticker,
+        commodity: ticker,
+        fk_currency: sgd,
+        currency: sgd,
+        valueNum: 500,
+        valueDenom: 1,
+      }).save();
+
+      jest.spyOn(apiHook, 'usePrices')
+        .mockReturnValue({
+          data: new PriceDBMap([
+            tickerPrice,
+            {
+              fk_commodity: eur,
+              commodity: eur,
+              fk_currency: sgd,
+              currency: sgd,
+              value: 1 / 0.7,
+            } as Price,
+          ]),
+        } as SWRResponse);
+
+      const tickerAccount = await Account.create({
+        guid: 'account_guid_3',
+        name: 'Asset3',
+        type: 'ASSET',
+        fk_commodity: ticker,
+        parent: root,
+      }).save();
+
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [assetAccount, tickerAccount, expenseAccount],
+        } as SWRResponse,
+      );
+      const mockSave = jest.fn();
+
+      render(
+        <TransactionForm
+          onSave={mockSave}
+          defaultValues={
+            {
+              date: '',
+              description: '',
+              splits: [
+                Split.create({
+                  value: 0,
+                  quantity: 0,
+                  fk_account: tickerAccount,
+                }),
+                new Split(),
+              ],
+              fk_currency: assetAccount.commodity,
+            }
+          }
+        />,
+      );
+
+      await user.type(screen.getByLabelText('Date'), '2023-01-01');
+      await user.type(screen.getByLabelText('Description'), 'Buy TICKER');
+
+      const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
+      await user.type(q0, '2');
+      await waitFor(() => expect(q0).toHaveValue(2));
+
+      const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
+      // We haven't selected an account so txCurrency here is SGD because TICKER's
+      // currency is SGD
+      await waitFor(() => expect(q1).toHaveValue(-1000));
+
+      await user.click(screen.getByRole('combobox', { name: 'splits.1.account' }));
+      await user.click(screen.getByText('Assets:asset1'));
+
+      // At this point v1 becomes available because txCurrency is SGD
+      const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value' });
+      const v0 = screen.getByRole('spinbutton', { name: 'splits.0.value' });
+
+      await waitFor(() => expect(q0).toHaveValue(2)); // 2 TICKER
+      await waitFor(() => expect(v0).toHaveValue(1000)); // 1000 SGD
+      await waitFor(() => expect(v1).toHaveValue(-1000)); // -1000 SGD
+      await waitFor(() => expect(q1).toHaveValue(-700)); // -700 EUR
+
+      await user.click(screen.getByText('Add split', { exact: false }));
+
+      await user.click(screen.getByRole('combobox', { name: 'splits.2.account' }));
+      await user.click(screen.getByText('Expenses:random'));
+
+      const q2 = screen.getByRole('spinbutton', { name: 'splits.2.quantity' });
+      const v2 = screen.getByRole('spinbutton', { name: 'splits.2.value' });
+      await user.type(v2, '5');
+      await waitFor(() => expect(q2).toHaveValue(3.5)); // 3.5 EUR
+
+      // We need to deduct the fee from the amount we've invested in the STOCK to make
+      // the imbalance disappear
+      await user.clear(v0);
+      await user.type(v0, '995');
+
+      expect(screen.getByText('add')).not.toBeDisabled();
+      await user.click(screen.getByText('add'));
+
+      const tx = await Transaction.findOneOrFail({
+        where: { description: 'Buy TICKER' },
+        relations: {
+          splits: {
+            fk_account: true,
+          },
+        },
+      });
+
+      expect(tx).toMatchObject({
+        guid: expect.any(String),
+        date: DateTime.fromISO('2023-01-01'),
+        description: 'Buy TICKER',
+        fk_currency: sgd,
+        splits: [
+          {
+            guid: expect.any(String),
+            action: '',
+            fk_account: {
+              guid: 'account_guid_3',
+            },
+            quantityNum: 2,
+            quantityDenom: 1,
+            valueNum: 995,
+            valueDenom: 1,
+          },
+          {
+            guid: expect.any(String),
+            action: '',
+            fk_account: {
+              guid: 'account_guid_1',
+            },
+            quantityNum: -700,
+            quantityDenom: 1,
+            valueNum: -1000,
+            valueDenom: 1,
+          },
+          {
+            guid: expect.any(String),
+            action: '',
+            fk_account: {
+              guid: 'account_guid_2',
+            },
+            quantityNum: 35,
+            quantityDenom: 10,
+            valueNum: 5,
+            valueDenom: 1,
+          },
+        ],
+      });
+      expect(tx.guid.length).toEqual(31);
+      expect(mockSave).toHaveBeenCalledTimes(1);
+    });
   });
 
-  it('creates multiple splits transaction with mainSplit not being main currency', async () => {
+  it('refreshes investment SWR cache when commodity is not CURRENCY', async () => {
     const user = userEvent.setup();
-    jest.spyOn(stocker, 'getPrice')
-      .mockResolvedValue({ price: 0.7, currency: '' });
-    assetAccount.fk_commodity = sgd;
-    await assetAccount.save();
-    const expenseAccount2 = await Account.create({
-      guid: 'account_guid_3',
-      name: 'random3',
-      type: 'EXPENSE',
-      fk_commodity: eur,
-      parent: root,
-      path: 'Expenses:random3',
-    }).save();
-    expenseAccount2.path = 'Expenses:random3';
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [assetAccount, expenseAccount, expenseAccount2],
-      } as SWRResponse,
-    );
-    const mockSave = jest.fn();
-
-    render(
-      <TransactionForm
-        onSave={mockSave}
-        defaultValues={
-          {
-            date: '',
-            description: '',
-            splits: [
-              Split.create({
-                value: 0,
-                quantity: 0,
-                fk_account: assetAccount,
-              }),
-              new Split(),
-            ],
-            fk_currency: assetAccount.commodity,
-          }
-        }
-      />,
-    );
-
-    await user.type(screen.getByLabelText('Date'), '2023-01-01');
-    await user.type(screen.getByLabelText('Description'), 'My expense');
-
-    // Set Amount to -100
-    const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
-    await user.type(q0, '-100');
-    await waitFor(() => expect(q0).toHaveValue(-100));
-
-    // Select account for first split
-    await user.click(screen.getByLabelText('splits.1.account'));
-    await user.click(screen.getByText('Expenses:random'));
-
-    // Check value for main split is set with main currency exchange
-    // and that q1 is automatically populated
-    const v0 = screen.getByRole('spinbutton', { name: 'splits.0.value' });
-    await waitFor(() => expect(v0).toHaveValue(-70));
-    const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
-    await waitFor(() => expect(q1).toHaveValue(70));
-
-    // Set custom quantity for first split
-    user.clear(q1);
-    // This gives act warnings but didn't find a better way to work around it
-    await act(async () => {
-      await user.type(q1, '50');
-    });
-    await waitFor(() => expect(q1).toHaveValue(50));
-    const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value', hidden: true });
-    await waitFor(() => expect(v1).toHaveValue(50));
-
-    // Add extra split
-    await user.click(screen.getByText('Add split'));
-
-    // Select account for second split
-    await user.click(screen.getByRole('combobox', { name: 'splits.2.account' }));
-    await user.click(screen.getByText('Expenses:random3'));
-    const q2 = screen.getByRole('spinbutton', { name: 'splits.2.quantity' });
-
-    // Set quantity for second split
-    await user.type(q2, '20');
-    await waitFor(() => expect(q2).toHaveValue(20));
-    const v2 = screen.getByRole('spinbutton', { name: 'splits.2.value', hidden: true });
-    await waitFor(() => expect(v2).toHaveValue(20));
-
-    expect(screen.getByText('add')).not.toBeDisabled();
-    await user.click(screen.getByText('add'));
-
-    const tx = await Transaction.findOneOrFail({
-      where: { description: 'My expense' },
-      relations: {
-        splits: {
-          fk_account: true,
-        },
-      },
-    });
-
-    expect(tx).toMatchObject({
-      guid: expect.any(String),
-      date: DateTime.fromISO('2023-01-01'),
-      description: 'My expense',
-      fk_currency: eur,
-      splits: [
-        {
-          guid: expect.any(String),
-          action: '',
-          fk_account: {
-            guid: 'account_guid_1',
-          },
-          quantityNum: -100,
-          quantityDenom: 1,
-          valueNum: -70,
-          valueDenom: 1,
-        },
-        {
-          guid: expect.any(String),
-          action: '',
-          fk_account: {
-            guid: 'account_guid_2',
-          },
-          quantityNum: 50,
-          quantityDenom: 1,
-          valueNum: 50,
-          valueDenom: 1,
-        },
-        {
-          guid: expect.any(String),
-          action: '',
-          fk_account: {
-            guid: 'account_guid_3',
-          },
-          quantityNum: 20,
-          quantityDenom: 1,
-          valueNum: 20,
-          valueDenom: 1,
-        },
-      ],
-    });
-    expect(tx.guid.length).toEqual(31);
-    expect(mockSave).toHaveBeenCalledTimes(1);
-  }, 10000);
-
-  it('creates transaction with split not being main currency', async () => {
-    const user = userEvent.setup();
-    jest.spyOn(stocker, 'getPrice')
-      .mockResolvedValue({ price: 1.42857, currency: '' });
-    expenseAccount.fk_commodity = sgd;
-    await expenseAccount.save();
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [assetAccount, expenseAccount],
-      } as SWRResponse,
-    );
-    const mockSave = jest.fn();
-
-    render(
-      <TransactionForm
-        onSave={mockSave}
-        defaultValues={
-          {
-            date: '',
-            description: '',
-            splits: [
-              Split.create({
-                value: 0,
-                quantity: 0,
-                fk_account: assetAccount,
-              }),
-              new Split(),
-            ],
-            fk_currency: assetAccount.commodity,
-          }
-        }
-      />,
-    );
-
-    await user.type(screen.getByLabelText('Date'), '2023-01-01');
-    await user.type(screen.getByLabelText('Description'), 'My expense');
-
-    const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
-    await user.type(q0, '-100');
-    await waitFor(() => expect(q0).toHaveValue(-100));
-
-    const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
-    // We haven't selected an account so txCurrency here is EUR (because ASSET account)
-    await waitFor(() => expect(q1).toHaveValue(100));
-
-    await user.click(screen.getByRole('combobox', { name: 'splits.1.account' }));
-    await user.click(screen.getByText('Expenses:random'));
-
-    // We have selected an SGD account which is not our mainCurrency
-    await waitFor(() => expect(q1).toHaveValue(70));
-
-    expect(screen.getByText('add')).not.toBeDisabled();
-    await user.click(screen.getByText('add'));
-
-    const tx = await Transaction.findOneOrFail({
-      where: { description: 'My expense' },
-      relations: {
-        splits: {
-          fk_account: true,
-        },
-      },
-    });
-
-    expect(tx).toMatchObject({
-      guid: expect.any(String),
-      date: DateTime.fromISO('2023-01-01'),
-      description: 'My expense',
-      fk_currency: eur,
-      splits: [
-        {
-          guid: expect.any(String),
-          action: '',
-          fk_account: {
-            guid: 'account_guid_1',
-          },
-          quantityNum: -100,
-          quantityDenom: 1,
-          valueNum: -100,
-          valueDenom: 1,
-        },
-        {
-          guid: expect.any(String),
-          action: '',
-          fk_account: {
-            guid: 'account_guid_2',
-          },
-          quantityNum: 70,
-          quantityDenom: 1,
-          valueNum: 100,
-          valueDenom: 1,
-        },
-      ],
-    });
-    expect(tx.guid.length).toEqual(31);
-    expect(mockSave).toHaveBeenCalledTimes(1);
-  });
-
-  it('refreshes investments key when account is investment', async () => {
-    const user = userEvent.setup();
-    jest.spyOn(stocker, 'getPrice')
-      .mockResolvedValue({ price: 90, currency: '' });
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [assetAccount, expenseAccount],
@@ -679,390 +1037,257 @@ describe('TransactionForm', () => {
 
     expect(swr.mutate).toBeCalledTimes(6);
     expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/account_guid_1');
-    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/investments');
+    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/investments', undefined);
     expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/investments/stock_account');
     expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/splits/stock_account');
     expect(swr.mutate).toHaveBeenNthCalledWith(5, '/api/monthly-totals', undefined);
     expect(swr.mutate).toHaveBeenNthCalledWith(6, '/api/txs/latest', undefined);
   });
 
-  // When the main split is a stock account the getExchangeRate rate logic
-  // is different as it has to retrieve the price for that stock only
-  // and then set the price to 1 / rate
-  it('can create split transaction with stock being main split', async () => {
-    const user = userEvent.setup();
-    jest.spyOn(stocker, 'getPrice')
-      .mockImplementation(async () => Promise.resolve({ price: 90, currency: 'SGD' }));
-    const stockCommodity = await Commodity.create({
-      guid: 'stock_guid',
-      namespace: 'NASDAQ',
-      mnemonic: 'STOCK',
-    }).save();
+  describe('actions', () => {
+    it('updates transaction', async () => {
+      const user = userEvent.setup();
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [assetAccount, expenseAccount],
+        } as SWRResponse,
+      );
+      const mockSave = jest.fn();
 
-    const stockAccount = await Account.create({
-      guid: 'stock_account',
-      name: 'Stock',
-      type: 'STOCK',
-      fk_commodity: stockCommodity,
-      parent: assetAccount,
-    }).save();
+      await Transaction.create({
+        guid: 'tx_guid',
+        date: DateTime.fromISO('2023-01-01'),
+        description: 'description',
+        splits: [
+          Split.create({
+            valueNum: -100,
+            valueDenom: 1,
+            quantityNum: -100,
+            quantityDenom: 1,
+            fk_account: assetAccount,
+          }),
+          Split.create({
+            valueNum: 100,
+            valueDenom: 1,
+            quantityNum: 100,
+            quantityDenom: 1,
+            fk_account: expenseAccount,
+          }),
+        ],
+        fk_currency: assetAccount.commodity,
+      }).save();
 
-    assetAccount.fk_commodity = sgd;
-    await assetAccount.save();
+      const tx = await Transaction.findOneOrFail({
+        where: { description: 'description' },
+        relations: {
+          splits: {
+            fk_account: true,
+          },
+        },
+      });
 
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [assetAccount, stockAccount],
-      } as SWRResponse,
-    );
-    const mockSave = jest.fn();
+      render(
+        <TransactionForm
+          action="update"
+          onSave={mockSave}
+          defaultValues={
+            {
+              ...tx,
+              date: tx.date.toISODate() as string,
+              fk_currency: tx.currency,
+            }
+          }
+        />,
+      );
 
-    render(
-      <TransactionForm
-        action="add"
-        onSave={mockSave}
-        defaultValues={
-          {
-            guid: 'tx_guid',
-            date: DateTime.fromISO('2023-01-01').toISODate() as string,
-            description: 'Split STOCK',
-            splits: [
-              {
-                // This is hacky but because we rely on destructured objects
-                // to pass to the form because in there, we use the `value` and
-                // `quantity` fields to evaluate if the form has changed. If
-                // we don't destructure the object, value and quantity fields
-                // don't exist and thus it fails. This behavior is what
-                // currently happens in the real code too
-                ...Split.create({
-                  valueNum: 0,
+      await user.clear(screen.getByLabelText('Description'));
+      await user.type(screen.getByLabelText('Description'), 'New description');
+
+      await user.click(screen.getByText('update'));
+
+      const txs = await Transaction.find();
+      expect(txs).toHaveLength(1);
+      expect(txs[0].description).toEqual('New description');
+    });
+
+    it('updates doesnt leave splits with empty transaction', async () => {
+      const user = userEvent.setup();
+
+      const extraExpenseAccount = await Account.create({
+        guid: 'account_guid_3',
+        name: 'Extra',
+        type: 'EXPENSE',
+        fk_commodity: eur,
+        parent: root,
+      }).save();
+
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [assetAccount, expenseAccount, extraExpenseAccount],
+        } as SWRResponse,
+      );
+      const mockSave = jest.fn();
+
+      const { rerender } = render(
+        <TransactionForm
+          action="add"
+          onSave={mockSave}
+          defaultValues={
+            {
+              guid: 'tx_guid',
+              date: DateTime.fromISO('2023-01-01').toISODate() as string,
+              description: 'description',
+              splits: [
+                Split.create({
+                  valueNum: -200,
                   valueDenom: 1,
-                  quantityNum: 0,
+                  quantityNum: -200,
                   quantityDenom: 1,
-                  fk_account: stockAccount,
+                  fk_account: assetAccount,
                 }),
-                account: stockAccount,
-              } as Split,
-              new Split(),
-            ],
-            fk_currency: stockAccount.commodity,
+                Split.create({
+                  valueNum: 100,
+                  valueDenom: 1,
+                  quantityNum: 100,
+                  quantityDenom: 1,
+                  fk_account: expenseAccount,
+                }),
+                Split.create({
+                  valueNum: 100,
+                  valueDenom: 1,
+                  quantityNum: 100,
+                  quantityDenom: 1,
+                  fk_account: extraExpenseAccount,
+                }),
+              ],
+              fk_currency: assetAccount.commodity,
+            }
           }
-        }
-      />,
-    );
+        />,
+      );
 
-    const q0 = screen.getByLabelText('splits.0.quantity');
-    // Buy 100 stocks
-    await user.type(q0, '100');
-    await waitFor(() => expect(q0).toHaveValue(100));
+      expect(screen.getByText('add')).toBeEnabled();
+      await user.click(screen.getByText('add'));
 
-    const q1 = screen.getByLabelText('splits.1.quantity');
-    // We haven't selected an account so txCurrency here is STOCK
-    await waitFor(() => expect(q1).toHaveValue(-100));
-
-    await user.click(screen.getByRole('combobox', { name: 'splits.1.account' }));
-    await user.click(screen.getByText('Assets:asset1'));
-
-    const v1 = screen.getByLabelText('splits.1.value');
-    // We have selected an account with SGD currency which is the same currency
-    // as the stock one
-    await waitFor(() => expect(v1).toHaveValue(-100));
-    await waitFor(() => expect(q1).toHaveValue(-9000));
-
-    const v0 = screen.getByLabelText('splits.0.value');
-    user.clear(v0);
-    await user.type(v0, '0');
-    user.clear(q1);
-    // Set the quantity for asset account to 0 to reflect the new shares
-    // cost nothing
-    await user.type(q1, '0');
-
-    expect(screen.getByText('add')).not.toBeDisabled();
-    await user.click(screen.getByText('add'));
-
-    const tx = await Transaction.findOneOrFail({
-      where: { description: 'Split STOCK' },
-      relations: {
-        splits: {
-          fk_account: true,
-        },
-      },
-    });
-
-    expect(tx).toMatchObject({
-      guid: expect.any(String),
-      date: DateTime.fromISO('2023-01-01'),
-      description: 'Split STOCK',
-      fk_currency: sgd,
-      splits: [
-        {
-          guid: expect.any(String),
-          action: '',
-          fk_account: {
-            guid: 'stock_account',
-          },
-          quantityNum: 100,
-          quantityDenom: 1,
-          valueNum: 0,
-          valueDenom: 1,
-        },
-        {
-          guid: expect.any(String),
-          action: '',
-          fk_account: {
-            guid: 'account_guid_1',
-          },
-          quantityNum: 0,
-          quantityDenom: 1,
-          valueNum: 0,
-          valueDenom: 1,
-        },
-      ],
-    });
-  });
-
-  it('updates transaction', async () => {
-    const user = userEvent.setup();
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [assetAccount, expenseAccount],
-      } as SWRResponse,
-    );
-    const mockSave = jest.fn();
-
-    await Transaction.create({
-      guid: 'tx_guid',
-      date: DateTime.fromISO('2023-01-01'),
-      description: 'description',
-      splits: [
-        Split.create({
-          valueNum: -100,
-          valueDenom: 1,
-          quantityNum: -100,
-          quantityDenom: 1,
-          fk_account: assetAccount,
-        }),
-        Split.create({
-          valueNum: 100,
-          valueDenom: 1,
-          quantityNum: 100,
-          quantityDenom: 1,
-          fk_account: expenseAccount,
-        }),
-      ],
-      fk_currency: assetAccount.commodity,
-    }).save();
-
-    const tx = await Transaction.findOneOrFail({
-      where: { description: 'description' },
-      relations: {
-        splits: {
-          fk_account: true,
-        },
-      },
-    });
-
-    render(
-      <TransactionForm
-        action="update"
-        onSave={mockSave}
-        defaultValues={
-          {
-            ...tx,
-            date: tx.date.toISODate() as string,
-            fk_currency: tx.currency,
-          }
-        }
-      />,
-    );
-
-    await user.clear(screen.getByLabelText('Description'));
-    await user.type(screen.getByLabelText('Description'), 'New description');
-
-    await user.click(screen.getByText('update'));
-
-    const txs = await Transaction.find();
-    expect(txs).toHaveLength(1);
-    expect(txs[0].description).toEqual('New description');
-  });
-
-  it('updates doesnt leave splits with empty transaction', async () => {
-    const user = userEvent.setup();
-
-    const extraExpenseAccount = await Account.create({
-      guid: 'account_guid_3',
-      name: 'Extra',
-      type: 'EXPENSE',
-      fk_commodity: eur,
-      parent: root,
-    }).save();
-
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [assetAccount, expenseAccount, extraExpenseAccount],
-      } as SWRResponse,
-    );
-    const mockSave = jest.fn();
-
-    const { rerender } = render(
-      <TransactionForm
-        action="add"
-        onSave={mockSave}
-        defaultValues={
-          {
-            guid: 'tx_guid',
-            date: DateTime.fromISO('2023-01-01').toISODate() as string,
-            description: 'description',
-            splits: [
-              Split.create({
-                valueNum: -200,
-                valueDenom: 1,
-                quantityNum: -200,
-                quantityDenom: 1,
-                fk_account: assetAccount,
-              }),
-              Split.create({
-                valueNum: 100,
-                valueDenom: 1,
-                quantityNum: 100,
-                quantityDenom: 1,
-                fk_account: expenseAccount,
-              }),
-              Split.create({
-                valueNum: 100,
-                valueDenom: 1,
-                quantityNum: 100,
-                quantityDenom: 1,
-                fk_account: extraExpenseAccount,
-              }),
-            ],
-            fk_currency: assetAccount.commodity,
-          }
-        }
-      />,
-    );
-
-    expect(screen.getByText('add')).toBeEnabled();
-    await user.click(screen.getByText('add'));
-
-    const tx = await Transaction.findOneOrFail({
-      where: { description: 'description' },
-      relations: {
-        splits: {
-          fk_transaction: {
-            splits: {
-              fk_account: true,
+      const tx = await Transaction.findOneOrFail({
+        where: { description: 'description' },
+        relations: {
+          splits: {
+            fk_transaction: {
+              splits: {
+                fk_account: true,
+              },
             },
+            fk_account: true,
           },
-          fk_account: true,
         },
-      },
+      });
+
+      rerender(
+        <TransactionForm
+          action="update"
+          onSave={mockSave}
+          defaultValues={
+            {
+              ...tx,
+              date: tx.date.toISODate() as string,
+              fk_currency: tx.currency as Commodity,
+            }
+          }
+        />,
+      );
+
+      await user.click(screen.getByText('X'));
+      const [, q1] = screen.getAllByRole('spinbutton');
+      await user.type(q1, '200');
+
+      await user.click(screen.getByText('update'));
+
+      const splits = await Split.findBy({
+        fk_transaction: IsNull(),
+      });
+      expect(splits).toHaveLength(0);
+      const txs = await Transaction.find();
+      expect(txs).toHaveLength(1);
     });
 
-    rerender(
-      <TransactionForm
-        action="update"
-        onSave={mockSave}
-        defaultValues={
-          {
-            ...tx,
-            date: tx.date.toISODate() as string,
-            fk_currency: tx.currency as Commodity,
+    it('deletes transaction and splits', async () => {
+      const user = userEvent.setup();
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [assetAccount, expenseAccount],
+        } as SWRResponse,
+      );
+      const mockSave = jest.fn();
+
+      const { rerender } = render(
+        <TransactionForm
+          action="add"
+          onSave={mockSave}
+          defaultValues={
+            {
+              guid: 'tx_guid',
+              date: DateTime.fromISO('2023-01-01').toISODate() as string,
+              description: 'description',
+              splits: [
+                Split.create({
+                  valueNum: -100,
+                  valueDenom: 1,
+                  quantityNum: -100,
+                  quantityDenom: 1,
+                  fk_account: assetAccount,
+                }),
+                Split.create({
+                  valueNum: 100,
+                  valueDenom: 1,
+                  quantityNum: 100,
+                  quantityDenom: 1,
+                  fk_account: expenseAccount,
+                }),
+              ],
+              fk_currency: assetAccount.commodity,
+            }
           }
-        }
-      />,
-    );
+        />,
+      );
 
-    await user.click(screen.getByText('X'));
-    const [, q1] = screen.getAllByRole('spinbutton');
-    await user.type(q1, '200');
+      expect(screen.getByText('add')).toBeEnabled();
+      await user.click(screen.getByText('add'));
 
-    await user.click(screen.getByText('update'));
-
-    const splits = await Split.findBy({
-      fk_transaction: IsNull(),
-    });
-    expect(splits).toHaveLength(0);
-    const txs = await Transaction.find();
-    expect(txs).toHaveLength(1);
-  });
-
-  it('deletes transaction and splits', async () => {
-    const user = userEvent.setup();
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [assetAccount, expenseAccount],
-      } as SWRResponse,
-    );
-    const mockSave = jest.fn();
-
-    const { rerender } = render(
-      <TransactionForm
-        action="add"
-        onSave={mockSave}
-        defaultValues={
-          {
-            guid: 'tx_guid',
-            date: DateTime.fromISO('2023-01-01').toISODate() as string,
-            description: 'description',
-            splits: [
-              Split.create({
-                valueNum: -100,
-                valueDenom: 1,
-                quantityNum: -100,
-                quantityDenom: 1,
-                fk_account: assetAccount,
-              }),
-              Split.create({
-                valueNum: 100,
-                valueDenom: 1,
-                quantityNum: 100,
-                quantityDenom: 1,
-                fk_account: expenseAccount,
-              }),
-            ],
-            fk_currency: assetAccount.commodity,
-          }
-        }
-      />,
-    );
-
-    expect(screen.getByText('add')).toBeEnabled();
-    await user.click(screen.getByText('add'));
-
-    const tx = await Transaction.findOneOrFail({
-      where: { description: 'description' },
-      relations: {
-        splits: {
-          fk_transaction: {
-            splits: {
-              fk_account: true,
+      const tx = await Transaction.findOneOrFail({
+        where: { description: 'description' },
+        relations: {
+          splits: {
+            fk_transaction: {
+              splits: {
+                fk_account: true,
+              },
             },
+            fk_account: true,
           },
-          fk_account: true,
         },
-      },
-    });
+      });
 
-    rerender(
-      <TransactionForm
-        action="delete"
-        onSave={mockSave}
-        defaultValues={
-          {
-            ...tx,
-            date: tx.date.toISODate() as string,
-            fk_currency: tx.currency as Commodity,
+      rerender(
+        <TransactionForm
+          action="delete"
+          onSave={mockSave}
+          defaultValues={
+            {
+              ...tx,
+              date: tx.date.toISODate() as string,
+              fk_currency: tx.currency as Commodity,
+            }
           }
-        }
-      />,
-    );
+        />,
+      );
 
-    await user.click(screen.getByText('delete'));
+      await user.click(screen.getByText('delete'));
 
-    const txs = await Transaction.find();
-    expect(txs).toHaveLength(0);
-    const splits = await Split.find();
-    expect(splits).toHaveLength(0);
+      const txs = await Transaction.find();
+      expect(txs).toHaveLength(0);
+      const splits = await Split.find();
+      expect(splits).toHaveLength(0);
+    });
   });
 });

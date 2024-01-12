@@ -79,12 +79,12 @@ function aggregateChildrenTotals(
       const childAccount = accounts[childId];
       let childCurrency = childAccount.commodity.mnemonic;
       if (isInvestment(childAccount)) {
-        const price = todayQuotes.getStockPrice(
+        const stockPrice = todayQuotes.getInvestmentPrice(
           childAccount.commodity.mnemonic,
           DateTime.now(),
         );
-        rate = price.value;
-        childCurrency = price.currency.mnemonic;
+        rate = stockPrice.value;
+        childCurrency = stockPrice.currency.mnemonic;
       }
       if (childMonthlyTotal.currency !== commodity.mnemonic) {
         rate *= todayQuotes.getPrice(
