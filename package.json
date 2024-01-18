@@ -134,7 +134,7 @@
     "@types/react-table": "^7.7.19",
     "@types/react-test-renderer": "^18.0.7",
     "@types/sql.js": "^1.4.9",
-    "autoprefixer": "^10.4.16",
+    "autoprefixer": "^10.4.17",
     "babel-preset-react-app": "^10.0.1",
     "copy-webpack-plugin": "^11.0.0",
     "eslint": "^8.56.0",
