@@ -37,8 +37,8 @@ describe('InvestmentsTable', () => {
           },
           {
             accessorFn: expect.any(Function),
-            header: 'Today',
-            id: 'today',
+            header: 'Latest',
+            id: 'latest',
             cell: expect.any(Function),
           },
           {

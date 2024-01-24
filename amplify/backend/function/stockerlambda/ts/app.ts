@@ -2,7 +2,6 @@ import cors from 'cors';
 import express from 'express';
 import bodyParser from 'body-parser';
 import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware';
-import { AxiosError } from 'axios';
 
 import * as yahoo  from './yahoo';
 import { Price } from './types';
@@ -62,29 +61,4 @@ app.get('/api/prices', async (req, res) => {
   }
 
   res.json(result);
-});
-
-app.get('/api/price', async (req, res) => {
-  let ticker = req.query.id;
-  let when = Number(req.query.when) || undefined;
-
-  if (!ticker) {
-    res.status(400).json({
-      error: 'IDS_REQUIRED',
-      description: 'You need to pass \'id\' queryparam to select the quote',
-    });
-    return;
-  }
-
-  try {
-    const price = await yahoo.getPrice(ticker as string, when);
-    res.json(price);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      error: 'UNKNOWN_ERROR',
-      description: 'Failed to retrieve prices',
-    });
-    return;
-  }
 });

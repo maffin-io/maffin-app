@@ -36,6 +36,9 @@ describe('LatestTransactions', () => {
                 guid: 'account1',
                 name: 'Account 1',
                 type: 'ASSET',
+                commodity: {
+                  mnemonic: 'EUR',
+                },
               },
               quantity: 100,
             },
@@ -53,6 +56,9 @@ describe('LatestTransactions', () => {
                 guid: 'account2',
                 name: 'Account 2',
                 type: 'ASSET',
+                commodity: {
+                  mnemonic: 'SGD',
+                },
               },
               quantity: -100,
             },
@@ -82,6 +88,9 @@ describe('LatestTransactions', () => {
                 guid: 'account2',
                 name: 'Account 2',
                 type: 'STOCK',
+                commodity: {
+                  mnemonic: 'EUR',
+                },
               },
               quantity: 100,
             },
@@ -90,6 +99,9 @@ describe('LatestTransactions', () => {
                 guid: 'account1',
                 name: 'Account 1',
                 type: 'ASSET',
+                commodity: {
+                  mnemonic: 'EUR',
+                },
               },
               quantity: 100,
             },

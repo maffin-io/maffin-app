@@ -8,7 +8,6 @@ import useDataSource from '@/hooks/useDataSource';
 import * as storageHooks from '@/hooks/useBookStorage';
 import * as gnucash from '@/lib/gnucash';
 import BookStorage from '@/apis/BookStorage';
-import { PriceDB } from '@/book/prices';
 import * as queries from '@/lib/queries';
 
 jest.mock('swr', () => ({
@@ -37,12 +36,10 @@ jest.mock('@/lib/queries', () => ({
   ...jest.requireActual('@/lib/queries'),
 }));
 
-jest.mock('@/book/prices', () => ({
+jest.mock('@/apis/Stocker', () => ({
   __esModule: true,
-  ...jest.requireActual('@/book/prices'),
-  PriceDB: {
-    getTodayQuotes: jest.fn(),
-  },
+  ...jest.requireActual('@/apis/Stocker'),
+  insertTodayPrices: jest.fn(),
 }));
 
 jest.mock('typeorm', () => ({
@@ -83,7 +80,7 @@ describe('useDataSource', () => {
       },
     });
     jest.spyOn(queries, 'getMonthlyTotals').mockImplementation();
-    jest.spyOn(PriceDB, 'getTodayQuotes').mockImplementation();
+    jest.spyOn(queries, 'getPrices').mockImplementation();
   });
 
   afterEach(() => {

@@ -5,13 +5,12 @@ import type { UseFormReturn } from 'react-hook-form';
 import classNames from 'classnames';
 import type { SingleValue } from 'react-select';
 
-import { isInvestment } from '@/book/helpers/accountType';
 import { getMainCurrency } from '@/lib/queries';
-import { getPrice } from '@/apis/Stocker';
 import { toFixed } from '@/helpers/number';
 import { AccountSelector } from '@/components/selectors';
 import { currencyToSymbol } from '@/helpers/currency';
-import type { Account, Commodity } from '@/book/entities';
+import { usePrices } from '@/hooks/api';
+import { Account, Price } from '@/book/entities';
 import type { FormValues } from './types';
 
 export type SplitFieldProps = {
@@ -25,50 +24,43 @@ export default function SplitField({
   form,
   disabled = false,
 }: SplitFieldProps): JSX.Element {
-  const [exchangeRate, setExchangeRate] = React.useState(1);
   const account = form.watch(`splits.${index}.fk_account`) as Account;
   const txCurrency = form.watch('fk_currency');
   const date = form.watch('date');
+  const { data: prices } = usePrices(account?.commodity);
+  const [exchangeRate, setExchangeRate] = React.useState(
+    Price.create({ valueNum: 1, valueDenom: 1, fk_currency: txCurrency }),
+  );
 
   const showValueField = account && account.commodity.guid !== txCurrency?.guid;
   const value = form.watch(`splits.${index}.value`);
 
   React.useEffect(() => {
-    let isCancelled = false;
-
-    async function fetchRate() {
-      const rate = await getExchangeRate(
-        account,
-        txCurrency,
-        DateTime.fromISO(date),
-      );
-      if (!isCancelled) {
-        setExchangeRate(rate);
-      }
-    }
-
     if (
       account
       && date
       && form.formState.isDirty
+      && prices
     ) {
-      fetchRate();
-    }
+      let rate = null;
+      const d = DateTime.fromISO(date);
+      if (account.commodity.guid !== txCurrency.guid && txCurrency.namespace === 'CURRENCY') {
+        rate = account.commodity.namespace !== 'CURRENCY'
+          ? prices.getInvestmentPrice(account.commodity.mnemonic, d)
+          : prices.getPrice(account.commodity.mnemonic, txCurrency.mnemonic, d);
 
-    return () => {
-      // This is to avoid race conditions for when both txCurrency and account
-      // change at the same time. The problem is that sometimes the second
-      // request is faster than the first and then the exchange rate
-      // is wrongly set. I don't have a better idea on how to fix this for now
-      isCancelled = true;
-    };
-  }, [account, txCurrency, date, disabled, form.formState.isDirty, index]);
+        setExchangeRate(rate);
+      } else {
+        setExchangeRate(Price.create({ valueNum: 1, valueDenom: 1 }));
+      }
+    }
+  }, [account, txCurrency, date, disabled, form.formState.isDirty, index, prices]);
 
   React.useEffect(() => {
     if (value && form.formState.isDirty) {
       form.setValue(
         `splits.${index}.quantity`,
-        toFixed(value / exchangeRate, 3),
+        toFixed(value / exchangeRate.value, 3),
       );
     }
     form.trigger('splits');
@@ -87,20 +79,29 @@ export default function SplitField({
                 isClearable={false}
                 isDisabled={disabled}
                 placeholder="<account>"
-                onChange={async (newValue: SingleValue<Account>) => {
-                  field.onChange(newValue);
+                onChange={async (a: SingleValue<Account>) => {
+                  field.onChange(a);
                   const mainCurrency = await getMainCurrency();
                   const splits = form.getValues('splits');
 
-                  if (txCurrency.guid !== mainCurrency.guid) {
-                    if (splits.some(
-                      split => split.fk_account.commodity.guid === mainCurrency?.guid,
-                    )) {
-                      form.setValue('fk_currency', mainCurrency);
-                    } else if (splits[0].account.commodity.namespace === 'CURRENCY') {
-                      form.setValue('fk_currency', splits[0].account.commodity);
-                    } else {
-                      form.setValue('fk_currency', splits[1].account.commodity);
+                  if (a) {
+                    const nonCurrencySplit = splits.find(
+                      split => split.fk_account.commodity.namespace !== 'CURRENCY',
+                    );
+
+                    if (nonCurrencySplit) {
+                      const price = await Price.findOneByOrFail({
+                        fk_commodity: {
+                          guid: nonCurrencySplit.fk_account.commodity.guid,
+                        },
+                      });
+                      form.setValue('fk_currency', price.currency);
+                    } else if (txCurrency.guid !== mainCurrency.guid) {
+                      if (a.commodity.guid === mainCurrency?.guid) {
+                        form.setValue('fk_currency', mainCurrency);
+                      } else {
+                        form.setValue('fk_currency', splits[0].fk_account.commodity);
+                      }
                     }
                   }
 
@@ -140,7 +141,7 @@ export default function SplitField({
             onChange={(e) => {
               if (account.commodity.guid === txCurrency.guid) {
                 const quantity = Number(e.target.value);
-                form.setValue(`splits.${index}.value`, toFixed(quantity * exchangeRate, 3));
+                form.setValue(`splits.${index}.value`, toFixed(quantity * exchangeRate.value, 3));
               }
             }}
           />
@@ -175,40 +176,4 @@ export default function SplitField({
       </div>
     </fieldset>
   );
-}
-
-/**
- * Retrieves the rate to convert the current account commodity
- * to the currency of the transaction.
- *
- * If the account is an investment, we fetch its value at the given
- * date instead.
- */
-async function getExchangeRate(
-  account: Account,
-  to: Commodity,
-  when: DateTime,
-): Promise<number> {
-  if (account.commodity.mnemonic === to.mnemonic) {
-    return 1;
-  }
-  let ticker = `${account.commodity.mnemonic}${to.mnemonic}=X`;
-
-  if (isInvestment(account)) {
-    ticker = account.commodity.mnemonic;
-  }
-
-  if (to.namespace !== 'CURRENCY') {
-    ticker = to.mnemonic;
-  }
-
-  const rate = await getPrice(ticker, when);
-
-  if (to.namespace !== 'CURRENCY') {
-    if (rate.currency !== account.commodity.mnemonic) {
-      throw new Error('The commodity of the account doesnt match the currency of the stock');
-    }
-    rate.price = 1 / rate.price;
-  }
-  return rate.price;
 }

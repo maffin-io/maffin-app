@@ -19,9 +19,9 @@ export default function InvestmentChart({
   account,
 }: InvestmentChartProps): JSX.Element {
   const { data: investment } = useInvestment(account.guid);
-  let { data: prices } = usePrices(account.commodity.guid);
+  const { data: pricesMap } = usePrices(account.commodity);
 
-  if (!investment || !prices) {
+  if (!investment || !pricesMap) {
     return <Loading />;
   }
 
@@ -34,7 +34,7 @@ export default function InvestmentChart({
   }
 
   const startDate = investment.account.splits[0].transaction.date;
-  prices = prices || [];
+  const prices = pricesMap.prices || [];
   const currency = (prices.length && prices[0].currency.mnemonic) || '';
 
   const pricesData: { x: number, y: number }[] = [];
@@ -48,7 +48,9 @@ export default function InvestmentChart({
   const numStocksData: { x: number, y: number }[] = [];
   const valueData: { x: number, y: number }[] = [];
   const interval = Interval.fromDateTimes(startDate, DateTime.now());
-  const monthly = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).startOf('month'));
+  const monthly = interval.toDuration('months').months >= 3
+    ? interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).startOf('month'))
+    : interval.splitBy({ day: 1 }).map(d => (d.start as DateTime));
   monthly.forEach(x => {
     investment.processSplits(x);
     numStocksData.push({
@@ -64,6 +66,9 @@ export default function InvestmentChart({
       });
     }
   });
+
+  // Process back to where we were as this object is shared in other components
+  investment.processSplits(DateTime.now());
 
   return (
     <Line

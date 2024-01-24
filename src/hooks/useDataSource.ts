@@ -5,8 +5,7 @@ import { useSWRConfig, mutate, Cache } from 'swr';
 import pako from 'pako';
 
 import * as queries from '@/lib/queries';
-import { PriceDB } from '@/book/prices';
-
+import { insertTodayPrices } from '@/apis/Stocker';
 import useBookStorage from '@/hooks/useBookStorage';
 import { importBook as importGnucashBook } from '@/lib/gnucash';
 import {
@@ -19,7 +18,6 @@ import {
 } from '@/book/entities';
 import type BookStorage from '@/apis/BookStorage';
 import { MIGRATIONS } from '@/book/migrations';
-import type { AccountsMap } from '@/types/book';
 
 export type DataSourceContextType = {
   datasource: DataSource | null,
@@ -147,17 +145,22 @@ async function createEmptyBook() {
  *
  * Without this, we need to wait for SWR to load monthly-totals
  * "naturally" which takes seconds (because it depends on accounts
- * and todayPrices).
+ * and prices).
  */
 async function preloadData() {
-  // Pre load actively to increase render time for users
-  const [accounts, todayPrices] = await Promise.all([
-    queries.getAccounts(),
-    PriceDB.getTodayQuotes(),
-  ]);
-  mutate('/api/main-currency', (accounts as AccountsMap).type_asset?.commodity);
+  const accounts = await queries.getAccounts();
+  const mainCurrency = accounts.type_asset.commodity;
+  mutate('/api/main-currency', mainCurrency);
+
+  try {
+    await insertTodayPrices();
+  } catch (e) {
+    console.warn(`Retrieving live prices failed ${e}`);
+  }
+
+  const prices = await queries.getPrices({});
   mutate(
     '/api/monthly-totals',
-    async () => queries.getMonthlyTotals(accounts, todayPrices),
+    async () => queries.getMonthlyTotals(accounts, prices),
   );
 }

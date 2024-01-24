@@ -12,6 +12,7 @@ import FormButton from '@/components/buttons/FormButton';
 import * as apiHook from '@/hooks/api';
 import PriceForm from '@/components/forms/price/PriceForm';
 import CommodityForm from '@/components/forms/commodity/CommodityForm';
+import { PriceDBMap } from '@/book/prices';
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
@@ -76,7 +77,7 @@ describe('CommodityPage', () => {
     jest.spyOn(apiHook, 'useCommodity').mockReturnValue(
       { data: { guid: 'guid', mnemonic: 'EUR' } as Commodity } as SWRResponse,
     );
-    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: [] } as SWRResponse);
+    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: new PriceDBMap([]) } as SWRResponse);
 
     render(<CommodityPage params={{ guid: 'guid' }} />);
 
@@ -111,7 +112,7 @@ describe('CommodityPage', () => {
         },
       } as Price,
     ];
-    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: prices } as SWRResponse);
+    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: new PriceDBMap(prices) } as SWRResponse);
 
     const { container } = render(<CommodityPage params={{ guid: 'guid' }} />);
 
@@ -217,7 +218,7 @@ describe('CommodityPage', () => {
         },
       } as Price,
     ];
-    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: prices } as SWRResponse);
+    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: new PriceDBMap(prices) } as SWRResponse);
     render(<CommodityPage params={{ guid: 'guid' }} />);
 
     await screen.findByText('GOOGL');

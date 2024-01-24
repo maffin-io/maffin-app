@@ -12,6 +12,7 @@ import type { SWRResponse } from 'swr';
 import {
   Account,
   Commodity,
+  Price,
   Split,
   Transaction,
 } from '@/book/entities';
@@ -36,7 +37,7 @@ describe('SplitsField', () => {
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Account, Commodity, Split, Transaction],
+      entities: [Account, Commodity, Split, Transaction, Price],
       synchronize: true,
       logging: false,
     });
@@ -69,6 +70,7 @@ describe('SplitsField', () => {
     const eur = {
       guid: 'eur',
       mnemonic: 'EUR',
+      namespace: 'CURRENCY',
     } as Commodity;
     jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
 
@@ -129,6 +131,7 @@ function FormWrapper({ disabled = false }: { disabled?: boolean }): JSX.Element 
     commodity: {
       guid: 'eur',
       mnemonic: 'EUR',
+      namespace: 'CURRENCY',
     } as Commodity,
   } as Account;
 
@@ -146,6 +149,7 @@ function FormWrapper({ disabled = false }: { disabled?: boolean }): JSX.Element 
       fk_currency: {
         guid: 'eur',
         mnemonic: 'EUR',
+        namespace: 'CURRENCY',
       },
     },
   });

@@ -66,68 +66,89 @@ describe('PriceDBMap', () => {
 
     it('creates map as expected', () => {
       expect(instance.map).toEqual({
-        'EUR.USD.2023-01-01': price1,
-        'USD.EUR.2023-01-01': price2,
+        'EUR.USD': [price1],
+        'USD.EUR': [price2],
       });
     });
 
-    it('raises error if commodity is not loaded', () => {
-      expect(() => new PriceDBMap([
-        Price.create({
-          fk_commodity: 'foo',
-          fk_currency: eur,
-          date: DateTime.fromISO('2023-01-01'),
-          valueNum: 20,
-          valueDenom: 100,
-        }),
-      ])).toThrow('To create PriceDBMap');
-    });
+    it('indexes stocks as expected', async () => {
+      const ticker = await Commodity.create({
+        namespace: 'STOCK',
+        mnemonic: 'TICKER',
+      }).save();
 
-    it('raises error if currency is not loaded', () => {
-      expect(() => new PriceDBMap([
-        Price.create({
-          fk_commodity: usd,
-          fk_currency: 'foo',
-          date: DateTime.fromISO('2023-01-01'),
-          valueNum: 20,
-          valueDenom: 100,
-        }),
-      ])).toThrow('To create PriceDBMap');
+      price1 = Price.create({
+        fk_commodity: ticker,
+        fk_currency: usd,
+        date: DateTime.fromISO('2023-01-01'),
+        valueNum: 10,
+        valueDenom: 100,
+      });
+
+      price2 = Price.create({
+        fk_commodity: ticker,
+        fk_currency: usd,
+        date: DateTime.fromISO('2023-01-02'),
+        valueNum: 20,
+        valueDenom: 100,
+      });
+
+      instance = new PriceDBMap([price1, price2]);
+      expect(instance.map).toEqual({
+        TICKER: [price1, price2],
+      });
     });
   });
 
   describe('getPrice', () => {
     beforeEach(() => {
+      price1 = Price.create({
+        guid: 'price1',
+        fk_commodity: usd,
+        fk_currency: eur,
+        date: DateTime.fromISO('2023-01-01'),
+        valueNum: 10,
+        valueDenom: 100,
+      });
+
+      price2 = Price.create({
+        guid: 'price2',
+        fk_commodity: usd,
+        fk_currency: eur,
+        date: DateTime.fromISO('2023-01-03'),
+        valueNum: 20,
+        valueDenom: 100,
+      });
+
       instance = new PriceDBMap([price1, price2]);
     });
 
-    it('returns dummy price with value 1 if from=to', () => {
-      expect(instance.getPrice('EUR', 'EUR', DateTime.now())).toMatchObject({
-        valueNum: 1,
-        valueDenom: 1,
-      });
+    it('returns missing_price when no prices for the key', () => {
+      expect(instance.getPrice('from', 'to').guid).toEqual('missing_price');
     });
 
-    it('returns matching price', () => {
-      expect(instance.getPrice('EUR', 'USD', DateTime.fromISO('2023-01-01'))).toEqual(price1);
+    it('returns missing_price when from === to', () => {
+      expect(instance.getPrice('from', 'to').guid).toEqual('missing_price');
     });
 
-    it('returns previous day when current not found', () => {
-      expect(instance.getPrice('EUR', 'USD', DateTime.fromISO('2023-01-02'))).toEqual(price1);
+    it('returns price with matching date', () => {
+      expect(instance.getPrice('USD', 'EUR', DateTime.fromISO('2023-01-01')).guid).toEqual('price1');
     });
 
-    it('returns next day when current not found', () => {
-      expect(instance.getPrice('EUR', 'USD', DateTime.fromISO('2022-12-31'))).toEqual(price1);
+    it('returns candidate with previous date when no current date', () => {
+      expect(instance.getPrice('USD', 'EUR', DateTime.fromISO('2023-01-02')).guid).toEqual('price1');
     });
 
-    it('raises an error if no matching price found', () => {
-      expect(() => instance.getPrice('EUR', 'USD', DateTime.fromISO('2023-01-03'))).toThrow(
-        'Price EUR.USD.2023-01-03 not found',
-      );
+    it('returns future price when no other candidates', () => {
+      expect(instance.getPrice('USD', 'EUR', DateTime.fromISO('2022-01-01')).guid).toEqual('price1');
+    });
+
+    it('returns latest price when no date passed', () => {
+      expect(instance.getPrice('USD', 'EUR').guid).toEqual('price2');
     });
   });
 
-  describe('getStockPrice', () => {
+  describe('getInvestmentPrice', () => {
     beforeEach(async () => {
       const commodityStock = await Commodity.create({
         namespace: 'AS',
@@ -135,6 +156,7 @@ describe('PriceDBMap', () => {
       }).save();
 
       price1 = Price.create({
+        guid: 'price1',
         fk_commodity: commodityStock,
         fk_currency: usd,
         date: DateTime.fromISO('2023-01-01'),
@@ -142,21 +164,36 @@ describe('PriceDBMap', () => {
         valueDenom: 100,
       });
 
-      instance = new PriceDBMap([price1]);
+      price2 = Price.create({
+        guid: 'price2',
+        fk_commodity: commodityStock,
+        fk_currency: usd,
+        date: DateTime.fromISO('2023-01-03'),
+        valueNum: 10,
+        valueDenom: 100,
+      });
+
+      instance = new PriceDBMap([price1, price2]);
     });
 
-    it('returns matching price', () => {
-      expect(instance.getStockPrice('STOCK', DateTime.fromISO('2023-01-01'))).toEqual(price1);
+    it('returns missing_price when no prices for the key', () => {
+      expect(instance.getInvestmentPrice('from').guid).toEqual('missing_price');
     });
 
-    it('returns previous day when current not found', () => {
-      expect(instance.getStockPrice('STOCK', DateTime.fromISO('2023-01-02'))).toEqual(price1);
+    it('returns price with matching date', () => {
+      expect(instance.getInvestmentPrice('STOCK', DateTime.fromISO('2023-01-01')).guid).toEqual('price1');
     });
 
-    it('raises an error if no matching price found', () => {
-      expect(() => instance.getStockPrice('STOCK', DateTime.fromISO('2023-01-03'))).toThrow(
-        'Price STOCK.2023-01-03 not found',
-      );
+    it('returns candidate with previous date when no current date', () => {
+      expect(instance.getInvestmentPrice('STOCK', DateTime.fromISO('2023-01-02')).guid).toEqual('price1');
+    });
+
+    it('returns future price when no other candidates', () => {
+      expect(instance.getInvestmentPrice('STOCK', DateTime.fromISO('2022-01-01')).guid).toEqual('price1');
+    });
+
+    it('returns latest price when no date passed', () => {
+      expect(instance.getInvestmentPrice('STOCK').guid).toEqual('price2');
     });
   });
 });

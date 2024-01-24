@@ -10,7 +10,7 @@ import type { AccountsMap } from '@/types/book';
  *
  * If a guid is passed, we return that account instead
  */
-export default async function getAccounts(guid?: string): Promise<AccountsMap | Account> {
+export default async function getAccounts(guid?: string): Promise<AccountsMap> {
   const accounts = await Account.findBy({ guid });
 
   if (guid) {

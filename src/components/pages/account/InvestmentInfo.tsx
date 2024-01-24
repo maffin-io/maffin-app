@@ -17,13 +17,14 @@ export default function InvestmentInfo({
   account,
 }: InvestmentInfoProps): JSX.Element {
   const { data: investment } = useInvestment(account.guid);
-  let { data: prices } = usePrices(account.commodity.guid);
+  let { data: prices } = usePrices(account.commodity);
+
   if (!investment || !prices) {
     return <Loading />;
   }
 
   prices = prices || [];
-  const latestPrice = prices[prices.length - 1];
+  const latestPrice = prices.getInvestmentPrice(investment.account.commodity.mnemonic);
 
   return (
     <div className="grid grid-cols-12">

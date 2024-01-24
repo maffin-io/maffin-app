@@ -3,74 +3,85 @@ import { DateTime } from 'luxon';
 import { Price } from '../entities';
 
 export default class PriceDBMap {
-  readonly map: { [pair: string]: Price } = {};
+  readonly prices: Price[];
+  readonly map: { [key: string]: Price[] } = {};
 
   constructor(instances: Price[] = []) {
+    this.prices = instances;
     instances.forEach(instance => {
-      if (!instance.commodity.mnemonic || !instance.currency.mnemonic) {
-        throw new Error('To create PriceDBMap currency and commodity need to be loaded');
-      }
-
-      let key = `${instance.commodity.mnemonic}.${instance.currency.mnemonic}.${instance.date.toISODate()}`;
+      let key = `${instance.commodity.mnemonic}.${instance.currency.mnemonic}`;
       if (instance.commodity.namespace !== 'CURRENCY') {
         // In case of stocks/funds the currency is unknown and we use Price object to get it
-        key = `${instance.commodity.mnemonic}.${instance.date.toISODate()}`;
+        key = instance.commodity.mnemonic;
       }
-      this.map[key] = instance;
+
+      if (key in this.map) {
+        this.map[key].push(instance);
+      } else {
+        this.map[key] = [instance];
+      }
     });
   }
 
-  getPrice(from: string, to: string, when: DateTime): Price {
+  getPrice(from: string, to: string, when?: DateTime): Price {
+    const missingPrice = Price.create({
+      guid: 'missing_price',
+      date: DateTime.now(),
+      valueNum: 1,
+      valueDenom: 1,
+      fk_commodity: {
+        mnemonic: from,
+      },
+      fk_currency: {
+        mnemonic: to,
+      },
+    });
+
     if (from === to) {
-      const p = new Price();
-      p.guid = 'tmp_guid';
-      p.date = DateTime.now();
-      p.valueNum = 1;
-      p.valueDenom = 1;
-      return p;
+      return missingPrice;
     }
 
-    let key = `${from}.${to}.${when.toISODate()}`;
-    let price = this.map[key];
-    if (price) {
-      return price;
-    }
-
-    // Gnucash has an issue of timezones where pricedb and transaction entries don't match
-    // this is how we fix it.
-    key = `${from}.${to}.${when.minus({ day: 1 }).toISODate()}`;
-    price = this.map[key];
-    if (price) {
-      return price;
-    }
-
-    // Gnucash has an issue of timezones where pricedb and transaction entries don't match
-    // this is how we fix it.
-    key = `${from}.${to}.${when.plus({ day: 1 }).toISODate()}`;
-    price = this.map[key];
-    if (price) {
-      return price;
-    }
-
-    throw new Error(`Price ${from}.${to}.${when.toISODate()} not found`);
+    const key = `${from}.${to}`;
+    return this._getPrice(key, missingPrice, when);
   }
 
-  getStockPrice(from: string, when: DateTime): Price {
-    let key = `${from}.${when.toISODate()}`;
-    let price = this.map[key];
-    if (price) {
-      return price;
+  getInvestmentPrice(from: string, when?: DateTime): Price {
+    const missingPrice = Price.create({
+      guid: 'missing_price',
+      date: DateTime.now(),
+      valueNum: 1,
+      valueDenom: 1,
+      fk_commodity: {
+        mnemonic: from,
+      },
+    });
+
+    const key = from;
+    return this._getPrice(key, missingPrice, when);
+  }
+
+  // Retrieves the price for the given key for a given date. Any price before or on
+  // the same date is valid, prioritizing the current date. If no price is found then
+  // we return a price rate of 1
+  _getPrice(key: string, missingPrice: Price, when?: DateTime): Price {
+    const prices = this.map[key];
+
+    if (!prices) {
+      console.warn(`Missing price for ${key}`);
+      return missingPrice;
     }
 
-    // Gnucash has an issue of timezones where pricedb and transaction entries don't match
-    // this is how we fix it.
-    key = `${from}.${when.minus({ day: 1 }).toISODate()}`;
-    price = this.map[key];
-    if (price) {
-      return price;
+    if (!when) {
+      return prices[prices.length - 1];
     }
 
-    throw new Error(`Price ${from}.${when.toISODate()} not found`);
+    const possible = prices.filter(price => price.date <= when);
+    const chosenPrice = possible[possible.length - 1];
+    if (!chosenPrice) {
+      return prices[0];
+    }
+
+    return chosenPrice;
   }
 
   get keys(): string[] {
@@ -78,6 +89,6 @@ export default class PriceDBMap {
   }
 
   get isEmpty(): boolean {
-    return Object.keys(this.map).length === 0;
+    return this.prices.length === 0;
   }
 }

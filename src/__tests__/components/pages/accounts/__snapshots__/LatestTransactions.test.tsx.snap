@@ -211,7 +211,7 @@ exports[`LatestTransactions renders as expected with txs 1`] = `
             <span
               class="amount-negative"
             >
-              -€100.00
+              -SGD 100.00
             </span>
             <a
               class="ml-auto text-xs badge hover:text-slate-300 info"

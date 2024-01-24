@@ -2,12 +2,12 @@ import { DateTime } from 'luxon';
 import { mutate, SWRResponse } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
-import { Commodity, Price } from '@/book/entities';
-import { PriceDB, PriceDBMap } from '@/book/prices';
+import { Commodity } from '@/book/entities';
 import { InvestmentAccount } from '@/book/models';
 import * as queries from '@/lib/queries';
 import getUser from '@/lib/getUser';
 import useGapiClient from '@/hooks/useGapiClient';
+import type { PriceDBMap } from '@/book/prices';
 import type { AccountsMap } from '@/types/book';
 import type { Account, Split, Transaction } from '@/book/entities';
 import type { User } from '@/types/user';
@@ -114,16 +114,16 @@ export function useAccounts(): SWRResponse<AccountsMap> {
 
 export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
   const { data: accounts } = useAccounts();
-  const { data: todayPrices } = useSWRImmutable(
-    '/api/prices/today',
-    fetcher(PriceDB.getTodayQuotes, '/api/prices/today'),
+  const { data: prices } = useSWRImmutable(
+    '/api/prices',
+    fetcher(() => queries.getPrices({}), '/api/prices'),
   );
 
   const key = '/api/monthly-totals';
   const result = useSWRImmutable(
-    key,
+    (accounts && prices) ? key : null,
     fetcher(
-      () => queries.getMonthlyTotals(accounts as AccountsMap, todayPrices as PriceDBMap),
+      () => queries.getMonthlyTotals(accounts as AccountsMap, prices),
       key,
     ),
   );
@@ -136,7 +136,7 @@ export function useInvestment(guid: string): SWRResponse<InvestmentAccount> {
 
   const result = useSWRImmutable(
     key,
-    fetcher(() => queries.getInvestments(guid), key),
+    fetcher(() => queries.getInvestment(guid), key),
   );
 
   if (result.error) {
@@ -182,11 +182,11 @@ export function useSplits(guid: string): SWRResponse<Split[]> {
 /**
  * Returns prices for a given commodity
  */
-export function usePrices(guid: string): SWRResponse<Price[]> {
-  const key = `/api/prices/${guid}`;
+export function usePrices(c: Commodity | undefined): SWRResponse<PriceDBMap> {
+  const key = `/api/prices/${c?.guid}`;
   return useSWRImmutable(
-    key,
-    fetcher(async () => queries.getPrices(guid), key),
+    c?.guid ? key : null,
+    fetcher(async () => queries.getPrices({ from: c }), key),
   );
 }
 

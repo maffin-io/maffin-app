@@ -11,7 +11,6 @@ import {
   Split,
   Transaction,
 } from '@/book/entities';
-import { isInvestment } from '@/book/helpers/accountType';
 import SplitsField from './SplitsField';
 import type { FormValues } from './types';
 
@@ -150,8 +149,8 @@ async function onSubmit(data: FormValues, action: 'add' | 'update' | 'delete', o
   }
 
   transaction.splits.forEach(split => {
-    if (isInvestment(split.account)) {
-      mutate('/api/investments');
+    if (split.account.commodity.namespace !== 'CURRENCY') {
+      mutate('/api/investments', undefined);
       mutate(`/api/investments/${split.account.guid}`);
     }
     mutate(`/api/splits/${split.account.guid}`);

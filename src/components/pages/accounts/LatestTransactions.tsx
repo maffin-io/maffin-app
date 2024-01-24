@@ -50,7 +50,10 @@ export default function LatestTransactions(): JSX.Element {
                           'amount-negative': (selectedSplit?.quantity || 0) < 0,
                         })}
                       >
-                        {moneyToString(selectedSplit?.quantity || 0, tx.currency.mnemonic)}
+                        {moneyToString(
+                          selectedSplit?.quantity || 0,
+                          selectedSplit?.account.commodity.mnemonic || '',
+                        )}
                       </span>
                       <Link
                         className={classNames('ml-auto text-xs badge hover:text-slate-300', {

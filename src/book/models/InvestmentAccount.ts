@@ -28,15 +28,22 @@ export default class InvestmentAccount {
     this.mainCurrency = mainCurrency;
 
     this._priceDBMap = priceDBMap;
-    const price = this._priceDBMap.getStockPrice(
+    const price = this._priceDBMap.getInvestmentPrice(
       this.account.commodity.mnemonic,
       DateTime.now(),
     );
-    if (!price.quoteInfo) {
-      throw new Error(`No quote info found in price '${price.id}'`);
+    if (price.guid === 'missing_price') {
+      throw new Error(`No price found for ${this.account.commodity.mnemonic}`);
     }
     this.currency = price.currency.mnemonic;
-    this.setTodayQuoteInfo(price.quoteInfo);
+    this.setTodayQuoteInfo(
+      price.quoteInfo || {
+        changePct: 0,
+        changeAbs: 0,
+        price: price.value,
+        currency: this.currency,
+      },
+    );
 
     this.quantity = new Money(0, this.account.commodity.mnemonic);
     this.realizedProfit = new Money(0, this.currency);
