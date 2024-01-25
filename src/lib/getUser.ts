@@ -8,6 +8,15 @@ const emptyUser: User = {
 };
 
 export default async function getUser(): Promise<User> {
+  if (process.env.NEXT_PUBLIC_ENV === 'demo') {
+    return {
+      name: 'Maffin',
+      email: 'iomaffin@gmail.com',
+      image: 'https://app.maffin.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fmaffin_logo_sm.094266a4.png&w=128&q=75',
+      isLoggedIn: true,
+    };
+  }
+
   try {
     const res = await window.gapi.client.people.people.get({
       resourceName: 'people/me',

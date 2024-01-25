@@ -6,7 +6,7 @@ const awsmobile = {
     "aws_cloud_logic_custom": [
         {
             "name": "stocker",
-            "endpoint": "http://localhost:3001",
+            "endpoint": "https://mpwj1ltvkd.execute-api.ap-southeast-1.amazonaws.com/master",
             "region": "ap-southeast-1"
         }
     ]
