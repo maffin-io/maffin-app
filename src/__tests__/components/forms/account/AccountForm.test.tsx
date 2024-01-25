@@ -190,36 +190,27 @@ describe('AccountForm', () => {
   });
 
   /**
-   * STOCK/MUTUAL accounts can't have children
+   * INVESTMENT accounts can't have children
    */
   it('filters stock/mutual accounts as parents', async () => {
     const user = userEvent.setup();
     const commodity = await Commodity.create({
-      mnemonic: 'STOCK',
-      namespace: 'NASDAQ',
+      mnemonic: 'TICKER',
+      namespace: 'STOCK',
     }).save();
 
     const stockAccount = await Account.create({
       guid: 'stock_guid_1',
       name: 'Stock',
-      type: 'STOCK',
-      fk_commodity: commodity,
-      parent: assetAccount,
-    }).save();
-
-    const mutualAccount = await Account.create({
-      guid: 'mutual_guid_1',
-      name: 'Fund',
-      type: 'MUTUAL',
+      type: 'INVESTMENT',
       fk_commodity: commodity,
       parent: assetAccount,
     }).save();
 
     stockAccount.path = 'Assets:Stock';
-    mutualAccount.path = 'Assets:Mutual';
 
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      { data: [root, assetAccount, expenseAccount, stockAccount, mutualAccount] } as SWRResponse,
+      { data: [root, assetAccount, expenseAccount, stockAccount] } as SWRResponse,
     );
 
     render(

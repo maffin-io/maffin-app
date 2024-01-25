@@ -9,10 +9,8 @@ import {
 } from '../../helpers/accountType';
 
 describe('isInvestment', () => {
-  it.each(
-    ['STOCK', 'MUTUAL'],
-  )('returns true for %s', (type) => {
-    expect(isInvestment({ type } as Account)).toBe(true);
+  it('returns true for INVESTMENT', () => {
+    expect(isInvestment({ type: 'INVESTMENT' } as Account)).toBe(true);
   });
 });
 
@@ -35,7 +33,7 @@ describe('isLiability', () => {
 describe('getAllowedSubAccounts', () => {
   it.each([
     ['ROOT', ['ASSET', 'EXPENSE', 'INCOME', 'LIABILITY', 'EQUITY']],
-    ['ASSET', ['ASSET', 'BANK', 'CASH', 'STOCK', 'MUTUAL', 'RECEIVABLE']],
+    ['ASSET', ['ASSET', 'BANK', 'CASH', 'FIXED', 'INVESTMENT', 'RECEIVABLE']],
     ['LIABILITY', ['LIABILITY', 'CREDIT', 'PAYABLE']],
     ['INCOME', ['INCOME']],
     ['EXPENSE', ['EXPENSE']],

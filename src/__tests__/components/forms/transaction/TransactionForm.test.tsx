@@ -531,7 +531,7 @@ describe('TransactionForm', () => {
       const ticker = await Commodity.create({
         guid: 'ticker',
         mnemonic: 'TICKER',
-        namespace: 'CUSTOM',
+        namespace: 'OTHER',
       }).save();
 
       const tickerPrice = await Price.create({
@@ -673,7 +673,7 @@ describe('TransactionForm', () => {
       const ticker = await Commodity.create({
         guid: 'ticker',
         mnemonic: 'TICKER',
-        namespace: 'CUSTOM',
+        namespace: 'OTHER',
       }).save();
 
       const tickerPrice = await Price.create({
@@ -818,7 +818,7 @@ describe('TransactionForm', () => {
       const ticker = await Commodity.create({
         guid: 'ticker',
         mnemonic: 'TICKER',
-        namespace: 'CUSTOM',
+        namespace: 'OTHER',
       }).save();
 
       const tickerPrice = await Price.create({
@@ -986,7 +986,7 @@ describe('TransactionForm', () => {
       const ticker = await Commodity.create({
         guid: 'ticker',
         mnemonic: 'TICKER',
-        namespace: 'CUSTOM',
+        namespace: 'OTHER',
       }).save();
 
       const tickerPrice = await Price.create({
@@ -1166,14 +1166,14 @@ describe('TransactionForm', () => {
 
     const stockCommodity = await Commodity.create({
       guid: 'stock_guid',
-      namespace: 'NASDAQ',
-      mnemonic: 'STOCK',
+      namespace: 'STOCK',
+      mnemonic: 'TICKER',
     }).save();
 
     const stockAccount = await Account.create({
       guid: 'stock_account',
       name: 'Stock',
-      type: 'STOCK',
+      type: 'INVESTMENT',
       fk_commodity: stockCommodity,
       parent: assetAccount,
     }).save();

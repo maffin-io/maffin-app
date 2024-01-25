@@ -112,7 +112,7 @@ describe('SplitField', () => {
                 name: 'path1',
                 guid: 'account_guid_1',
                 path: 'path1',
-                type: 'STOCK',
+                type: 'INVESTMENT',
                 commodity: {
                   guid: 'eur',
                   mnemonic: 'EUR',
@@ -161,7 +161,7 @@ describe('SplitField', () => {
               path: 'path2',
               type: 'ASSET',
               commodity: {
-                namespace: 'CUSTOM',
+                namespace: 'OTHER',
                 mnemonic: 'TICKER',
                 guid: 'ticker_guid',
               },
@@ -227,7 +227,7 @@ describe('SplitField', () => {
                   path: 'path1',
                   type: 'ASSET',
                   commodity: {
-                    namespace: 'CUSTOM',
+                    namespace: 'OTHER',
                     mnemonic: 'TICKER',
                     guid: 'ticker_guid',
                   },
@@ -455,7 +455,7 @@ describe('SplitField', () => {
       const ticker = {
         guid: 'ticker_guid',
         mnemonic: 'TICKER',
-        namespace: 'CUSTOM',
+        namespace: 'OTHER',
       };
       // @ts-ignore
       jest.spyOn(Price, 'findOneByOrFail').mockResolvedValue({ currency: eur });
@@ -571,7 +571,7 @@ describe('SplitField', () => {
       const ticker = {
         guid: 'ticker_guid',
         mnemonic: 'TICKER',
-        namespace: 'CUSTOM',
+        namespace: 'OTHER',
       };
       const usd = {
         guid: 'usd',

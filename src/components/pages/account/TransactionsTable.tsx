@@ -158,7 +158,7 @@ function FromToAccountPartial(
                   danger: account.type === 'EXPENSE',
                   info: ['ASSET', 'BANK'].includes(account.type),
                   warning: account.type === 'LIABILITY',
-                  misc: ['STOCK', 'MUTUAL'].includes(account.type),
+                  misc: ['INVESTMENT'].includes(account.type),
                 })}
               >
                 { account?.path }

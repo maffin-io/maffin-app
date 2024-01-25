@@ -204,7 +204,7 @@ describe('AccountPage', () => {
     const account = {
       guid: 'guid',
       path: 'path',
-      type: 'STOCK',
+      type: 'INVESTMENT',
       commodity: {
         mnemonic: 'GOOGL',
       },

@@ -11,7 +11,7 @@ const NAMESPACES: Namespace[] = [
   { namespace: 'CURRENCY' },
   { namespace: 'STOCK' },
   { namespace: 'FUND' },
-  { namespace: 'CUSTOM' },
+  { namespace: 'OTHER' },
 ];
 
 export default function AccountTypeSelector(

@@ -10,8 +10,9 @@ export default class PriceDBMap {
     this.prices = instances;
     instances.forEach(instance => {
       let key = `${instance.commodity.mnemonic}.${instance.currency.mnemonic}`;
+      // In case of non currency commodities, the currency is unknown
+      // and we use Price object to get it
       if (instance.commodity.namespace !== 'CURRENCY') {
-        // In case of stocks/funds the currency is unknown and we use Price object to get it
         key = instance.commodity.mnemonic;
       }
 

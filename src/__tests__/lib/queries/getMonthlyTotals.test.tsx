@@ -285,7 +285,7 @@ describe('getMonthlyTotals', () => {
 
   /**
    * The purpose of this test is to verify that we convert totals for the parent
-   * account of STOCK/MUTUAL accounts as expected. We buy 2 GOOGL stocks for 50 USD each
+   * account of INVESTMENT accounts as expected. We buy 2 GOOGL stocks for 50 USD each
    * from the assets account (USD). Our investments account is in EUR so we want to check that:
    *   - We have 2 GOOGL stocks in our stocks account
    *   - We have +98 EUR in the investments account
@@ -321,7 +321,7 @@ describe('getMonthlyTotals', () => {
     const stockAccount = await Account.create({
       guid: 'googl',
       name: 'GOOGL',
-      type: 'STOCK',
+      type: 'INVESTMENT',
       fk_commodity: stock,
       parent: investmentsAccount,
     }).save();
@@ -399,7 +399,7 @@ describe('getMonthlyTotals', () => {
     split1.quantity = 0;
     split1.fk_account = await Account.create({
       name: 'GOOGL',
-      type: 'STOCK',
+      type: 'INVESTMENT',
       fk_commodity: commodity,
       parent: assetAccount,
     }).save();

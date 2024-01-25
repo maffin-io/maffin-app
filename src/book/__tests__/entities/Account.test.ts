@@ -165,7 +165,7 @@ describe('Account', () => {
     it('fails if currency assigned to investment account', async () => {
       account = Account.create({
         name: 'name',
-        type: 'STOCK',
+        type: 'INVESTMENT',
         parent: root,
         fk_commodity: eur,
       });

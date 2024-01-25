@@ -13,7 +13,7 @@ Commodity,
 false,
 GroupBase<Commodity>
 > {
-  namespace?: 'EQUITY' | 'ETF' | 'MUTUALFUND' | 'CURRENCY' | undefined,
+  namespace?: 'OTHER' | 'STOCK' | 'MUTUAL' | 'CURRENCY' | undefined,
 }
 
 export default function CommoditySelector(

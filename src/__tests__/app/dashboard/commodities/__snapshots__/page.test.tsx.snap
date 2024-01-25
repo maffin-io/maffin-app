@@ -68,7 +68,7 @@ exports[`CommoditiesPage renders as expected 1`] = `
     <span
       class="title text-lg"
     >
-      Investments
+      Financial
     </span>
   </div>
   <div
@@ -108,7 +108,7 @@ exports[`CommoditiesPage renders as expected 1`] = `
     <span
       class="title text-lg"
     >
-      Custom
+      Other
     </span>
   </div>
   <div

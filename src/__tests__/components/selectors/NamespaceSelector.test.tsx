@@ -24,7 +24,7 @@ describe('NamespaceSelector', () => {
           { namespace: 'CURRENCY' },
           { namespace: 'STOCK' },
           { namespace: 'FUND' },
-          { namespace: 'CUSTOM' },
+          { namespace: 'OTHER' },
         ],
         placeholder: 'Choose namespace',
         getOptionLabel: expect.any(Function),

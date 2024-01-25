@@ -63,7 +63,7 @@ describe('CommoditiesPage', () => {
         {
           guid: 'loy',
           mnemonic: 'EX_LOYALTY',
-          namespace: 'CUSTOM',
+          namespace: 'OTHER',
           full_name: 'Loyalty points',
         },
       ],
@@ -72,8 +72,8 @@ describe('CommoditiesPage', () => {
     const { container } = render(<CommoditiesPage />);
 
     screen.getByText('Currencies');
-    screen.getByText('Investments');
-    screen.getByText('Custom');
+    screen.getByText('Financial');
+    screen.getByText('Other');
 
     expect(FormButton).toBeCalledWith(
       expect.objectContaining({
