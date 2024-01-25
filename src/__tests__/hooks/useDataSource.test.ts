@@ -7,8 +7,8 @@ import { Account, Book, Commodity } from '@/book/entities';
 import useDataSource from '@/hooks/useDataSource';
 import * as storageHooks from '@/hooks/useBookStorage';
 import * as gnucash from '@/lib/gnucash';
-import BookStorage from '@/apis/BookStorage';
 import * as queries from '@/lib/queries';
+import type BookStorage from '@/lib/storage/GDriveBookStorage';
 
 jest.mock('swr', () => ({
   __esModule: true,

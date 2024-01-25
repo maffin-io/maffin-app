@@ -3,6 +3,7 @@ import { BiCloudUpload, BiLoader } from 'react-icons/bi';
 import useSWRImmutable from 'swr/immutable';
 
 import { DataSourceContext } from '@/hooks';
+import { isDemo } from '@/helpers/env';
 
 export default function SaveButton(): JSX.Element {
   const { data: isSaving } = useSWRImmutable(
@@ -27,7 +28,7 @@ export default function SaveButton(): JSX.Element {
       id="save-button"
       type="button"
       className="btn btn-primary"
-      disabled={isSaving}
+      disabled={isSaving || isDemo()}
       onClick={async () => {
         await save();
       }}

@@ -1,4 +1,5 @@
 import type { User } from '@/types/user';
+import { isDemo } from '@/helpers/env';
 
 const emptyUser: User = {
   name: '',
@@ -8,11 +9,11 @@ const emptyUser: User = {
 };
 
 export default async function getUser(): Promise<User> {
-  if (process.env.NEXT_PUBLIC_ENV === 'demo') {
+  if (isDemo()) {
     return {
       name: 'Maffin',
       email: 'iomaffin@gmail.com',
-      image: 'https://app.maffin.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fmaffin_logo_sm.094266a4.png&w=128&q=75',
+      image: '',
       isLoggedIn: true,
     };
   }

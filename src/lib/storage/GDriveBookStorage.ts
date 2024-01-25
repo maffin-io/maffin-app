@@ -1,10 +1,12 @@
 import pako from 'pako';
 
-export default class BookStorage {
-  gapiClient: typeof gapi.client;
-  driveClient: typeof gapi.client.drive;
-  parentFolderId: string;
-  bookFileId: string;
+import BookStorage from '@/lib/storage/BookStorage';
+
+export default class GDriveBookStorage implements BookStorage {
+  private gapiClient: typeof gapi.client;
+  private driveClient: typeof gapi.client.drive;
+  private parentFolderId: string;
+  private bookFileId: string;
 
   constructor(client: typeof gapi.client) {
     // Apparently there is no use to upload content using gapi.drive client

@@ -75,4 +75,16 @@ describe('SaveButton', () => {
 
     await waitFor(() => expect(mockSave).toBeCalledTimes(1));
   });
+
+  it('is disabled when demo', async () => {
+    process.env.NEXT_PUBLIC_ENV = 'demo';
+    render(
+      <DataSourceContext.Provider value={{ isLoaded: true } as DataSourceContextType}>
+        <SaveButton />
+      </DataSourceContext.Provider>,
+    );
+
+    expect(screen.getByRole('button')).toBeDisabled();
+    process.env.NEXT_PUBLIC_ENV = '';
+  });
 });

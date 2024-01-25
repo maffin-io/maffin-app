@@ -16,8 +16,9 @@ import {
   Split,
   Transaction,
 } from '@/book/entities';
-import type BookStorage from '@/apis/BookStorage';
+import type BookStorage from '@/lib/storage/BookStorage';
 import { MIGRATIONS } from '@/book/migrations';
+import { isDemo } from '@/helpers/env';
 
 export type DataSourceContextType = {
   datasource: DataSource | null,
@@ -89,20 +90,20 @@ export default function useDataSource(): DataSourceContextType {
 
   return {
     datasource: DATASOURCE,
-    save: () => save(storage),
-    importBook: (rawData: Uint8Array) => importBook(storage, rawData, cache),
+    save: () => save(storage as BookStorage),
+    importBook: (rawData: Uint8Array) => importBook(storage as BookStorage, rawData, cache),
     isLoaded,
   };
 }
 
-async function save(storage: BookStorage | null) {
+async function save(storage: BookStorage) {
   mutate('/state/save', true, { revalidate: false });
   const rawBook = DATASOURCE.sqljsManager.exportDatabase();
-  await (storage as BookStorage).save(rawBook);
+  await storage.save(rawBook);
   mutate('/state/save', false, { revalidate: false });
 }
 
-async function importBook(storage: BookStorage | null, rawData: Uint8Array, cache: Cache) {
+async function importBook(storage: BookStorage, rawData: Uint8Array, cache: Cache) {
   let parsedData;
   try {
     parsedData = pako.ungzip(rawData);
@@ -149,13 +150,15 @@ async function createEmptyBook() {
  */
 async function preloadData() {
   const accounts = await queries.getAccounts();
-  const mainCurrency = accounts.type_asset.commodity;
+  const mainCurrency = accounts.type_asset?.commodity;
   mutate('/api/main-currency', mainCurrency);
 
-  try {
-    await insertTodayPrices();
-  } catch (e) {
-    console.warn(`Retrieving live prices failed ${e}`);
+  if (!isDemo() && mainCurrency) {
+    try {
+      await insertTodayPrices();
+    } catch (e) {
+      console.warn(`Retrieving live prices failed ${e}`);
+    }
   }
 
   const prices = await queries.getPrices({});

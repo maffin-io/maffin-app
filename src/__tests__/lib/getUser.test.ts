@@ -49,4 +49,16 @@ describe('getUser', () => {
       isLoggedIn: true,
     });
   });
+
+  it('returns fake user when env is demo', async () => {
+    process.env.NEXT_PUBLIC_ENV = 'demo';
+    const user = await getUser();
+    expect(user).toEqual({
+      name: 'Maffin',
+      email: 'iomaffin@gmail.com',
+      image: '',
+      isLoggedIn: true,
+    });
+    process.env.NEXT_PUBLIC_ENV = '';
+  });
 });

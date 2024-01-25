@@ -83,4 +83,20 @@ describe('LoginPage', () => {
     expect(swr.mutate).toBeCalledTimes(1);
     expect(swr.mutate).toBeCalledWith('/api/user', null, { revalidate: true });
   });
+
+  it('does not call requestAcessToken when clicking sign in button and sends to /home/dashboard when demo', async () => {
+    process.env.NEXT_PUBLIC_ENV = 'demo';
+    render(<LoginPage />);
+
+    expect(mockInitTokenClient).toHaveBeenCalledWith({
+      callback: expect.any(Function),
+      client_id: '123339406534-gnk10bh5hqo87qlla8e9gmol1j961rtg.apps.googleusercontent.com',
+      scope: 'email profile https://www.googleapis.com/auth/drive.file',
+    });
+
+    screen.getByText('Sign In').click();
+    expect(requestAccessToken).toBeCalledTimes(0);
+    expect(mockRouterPush).toHaveBeenCalledWith('/dashboard/accounts');
+    process.env.NEXT_PUBLIC_ENV = '';
+  });
 });

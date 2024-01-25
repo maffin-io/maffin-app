@@ -1,23 +1,26 @@
-name: Staging Deploy
-
-on: [workflow_dispatch]
+name: Staging sync
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
-  frontend-build:
-    uses: ./.github/workflows/frontend-ci.yml
-
-  backend-build:
-    uses: ./.github/workflows/backend-ci.yml
-
-  deploy:
-    needs: [frontend-build, backend-build]
+  sync-branches:
+    name: Staging sync
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [16.17.0]
-
     steps:
-      - name: deploy
-        run: |
-          curl -X POST -d {} "${{ secrets.STAGING_WEBHOOK_URL }}" -H "Content-Type: application/json"
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Opening pull request
+        id: pull
+        uses: tretuna/sync-branches@1.4.0
+        with:
+          GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
+          FROM_BRANCH: "master"
+          TO_BRANCH: "staging"
+          PULL_REQUEST_AUTO_MERGE_METHOD: "merge"
