@@ -976,6 +976,183 @@ describe('TransactionForm', () => {
       expect(tx.guid.length).toEqual(31);
       expect(mockSave).toHaveBeenCalledTimes(1);
     });
+
+    /**
+     * Same as above but with the commodity account being the last split as this triggers
+     * a change of txCurrency for the two previous splits.
+     */
+    it('creates tx with multiple splits with commodity split being last', async () => {
+      const user = userEvent.setup();
+      const ticker = await Commodity.create({
+        guid: 'ticker',
+        mnemonic: 'TICKER',
+        namespace: 'CUSTOM',
+      }).save();
+
+      const tickerPrice = await Price.create({
+        date: DateTime.fromISO('2023-01-01'),
+        fk_commodity: ticker,
+        commodity: ticker,
+        fk_currency: sgd,
+        currency: sgd,
+        valueNum: 500,
+        valueDenom: 1,
+      }).save();
+
+      assetAccount.fk_commodity = sgd;
+      await assetAccount.save();
+
+      jest.spyOn(apiHook, 'usePrices')
+        .mockReturnValue({
+          data: new PriceDBMap([
+            tickerPrice,
+            {
+              fk_commodity: sgd,
+              commodity: sgd,
+              fk_currency: eur,
+              currency: eur,
+              value: 0.7,
+            } as Price,
+            {
+              fk_commodity: eur,
+              commodity: eur,
+              fk_currency: sgd,
+              currency: sgd,
+              value: 1 / 0.7,
+            } as Price,
+          ]),
+        } as SWRResponse);
+
+      const tickerAccount = await Account.create({
+        guid: 'account_guid_3',
+        name: 'Asset3',
+        type: 'ASSET',
+        fk_commodity: ticker,
+        parent: root,
+      }).save();
+      tickerAccount.path = 'Assets:asset3';
+
+      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+        {
+          data: [assetAccount, tickerAccount, expenseAccount],
+        } as SWRResponse,
+      );
+      const mockSave = jest.fn();
+
+      render(
+        <TransactionForm
+          onSave={mockSave}
+          defaultValues={
+            {
+              date: '',
+              description: '',
+              splits: [
+                Split.create({
+                  value: 0,
+                  quantity: 0,
+                  fk_account: assetAccount,
+                }),
+                new Split(),
+              ],
+              fk_currency: assetAccount.commodity,
+            }
+          }
+        />,
+      );
+
+      await user.type(screen.getByLabelText('Date'), '2023-01-01');
+      await user.type(screen.getByLabelText('Description'), 'Buy TICKER');
+
+      const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
+      await user.type(q0, '-1000');
+      await waitFor(() => expect(q0).toHaveValue(-1000));
+
+      const q1 = screen.getByRole('spinbutton', { name: 'splits.1.quantity' });
+      // We haven't selected an account so txCurrency here is SGD
+      await waitFor(() => expect(q1).toHaveValue(1000));
+
+      await user.click(screen.getByRole('combobox', { name: 'splits.1.account' }));
+      await user.click(screen.getByText('Expenses:random'));
+
+      // At this point v0 becomes available because txCurrency is EUR
+      const v0 = screen.getByRole('spinbutton', { name: 'splits.0.value' });
+      const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value', hidden: true });
+
+      await waitFor(() => expect(v0).toHaveValue(-700)); // -700 EUR
+      await waitFor(() => expect(v1).toHaveValue(700)); // 700 EUR
+      await waitFor(() => expect(q1).toHaveValue(700)); // 700 EUR
+
+      await user.click(screen.getByText('Add split', { exact: false }));
+
+      await user.click(screen.getByRole('combobox', { name: 'splits.2.account' }));
+      await user.click(screen.getByText('Assets:asset3'));
+
+      const q2 = screen.getByRole('spinbutton', { name: 'splits.2.quantity' });
+      const v2 = screen.getByRole('spinbutton', { name: 'splits.2.value' });
+      await user.type(q2, '0');
+      await user.type(v2, '0');
+
+      // Because we now have 3 splits, the value for split1 doesn't get updated
+      // with the total from mainSplit
+      await user.clear(v1);
+      await user.type(v1, '1000');
+
+      expect(screen.getByText('add')).not.toBeDisabled();
+      await user.click(screen.getByText('add'));
+
+      const tx = await Transaction.findOneOrFail({
+        where: { description: 'Buy TICKER' },
+        relations: {
+          splits: {
+            fk_account: true,
+          },
+        },
+      });
+
+      expect(tx).toMatchObject({
+        guid: expect.any(String),
+        date: DateTime.fromISO('2023-01-01'),
+        description: 'Buy TICKER',
+        fk_currency: sgd,
+        splits: [
+          {
+            guid: expect.any(String),
+            action: '',
+            fk_account: {
+              guid: 'account_guid_1',
+            },
+            quantityNum: -1000,
+            quantityDenom: 1,
+            valueNum: -1000,
+            valueDenom: 1,
+          },
+          {
+            guid: expect.any(String),
+            action: '',
+            fk_account: {
+              guid: 'account_guid_2',
+            },
+            quantityNum: 700,
+            quantityDenom: 1,
+            valueNum: 1000,
+            valueDenom: 1,
+          },
+          {
+            guid: expect.any(String),
+            action: '',
+            fk_account: {
+              guid: 'account_guid_3',
+            },
+            quantityNum: 0,
+            quantityDenom: 1,
+            valueNum: 0,
+            valueDenom: 1,
+          },
+        ],
+      });
+      expect(tx.guid.length).toEqual(31);
+      expect(mockSave).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('refreshes investment SWR cache when commodity is not CURRENCY', async () => {

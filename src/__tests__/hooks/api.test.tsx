@@ -4,7 +4,7 @@ import * as swr from 'swr';
 import { BareFetcher, SWRResponse } from 'swr';
 
 import { Account, Commodity } from '@/book/entities';
-import { PriceDB, PriceDBMap } from '@/book/prices';
+import { PriceDBMap } from '@/book/prices';
 import * as API from '@/hooks/api';
 import * as queries from '@/lib/queries';
 import * as gapiHooks from '@/hooks/useGapiClient';
@@ -18,9 +18,6 @@ jest.mock('@/lib/queries');
 jest.mock('@/book/prices', () => ({
   __esModule: true,
   ...jest.requireActual('@/book/prices'),
-  PriceDB: {
-    getTodayQuotes: jest.fn(),
-  },
 }));
 
 jest.mock('@/lib/getUser', () => ({
@@ -42,7 +39,6 @@ describe('API', () => {
   beforeEach(() => {
     jest.spyOn(Commodity, 'findOneByOrFail').mockImplementation();
     jest.spyOn(Commodity, 'find').mockImplementation();
-    jest.spyOn(PriceDB, 'getTodayQuotes').mockImplementation();
     jest.spyOn(getUserModule, 'default').mockImplementation();
     jest.spyOn(swrImmutable, 'default').mockImplementation(
       jest.fn((key, f: BareFetcher | null) => {
