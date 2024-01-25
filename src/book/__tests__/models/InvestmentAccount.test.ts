@@ -9,15 +9,12 @@ import {
   Split,
   Price,
 } from '@/book/entities';
-import { PriceDB, PriceDBMap } from '@/book/prices';
+import { PriceDBMap } from '@/book/prices';
 import Money from '@/book/Money';
 
 jest.mock('@/book/prices', () => ({
   __esModule: true,
   ...jest.requireActual('@/book/prices'),
-  PriceDB: {
-    getTodayQuotes: jest.fn(),
-  },
 }));
 
 describe('InvestmentAccount', () => {
@@ -32,8 +29,6 @@ describe('InvestmentAccount', () => {
       logging: false,
     });
     await datasource.initialize();
-
-    jest.spyOn(PriceDB, 'getTodayQuotes').mockResolvedValue(new PriceDBMap([]));
   });
 
   afterEach(async () => {
@@ -858,17 +853,6 @@ describe('InvestmentAccount', () => {
           },
         });
 
-        // Yes, I know its ugly but the test setup is a bit complicated so being pragmatic
-        if (currency === 'USD') {
-          // eslint-disable-next-line jest/no-conditional-expect
-          expect(() => new InvestmentAccount(
-            account,
-            'EUR',
-            new PriceDBMap([stockPrice, currencyPrice]),
-          )).toThrow('Adding dividends to income accounts not in EUR');
-          return;
-        }
-
         const instance = new InvestmentAccount(
           account,
           mainCurrency,
@@ -878,7 +862,7 @@ describe('InvestmentAccount', () => {
         expect(instance.realizedProfit.toString()).toEqual(`0.00 ${currency}`);
         expect(instance.realizedProfitInCurrency.toString()).toEqual(`0.00 ${mainCurrency}`);
         expect(instance.realizedDividends.toString()).toEqual(`89.67 ${currency}`);
-        const expected = new Money(89.67 * currencyPrice.value, mainCurrency);
+        const expected = new Money(89.67, mainCurrency);
         expect(instance.realizedDividendsInCurrency.toString()).toEqual(expected.toString());
 
         expect(instance.dividends[0].amount.toString()).toEqual(`89.67 ${currency}`);
@@ -966,7 +950,7 @@ describe('InvestmentAccount', () => {
         expect(instance.realizedDividendsInCurrency.toString()).toEqual('170.00 EUR');
       });
 
-      it('fails if transaction is not in main currency', async () => {
+      it('works when transaction is not in main currency using income split', async () => {
         const sgd = await Commodity.create({
           namespace: 'CURRENCY',
           mnemonic: 'SGD',
@@ -987,11 +971,52 @@ describe('InvestmentAccount', () => {
             },
           },
         });
-        expect(() => new InvestmentAccount(
+        const instance = new InvestmentAccount(
           account,
           'EUR',
           new PriceDBMap([stockPrice, currencyPrice]),
-        )).toThrow('Adding dividends to income accounts not in EUR');
+        );
+
+        expect(instance.realizedDividends.toString()).toEqual(`89.67 ${stockCurrency.mnemonic}`);
+        expect(instance.realizedDividendsInCurrency.toString()).toEqual('89.67 EUR');
+      });
+
+      it('works when transaction is not in main currency using getPrice', async () => {
+        const sgd = await Commodity.create({
+          namespace: 'CURRENCY',
+          mnemonic: 'SGD',
+        }).save();
+        // Override the already existing one with SGD
+        tx.fk_currency = sgd;
+        await tx.save();
+
+        incomeAccount.fk_commodity = sgd;
+        await incomeAccount.save();
+
+        const account = await Account.findOneOrFail({
+          where: { type: 'STOCK' },
+          relations: {
+            splits: {
+              fk_transaction: {
+                splits: {
+                  fk_account: true,
+                },
+              },
+            },
+          },
+        });
+        const instance = new InvestmentAccount(
+          account,
+          'EUR',
+          new PriceDBMap([stockPrice, currencyPrice]),
+        );
+
+        expect(instance.realizedDividends.toString()).toEqual(`89.67 ${stockCurrency.mnemonic}`);
+        expect(instance.realizedDividendsInCurrency.toString()).toEqual(
+          stockCurrency.mnemonic === 'USD'
+            ? '88.37 EUR'
+            : '89.67 EUR',
+        );
       });
     });
 

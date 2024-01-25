@@ -45,6 +45,8 @@ export default function MainSplit({
           : prices.getPrice(account.commodity.mnemonic, txCurrency.mnemonic, d);
 
         setExchangeRate(rate);
+      } else {
+        setExchangeRate(Price.create({ valueNum: 1, valueDenom: 1 }));
       }
     }
   }, [txCurrency, date, form.formState.isDirty, account, prices]);

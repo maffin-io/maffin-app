@@ -299,23 +299,36 @@ export default class InvestmentAccount {
    * doesnt support this by default. We rely on the user/maffin adding
    * an empty split that helps to identify the income/asset related
    * transaction.
+   *
+   * If the income split is in mainCurrency, we will retrieve the amountInCurrency
+   * from there. Otherwise, we use whatever priceDBMap.getPrice returns for that
+   * date.
    */
   _dividend(split: Split): void {
-    const originalSplit = split.transaction.splits.find(s => s.value === 0);
     const brokerSplit = split.transaction.splits.find(s => s.value > 0);
     if (!brokerSplit) {
       throw new Error(`Dividend transaction ${split.transaction.guid} is missing required splits`);
     }
 
-    if (split.transaction.currency.mnemonic === this.mainCurrency) {
-      this.dividends.push({
-        when: split.transaction.date,
-        amount: new Money(brokerSplit.quantity, brokerSplit.account.commodity.mnemonic),
-        // We only support receiving dividends to accounts in main currency
-        amountInCurrency: new Money(brokerSplit.value, this.mainCurrency),
-      });
-    } else {
-      throw new Error(`Adding dividends to income accounts not in ${this.mainCurrency} is not allowed. tx_guid: ${split.transaction.guid} ${originalSplit?.account.name}`);
-    }
+    const incomeSplit = split.transaction.splits.find(
+      s => s.account.type === 'INCOME' && s.account.commodity.mnemonic === this.mainCurrency,
+    );
+
+    const amountInCurrency = incomeSplit
+      ? incomeSplit.quantity * -1
+      : brokerSplit.quantity * this._priceDBMap.getPrice(
+        brokerSplit.account.commodity.mnemonic,
+        this.mainCurrency,
+        split.transaction.date,
+      ).value;
+
+    this.dividends.push({
+      when: split.transaction.date,
+      amount: new Money(brokerSplit.quantity, brokerSplit.account.commodity.mnemonic),
+      amountInCurrency: new Money(
+        amountInCurrency,
+        this.mainCurrency,
+      ),
+    });
   }
 }
