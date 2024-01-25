@@ -131,7 +131,7 @@ export default function AccountForm({
                 showRoot
                 isDisabled={disabled}
                 isClearable={false}
-                ignoreAccounts={['STOCK', 'MUTUAL']}
+                ignoreAccounts={['INVESTMENT']}
                 ignorePlaceholders={false}
                 placeholder="<parent account>"
                 onChange={field.onChange}

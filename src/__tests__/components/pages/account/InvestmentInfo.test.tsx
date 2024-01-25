@@ -47,7 +47,7 @@ describe('InvestmentInfo', () => {
     ticker = {
       guid: 'ticker_guid',
       mnemonic: 'TICKER',
-      namespace: 'CUSTOM',
+      namespace: 'OTHER',
     } as Commodity;
   });
 

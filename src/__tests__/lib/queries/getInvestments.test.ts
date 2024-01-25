@@ -102,7 +102,7 @@ describe('getInvestments', () => {
 
       const account1 = Account.create({
         name: 'TICKER1',
-        type: 'STOCK',
+        type: 'INVESTMENT',
         fk_commodity: {
           guid: 'ticker_guid_1',
           mnemonic: 'TICKER1',
@@ -111,7 +111,7 @@ describe('getInvestments', () => {
       });
       const account2 = Account.create({
         name: 'TICKER2',
-        type: 'STOCK',
+        type: 'INVESTMENT',
         fk_commodity: {
           guid: 'ticker_guid_2',
           mnemonic: 'TICKER2',
@@ -124,10 +124,7 @@ describe('getInvestments', () => {
 
       expect(investments).toEqual([{ guid: 'investment_guid' }, { guid: 'investment_guid' }]);
       expect(mockAccountFind).toHaveBeenCalledWith({
-        where: [
-          { type: 'STOCK' },
-          { type: 'MUTUAL' },
-        ],
+        where: { type: 'INVESTMENT' },
         relations: {
           splits: {
             fk_transaction: {
@@ -172,7 +169,7 @@ describe('getInvestments', () => {
 
       const account1 = Account.create({
         name: 'TICKER1',
-        type: 'STOCK',
+        type: 'INVESTMENT',
         fk_commodity: {
           guid: 'ticker_guid_1',
           mnemonic: 'TICKER1',
@@ -227,7 +224,7 @@ describe('getInvestments', () => {
 
       const account1 = Account.create({
         name: 'TICKER1',
-        type: 'STOCK',
+        type: 'INVESTMENT',
         fk_commodity: {
           guid: 'ticker_guid_1',
           mnemonic: 'TICKER1',

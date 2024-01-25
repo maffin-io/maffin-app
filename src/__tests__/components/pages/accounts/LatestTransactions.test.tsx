@@ -87,7 +87,7 @@ describe('LatestTransactions', () => {
               account: {
                 guid: 'account2',
                 name: 'Account 2',
-                type: 'STOCK',
+                type: 'INVESTMENT',
                 commodity: {
                   mnemonic: 'EUR',
                 },

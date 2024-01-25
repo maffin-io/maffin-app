@@ -1,10 +1,17 @@
 import type { Account } from '@/book/entities';
 
-export const ASSET_ACCOUNTS = ['ASSET', 'BANK', 'CASH', 'STOCK', 'MUTUAL', 'RECEIVABLE'];
+export const ASSET_ACCOUNTS = [
+  'ASSET',
+  'BANK',
+  'CASH',
+  'FIXED',
+  'INVESTMENT',
+  'RECEIVABLE',
+];
 export const LIABILITY_ACCOUNTS = ['LIABILITY', 'CREDIT', 'PAYABLE'];
 
 export function isInvestment(account: Account): boolean {
-  if (['STOCK', 'MUTUAL'].includes(account.type)) {
+  if (account.type === 'INVESTMENT') {
     return true;
   }
 

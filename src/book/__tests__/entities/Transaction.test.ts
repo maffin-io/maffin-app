@@ -168,7 +168,7 @@ describe('Transaction', () => {
       split1.quantity = 100;
       split1.fk_account = await Account.create({
         name: 'GOOGL',
-        type: 'STOCK',
+        type: 'INVESTMENT',
         fk_commodity: commodity,
         parent: account,
       }).save();

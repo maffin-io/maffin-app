@@ -31,8 +31,8 @@ export default function CommoditiesPage(): JSX.Element {
   commodities = commodities || [];
 
   const currencies = commodities.filter(c => c.namespace === 'CURRENCY');
-  const investments = commodities.filter(c => ['STOCK', 'FUND'].includes(c.namespace));
-  const custom = commodities.filter(c => (!(['CURRENCY', 'STOCK', 'FUND'].includes(c.namespace))));
+  const financial = commodities.filter(c => ['STOCK', 'FUND'].includes(c.namespace));
+  const other = commodities.filter(c => c.namespace === 'OTHER');
 
   return (
     <>
@@ -75,16 +75,16 @@ export default function CommoditiesPage(): JSX.Element {
         ))}
       </div>
       {
-        investments.length > 0
+        financial.length > 0
         && (
           <>
             <div className="header">
               <span className="title text-lg">
-                Investments
+                Financial
               </span>
             </div>
             <div className="grid grid-cols-12">
-              {investments.map(commodity => (
+              {financial.map(commodity => (
                 <Link
                   key={commodity.guid}
                   href={`/dashboard/commodities/${commodity.guid}`}
@@ -101,16 +101,16 @@ export default function CommoditiesPage(): JSX.Element {
         )
       }
       {
-        custom.length > 0
+        other.length > 0
         && (
           <>
             <div className="header">
               <span className="title text-lg">
-                Custom
+                Other
               </span>
             </div>
             <div className="grid grid-cols-12">
-              {custom.map(commodity => (
+              {other.map(commodity => (
                 <Link
                   key={commodity.guid}
                   href={`/dashboard/commodities/${commodity.guid}`}

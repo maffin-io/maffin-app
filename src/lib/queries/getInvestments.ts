@@ -7,10 +7,7 @@ import getPrices from '@/lib/queries/getPrices';
 export async function getInvestments(): Promise<InvestmentAccount[]> {
   const mainCurrency = await getMainCurrency();
   const accounts = await Account.find({
-    where: [
-      { type: 'STOCK' },
-      { type: 'MUTUAL' },
-    ],
+    where: { type: 'INVESTMENT' },
     relations: {
       // This is very similar to `getSplits` query. In the future
       // we may want to try to re-use it

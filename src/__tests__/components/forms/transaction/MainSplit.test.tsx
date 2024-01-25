@@ -87,7 +87,7 @@ describe('MainSplit', () => {
                 name: 'path1',
                 guid: 'account_guid_1',
                 path: 'path1',
-                type: 'STOCK',
+                type: 'INVESTMENT',
                 commodity: {
                   guid: 'eur',
                   mnemonic: 'EUR',
@@ -169,7 +169,7 @@ describe('MainSplit', () => {
       const ticker = {
         guid: 'ticker',
         mnemonic: 'TICKER',
-        namespace: 'CUSTOM',
+        namespace: 'OTHER',
       } as Commodity;
       jest.spyOn(apiHook, 'usePrices')
         .mockReturnValue({

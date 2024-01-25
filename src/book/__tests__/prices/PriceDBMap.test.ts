@@ -151,8 +151,8 @@ describe('PriceDBMap', () => {
   describe('getInvestmentPrice', () => {
     beforeEach(async () => {
       const commodityStock = await Commodity.create({
-        namespace: 'AS',
-        mnemonic: 'STOCK',
+        namespace: 'STOCK',
+        mnemonic: 'TICKER',
       }).save();
 
       price1 = Price.create({
@@ -181,19 +181,19 @@ describe('PriceDBMap', () => {
     });
 
     it('returns price with matching date', () => {
-      expect(instance.getInvestmentPrice('STOCK', DateTime.fromISO('2023-01-01')).guid).toEqual('price1');
+      expect(instance.getInvestmentPrice('TICKER', DateTime.fromISO('2023-01-01')).guid).toEqual('price1');
     });
 
     it('returns candidate with previous date when no current date', () => {
-      expect(instance.getInvestmentPrice('STOCK', DateTime.fromISO('2023-01-02')).guid).toEqual('price1');
+      expect(instance.getInvestmentPrice('TICKER', DateTime.fromISO('2023-01-02')).guid).toEqual('price1');
     });
 
     it('returns future price when no other candidates', () => {
-      expect(instance.getInvestmentPrice('STOCK', DateTime.fromISO('2022-01-01')).guid).toEqual('price1');
+      expect(instance.getInvestmentPrice('TICKER', DateTime.fromISO('2022-01-01')).guid).toEqual('price1');
     });
 
     it('returns latest price when no date passed', () => {
-      expect(instance.getInvestmentPrice('STOCK').guid).toEqual('price2');
+      expect(instance.getInvestmentPrice('TICKER').guid).toEqual('price2');
     });
   });
 });

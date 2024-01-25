@@ -122,7 +122,7 @@ describe('InvestmentChart', () => {
     const googl = {
       guid: 'googl_guid',
       mnemonic: 'GOOGL',
-      namespace: 'STOCK',
+      namespace: 'INVESTMENT',
     } as Commodity;
 
     const account = {

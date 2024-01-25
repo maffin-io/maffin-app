@@ -25,10 +25,20 @@ export default async function importBook(rawData: Uint8Array): Promise<Uint8Arra
     { path: account.path },
   )));
 
-  await Account.delete({
-    type: 'ROOT',
-    name: 'Template Root',
-  });
+  await Promise.all([
+    Account.delete({
+      type: 'ROOT',
+      name: 'Template Root',
+    }),
+    Account.update(
+      { type: 'STOCK' },
+      { type: 'INVESTMENT' },
+    ),
+    Account.update(
+      { type: 'MUTUAL' },
+      { type: 'INVESTMENT' },
+    ),
+  ]);
 
   return tempDataSource.sqljsManager.exportDatabase();
 }

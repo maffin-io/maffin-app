@@ -35,9 +35,7 @@ describe('InvestmentAccount', () => {
     await datasource.destroy();
   });
 
-  describe.each(
-    ['STOCK', 'MUTUAL'],
-  )('instance %s', (type) => {
+  describe('instance', () => {
     let eur: Commodity;
     let commodityAccount: Commodity;
 
@@ -65,8 +63,8 @@ describe('InvestmentAccount', () => {
       }).save();
 
       await Account.create({
-        name: type,
-        type,
+        name: 'investment',
+        type: 'INVESTMENT',
         fk_commodity: commodityAccount,
         parent: investmentAccount,
       }).save();
@@ -85,7 +83,7 @@ describe('InvestmentAccount', () => {
       ]);
 
       const account = await Account.findOneOrFail({
-        where: { type },
+        where: { type: 'INVESTMENT' },
         relations: {
           splits: true,
         },
@@ -138,7 +136,7 @@ describe('InvestmentAccount', () => {
       ]);
 
       const account = await Account.findOneOrFail({
-        where: { type },
+        where: { type: 'INVESTMENT' },
         relations: {
           splits: true,
         },
@@ -186,7 +184,7 @@ describe('InvestmentAccount', () => {
       ]);
 
       const account = await Account.findOneOrFail({
-        where: { type },
+        where: { type: 'INVESTMENT' },
         relations: {
           splits: true,
         },
@@ -221,7 +219,7 @@ describe('InvestmentAccount', () => {
       ]);
 
       const account = await Account.findOneOrFail({
-        where: { type },
+        where: { type: 'INVESTMENT' },
         relations: {
           splits: true,
         },
@@ -253,8 +251,8 @@ describe('InvestmentAccount', () => {
       }).save();
 
       stockCommodity = await Commodity.create({
-        namespace: 'NASDAQ',
-        mnemonic: 'STOCK',
+        namespace: 'STOCK',
+        mnemonic: 'TICKER',
       }).save();
 
       if (currency === mainCurrency) {
@@ -280,7 +278,7 @@ describe('InvestmentAccount', () => {
 
       stockAccount = await Account.create({
         name: 'stock',
-        type: 'STOCK',
+        type: 'INVESTMENT',
         fk_commodity: stockCommodity,
         parent: investmentsAccount,
       }).save();
@@ -346,7 +344,7 @@ describe('InvestmentAccount', () => {
     describe('buy', () => {
       it('processes buy transaction as expected', async () => {
         const account = await Account.findOneOrFail({
-          where: { type: 'STOCK' },
+          where: { type: 'INVESTMENT' },
           relations: {
             splits: {
               fk_transaction: {
@@ -361,7 +359,7 @@ describe('InvestmentAccount', () => {
           new PriceDBMap([stockPrice, currencyPrice, todayCurrencyPrice]),
         );
 
-        expect(instance.quantity.toString()).toEqual('122.85 STOCK');
+        expect(instance.quantity.toString()).toEqual('122.85 TICKER');
         expect(instance.cost.toString()).toEqual(`1000.00 ${currency}`);
         expect(instance.costInCurrency.toString()).toEqual(`${instance.cost.convert(mainCurrency, currencyPrice.value)}`);
         expect(instance.avgPrice).toEqual(8.14);
@@ -403,7 +401,7 @@ describe('InvestmentAccount', () => {
         }).save();
 
         const account = await Account.findOneOrFail({
-          where: { type: 'STOCK' },
+          where: { type: 'INVESTMENT' },
           relations: {
             splits: {
               fk_transaction: {
@@ -418,7 +416,7 @@ describe('InvestmentAccount', () => {
           new PriceDBMap([stockPrice, currencyPrice, currencyPrice2, todayCurrencyPrice]),
         );
 
-        expect(instance.quantity.toString()).toEqual('368.55 STOCK');
+        expect(instance.quantity.toString()).toEqual('368.55 TICKER');
         expect(instance.cost.toString()).toEqual(`2700.00 ${currency}`);
         const expectedCostInCurrency = new Money(
           1000 * currencyPrice.value + 1700 * currencyPrice2.value,
@@ -458,7 +456,7 @@ describe('InvestmentAccount', () => {
         }).save();
 
         const account = await Account.findOneOrFail({
-          where: { type: 'STOCK' },
+          where: { type: 'INVESTMENT' },
           relations: {
             splits: {
               fk_transaction: {
@@ -473,7 +471,7 @@ describe('InvestmentAccount', () => {
           new PriceDBMap([stockPrice, currencyPrice]),
         );
 
-        expect(instance.quantity.toString()).toEqual('0.00 STOCK');
+        expect(instance.quantity.toString()).toEqual('0.00 TICKER');
         expect(instance.realizedProfit.toString()).toEqual(`0.00 ${currency}`);
         expect(instance.realizedProfitInCurrency.toString()).toEqual(`0.00 ${mainCurrency}`);
         expect(instance.cost.toString()).toEqual(`0.00 ${currency}`);
@@ -507,7 +505,7 @@ describe('InvestmentAccount', () => {
         }).save();
 
         const account = await Account.findOneOrFail({
-          where: { type: 'STOCK' },
+          where: { type: 'INVESTMENT' },
           relations: {
             splits: {
               fk_transaction: {
@@ -522,7 +520,7 @@ describe('InvestmentAccount', () => {
           new PriceDBMap([stockPrice, currencyPrice]),
         );
 
-        expect(instance.quantity.toString()).toEqual('0.00 STOCK');
+        expect(instance.quantity.toString()).toEqual('0.00 TICKER');
         expect(instance.realizedProfit.toString()).toEqual(`1000.00 ${currency}`);
         const expectedRealizedProfitInCurrency = new Money(
           1000 * currencyPrice.value,
@@ -561,7 +559,7 @@ describe('InvestmentAccount', () => {
         }).save();
 
         const account = await Account.findOneOrFail({
-          where: { type: 'STOCK' },
+          where: { type: 'INVESTMENT' },
           relations: {
             splits: {
               fk_transaction: {
@@ -576,7 +574,7 @@ describe('InvestmentAccount', () => {
           new PriceDBMap([stockPrice, currencyPrice]),
         );
 
-        expect(instance.quantity.toString()).toEqual('0.00 STOCK');
+        expect(instance.quantity.toString()).toEqual('0.00 TICKER');
         expect(instance.realizedProfit.toString()).toEqual(`-500.00 ${currency}`);
         const expectedRealizedProfitInCurrency = new Money(
           -500 * currencyPrice.value,
@@ -615,7 +613,7 @@ describe('InvestmentAccount', () => {
         }).save();
 
         const account = await Account.findOneOrFail({
-          where: { type: 'STOCK' },
+          where: { type: 'INVESTMENT' },
           relations: {
             splits: {
               fk_transaction: {
@@ -630,7 +628,7 @@ describe('InvestmentAccount', () => {
           new PriceDBMap([stockPrice, currencyPrice, todayCurrencyPrice]),
         );
 
-        expect(instance.quantity.toString()).toEqual('61.42 STOCK');
+        expect(instance.quantity.toString()).toEqual('61.42 TICKER');
         expect(instance.realizedProfit.toString()).toEqual(`500.00 ${currency}`);
         const expectedRealizedProfitInCurrency = new Money(500 * currencyPrice.value, mainCurrency);
         expect(instance.realizedProfitInCurrency.toString()).toEqual(
@@ -668,7 +666,7 @@ describe('InvestmentAccount', () => {
         }).save();
 
         const account = await Account.findOneOrFail({
-          where: { type: 'STOCK' },
+          where: { type: 'INVESTMENT' },
           relations: {
             splits: {
               fk_transaction: {
@@ -683,7 +681,7 @@ describe('InvestmentAccount', () => {
           new PriceDBMap([stockPrice, currencyPrice, todayCurrencyPrice]),
         );
 
-        expect(instance.quantity.toString()).toEqual('61.42 STOCK');
+        expect(instance.quantity.toString()).toEqual('61.42 TICKER');
         expect(instance.realizedProfit.toString()).toEqual(`-250.00 ${currency}`);
         const expectedRealizedProfitInCurrency = new Money(
           -250 * currencyPrice.value,
@@ -719,7 +717,7 @@ describe('InvestmentAccount', () => {
         }).save();
 
         const account = await Account.findOneOrFail({
-          where: { type: 'STOCK' },
+          where: { type: 'INVESTMENT' },
           relations: {
             splits: {
               fk_transaction: {
@@ -734,7 +732,7 @@ describe('InvestmentAccount', () => {
           new PriceDBMap([stockPrice, currencyPrice, todayCurrencyPrice]),
         );
 
-        expect(instance.quantity.toString()).toEqual('143.85 STOCK');
+        expect(instance.quantity.toString()).toEqual('143.85 TICKER');
         expect(instance.cost.toString()).toEqual(`1000.00 ${currency}`); // cost stays the same
         const expectedCostInCurrency = new Money(1000 * currencyPrice.value, mainCurrency);
         expect(instance.costInCurrency.toString()).toEqual(expectedCostInCurrency.toString());
@@ -770,7 +768,7 @@ describe('InvestmentAccount', () => {
         }).save();
 
         const account = await Account.findOneOrFail({
-          where: { type: 'STOCK' },
+          where: { type: 'INVESTMENT' },
           relations: {
             splits: {
               fk_transaction: {
@@ -785,7 +783,7 @@ describe('InvestmentAccount', () => {
           new PriceDBMap([stockPrice, currencyPrice, todayCurrencyPrice]),
         );
 
-        expect(instance.quantity.toString()).toEqual('143.85 STOCK');
+        expect(instance.quantity.toString()).toEqual('143.85 TICKER');
         expect(instance.cost.toString()).toEqual(`1000.00 ${currency}`); // cost stays the same
         const expectedCostInCurrency = new Money(1000 * currencyPrice.value, mainCurrency);
         expect(instance.costInCurrency.toString()).toEqual(expectedCostInCurrency.toString());
@@ -841,7 +839,7 @@ describe('InvestmentAccount', () => {
 
       it('increases dividend amount', async () => {
         const account = await Account.findOneOrFail({
-          where: { type: 'STOCK' },
+          where: { type: 'INVESTMENT' },
           relations: {
             splits: {
               fk_transaction: {
@@ -929,7 +927,7 @@ describe('InvestmentAccount', () => {
         }).save();
 
         const account = await Account.findOneOrFail({
-          where: { type: 'STOCK' },
+          where: { type: 'INVESTMENT' },
           relations: {
             splits: {
               fk_transaction: {
@@ -960,7 +958,7 @@ describe('InvestmentAccount', () => {
         await tx.save();
 
         const account = await Account.findOneOrFail({
-          where: { type: 'STOCK' },
+          where: { type: 'INVESTMENT' },
           relations: {
             splits: {
               fk_transaction: {
@@ -994,7 +992,7 @@ describe('InvestmentAccount', () => {
         await incomeAccount.save();
 
         const account = await Account.findOneOrFail({
-          where: { type: 'STOCK' },
+          where: { type: 'INVESTMENT' },
           relations: {
             splits: {
               fk_transaction: {
@@ -1037,7 +1035,7 @@ describe('InvestmentAccount', () => {
       }).save();
 
       const account = await Account.findOneOrFail({
-        where: { type: 'STOCK' },
+        where: { type: 'INVESTMENT' },
         relations: {
           splits: {
             fk_transaction: {
