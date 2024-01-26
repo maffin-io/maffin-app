@@ -18,7 +18,7 @@ import {
 } from '@/book/entities';
 import type BookStorage from '@/lib/storage/BookStorage';
 import { MIGRATIONS } from '@/book/migrations';
-import { isDemo } from '@/helpers/env';
+import { isStaging } from '@/helpers/env';
 
 export type DataSourceContextType = {
   datasource: DataSource | null,
@@ -153,7 +153,7 @@ async function preloadData() {
   const mainCurrency = accounts.type_asset?.commodity;
   mutate('/api/main-currency', mainCurrency);
 
-  if (!isDemo() && mainCurrency) {
+  if (!isStaging() && mainCurrency) {
     try {
       await insertTodayPrices();
     } catch (e) {

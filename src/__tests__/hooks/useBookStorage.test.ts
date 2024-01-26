@@ -4,6 +4,7 @@ import useBookStorage from '@/hooks/useBookStorage';
 import * as gapiHooks from '@/hooks/useGapiClient';
 import BookStorage from '@/lib/storage/GDriveBookStorage';
 import DemoBookStorage from '@/lib/storage/DemoBookStorage';
+import * as helpers_env from '@/helpers/env';
 
 jest.mock('@/hooks/useGapiClient', () => ({
   __esModule: true,
@@ -12,9 +13,15 @@ jest.mock('@/hooks/useGapiClient', () => ({
 
 jest.mock('@/lib/storage/GDriveBookStorage');
 
+jest.mock('@/helpers/env', () => ({
+  __esModule: true,
+  isStaging: () => false,
+}));
+
 describe('useBookStorage', () => {
   beforeEach(() => {
     jest.spyOn(gapiHooks, 'default').mockReturnValue([false]);
+    jest.spyOn(helpers_env, 'isStaging').mockReturnValue(false);
   });
 
   afterEach(() => {
@@ -41,8 +48,8 @@ describe('useBookStorage', () => {
     });
   });
 
-  it('returns DemoStorage when env is demo', async () => {
-    process.env.NEXT_PUBLIC_ENV = 'demo';
+  it('returns DemoStorage when env is staging', async () => {
+    jest.spyOn(helpers_env, 'isStaging').mockReturnValue(true);
     window.gapi = {
       client: {} as typeof gapi.client,
     } as typeof gapi;

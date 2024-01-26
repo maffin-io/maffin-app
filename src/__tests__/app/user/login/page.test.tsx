@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import * as swr from 'swr';
 
 import LoginPage from '@/app/user/login/page';
+import * as helpers_env from '@/helpers/env';
 
 jest.mock('swr');
 
@@ -11,6 +12,11 @@ jest.mock('next/navigation', () => ({
 }));
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const useRouter = jest.spyOn(require('next/navigation'), 'useRouter');
+
+jest.mock('@/helpers/env', () => ({
+  __esModule: true,
+  isStaging: () => false,
+}));
 
 describe('LoginPage', () => {
   let requestAccessToken: jest.Mock;
@@ -84,8 +90,8 @@ describe('LoginPage', () => {
     expect(swr.mutate).toBeCalledWith('/api/user', null, { revalidate: true });
   });
 
-  it('does not call requestAcessToken when clicking sign in button and sends to /home/dashboard when demo', async () => {
-    process.env.NEXT_PUBLIC_ENV = 'demo';
+  it('does not call requestAcessToken when clicking sign in button and sends to /home/dashboard when staging', async () => {
+    jest.spyOn(helpers_env, 'isStaging').mockReturnValue(true);
     render(<LoginPage />);
 
     expect(mockInitTokenClient).toHaveBeenCalledWith({

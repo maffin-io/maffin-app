@@ -1,5 +1,5 @@
 import type { User } from '@/types/user';
-import { isDemo } from '@/helpers/env';
+import { isStaging } from '@/helpers/env';
 
 const emptyUser: User = {
   name: '',
@@ -9,7 +9,7 @@ const emptyUser: User = {
 };
 
 export default async function getUser(): Promise<User> {
-  if (isDemo()) {
+  if (isStaging()) {
     return {
       name: 'Maffin',
       email: 'iomaffin@gmail.com',
