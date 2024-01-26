@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - fix_branch_sync_v2
   workflow_dispatch:
 
 jobs:
@@ -16,11 +17,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12
-      - name: Opening pull request
+      - name: Syncing branches
         id: pull
         uses: tretuna/sync-branches@main
         with:
           GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
           FROM_BRANCH: "master"
           TO_BRANCH: "staging"
-          PULL_REQUEST_AUTO_MERGE_METHOD: "merge"
+          # PULL_REQUEST_AUTO_MERGE_METHOD: "merge"
