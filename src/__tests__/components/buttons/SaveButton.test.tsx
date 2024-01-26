@@ -11,6 +11,12 @@ import { SWRConfig, mutate } from 'swr';
 import SaveButton from '@/components/buttons/SaveButton';
 import { DataSourceContext } from '@/hooks';
 import type { DataSourceContextType } from '@/hooks';
+import * as helpers_env from '@/helpers/env';
+
+jest.mock('@/helpers/env', () => ({
+  __esModule: true,
+  isStaging: () => false,
+}));
 
 describe('SaveButton', () => {
   it('loads while unavailable datasource', async () => {
@@ -76,8 +82,8 @@ describe('SaveButton', () => {
     await waitFor(() => expect(mockSave).toBeCalledTimes(1));
   });
 
-  it('is disabled when demo', async () => {
-    process.env.NEXT_PUBLIC_ENV = 'demo';
+  it('is disabled when staging', async () => {
+    jest.spyOn(helpers_env, 'isStaging').mockReturnValue(true);
     render(
       <DataSourceContext.Provider value={{ isLoaded: true } as DataSourceContextType}>
         <SaveButton />

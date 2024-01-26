@@ -16,7 +16,7 @@ frontend:
     build:
       commands:
         - rm -rf .next/
-        - yarn maffin:build
+        - "NEXT_PUBLIC_ENV=$USER_BRANCH" yarn maffin:build
   artifacts:
     baseDirectory: .next
     files:

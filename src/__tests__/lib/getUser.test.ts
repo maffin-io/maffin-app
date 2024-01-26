@@ -1,4 +1,10 @@
 import getUser from '@/lib/getUser';
+import * as helpers_env from '@/helpers/env';
+
+jest.mock('@/helpers/env', () => ({
+  __esModule: true,
+  isStaging: () => false,
+}));
 
 describe('getUser', () => {
   let mockPeopleGet: jest.Mock;
@@ -50,8 +56,8 @@ describe('getUser', () => {
     });
   });
 
-  it('returns fake user when env is demo', async () => {
-    process.env.NEXT_PUBLIC_ENV = 'demo';
+  it('returns fake user when env is staging', async () => {
+    jest.spyOn(helpers_env, 'isStaging').mockReturnValue(true);
     const user = await getUser();
     expect(user).toEqual({
       name: 'Maffin',
@@ -59,6 +65,5 @@ describe('getUser', () => {
       image: '',
       isLoggedIn: true,
     });
-    process.env.NEXT_PUBLIC_ENV = '';
   });
 });

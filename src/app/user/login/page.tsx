@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { mutate } from 'swr';
 
 import Loading from '@/components/Loading';
-import { isDemo } from '@/helpers/env';
+import { isStaging } from '@/helpers/env';
 
 export default function LoginPage(): JSX.Element {
   const router = useRouter();
@@ -42,7 +42,7 @@ export default function LoginPage(): JSX.Element {
       className="btn btn-primary"
       type="button"
       onClick={() => {
-        if (isDemo()) {
+        if (isStaging()) {
           router.push('/dashboard/accounts');
         } else {
           tokenClient.requestAccessToken();
