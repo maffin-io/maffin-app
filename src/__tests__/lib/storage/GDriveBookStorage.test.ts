@@ -1,10 +1,10 @@
 import pako from 'pako';
 
-import BookStorage from '@/apis/BookStorage';
+import BookStorage from '@/lib/storage/GDriveBookStorage';
 
 describe('GoogleDrive', () => {
   let rawBook: Uint8Array;
-  let client: BookStorage;
+  let instance: BookStorage;
   let mockDriveClient: typeof gapi.client.drive;
   let mockGapiClient: typeof gapi.client;
   let mockFetch: jest.SpyInstance;
@@ -42,7 +42,7 @@ describe('GoogleDrive', () => {
         state: 'state',
       }),
     };
-    client = new BookStorage(mockGapiClient);
+    instance = new BookStorage(mockGapiClient);
 
     global.fetch = jest.fn();
     mockFetch = jest.spyOn(global, 'fetch');
@@ -54,7 +54,8 @@ describe('GoogleDrive', () => {
 
   describe('findParentFolderId', () => {
     it('calls list with expected params', async () => {
-      await client.findParentFolderId();
+      // @ts-ignore
+      await instance.findParentFolderId();
       expect(mockDriveClient.files.list).toHaveBeenNthCalledWith(
         1,
         {
@@ -76,23 +77,27 @@ describe('GoogleDrive', () => {
           },
         }
       ));
-      const parentFolderId = await client.findParentFolderId();
+      // @ts-ignore
+      const parentFolderId = await instance.findParentFolderId();
       expect(parentFolderId).toEqual('parentFolderId');
     });
 
     it('returns empty string when not found', async () => {
-      const parentFolderId = await client.findParentFolderId();
+      // @ts-ignore
+      const parentFolderId = await instance.findParentFolderId();
       expect(parentFolderId).toEqual('');
     });
   });
 
   describe('findBookFileId', () => {
     beforeEach(() => {
-      client.parentFolderId = 'parentFolderId';
+      // @ts-ignore
+      instance.parentFolderId = 'parentFolderId';
     });
 
     it('calls list with expected params', async () => {
-      await client.findBookFileId('book1');
+      // @ts-ignore
+      await instance.findBookFileId('book1');
       expect(mockDriveClient.files.list).toHaveBeenNthCalledWith(
         1,
         {
@@ -114,43 +119,54 @@ describe('GoogleDrive', () => {
           },
         }
       ));
-      const bookFileId = await client.findBookFileId('book1');
+      // @ts-ignore
+      const bookFileId = await instance.findBookFileId('book1');
       expect(bookFileId).toEqual('bookFileId');
     });
 
     it('returns empty string when not found', async () => {
-      const bookFileId = await client.findBookFileId('book1');
+      // @ts-ignore
+      const bookFileId = await instance.findBookFileId('book1');
       expect(bookFileId).toEqual('');
     });
 
     it('fails when parentFolderId is not set', async () => {
-      client.parentFolderId = '';
-      await expect(client.findBookFileId('book1')).rejects.toThrow('Parent folder id is not set');
+      // @ts-ignore
+      instance.parentFolderId = '';
+      // @ts-ignore
+      await expect(instance.findBookFileId('book1')).rejects.toThrow('Parent folder id is not set');
     });
   });
 
   describe('initStorage', () => {
     beforeEach(() => {
-      jest.spyOn(client, 'findParentFolderId').mockReturnValue(Promise.resolve('parentFolderId'));
-      jest.spyOn(client, 'findBookFileId').mockReturnValue(Promise.resolve('bookFileId'));
+      // @ts-ignore
+      jest.spyOn(instance, 'findParentFolderId').mockReturnValue(Promise.resolve('parentFolderId'));
+      // @ts-ignore
+      jest.spyOn(instance, 'findBookFileId').mockReturnValue(Promise.resolve('bookFileId'));
     });
 
     it('calls findParentFolderId', async () => {
-      await client.initStorage();
-      expect(client.findParentFolderId).toHaveBeenCalledTimes(1);
+      await instance.initStorage();
+      // @ts-ignore
+      expect(instance.findParentFolderId).toHaveBeenCalledTimes(1);
     });
 
     it('creates parent folder and book file when not initialised', async () => {
-      jest.spyOn(client, 'findParentFolderId').mockReturnValue(Promise.resolve(''));
-      jest.spyOn(client, 'findBookFileId').mockReturnValue(Promise.resolve(''));
+      // @ts-ignore
+      jest.spyOn(instance, 'findParentFolderId').mockReturnValue(Promise.resolve(''));
+      // @ts-ignore
+      jest.spyOn(instance, 'findBookFileId').mockReturnValue(Promise.resolve(''));
       mockFetch = jest.spyOn(global, 'fetch').mockImplementation(
         jest.fn(() => Promise.resolve({
           json: () => Promise.resolve({ id: 'createdResourceId' }),
         })) as jest.Mock,
       );
-      await client.initStorage();
-      expect(client.parentFolderId).toEqual('createdResourceId');
-      expect(client.bookFileId).toEqual('createdResourceId');
+      await instance.initStorage();
+      // @ts-ignore
+      expect(instance.parentFolderId).toEqual('createdResourceId');
+      // @ts-ignore
+      expect(instance.bookFileId).toEqual('createdResourceId');
       expect(mockDriveClient.files.create).toHaveBeenNthCalledWith(
         1,
         {
@@ -187,13 +203,15 @@ describe('GoogleDrive', () => {
           },
         }
       ));
-      await client.initStorage();
-      expect(client.parentFolderId).toEqual('parentFolderId');
+      await instance.initStorage();
+      // @ts-ignore
+      expect(instance.parentFolderId).toEqual('parentFolderId');
       expect(mockDriveClient.files.create).not.toHaveBeenCalled();
     });
 
     it('raises an error when cant find parent id after creating', async () => {
-      jest.spyOn(client, 'findParentFolderId').mockReturnValue(Promise.resolve(''));
+      // @ts-ignore
+      jest.spyOn(instance, 'findParentFolderId').mockReturnValue(Promise.resolve(''));
       // @ts-ignore
       mockDriveClient.files.create = jest.fn(async () => (
         {
@@ -203,17 +221,20 @@ describe('GoogleDrive', () => {
         }
       ));
 
-      await expect(client.initStorage()).rejects.toThrow('Couldnt get parent folder id');
+      await expect(instance.initStorage()).rejects.toThrow('Couldnt get parent folder id');
     });
 
     it('calls findBookFileId', async () => {
-      await client.initStorage();
-      expect(client.findBookFileId).toHaveBeenCalledTimes(1);
+      await instance.initStorage();
+      // @ts-ignore
+      expect(instance.findBookFileId).toHaveBeenCalledTimes(1);
     });
 
     it('raises an error when cant find book id after creating', async () => {
-      jest.spyOn(client, 'findParentFolderId').mockReturnValue(Promise.resolve('parentFolderId'));
-      jest.spyOn(client, 'findBookFileId').mockReturnValue(Promise.resolve(''));
+      // @ts-ignore
+      jest.spyOn(instance, 'findParentFolderId').mockReturnValue(Promise.resolve('parentFolderId'));
+      // @ts-ignore
+      jest.spyOn(instance, 'findBookFileId').mockReturnValue(Promise.resolve(''));
       // @ts-ignore
       mockDriveClient.files.create = jest.fn(async () => (
         {
@@ -223,7 +244,7 @@ describe('GoogleDrive', () => {
         }
       ));
 
-      await expect(client.initStorage()).rejects.toThrow('Couldnt get bookFile id');
+      await expect(instance.initStorage()).rejects.toThrow('Couldnt get bookFile id');
     });
   });
 
@@ -234,13 +255,15 @@ describe('GoogleDrive', () => {
           arrayBuffer: () => Promise.resolve(rawBook.buffer),
         })) as jest.Mock,
       );
-      jest.spyOn(client, 'initStorage');
+      jest.spyOn(instance, 'initStorage');
     });
 
     it('returns decompressed data from downloaded file', async () => {
-      client.parentFolderId = 'parentFolderId';
-      client.bookFileId = 'bookFileId';
-      const content = await client.get();
+      // @ts-ignore
+      instance.parentFolderId = 'parentFolderId';
+      // @ts-ignore
+      instance.bookFileId = 'bookFileId';
+      const content = await instance.get();
 
       expect(mockFetch).toHaveBeenNthCalledWith(
         1,
@@ -259,13 +282,15 @@ describe('GoogleDrive', () => {
 
   describe('save', () => {
     beforeEach(() => {
-      jest.spyOn(client, 'initStorage');
+      jest.spyOn(instance, 'initStorage');
     });
 
     it('saves book as expected', async () => {
-      client.parentFolderId = 'parentFolderId';
-      client.bookFileId = 'bookFileId';
-      await client.save(rawBook);
+      // @ts-ignore
+      instance.parentFolderId = 'parentFolderId';
+      // @ts-ignore
+      instance.bookFileId = 'bookFileId';
+      await instance.save(rawBook);
 
       expect(mockFetch).toHaveBeenNthCalledWith(
         1,

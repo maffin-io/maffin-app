@@ -1,22 +1,8 @@
 {
   "version": 1,
   "paths": {
-    "/api/price": {
-      "name": "/api/price",
-      "lambdaFunction": "stockerlambda",
-      "permissions": {
-        "setting": "open"
-      }
-    },
     "/api/prices": {
       "name": "/api/prices",
-      "lambdaFunction": "stockerlambda",
-      "permissions": {
-        "setting": "open"
-      }
-    },
-    "/api/search": {
-      "name": "/api/search",
       "lambdaFunction": "stockerlambda",
       "permissions": {
         "setting": "open"
