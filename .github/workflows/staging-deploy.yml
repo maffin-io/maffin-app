@@ -23,4 +23,4 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
           FROM_BRANCH: "master"
           TO_BRANCH: "staging"
-          PULL_REQUEST_AUTO_MERGE_METHOD: "merge"
+          PULL_REQUEST_AUTO_MERGE_METHOD: "squash"
