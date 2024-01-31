@@ -1,50 +1,43 @@
-# maffin.io
-
-# Developing
-
-If you want to add a new user, before starting with the installation you will need few steps:
-
-1. [new maintainers only] Ask a maintainer for the AWS keys and credentials so you can interact with local amplify cli and access AWS console respectively
-2. Add the user gmail account to the google console as a test user (for now)
+<img align="left" src="https://github.com/maffin-io/maffin-app/blob/master/src/assets/images/maffin_logo_sm.png" width="70" height="65">
 
 
-## Installation
+# Maffin
 
-Run `nvm use` to set the correct node version.
+<p align="center">
+  🌍 <a href="https://maffin.io" target="_blank">Landing page</a>&nbsp;&nbsp;
+  🍭 <a href="https://demo.maffin.io" target="_blank">Our demo</a>&nbsp;&nbsp;
+  📖 <a href="https://blog.maffin.io/docs" target="_blank">Documentation</a>&nbsp;&nbsp;
+  📰 <a href="https://blog.maffin.io" target="_blank">Blog</a>
+</p>
 
-```
-yarn                  # Install frontend dependencies
-yarn stocker:install  # Install backend dependencies
-```
+Maffin is an **accounting software** focused on particulars or small businesses. It allows you to track income, expenses, investments and other types of assets while showing your financials in nice dashboards and reports.
 
-If not installed yet, install amplify cli with `npm install -g @aws-amplify/cli`. Then if it's your first time, you'll have to pull the amplify project:
+<div align="center">
+  <img width="879" alt="Screenshot 2024-01-28 at 4 59 36 PM" src="https://github.com/maffin-io/maffin-blog/assets/3578154/cc418b3c-ebdb-4beb-abd0-534cd5692cfc">
+</div>
 
-> Make sure to select your AWS profile credentials with `export AWS_PROFILE=maffin`
+## 🍒 Features
 
-```
-10:56 $ amplify pull
-? Select the authentication method you want to use: AWS access keys
-? accessKeyId:  ********************                           # credentials from maffin account
-? secretAccessKey:  ****************************************
-? region:  eu-central-1
-? Which app are you working on? dkycpktllbi8x
-Backend environment 'master' found. Initializing...
-? Choose your default editor: Vim (via Terminal, macOS only)
-? Choose the type of app that you're building javascript
-Please tell us about your project
-? What javascript framework are you using react
-? Source Directory Path:  src
-? Distribution Directory Path: build
-? Build Command:  yarn build
-? Start Command: yarn start
-✖ Failed to sync UI components
-? Do you plan on modifying this backend? Yes
-```
+- 🔒 We store your data in your Google Drive. _Your data is yours_.
+- 🪙 You can track assets in multiple currencies
+- 📈 Investment dedicated reports and tracking.
+- 📆 Monthly cash flow, balance sheet and other reports to have a better view of your wealth.
+- 🐮 Do you need to count cows as part of your assets? You can, we do support _custom commodities_.
+- 🔬 Transparency is a must for us, that's why all code is available in our [Github repo](https://github.com/maffin-io/maffin-app).
 
-## Running
+Do you want to see how it looks like? Visit our <a href="https://demo.maffin.io" blank="_blank">demo page</a>! You can create/update/delete anything you want in there.
 
-Run stocker with `yarn stocker:start` and then the frontend with `yarn maffin:start:`.
+## Implementation
 
-## Deploying
+Maffin is implemented using <a href="https://typeorm.io/" target="_blank">TypeOrm</a> entities that are stored in the browser. Whenever you do a change, all the data is uploaded to Google Drive. The schemas are extracted from <a href="https://wiki.gnucash.org/wiki/SQL" target="_blank">Gnucash schemas</a>.
 
-The project is deployed automatically everytime there is a merge to master using Amplify pipeline.
+> I was a user of Gnucash before building this. The main reason I used the same schemas is because I knew they would be better than anything I can think of and because I wanted to easily migrate the years of data I had.
+
+## Developing
+
+- Clone this repo.
+- Install dependencies with `yarn`.
+- Run the frontend with `NEXT_PUBLIC_ENV="staging" yarn maffin:dev`. If you don't add the env variable, you'll need Oauth permissions which.. you won't have.
+- Run the backend with `yarn stocker:dev`.
+
+Happy coding 🥳.
