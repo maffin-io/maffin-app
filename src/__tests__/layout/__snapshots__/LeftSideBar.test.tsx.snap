@@ -10,18 +10,18 @@ exports[`LeftSidebar renders as expected 1`] = `
       href="/"
     >
       <span
-        class="flex justify-center items-center h-20"
+        class="flex justify-center items-center ml-6 h-20"
       >
         <img
           alt="logo"
           data-nimg="1"
           decoding="async"
-          height="45"
+          height="65"
           loading="lazy"
-          src="/_next/image?url=%2Fimg.jpg&w=96&q=75"
-          srcset="/_next/image?url=%2Fimg.jpg&w=48&q=75 1x, /_next/image?url=%2Fimg.jpg&w=96&q=75 2x"
+          src="/_next/image?url=%2Fimg.jpg&w=256&q=75"
+          srcset="/_next/image?url=%2Fimg.jpg&w=96&q=75 1x, /_next/image?url=%2Fimg.jpg&w=256&q=75 2x"
           style="color: transparent;"
-          width="45"
+          width="65"
         />
       </span>
     </a>
