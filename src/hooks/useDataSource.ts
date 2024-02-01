@@ -5,7 +5,7 @@ import { useSWRConfig, mutate, Cache } from 'swr';
 import pako from 'pako';
 
 import * as queries from '@/lib/queries';
-import { insertTodayPrices } from '@/apis/Stocker';
+import { insertTodayPrices } from '@/lib/Stocker';
 import useBookStorage from '@/hooks/useBookStorage';
 import { importBook as importGnucashBook } from '@/lib/gnucash';
 import {

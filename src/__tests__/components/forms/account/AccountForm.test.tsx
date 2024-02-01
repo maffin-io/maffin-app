@@ -9,7 +9,8 @@ import userEvent from '@testing-library/user-event';
 import { DataSource } from 'typeorm';
 import * as swr from 'swr';
 import type { SWRResponse } from 'swr';
-import { useRouter } from 'next/navigation';
+import * as navigation from 'next/navigation';
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 import { getAllowedSubAccounts } from '@/book/helpers/accountType';
 import {
@@ -23,6 +24,8 @@ import AccountForm from '@/components/forms/account/AccountForm';
 import * as apiHook from '@/hooks/api';
 
 jest.mock('swr');
+
+jest.mock('next/navigation');
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
@@ -308,9 +311,9 @@ describe('AccountForm', () => {
     const mockSave = jest.fn();
 
     const mockRouterReplace = jest.fn();
-    (useRouter as jest.Mock).mockImplementation(() => ({
-      replace: mockRouterReplace,
-    }));
+    jest.spyOn(navigation, 'useRouter').mockImplementation(() => ({
+      replace: mockRouterReplace as AppRouterInstance['replace'],
+    } as AppRouterInstance));
 
     const account = await Account.findOneOrFail({
       where: { name: 'Assets' },

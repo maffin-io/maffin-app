@@ -4,7 +4,6 @@ import React from 'react';
 import Modal from 'react-modal';
 
 import { useDataSource, DataSourceContext } from '@/hooks';
-import useUser from '@/hooks/useUser';
 import Footer from '@/layout/Footer';
 import LeftSidebar from '@/layout/LeftSidebar';
 import Topbar from '@/layout/Topbar';
@@ -16,7 +15,6 @@ Modal.setAppElement('#modals');
 export default function DashboardLayout({
   children,
 }: React.PropsWithChildren): JSX.Element {
-  const { user } = useUser();
   const { data: theme } = useTheme();
   const hookData = useDataSource();
 
@@ -28,7 +26,7 @@ export default function DashboardLayout({
     }
   });
 
-  if (!user || !hookData.isLoaded || user.isLoggedIn === false) {
+  if (!hookData.isLoaded) {
     return (
       <div className="flex h-screen text-sm place-content-center place-items-center">
         <Loading />

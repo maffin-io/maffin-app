@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 import { Commodity, Price } from '@/book/entities';
 import { getMainCurrency } from '@/lib/queries';
 import { toAmountWithScale } from '@/helpers/number';
+import type { Credentials } from '@/types/user';
 
 import awsExports from '../aws-exports';
 
@@ -11,11 +12,45 @@ Amplify.configure(awsExports);
 
 const API_NAME = 'stocker';
 
+export async function authorize(code: string): Promise<Credentials> {
+  const start = performance.now();
+  const options = {
+    queryStringParameters: {
+      code,
+    },
+    headers: {
+      'X-Requested-With': 'XmlHttpRequest',
+    },
+  };
+
+  const resp = await API.get(API_NAME, '/user/authorize', options) as Credentials;
+  const end = performance.now();
+  console.log(`/user/authorize: ${end - start}ms`);
+
+  return resp;
+}
+
+export async function refresh(refreshToken: string): Promise<Credentials> {
+  const start = performance.now();
+  const options = {
+    queryStringParameters: {
+      refresh_token: refreshToken,
+    },
+  };
+
+  const resp = await API.get(API_NAME, '/user/refresh', options) as Credentials;
+  const end = performance.now();
+  console.log(`/user/refresh: ${end - start}ms`);
+
+  return resp;
+}
+
 /**
  * Connect to Stocker API and retrieve current prices for
  * all currency pairs and commodities.
  */
 export async function insertTodayPrices(): Promise<void> {
+  const start = performance.now();
   const mainCurrency = await getMainCurrency();
   const [currencies, commodities] = await Promise.all([
     Commodity.findBy({ namespace: 'CURRENCY' }),
@@ -80,6 +115,9 @@ export async function insertTodayPrices(): Promise<void> {
       conflictPaths: ['fk_commodity', 'fk_currency', 'date'],
     },
   );
+
+  const end = performance.now();
+  console.log(`/api/prices: ${end - start}ms`);
 }
 
 export type LiveSummary = {
