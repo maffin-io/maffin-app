@@ -7,6 +7,20 @@
       "permissions": {
         "setting": "open"
       }
+    },
+    "/user/authorize": {
+      "name": "/user/authorize",
+      "lambdaFunction": "stockerlambda",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/user/refresh": {
+      "name": "/user/refresh",
+      "lambdaFunction": "stockerlambda",
+      "permissions": {
+        "setting": "open"
+      }
     }
   }
 }
