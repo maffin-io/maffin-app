@@ -18,9 +18,6 @@ export async function authorize(code: string): Promise<Credentials> {
     queryStringParameters: {
       code,
     },
-    headers: {
-      'X-Requested-With': 'XmlHttpRequest',
-    },
   };
 
   const resp = await API.get(API_NAME, '/user/authorize', options) as Credentials;
