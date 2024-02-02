@@ -1,50 +1,63 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import * as swr from 'swr';
+import { act, render, screen } from '@testing-library/react';
+import * as navigation from 'next/navigation';
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
+import * as Stocker from '@/lib/Stocker';
 import LoginPage from '@/app/user/login/page';
 import * as helpers_env from '@/helpers/env';
+import * as sessionHook from '@/hooks/useSession';
+import type { Credentials } from '@/types/user';
 
 jest.mock('swr');
 
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
+jest.mock('next/navigation');
+
+jest.mock('@/lib/Stocker', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/lib/Stocker'),
 }));
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const useRouter = jest.spyOn(require('next/navigation'), 'useRouter');
 
 jest.mock('@/helpers/env', () => ({
   __esModule: true,
   isStaging: () => false,
 }));
 
+jest.mock('@/hooks/useSession', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/useSession'),
+}));
+
 describe('LoginPage', () => {
-  let requestAccessToken: jest.Mock;
-  let mockInitTokenClient: jest.Mock;
-  let mockStorageSetItem: jest.SpyInstance;
+  let requestCode: jest.Mock;
+  let mockInitCodeClient: jest.Mock;
+  let mockSetCredentials: jest.Mock<React.Dispatch<React.SetStateAction<Credentials>>>;
   let mockRouterPush: jest.Mock;
-  let mockRouterPrefetch: jest.Mock;
 
   beforeEach(() => {
-    requestAccessToken = jest.fn();
-    mockInitTokenClient = jest.fn().mockReturnValue({
-      requestAccessToken,
-    }) as jest.Mock<typeof window.google.accounts.oauth2.initTokenClient>;
+    requestCode = jest.fn();
+    mockInitCodeClient = jest.fn().mockReturnValue({
+      requestCode,
+    }) as jest.Mock<typeof window.google.accounts.oauth2.initCodeClient>;
     window.google = {
       accounts: {
         // @ts-ignore
         oauth2: {
-          initTokenClient: mockInitTokenClient,
+          initCodeClient: mockInitCodeClient,
         } as typeof window.google.accounts.oauth2,
       } as typeof window.google.accounts,
     };
-    mockStorageSetItem = jest.spyOn(Storage.prototype, 'setItem');
     mockRouterPush = jest.fn();
-    mockRouterPrefetch = jest.fn();
-    useRouter.mockImplementation(() => ({
-      push: mockRouterPush,
-      prefetch: mockRouterPrefetch,
-    }));
+    jest.spyOn(navigation, 'useRouter').mockImplementation(() => ({
+      push: mockRouterPush as AppRouterInstance['push'],
+    } as AppRouterInstance));
+
+    mockSetCredentials = jest.fn();
+    jest.spyOn(sessionHook, 'default').mockReturnValue({
+      session: undefined,
+      setCredentials: mockSetCredentials as React.Dispatch<
+      React.SetStateAction<Credentials | undefined> >,
+    } as sessionHook.SessionReturn);
   });
 
   it('shows loading... when not finished', () => {
@@ -52,56 +65,58 @@ describe('LoginPage', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('calls requestAcessToken when clicking sign in button', async () => {
+  it('calls requestCode when clicking sign in button', async () => {
     render(<LoginPage />);
 
-    expect(mockInitTokenClient).toHaveBeenCalledWith({
+    expect(mockInitCodeClient).toHaveBeenCalledWith({
       callback: expect.any(Function),
       client_id: '123339406534-gnk10bh5hqo87qlla8e9gmol1j961rtg.apps.googleusercontent.com',
-      scope: 'email profile https://www.googleapis.com/auth/drive.file',
+      scope: 'https://www.googleapis.com/auth/drive.file',
+      ux_mode: 'popup',
     });
 
-    expect(requestAccessToken).toBeCalledTimes(0);
+    expect(requestCode).toBeCalledTimes(0);
     screen.getByText('Sign In').click();
-    expect(requestAccessToken).toBeCalledTimes(1);
+    expect(requestCode).toBeCalledTimes(1);
   });
 
-  it('prefetches dashboard pages', async () => {
+  it('callback authorizes, saves session to storage and navigates to accounts page', async () => {
+    const credentials = {
+      access_token: 'access_token',
+      id_token: 'id_token',
+      refresh_token: 'refresh_token',
+      expiry_date: 123,
+      scope: '',
+      token_type: '',
+    };
+    jest.spyOn(Stocker, 'authorize').mockResolvedValue(credentials);
+
     render(<LoginPage />);
 
-    expect(mockRouterPrefetch).toHaveBeenCalledWith('/dashboard/accounts');
-    expect(mockRouterPrefetch).toHaveBeenCalledWith('/dashboard/accounts/guid');
-    expect(mockRouterPrefetch).toHaveBeenCalledWith('/dashboard/investments');
-  });
+    const { callback } = mockInitCodeClient.mock.calls[0][0];
+    await act(async () => callback({ code: 'CODE' }));
 
-  it('callback saves access token to storage, purges swr and navigates to accounts page', async () => {
-    render(<LoginPage />);
-
-    const { callback } = mockInitTokenClient.mock.calls[0][0];
-    await callback({ access_token: 'ACCESS_TOKEN' });
-
-    expect(mockStorageSetItem).toHaveBeenNthCalledWith(
+    expect(Stocker.authorize).toBeCalledWith('CODE');
+    expect(mockSetCredentials).toHaveBeenNthCalledWith(
       1,
-      'accessToken',
-      'ACCESS_TOKEN',
+      credentials,
     );
     expect(mockRouterPush).toHaveBeenCalledWith('/dashboard/accounts');
-    expect(swr.mutate).toBeCalledTimes(1);
-    expect(swr.mutate).toBeCalledWith('/api/user', null, { revalidate: true });
   });
 
-  it('does not call requestAcessToken when clicking sign in button and sends to /home/dashboard when staging', async () => {
+  it('does not call requestCode when clicking sign in button and sends to /home/dashboard when staging', async () => {
     jest.spyOn(helpers_env, 'isStaging').mockReturnValue(true);
     render(<LoginPage />);
 
-    expect(mockInitTokenClient).toHaveBeenCalledWith({
+    expect(mockInitCodeClient).toHaveBeenCalledWith({
       callback: expect.any(Function),
       client_id: '123339406534-gnk10bh5hqo87qlla8e9gmol1j961rtg.apps.googleusercontent.com',
-      scope: 'email profile https://www.googleapis.com/auth/drive.file',
+      scope: 'https://www.googleapis.com/auth/drive.file',
+      ux_mode: 'popup',
     });
 
     screen.getByText('Sign In').click();
-    expect(requestAccessToken).toBeCalledTimes(0);
+    expect(requestCode).toBeCalledTimes(0);
     expect(mockRouterPush).toHaveBeenCalledWith('/dashboard/accounts');
     process.env.NEXT_PUBLIC_ENV = '';
   });

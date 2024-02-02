@@ -3,11 +3,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { BiLogOut } from 'react-icons/bi';
 
-import { useUser } from '@/hooks';
 import ImportButton from '@/components/buttons/ImportButton';
+import useSession from '@/hooks/useSession';
 
 export default function ProfileDropdown(): JSX.Element {
-  const { user } = useUser();
+  const { user } = useSession();
 
   return (
     <div className="group relative h-full bg-light-100/60 hover:bg-light-100 dark:bg-dark-800/50 dark:hover:bg-dark-800">

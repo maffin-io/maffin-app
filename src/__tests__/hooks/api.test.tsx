@@ -7,8 +7,6 @@ import { Account, Commodity } from '@/book/entities';
 import { PriceDBMap } from '@/book/prices';
 import * as API from '@/hooks/api';
 import * as queries from '@/lib/queries';
-import * as gapiHooks from '@/hooks/useGapiClient';
-import * as getUserModule from '@/lib/getUser';
 import { InvestmentAccount } from '@/book/models';
 
 jest.mock('swr');
@@ -18,11 +16,6 @@ jest.mock('@/lib/queries');
 jest.mock('@/book/prices', () => ({
   __esModule: true,
   ...jest.requireActual('@/book/prices'),
-}));
-
-jest.mock('@/lib/getUser', () => ({
-  __esModule: true,
-  default: jest.fn(),
 }));
 
 jest.mock('swr/immutable', () => ({
@@ -39,7 +32,6 @@ describe('API', () => {
   beforeEach(() => {
     jest.spyOn(Commodity, 'findOneByOrFail').mockImplementation();
     jest.spyOn(Commodity, 'find').mockImplementation();
-    jest.spyOn(getUserModule, 'default').mockImplementation();
     jest.spyOn(swrImmutable, 'default').mockImplementation(
       jest.fn((key, f: BareFetcher | null) => {
         f?.(key);
@@ -147,32 +139,6 @@ describe('API', () => {
         expect.any(Function),
       );
       expect(queries.getMonthlyTotals).toBeCalledWith(accounts, todayPrices);
-    });
-  });
-
-  describe('useUser', () => {
-    it('calls useSWRImmutable with null key for useUser when no gapi', () => {
-      jest.spyOn(gapiHooks, 'default').mockReturnValue([false]);
-      renderHook(() => API.useUser());
-
-      expect(swrImmutable.default).toBeCalledWith(
-        null,
-        expect.any(Function),
-        { refreshInterval: 100000, revalidateOnMount: true },
-      );
-    });
-
-    it('calls useSWRImmutable with expected params for useUser when gapi', () => {
-      jest.spyOn(gapiHooks, 'default').mockReturnValue([true]);
-      renderHook(() => API.useUser());
-
-      expect(swrImmutable.default).toBeCalledWith(
-        '/api/user',
-        expect.any(Function),
-        { refreshInterval: 100000, revalidateOnMount: true },
-      );
-
-      expect(getUserModule.default).toBeCalledTimes(1);
     });
   });
 

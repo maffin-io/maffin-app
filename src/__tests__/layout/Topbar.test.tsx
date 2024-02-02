@@ -1,5 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
+import * as navigation from 'next/navigation';
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 import Topbar from '@/layout/Topbar';
 import { AccountSelector } from '@/components/selectors';
@@ -7,11 +9,7 @@ import SaveButton from '@/components/buttons/SaveButton';
 import ProfileDropdown from '@/components/ProfileDropdown';
 import ThemeButton from '@/components/buttons/ThemeButton';
 
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-}));
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const useRouter = jest.spyOn(require('next/navigation'), 'useRouter');
+jest.mock('next/navigation');
 
 jest.mock('@/components/ProfileDropdown', () => jest.fn(
   () => <div data-testid="ProfileDropdown" />,
@@ -37,9 +35,9 @@ describe('Topbar', () => {
 
   beforeEach(() => {
     mockRouterPush = jest.fn();
-    useRouter.mockImplementation(() => ({
-      push: mockRouterPush,
-    }));
+    jest.spyOn(navigation, 'useRouter').mockImplementation(() => ({
+      push: mockRouterPush as AppRouterInstance['push'],
+    } as AppRouterInstance));
   });
 
   it('renders as expected', () => {

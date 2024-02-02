@@ -3,9 +3,13 @@
 import React from 'react';
 import Link from 'next/link';
 
+import useSession from '@/hooks/useSession';
+
 export default function LogoutPage(): JSX.Element {
+  const { revoke } = useSession();
+
   React.useEffect(() => {
-    localStorage.setItem('accessToken', '');
+    revoke();
   });
 
   return (

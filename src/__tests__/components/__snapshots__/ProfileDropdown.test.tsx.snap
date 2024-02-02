@@ -1,0 +1,154 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ProfileDropdown renders with empty user 1`] = `
+<div>
+  <div
+    class="group relative h-full bg-light-100/60 hover:bg-light-100 dark:bg-dark-800/50 dark:hover:bg-dark-800"
+  >
+    <button
+      class="flex h-full w-full pl-3 pr-4 items-center"
+      type="button"
+    >
+      <div>
+        <p
+          class="fontsemibold capitalize"
+        >
+          ...
+        </p>
+        <p
+          class="text-xs"
+        />
+      </div>
+    </button>
+    <ul
+      class="absolute rounded-md w-40 hidden py-1 group-hover:block bg-white dark:bg-dark-700 "
+    >
+      <li
+        class="px-3 py-2 text-sm hover:bg-light-100 dark:hover:bg-dark-800"
+      >
+        <div
+          data-testid="ImportButton"
+        />
+      </li>
+      <li
+        class="block px-3 py-2 text-sm hover:bg-light-100 dark:hover:bg-dark-800"
+      >
+        <a
+          class="inline-block w-full whitespace-nowrap"
+          href="/user/logout"
+          id="menu-item-1"
+          role="menuitem"
+          tabindex="-1"
+        >
+          <svg
+            class="inline-block align-middle mr-1"
+            fill="currentColor"
+            height="1em"
+            stroke="currentColor"
+            stroke-width="0"
+            viewBox="0 0 24 24"
+            width="1em"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M16 13v-2H7V8l-5 4 5 4v-3z"
+            />
+            <path
+              d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z"
+            />
+          </svg>
+          <span
+            class="inline-block align-middle"
+          >
+            Logout
+          </span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+`;
+
+exports[`ProfileDropdown renders with user 1`] = `
+<div>
+  <div
+    class="group relative h-full bg-light-100/60 hover:bg-light-100 dark:bg-dark-800/50 dark:hover:bg-dark-800"
+  >
+    <button
+      class="flex h-full w-full pl-3 pr-4 items-center"
+      type="button"
+    >
+      <img
+        alt="user"
+        class="rounded-full mx-2 w-8 h-8"
+        data-nimg="1"
+        decoding="async"
+        height="24"
+        loading="lazy"
+        referrerpolicy="no-referrer"
+        src="/_next/image?url=https%3A%2F%2Fexample.com&w=48&q=75"
+        srcset="/_next/image?url=https%3A%2F%2Fexample.com&w=32&q=75 1x, /_next/image?url=https%3A%2F%2Fexample.com&w=48&q=75 2x"
+        style="color: transparent;"
+        width="24"
+      />
+      <div>
+        <p
+          class="fontsemibold capitalize"
+        >
+          Maffin IO
+        </p>
+        <p
+          class="text-xs"
+        >
+          iomaffin@gmail.com
+        </p>
+      </div>
+    </button>
+    <ul
+      class="absolute rounded-md w-40 hidden py-1 group-hover:block bg-white dark:bg-dark-700 "
+    >
+      <li
+        class="px-3 py-2 text-sm hover:bg-light-100 dark:hover:bg-dark-800"
+      >
+        <div
+          data-testid="ImportButton"
+        />
+      </li>
+      <li
+        class="block px-3 py-2 text-sm hover:bg-light-100 dark:hover:bg-dark-800"
+      >
+        <a
+          class="inline-block w-full whitespace-nowrap"
+          href="/user/logout"
+          id="menu-item-1"
+          role="menuitem"
+          tabindex="-1"
+        >
+          <svg
+            class="inline-block align-middle mr-1"
+            fill="currentColor"
+            height="1em"
+            stroke="currentColor"
+            stroke-width="0"
+            viewBox="0 0 24 24"
+            width="1em"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M16 13v-2H7V8l-5 4 5 4v-3z"
+            />
+            <path
+              d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z"
+            />
+          </svg>
+          <span
+            class="inline-block align-middle"
+          >
+            Logout
+          </span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+`;

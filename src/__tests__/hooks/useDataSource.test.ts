@@ -36,9 +36,9 @@ jest.mock('@/lib/queries', () => ({
   ...jest.requireActual('@/lib/queries'),
 }));
 
-jest.mock('@/apis/Stocker', () => ({
+jest.mock('@/lib/Stocker', () => ({
   __esModule: true,
-  ...jest.requireActual('@/apis/Stocker'),
+  ...jest.requireActual('@/lib/Stocker'),
   insertTodayPrices: jest.fn(),
 }));
 
