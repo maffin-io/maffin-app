@@ -2,38 +2,37 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { mutate } from 'swr';
 import { useAuth0 } from '@auth0/auth0-react';
 
 import Loading from '@/components/Loading';
 import { isStaging } from '@/helpers/env';
+import { authorize } from '@/lib/Stocker';
+import useSession from '@/hooks/useSession';
 
 export default function LoginPage(): JSX.Element {
+  const { setCredentials } = useSession();
   const router = useRouter();
   const { loginWithRedirect, isAuthenticated } = useAuth0();
   const [
-    tokenClient,
-    setTokenClient,
-  ] = React.useState<google.accounts.oauth2.TokenClient | null>(null);
+    codeClient,
+    setCodeClient,
+  ] = React.useState<google.accounts.oauth2.CodeClient | null>(null);
 
   React.useEffect(() => {
-    setTokenClient(window.google.accounts?.oauth2.initTokenClient({
+    setCodeClient(window.google.accounts?.oauth2.initCodeClient({
       client_id: '123339406534-gnk10bh5hqo87qlla8e9gmol1j961rtg.apps.googleusercontent.com',
-      scope: 'email profile https://www.googleapis.com/auth/drive.file',
-      callback: async (tokenResponse) => {
-        localStorage.setItem('accessToken', tokenResponse.access_token);
-        mutate('/api/user', null, { revalidate: true });
+      scope: 'https://www.googleapis.com/auth/drive.file',
+      ux_mode: 'popup',
+      callback: async (response) => {
+        const credentials = await authorize(response.code);
+        setCredentials(credentials);
         router.push('/dashboard/accounts');
       },
     }));
-
-    router.prefetch('/dashboard/investments');
-    router.prefetch('/dashboard/accounts');
-    router.prefetch('/dashboard/accounts/guid');
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (tokenClient === null) {
+  if (codeClient === null) {
     return (
       <Loading />
     );

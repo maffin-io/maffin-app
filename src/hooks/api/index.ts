@@ -5,12 +5,9 @@ import useSWRImmutable from 'swr/immutable';
 import { Commodity } from '@/book/entities';
 import { InvestmentAccount } from '@/book/models';
 import * as queries from '@/lib/queries';
-import getUser from '@/lib/getUser';
-import useGapiClient from '@/hooks/useGapiClient';
 import type { PriceDBMap } from '@/book/prices';
 import type { AccountsMap } from '@/types/book';
 import type { Account, Split, Transaction } from '@/book/entities';
-import type { User } from '@/types/user';
 
 export function useStartDate(): SWRResponse<DateTime> {
   const key = '/api/start-date';
@@ -187,19 +184,6 @@ export function usePrices(c: Commodity | undefined): SWRResponse<PriceDBMap> {
   return useSWRImmutable(
     c?.guid ? key : null,
     fetcher(async () => queries.getPrices({ from: c }), key),
-  );
-}
-
-export function useUser(): SWRResponse<User> {
-  const [isGapiLoaded] = useGapiClient();
-  const key = '/api/user';
-  return useSWRImmutable(
-    isGapiLoaded ? key : null,
-    fetcher(getUser, key),
-    {
-      refreshInterval: 100000,
-      revalidateOnMount: true,
-    },
   );
 }
 

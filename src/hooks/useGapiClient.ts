@@ -1,6 +1,9 @@
 import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 
+import { isStaging } from '@/helpers/env';
+import useSession from './useSession';
+
 const isBrowser = typeof window !== 'undefined';
 
 /**
@@ -13,10 +16,12 @@ const isBrowser = typeof window !== 'undefined';
  * }
  */
 export default function useGapiClient() {
+  // const { session } = useSession();
   const [isLoaded, setIsLoaded] = React.useState<boolean>(
     isBrowser && !!window.gapi && !!window.gapi.client,
   );
   const { user, getAccessTokenSilently, isAuthenticated } = useAuth0();
+  // const [accessToken, setAccessToken] = React.useState('');
 
   React.useEffect(() => {
     if (!window.gapi || !window.gapi.client) {
@@ -35,7 +40,7 @@ export default function useGapiClient() {
     }
 
     return () => {};
-  }, [isLoaded]);
+  }, []);
 
   React.useEffect(() => {
     async function load() {
@@ -50,6 +55,19 @@ export default function useGapiClient() {
   console.log(user);
 
   return [isLoaded && isAuthenticated];
+  // /**
+  //  * Whenever session or isLoaded changes, we reset the access_token
+  //  * for the client.
+  //  */
+  // React.useEffect(() => {
+  //   if (isLoaded && session) {
+  //     window.gapi.client.setToken({ access_token: session.access_token });
+  //     setAccessToken(session.access_token);
+  //   }
+  // }, [isLoaded, session]);
+
+  // // eslint-disable-next-line no-unneeded-ternary
+  // return [(isLoaded && accessToken) || isStaging() ? true : false];
 }
 
 /**
@@ -63,8 +81,7 @@ async function loadGapiClient(callback: React.Dispatch<React.SetStateAction<bool
         window.gapi.load('client', res);
       }
     });
-    window.gapi.client.setToken({ access_token: localStorage.getItem('accessToken') as string });
-    await window.gapi.client.load('https://www.googleapis.com/discovery/v1/apis/people/v1/rest');
+
     await window.gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest');
     callback(true);
   }
