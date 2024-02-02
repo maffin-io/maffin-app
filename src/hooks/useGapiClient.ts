@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const isBrowser = typeof window !== 'undefined';
 
@@ -15,6 +16,8 @@ export default function useGapiClient() {
   const [isLoaded, setIsLoaded] = React.useState<boolean>(
     isBrowser && !!window.gapi && !!window.gapi.client,
   );
+  const { user, getAccessTokenSilently, isAuthenticated } = useAuth0();
+
   React.useEffect(() => {
     if (!window.gapi || !window.gapi.client) {
       const script = document.createElement('script');
@@ -34,7 +37,19 @@ export default function useGapiClient() {
     return () => {};
   }, [isLoaded]);
 
-  return [isLoaded];
+  React.useEffect(() => {
+    async function load() {
+      const accessToken = await getAccessTokenSilently();
+      console.log(accessToken);
+    }
+
+    console.log(isAuthenticated);
+    load();
+  }, [getAccessTokenSilently, isAuthenticated]);
+
+  console.log(user);
+
+  return [isLoaded && isAuthenticated];
 }
 
 /**

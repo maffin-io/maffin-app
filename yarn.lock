@@ -25,6 +25,18 @@
     "@jridgewell/gen-mapping" "^0.3.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
+"@auth0/auth0-react@^2.2.4":
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/@auth0/auth0-react/-/auth0-react-2.2.4.tgz#7f21751a219d4e0e019141819f00e76e436176dd"
+  integrity sha512-l29PQC0WdgkCoOc6WeMAY26gsy/yXJICW0jHfj0nz8rZZphYKrLNqTRWFFCMJY+sagza9tSgB1kG/UvQYgGh9A==
+  dependencies:
+    "@auth0/auth0-spa-js" "^2.1.3"
+
+"@auth0/auth0-spa-js@^2.1.3":
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/@auth0/auth0-spa-js/-/auth0-spa-js-2.1.3.tgz#aabf6f439e41edbeef0cf4766ad754e5b47616e5"
+  integrity sha512-NMTBNuuG4g3rame1aCnNS5qFYIzsTUV5qTFPRfTyYFS1feS6jsCBR+eTq9YkxCp1yuoM2UIcjunPaoPl77U9xQ==
+
 "@aws-amplify/analytics@6.5.6":
   version "6.5.6"
   resolved "https://registry.yarnpkg.com/@aws-amplify/analytics/-/analytics-6.5.6.tgz#ed71dfa2733cb8f735433aaf35bb484f4281ab6c"
@@ -4522,14 +4534,7 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.16.3.tgz#6bda7819aae6ea0b386ebc5b24bdf602f1b42b01"
   integrity sha512-OPs5WnnT1xkCBiuQrZA4+YAV4HEJejmHneyraIaxsbev5yCEr6KMwINNFP9wQeFIw8FWcoTqF3vQsa5CDaI+8Q==
 
-"@types/node@^20.11.13":
-  version "20.11.13"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.11.13.tgz#188263ee2c8d590e181d3f5bfa7e485a932957cb"
-  integrity sha512-5G4zQwdiQBSWYTDAH1ctw2eidqdhMJaNsiIDKHFr55ihz5Trl2qqR8fdrT732yPBho5gkNxXm67OxWFBqX9aPg==
-  dependencies:
-    undici-types "~5.26.4"
-
-"@types/node@^20.11.10":
+"@types/node@^20.11.10", "@types/node@^20.11.13":
   version "20.11.13"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.11.13.tgz#188263ee2c8d590e181d3f5bfa7e485a932957cb"
   integrity sha512-5G4zQwdiQBSWYTDAH1ctw2eidqdhMJaNsiIDKHFr55ihz5Trl2qqR8fdrT732yPBho5gkNxXm67OxWFBqX9aPg==

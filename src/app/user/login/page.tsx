@@ -3,12 +3,14 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { mutate } from 'swr';
+import { useAuth0 } from '@auth0/auth0-react';
 
 import Loading from '@/components/Loading';
 import { isStaging } from '@/helpers/env';
 
 export default function LoginPage(): JSX.Element {
   const router = useRouter();
+  const { loginWithRedirect, isAuthenticated } = useAuth0();
   const [
     tokenClient,
     setTokenClient,
@@ -37,6 +39,11 @@ export default function LoginPage(): JSX.Element {
     );
   }
 
+  console.log(isAuthenticated);
+  // if (isStaging() || isAuthenticated) {
+  //   router.push('/dashboard/accounts');
+  // }
+
   return (
     <button
       className="btn btn-primary"
@@ -45,7 +52,7 @@ export default function LoginPage(): JSX.Element {
         if (isStaging()) {
           router.push('/dashboard/accounts');
         } else {
-          tokenClient.requestAccessToken();
+          loginWithRedirect();
         }
       }}
     >
