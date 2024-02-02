@@ -18,7 +18,6 @@ describe('Stocker', () => {
         '/user/authorize',
         {
           queryStringParameters: { code: 'code_token' },
-          headers: { 'X-Requested-With': 'XmlHttpRequest' },
         },
       );
       expect(credentials).toEqual({ access_token: 'at' });
