@@ -7513,10 +7513,10 @@ googleapis-common@^7.0.0:
     url-template "^2.0.8"
     uuid "^9.0.0"
 
-googleapis@^131.0.0:
-  version "131.0.0"
-  resolved "https://registry.yarnpkg.com/googleapis/-/googleapis-131.0.0.tgz#2b7bdedcc993135cb1b60e8f7fea362b12a3dea7"
-  integrity sha512-fa4kdkY0VwHDw/04ItpQv2tlvlPIwbh6NjHDoWAVrV52GuaZbYCMOC5Y+hRmprp5HHIMRODmyb2YujlbZSRUbQ==
+googleapis@^132.0.0:
+  version "132.0.0"
+  resolved "https://registry.yarnpkg.com/googleapis/-/googleapis-132.0.0.tgz#561c8b0a62d5c9b90280c4d6ae25a267a83d0ae3"
+  integrity sha512-3TvliWpfcpxqIOxAKyxUtS13VbwVM62BLfjxFhDjSSRmNLI3jh+4zfj2hcL2UvzU5yfHZJUfb8tXmumx2e+ruQ==
   dependencies:
     google-auth-library "^9.0.0"
     googleapis-common "^7.0.0"
