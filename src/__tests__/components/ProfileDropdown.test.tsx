@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 
 import ProfileDropdown from '@/components/ProfileDropdown';
 import * as sessionHook from '@/hooks/useSession';
-import { User } from '@/types/user';
+import type { User } from '@auth0/auth0-react';
 
 jest.mock('@/hooks/useSession', () => ({
   __esModule: true,
@@ -19,7 +19,7 @@ describe('ProfileDropdown', () => {
     jest.spyOn(sessionHook, 'default').mockReturnValue({
       user: {
         name: '',
-        image: '',
+        picture: '',
         email: '',
       } as User,
     } as sessionHook.SessionReturn);
@@ -34,7 +34,7 @@ describe('ProfileDropdown', () => {
     jest.spyOn(sessionHook, 'default').mockReturnValue({
       user: {
         name: 'Maffin IO',
-        image: 'https://example.com',
+        picture: 'https://example.com',
         email: 'iomaffin@gmail.com',
       } as User,
     } as sessionHook.SessionReturn);

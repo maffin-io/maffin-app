@@ -2,14 +2,19 @@
 
 import React from 'react';
 import Link from 'next/link';
-
-import useSession from '@/hooks/useSession';
+import { useAuth0 } from '@auth0/auth0-react';
 
 export default function LogoutPage(): JSX.Element {
-  const { revoke } = useSession();
+  const { logout } = useAuth0();
 
   React.useEffect(() => {
-    revoke();
+    logout({
+      logoutParams: {
+        returnTo: (
+          typeof window !== 'undefined' && `${window.location.origin}/user/login`
+        ) || '',
+      },
+    });
   });
 
   return (

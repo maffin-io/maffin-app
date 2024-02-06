@@ -15,11 +15,10 @@ const isBrowser = typeof window !== 'undefined';
  * }
  */
 export default function useGapiClient() {
-  const { session } = useSession();
   const [isLoaded, setIsLoaded] = React.useState<boolean>(
     isBrowser && !!window.gapi && !!window.gapi.client,
   );
-  const [accessToken, setAccessToken] = React.useState('');
+  const { accessToken } = useSession();
 
   React.useEffect(() => {
     if (!window.gapi || !window.gapi.client) {
@@ -45,11 +44,10 @@ export default function useGapiClient() {
    * for the client.
    */
   React.useEffect(() => {
-    if (isLoaded && session) {
-      window.gapi.client.setToken({ access_token: session.access_token });
-      setAccessToken(session.access_token);
+    if (isLoaded && accessToken) {
+      window.gapi.client.setToken({ access_token: accessToken });
     }
-  }, [isLoaded, session]);
+  }, [isLoaded, accessToken]);
 
   // eslint-disable-next-line no-unneeded-ternary
   return [(isLoaded && accessToken) || isStaging() ? true : false];

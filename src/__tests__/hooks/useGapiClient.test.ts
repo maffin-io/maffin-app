@@ -3,7 +3,6 @@ import { act, renderHook } from '@testing-library/react';
 import useGapiClient from '@/hooks/useGapiClient';
 import * as sessionHook from '@/hooks/useSession';
 import * as helpers_env from '@/helpers/env';
-import type { Credentials } from '@/types/user';
 
 jest.mock('@/hooks/useSession', () => ({
   __esModule: true,
@@ -22,8 +21,7 @@ describe('useGapiClient', () => {
 
     jest.spyOn(helpers_env, 'isStaging').mockReturnValue(false);
     jest.spyOn(sessionHook, 'default').mockReturnValue({
-      session: undefined,
-      setCredentials: jest.fn() as Function,
+      accessToken: '',
     } as sessionHook.SessionReturn);
   });
 
@@ -118,8 +116,7 @@ describe('useGapiClient', () => {
   it('returns true when script onload finished and session and loads needed libraries', async () => {
     jest.spyOn(sessionHook, 'default').mockReturnValue(
       {
-        session: { access_token: 'access_token' } as Credentials,
-        setCredentials: jest.fn() as Function,
+        accessToken: 'access_token',
       } as sessionHook.SessionReturn,
     );
     const mockGapiClientLoad: jest.MockedFunction<typeof window.gapi.client.load> = jest.fn();
