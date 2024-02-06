@@ -3,7 +3,7 @@ import { Settings } from 'luxon';
 import Script from 'next/script';
 
 import '@/css/globals.css';
-import Auth0Provider from '@/lib/auth0-provider';
+import { Auth0Provider } from '@/lib/auth0-provider';
 import { isProd } from '@/helpers/env';
 
 Settings.throwOnInvalid = true;

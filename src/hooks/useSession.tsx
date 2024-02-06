@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import type { User } from '@auth0/auth0-react';
+import type { User, Auth0ContextInterface } from '@auth0/auth0-react';
 
 import { isStaging } from '@/helpers/env';
 
@@ -12,14 +12,13 @@ const emptyUser: User = {
 
 export type SessionReturn = {
   accessToken: string,
-  user: User;
-};
+} & Auth0ContextInterface<User>;
 
 /**
  * This hook captures Authorization data from Google Oauth2
  */
 export default function useSession(): SessionReturn {
-  const { user, isAuthenticated } = useAuth0();
+  const auth0 = useAuth0();
   const [accessToken, setAccessToken] = React.useState('');
 
   /**
@@ -32,15 +31,16 @@ export default function useSession(): SessionReturn {
       setAccessToken(u.accessToken);
     }
 
-    if (user && isAuthenticated) {
-      load(user);
+    if (auth0.user && auth0.isAuthenticated) {
+      load(auth0.user);
     }
-  }, [user, isAuthenticated, setAccessToken]);
+  }, [auth0.user, auth0.isAuthenticated, setAccessToken]);
 
   return {
+    ...auth0,
     accessToken,
     user: isStaging()
       ? { name: 'Maffin', email: 'iomaffin@gmail.com', picture: '' }
-      : user || emptyUser,
+      : auth0.user || emptyUser,
   };
 }

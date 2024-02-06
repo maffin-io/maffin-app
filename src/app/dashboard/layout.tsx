@@ -9,14 +9,18 @@ import LeftSidebar from '@/layout/LeftSidebar';
 import Topbar from '@/layout/Topbar';
 import Loading from '@/components/Loading';
 import { useTheme } from '@/hooks/state';
+import useSession from '@/hooks/useSession';
+import { useRouter } from 'next/navigation';
 
 Modal.setAppElement('#modals');
 
 export default function DashboardLayout({
   children,
 }: React.PropsWithChildren): JSX.Element {
+  const router = useRouter();
   const { data: theme } = useTheme();
   const hookData = useDataSource();
+  const { isLoading, isAuthenticated } = useSession();
 
   React.useLayoutEffect(() => {
     if (theme === 'dark') {
@@ -25,6 +29,12 @@ export default function DashboardLayout({
       document.documentElement.classList.remove('dark');
     }
   });
+
+  React.useLayoutEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/user/login');
+    }
+  }, [router, isAuthenticated, isLoading]);
 
   if (!hookData.isLoaded) {
     return (
