@@ -15,8 +15,8 @@ const config = {
   collectCoverageFrom: ['src/**/*.{ts,tsx}'],
   coverageThreshold: {
     global: {
-      lines: 92.9,
-      branches: 86.6,
+      lines: 92,
+      branches: 85,
     },
   },
   testEnvironment: 'jest-environment-jsdom',

@@ -10,7 +10,7 @@ exports[`LeftSidebar renders as expected 1`] = `
       href="/"
     >
       <span
-        class="flex justify-center items-center ml-6 h-20"
+        class="flex justify-center items-center ml-6 mr-1 h-20"
       >
         <img
           alt="logo"

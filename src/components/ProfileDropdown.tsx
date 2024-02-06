@@ -16,9 +16,9 @@ export default function ProfileDropdown(): JSX.Element {
         className="flex h-full w-full pl-3 pr-4 items-center"
       >
         {
-          user && user.image !== '' && (
+          user && user.picture && (
             <Image
-              src={user.image}
+              src={user.picture}
               width={24}
               height={24}
               referrerPolicy="no-referrer"

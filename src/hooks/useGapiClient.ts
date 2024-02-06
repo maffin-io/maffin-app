@@ -1,5 +1,4 @@
 import React from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
 
 import { isStaging } from '@/helpers/env';
 import useSession from './useSession';
@@ -16,12 +15,10 @@ const isBrowser = typeof window !== 'undefined';
  * }
  */
 export default function useGapiClient() {
-  // const { session } = useSession();
   const [isLoaded, setIsLoaded] = React.useState<boolean>(
     isBrowser && !!window.gapi && !!window.gapi.client,
   );
-  const { user, getAccessTokenSilently, isAuthenticated } = useAuth0();
-  // const [accessToken, setAccessToken] = React.useState('');
+  const { accessToken } = useSession();
 
   React.useEffect(() => {
     if (!window.gapi || !window.gapi.client) {
@@ -42,32 +39,18 @@ export default function useGapiClient() {
     return () => {};
   }, []);
 
+  /**
+   * Whenever session or isLoaded changes, we reset the access_token
+   * for the client.
+   */
   React.useEffect(() => {
-    async function load() {
-      const accessToken = await getAccessTokenSilently();
-      console.log(accessToken);
+    if (isLoaded && accessToken) {
+      window.gapi.client.setToken({ access_token: accessToken });
     }
+  }, [isLoaded, accessToken]);
 
-    console.log(isAuthenticated);
-    load();
-  }, [getAccessTokenSilently, isAuthenticated]);
-
-  console.log(user);
-
-  return [isLoaded && isAuthenticated];
-  // /**
-  //  * Whenever session or isLoaded changes, we reset the access_token
-  //  * for the client.
-  //  */
-  // React.useEffect(() => {
-  //   if (isLoaded && session) {
-  //     window.gapi.client.setToken({ access_token: session.access_token });
-  //     setAccessToken(session.access_token);
-  //   }
-  // }, [isLoaded, session]);
-
-  // // eslint-disable-next-line no-unneeded-ternary
-  // return [(isLoaded && accessToken) || isStaging() ? true : false];
+  // eslint-disable-next-line no-unneeded-ternary
+  return [(isLoaded && accessToken) || isStaging() ? true : false];
 }
 
 /**

@@ -1,9 +1,9 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import type { LinkProps } from 'next/link';
+import * as auth0 from '@auth0/auth0-react';
 
 import LogoutPage from '@/app/user/logout/page';
-import * as sessionHook from '@/hooks/useSession';
 
 jest.mock('next/link', () => jest.fn(
   (
@@ -13,19 +13,19 @@ jest.mock('next/link', () => jest.fn(
   ),
 ));
 
-jest.mock('@/hooks/useSession', () => ({
+jest.mock('@auth0/auth0-react', () => ({
   __esModule: true,
-  ...jest.requireActual('@/hooks/useSession'),
+  ...jest.requireActual('@auth0/auth0-react'),
 }));
 
 describe('LogoutPage', () => {
-  let mockRevoke: jest.Mock;
+  let mockLogout: jest.Mock;
 
   beforeEach(() => {
-    mockRevoke = jest.fn();
-    jest.spyOn(sessionHook, 'default').mockReturnValue({
-      revoke: mockRevoke as Function,
-    } as sessionHook.SessionReturn);
+    mockLogout = jest.fn();
+    jest.spyOn(auth0, 'useAuth0').mockReturnValue({
+      logout: mockLogout as Function,
+    } as auth0.Auth0ContextInterface<auth0.User>);
   });
 
   it('matches snapshot', () => {
@@ -33,9 +33,13 @@ describe('LogoutPage', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('sets empty accessToken', () => {
+  it('calls logout', () => {
     render(<LogoutPage />);
 
-    expect(mockRevoke).toBeCalled();
+    expect(mockLogout).toBeCalledWith({
+      logoutParams: {
+        returnTo: 'http://localhost/user/login',
+      },
+    });
   });
 });
