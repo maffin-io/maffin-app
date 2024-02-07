@@ -5,7 +5,7 @@ import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
 import Bar from '@/components/charts/Bar';
-import { NetWorthHistogram } from '@/components/pages/accounts';
+import { IncomeExpenseHistogram } from '@/components/pages/accounts';
 import * as apiHook from '@/hooks/api';
 
 jest.mock('@/components/charts/Bar', () => jest.fn(
@@ -17,7 +17,7 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
-describe('NetWorthHistogram', () => {
+describe('IncomeExpenseHistogram', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02') as DateTime<true>);
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue({ data: undefined } as SWRResponse);
@@ -30,7 +30,7 @@ describe('NetWorthHistogram', () => {
 
   it('renders with no data', () => {
     render(
-      <NetWorthHistogram />,
+      <IncomeExpenseHistogram />,
     );
 
     expect(Bar).toBeCalledWith(
@@ -39,11 +39,28 @@ describe('NetWorthHistogram', () => {
         data: {
           datasets: [
             {
+              backgroundColor: '#22C55E',
+              data: [],
+              label: 'Income',
+            },
+            {
+              backgroundColor: '#EF4444',
+              data: [],
+              label: 'Expenses',
+            },
+            {
               backgroundColor: '#06B6D4',
               data: [],
-              label: 'Assets',
-              order: 1,
-              barPercentage: 0.6,
+              label: 'Savings',
+              datalabels: {
+                anchor: 'end',
+                display: true,
+                formatter: expect.any(Function),
+                align: 'end',
+                backgroundColor: '#06B6D466',
+                borderRadius: 5,
+                color: '#FFF',
+              },
             },
           ],
           labels: [],
@@ -57,7 +74,7 @@ describe('NetWorthHistogram', () => {
             title: {
               align: 'start',
               display: true,
-              text: 'Net Worth',
+              text: 'Monthly Savings',
               font: {
                 size: 18,
               },
@@ -86,7 +103,6 @@ describe('NetWorthHistogram', () => {
           },
           scales: {
             x: {
-              stacked: true,
               grid: {
                 display: false,
               },
@@ -125,19 +141,23 @@ describe('NetWorthHistogram', () => {
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
       {
         data: {
-          asset: {
-            '11/2022': new Money(800, 'EUR'),
-            '12/2022': new Money(400, 'EUR'),
+          income: {
+            '11/2022': new Money(-600, 'EUR'),
+            '12/2022': new Money(-400, 'EUR'),
           },
-          liability: {
+          equity: {
             '11/2022': new Money(-200, 'EUR'),
+          },
+          expense: {
+            '11/2022': new Money(400, 'EUR'),
+            '12/2022': new Money(500, 'EUR'),
           },
         },
       } as SWRResponse,
     );
 
     render(
-      <NetWorthHistogram
+      <IncomeExpenseHistogram
         startDate={DateTime.fromISO('2022-09-01')}
       />,
     );
@@ -147,16 +167,16 @@ describe('NetWorthHistogram', () => {
         data: {
           datasets: [
             expect.objectContaining({
-              data: [0, 0, 800, 1200, 1200],
-              label: 'Assets',
+              data: [-0, -0, 600, 400, -0],
+              label: 'Income',
             }),
             expect.objectContaining({
-              data: [0, 0, -200, -200, -200],
-              label: 'Liabilities',
+              data: [-0, -0, -400, -500, -0],
+              label: 'Expenses',
             }),
             expect.objectContaining({
-              data: [0, 0, 600, 1000, 1000],
-              label: 'Net worth',
+              data: [-0, -0, 200, -100, -0],
+              label: 'Savings',
             }),
           ],
           labels: [

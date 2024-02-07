@@ -10,6 +10,7 @@ import {
   AccountsTable,
   NetWorthPie,
   NetWorthHistogram,
+  IncomeExpenseHistogram,
   MonthlyTotalHistogram,
   LatestTransactions,
 } from '@/components/pages/accounts';
@@ -73,7 +74,7 @@ export default function AccountsPage(): JSX.Element {
       </div>
       <div className="grid grid-cols-12 items-start items-top">
         <div className="grid grid-cols-12 col-span-3">
-          <div className="card col-span-12 mb-0 rounded-b-none">
+          <div className="card col-span-12">
             <NetWorthPie
               selectedDate={selectedDate}
             />
@@ -84,25 +85,31 @@ export default function AccountsPage(): JSX.Element {
               />
             </div>
           </div>
+          <div className="card col-span-12">
+            <LatestTransactions />
+          </div>
         </div>
         <div className="grid grid-cols-12 col-span-9">
-          <div className="card col-span-9">
+          <div className="card col-span-8">
             <NetWorthHistogram
               startDate={earliestDate}
               selectedDate={selectedDate}
             />
           </div>
-          <div className="card col-span-3">
-            <LatestTransactions />
-          </div>
-          <div className="card col-span-6">
+          <div className="card col-span-4">
             <MonthlyTotalHistogram
               accounts={accounts?.type_income?.childrenIds.map((guid: string) => accounts?.[guid])}
               title="Income"
               selectedDate={selectedDate}
             />
           </div>
-          <div className="card col-span-6">
+          <div className="card col-span-8">
+            <IncomeExpenseHistogram
+              startDate={earliestDate}
+              selectedDate={selectedDate}
+            />
+          </div>
+          <div className="card col-span-4">
             <MonthlyTotalHistogram
               accounts={accounts?.type_expense?.childrenIds.map((guid: string) => accounts?.[guid])}
               title="Expenses"

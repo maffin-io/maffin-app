@@ -54,11 +54,13 @@ export default function MonthlyTotalHistogram({
 
   return (
     <Bar
+      height="400"
       data={{
         labels: dates,
         datasets,
       }}
       options={{
+        maintainAspectRatio: false,
         hover: {
           mode: 'dataset',
           intersect: true,

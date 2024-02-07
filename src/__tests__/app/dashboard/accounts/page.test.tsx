@@ -15,6 +15,7 @@ import Onboarding from '@/components/onboarding/Onboarding';
 import {
   AccountsTable,
   NetWorthPie,
+  IncomeExpenseHistogram,
   NetWorthHistogram,
   MonthlyTotalHistogram,
   LatestTransactions,
@@ -50,6 +51,10 @@ jest.mock('@/components/pages/accounts/NetWorthPie', () => jest.fn(
   () => <div data-testid="NetWorthPie" />,
 ));
 
+jest.mock('@/components/pages/accounts/IncomeExpenseHistogram', () => jest.fn(
+  () => <div data-testid="IncomeExpenseHistogram" />,
+));
+
 jest.mock('@/components/pages/accounts/NetWorthHistogram', () => jest.fn(
   () => <div data-testid="NetWorthHistogram" />,
 ));
@@ -72,7 +77,7 @@ jest.mock('@/components/Loading', () => jest.fn(
 
 describe('AccountsPage', () => {
   beforeEach(() => {
-    jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02'));
+    jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02') as DateTime<true>);
     jest.spyOn(apiHook, 'useStartDate').mockReturnValue({ data: undefined } as SWRResponse);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
   });
@@ -141,6 +146,15 @@ describe('AccountsPage', () => {
     expect(NetWorthPie).toHaveBeenLastCalledWith(
       {
         selectedDate: DateTime.fromISO('2023-01-02'),
+      },
+      {},
+    );
+
+    await screen.findByTestId('IncomeExpenseHistogram');
+    expect(IncomeExpenseHistogram).toHaveBeenLastCalledWith(
+      {
+        selectedDate: DateTime.fromISO('2023-01-02'),
+        startDate: DateTime.fromISO('2022-01-01'),
       },
       {},
     );
@@ -250,6 +264,13 @@ describe('AccountsPage', () => {
     expect(NetWorthPie).toHaveBeenLastCalledWith({
       selectedDate: DateTime.now(),
     }, {});
+    expect(IncomeExpenseHistogram).toHaveBeenLastCalledWith(
+      {
+        startDate: date,
+        selectedDate: DateTime.fromISO('2023-01-02'),
+      },
+      {},
+    );
     expect(NetWorthHistogram).toHaveBeenLastCalledWith(
       {
         startDate: date,
