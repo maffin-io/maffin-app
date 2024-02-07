@@ -1,6 +1,8 @@
 import React from 'react';
 import { DateTime, Interval } from 'luxon';
 import type { ChartDataset } from 'chart.js';
+import { Chart as C } from 'chart.js';
+import zoomPlugin from 'chartjs-plugin-zoom';
 
 import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
@@ -10,6 +12,10 @@ export type IncomeExpenseHistogramProps = {
   startDate?: DateTime,
   selectedDate?: DateTime,
 };
+
+C.register(
+  zoomPlugin,
+);
 
 export default function IncomeExpenseHistogram({
   startDate,
@@ -46,6 +52,7 @@ export default function IncomeExpenseHistogram({
       data: [],
       backgroundColor: '#06B6D4',
       datalabels: {
+        clip: true,
         anchor: 'end',
         display: true,
         formatter: (value) => moneyToString(value, unit),
@@ -130,6 +137,26 @@ export default function IncomeExpenseHistogram({
               },
               font: {
                 size: 18,
+              },
+            },
+            zoom: {
+              limits: {
+                x: {
+                  min: startDate?.toMillis(),
+                  max: now.toMillis(),
+                  minRange: zoomInterval.toDuration().toMillis(),
+                },
+              },
+              pan: {
+                mode: 'x',
+                enabled: true,
+              },
+              zoom: {
+                mode: 'x',
+                wheel: {
+                  enabled: true,
+                  modifierKey: 'meta',
+                },
               },
             },
             legend: {

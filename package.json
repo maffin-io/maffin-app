@@ -32,6 +32,7 @@
     "chartjs-plugin-annotation": "^3.0.1",
     "chartjs-plugin-autocolors": "^0.2.2",
     "chartjs-plugin-datalabels": "^2.2.0",
+    "chartjs-plugin-zoom": "^2.0.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "classnames": "^2.5.1",

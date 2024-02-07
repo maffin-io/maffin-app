@@ -6,6 +6,7 @@ import {
   LineElement,
   LineController,
 } from 'chart.js';
+import zoomPlugin from 'chartjs-plugin-zoom';
 
 import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
@@ -17,6 +18,7 @@ import * as API from '@/hooks/api';
 C.register(
   LineElement,
   LineController,
+  zoomPlugin,
 );
 
 export type NetWorthHistogramProps = {
@@ -170,6 +172,26 @@ export default function NetWorthHistogram({
               },
               font: {
                 size: 18,
+              },
+            },
+            zoom: {
+              limits: {
+                x: {
+                  min: startDate?.toMillis(),
+                  max: now.toMillis(),
+                  minRange: zoomInterval.toDuration().toMillis(),
+                },
+              },
+              pan: {
+                mode: 'x',
+                enabled: true,
+              },
+              zoom: {
+                mode: 'x',
+                wheel: {
+                  enabled: true,
+                  modifierKey: 'meta',
+                },
               },
             },
             legend: {

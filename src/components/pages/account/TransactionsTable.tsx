@@ -17,6 +17,8 @@ import {
 import type { AccountsMap } from '@/types/book';
 import * as API from '@/hooks/api';
 import type { Commodity } from '@/book/entities';
+import { isAsset } from '@/book/helpers';
+import { isLiability } from '@/book/helpers/accountType';
 
 export type TransactionsTableProps = {
   account: Account,
@@ -156,9 +158,9 @@ function FromToAccountPartial(
                 className={classNames('badge mb-0.5 hover:text-slate-300', {
                   success: account.type === 'INCOME',
                   danger: account.type === 'EXPENSE',
-                  info: ['ASSET', 'BANK'].includes(account.type),
-                  warning: account.type === 'LIABILITY',
                   misc: ['INVESTMENT'].includes(account.type),
+                  info: isAsset(account),
+                  warning: isLiability(account),
                 })}
               >
                 { account?.path }
