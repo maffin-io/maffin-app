@@ -39,6 +39,8 @@ export default function useSession(): SessionReturn {
   return {
     ...auth0,
     accessToken,
+    isAuthenticated: isStaging() ? true : auth0.isAuthenticated,
+    isLoading: isStaging() ? false : auth0.isLoading,
     user: isStaging()
       ? { name: 'Maffin', email: 'iomaffin@gmail.com', picture: '' }
       : auth0.user || emptyUser,
