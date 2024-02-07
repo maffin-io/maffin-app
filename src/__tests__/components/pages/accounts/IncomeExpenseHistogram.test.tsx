@@ -5,7 +5,7 @@ import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
 import Bar from '@/components/charts/Bar';
-import { IncomeExpenseHistogram } from '@/components/pages/accounts';
+import IncomeExpenseHistogram from '@/components/pages/accounts/IncomeExpenseHistogram';
 import * as apiHook from '@/hooks/api';
 
 jest.mock('@/components/charts/Bar', () => jest.fn(
@@ -53,6 +53,7 @@ describe('IncomeExpenseHistogram', () => {
               data: [],
               label: 'Savings',
               datalabels: {
+                clip: true,
                 anchor: 'end',
                 display: true,
                 formatter: expect.any(Function),
@@ -81,6 +82,26 @@ describe('IncomeExpenseHistogram', () => {
               padding: {
                 bottom: 30,
                 top: 0,
+              },
+            },
+            zoom: {
+              limits: {
+                x: {
+                  min: undefined,
+                  max: 1672617600000,
+                  minRange: 21168000000,
+                },
+              },
+              pan: {
+                mode: 'x',
+                enabled: true,
+              },
+              zoom: {
+                mode: 'x',
+                wheel: {
+                  enabled: true,
+                  modifierKey: 'meta',
+                },
               },
             },
             legend: {

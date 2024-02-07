@@ -15,11 +15,11 @@ import Onboarding from '@/components/onboarding/Onboarding';
 import {
   AccountsTable,
   NetWorthPie,
-  IncomeExpenseHistogram,
-  NetWorthHistogram,
   MonthlyTotalHistogram,
   LatestTransactions,
 } from '@/components/pages/accounts';
+import NetWorthHistogram from '@/components/pages/accounts/NetWorthHistogram';
+import IncomeExpenseHistogram from '@/components/pages/accounts/IncomeExpenseHistogram';
 import * as apiHook from '@/hooks/api';
 
 jest.mock('@/hooks/api', () => ({

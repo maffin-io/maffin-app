@@ -5,7 +5,7 @@ import type { SWRResponse } from 'swr';
 
 import Money from '@/book/Money';
 import Bar from '@/components/charts/Bar';
-import { NetWorthHistogram } from '@/components/pages/accounts';
+import NetWorthHistogram from '@/components/pages/accounts/NetWorthHistogram';
 import * as apiHook from '@/hooks/api';
 
 jest.mock('@/components/charts/Bar', () => jest.fn(
@@ -66,6 +66,26 @@ describe('NetWorthHistogram', () => {
                 top: 0,
               },
             },
+            zoom: {
+              limits: {
+                x: {
+                  min: undefined,
+                  max: 1672617600000,
+                  minRange: 22032000000,
+                },
+              },
+              pan: {
+                mode: 'x',
+                enabled: true,
+              },
+              zoom: {
+                mode: 'x',
+                wheel: {
+                  enabled: true,
+                  modifierKey: 'meta',
+                },
+              },
+            },
             legend: {
               onClick: expect.any(Function),
               labels: {
@@ -90,8 +110,10 @@ describe('NetWorthHistogram', () => {
               grid: {
                 display: false,
               },
-              max: DateTime.now().startOf('month').toMillis(),
-              min: DateTime.now().minus({ months: 8 }).startOf('month').toMillis(),
+              min: DateTime.now().minus({ months: 8 })
+                .startOf('month').minus({ days: 5 })
+                .toMillis(),
+              max: DateTime.now().startOf('month').plus({ days: 5 }).toMillis(),
               ticks: {
                 align: 'center',
               },
