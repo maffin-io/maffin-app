@@ -19,7 +19,7 @@ jest.mock('@/hooks/api', () => ({
 }));
 
 describe('MonthlyTotalHistogram', () => {
-  const now = DateTime.fromISO('2023-01-02');
+  const now = DateTime.fromISO('2023-01-02') as DateTime<true>;
 
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(now);
@@ -43,6 +43,7 @@ describe('MonthlyTotalHistogram', () => {
 
     expect(Bar).toBeCalledWith(
       {
+        height: '400',
         data: {
           datasets: [],
           labels: [
@@ -58,6 +59,7 @@ describe('MonthlyTotalHistogram', () => {
           ],
         },
         options: {
+          maintainAspectRatio: false,
           hover: {
             mode: 'dataset',
             intersect: true,

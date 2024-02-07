@@ -37,7 +37,7 @@ exports[`AccountsPage renders as expected when no data showing onboarding 1`] = 
       class="grid grid-cols-12 col-span-3"
     >
       <div
-        class="card col-span-12 mb-0 rounded-b-none"
+        class="card col-span-12"
       >
         <div
           data-testid="NetWorthPie"
@@ -50,33 +50,40 @@ exports[`AccountsPage renders as expected when no data showing onboarding 1`] = 
           />
         </div>
       </div>
+      <div
+        class="card col-span-12"
+      >
+        <div
+          data-testid="LatestTransactions"
+        />
+      </div>
     </div>
     <div
       class="grid grid-cols-12 col-span-9"
     >
       <div
-        class="card col-span-9"
+        class="card col-span-8"
       >
         <div
           data-testid="NetWorthHistogram"
         />
       </div>
       <div
-        class="card col-span-3"
-      >
-        <div
-          data-testid="LatestTransactions"
-        />
-      </div>
-      <div
-        class="card col-span-6"
+        class="card col-span-4"
       >
         <div
           data-testid="MonthlyTotalHistogram"
         />
       </div>
       <div
-        class="card col-span-6"
+        class="card col-span-8"
+      >
+        <div
+          data-testid="IncomeExpenseHistogram"
+        />
+      </div>
+      <div
+        class="card col-span-4"
       >
         <div
           data-testid="MonthlyTotalHistogram"

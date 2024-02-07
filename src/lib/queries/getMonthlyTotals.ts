@@ -20,7 +20,7 @@ export type MonthlyTotals = {
  */
 export default async function getMonthlyTotals(
   accounts: AccountsMap,
-  todayQuotes: PriceDBMap,
+  prices: PriceDBMap,
 ): Promise<MonthlyTotals> {
   const rows: { date: string, total: number, accountId: string }[] = await Split
     .query(`
@@ -53,7 +53,7 @@ export default async function getMonthlyTotals(
       aggregateChildrenTotals(
         accounts[childId],
         accounts,
-        todayQuotes,
+        prices,
         monthlyTotals,
       );
 
@@ -67,19 +67,19 @@ export default async function getMonthlyTotals(
 function aggregateChildrenTotals(
   current: Account,
   accounts: AccountsMap,
-  todayQuotes: PriceDBMap,
+  prices: PriceDBMap,
   monthlyTotals: MonthlyTotals,
 ) {
   const { commodity } = current;
   current.childrenIds.forEach(childId => {
-    aggregateChildrenTotals(accounts[childId], accounts, todayQuotes, monthlyTotals);
+    aggregateChildrenTotals(accounts[childId], accounts, prices, monthlyTotals);
 
     Object.entries(monthlyTotals[childId] || {}).forEach(([key, childMonthlyTotal]) => {
       let rate = 1;
       const childAccount = accounts[childId];
       let childCurrency = childAccount.commodity.mnemonic;
       if (isInvestment(childAccount)) {
-        const stockPrice = todayQuotes.getInvestmentPrice(
+        const stockPrice = prices.getInvestmentPrice(
           childAccount.commodity.mnemonic,
           DateTime.now(),
         );
@@ -87,7 +87,7 @@ function aggregateChildrenTotals(
         childCurrency = stockPrice.currency.mnemonic;
       }
       if (childMonthlyTotal.currency !== commodity.mnemonic) {
-        rate *= todayQuotes.getPrice(
+        rate *= prices.getPrice(
           childCurrency,
           commodity.mnemonic,
           DateTime.now(),
