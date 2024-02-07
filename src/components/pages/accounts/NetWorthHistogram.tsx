@@ -74,8 +74,13 @@ export default function NetWorthHistogram({
       pointHoverRadius: 10,
       order: 0,
       datalabels: {
-        anchor: 'end',
-        display: true,
+        display: (ctx) => {
+          if (ctx.dataIndex % 2) {
+            return true;
+          }
+
+          return false;
+        },
         formatter: (value) => moneyToString(value, unit),
         align: 'end',
         backgroundColor: '#0E749066',

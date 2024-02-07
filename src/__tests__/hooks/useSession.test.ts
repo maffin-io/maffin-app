@@ -61,5 +61,7 @@ describe('useSession', () => {
       picture: '',
       name: 'Maffin',
     });
+    expect(result.current.isAuthenticated).toBe(true);
+    expect(result.current.isLoading).toBe(false);
   });
 });
