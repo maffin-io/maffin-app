@@ -74,6 +74,7 @@ export default function NetWorthHistogram({
       pointHoverRadius: 10,
       order: 0,
       datalabels: {
+        clip: true,
         display: (ctx) => {
           if (ctx.dataIndex % 2) {
             return true;
