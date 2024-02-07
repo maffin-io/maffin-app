@@ -90,8 +90,10 @@ describe('NetWorthHistogram', () => {
               grid: {
                 display: false,
               },
-              max: DateTime.now().startOf('month').toMillis(),
-              min: DateTime.now().minus({ months: 8 }).startOf('month').toMillis(),
+              min: DateTime.now().minus({ months: 8 })
+                .startOf('month').minus({ days: 5 })
+                .toMillis(),
+              max: DateTime.now().startOf('month').plus({ days: 5 }).toMillis(),
               ticks: {
                 align: 'center',
               },

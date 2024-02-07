@@ -111,8 +111,8 @@ export default function NetWorthHistogram({
     selectedDate = now.minus({ months: 4 });
   }
   const zoomInterval = Interval.fromDateTimes(
-    selectedDate.minus({ months: 4 }).startOf('month'),
-    selectedDate.plus({ months: 4 }).startOf('month'),
+    selectedDate.minus({ months: 4 }).startOf('month').minus({ days: 5 }),
+    selectedDate.plus({ months: 4 }).startOf('month').plus({ days: 5 }),
   );
 
   return (
