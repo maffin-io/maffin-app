@@ -37,7 +37,7 @@ describe('NetWorthPie', () => {
           datasets: [
             {
               backgroundColor: ['#06B6D4', '#F97316'],
-              data: [0, -0],
+              data: [0, 0],
             },
           ],
           labels: ['Assets', 'Liabilities'],
@@ -54,11 +54,6 @@ describe('NetWorthPie', () => {
             datalabels: {
               borderRadius: 2,
               color: '#DDDDDD',
-              font: {
-                family: 'Intervariable',
-                size: 14,
-                weight: 300,
-              },
               formatter: expect.any(Function),
               padding: 6,
               textAlign: 'center',
@@ -73,22 +68,18 @@ describe('NetWorthPie', () => {
     );
   });
 
-  it('computes net worth as expected', () => {
+  it('shows net worth as expected', () => {
+    jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-02-20') as DateTime<true>);
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
       {
         data: {
           asset: {
             '01/2023': new Money(500, 'EUR'),
-            '02/2023': new Money(500, 'EUR'),
-          },
-          // To check we don't add equity to the calculations as
-          // equity transactions go to assets
-          equity: {
-            '11/2022': new Money(-200, 'EUR'),
+            '02/2023': new Money(1000, 'EUR'),
           },
           liability: {
             '01/2023': new Money(-50, 'EUR'),
-            '02/2023': new Money(-50, 'EUR'),
+            '02/2023': new Money(-100, 'EUR'),
           },
         },
       } as SWRResponse,
@@ -112,13 +103,13 @@ describe('NetWorthPie', () => {
     );
   });
 
-  it('computes net worth when no liabilities', () => {
+  it('shows net worth when no liabilities', () => {
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
       {
         data: {
           asset: {
             '01/2023': new Money(500, 'EUR'),
-            '02/2023': new Money(500, 'EUR'),
+            '02/2023': new Money(1000, 'EUR'),
           },
         },
       } as SWRResponse,
@@ -132,7 +123,7 @@ describe('NetWorthPie', () => {
           datasets: [
             {
               backgroundColor: ['#06B6D4', '#F97316'],
-              data: [1000, -0],
+              data: [1000, 0],
             },
           ],
           labels: ['Assets', 'Liabilities'],
@@ -148,11 +139,11 @@ describe('NetWorthPie', () => {
         data: {
           asset: {
             '01/2023': new Money(500, 'EUR'),
-            '02/2023': new Money(500, 'EUR'),
+            '02/2023': new Money(1000, 'EUR'),
           },
           liability: {
             '01/2023': new Money(-50, 'EUR'),
-            '02/2023': new Money(-50, 'EUR'),
+            '02/2023': new Money(-100, 'EUR'),
           },
         },
       } as SWRResponse,

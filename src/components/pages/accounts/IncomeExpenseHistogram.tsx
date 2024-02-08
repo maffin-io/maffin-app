@@ -52,12 +52,11 @@ export default function IncomeExpenseHistogram({
       data: [],
       backgroundColor: '#06B6D4',
       datalabels: {
-        clip: true,
         anchor: 'end',
         display: true,
         formatter: (value) => moneyToString(value, unit),
         align: 'end',
-        backgroundColor: '#06B6D466',
+        backgroundColor: '#06B6D4FF',
         borderRadius: 5,
         color: '#FFF',
       },
@@ -72,7 +71,7 @@ export default function IncomeExpenseHistogram({
 
     datasets[0].data.push(-incomeAmount);
     datasets[1].data.push(-expenseAmount);
-    datasets[2].data.push(netProfit);
+    datasets[2].data.push(netProfit || 0);
   });
 
   if (now.diff(selectedDate, ['months']).months < 4) {
@@ -92,6 +91,11 @@ export default function IncomeExpenseHistogram({
           datasets,
         }}
         options={{
+          layout: {
+            padding: {
+              right: 15,
+            },
+          },
           maintainAspectRatio: false,
           interaction: {
             mode: 'index',
@@ -116,6 +120,7 @@ export default function IncomeExpenseHistogram({
               },
             },
             y: {
+              grace: 1,
               position: 'left',
               border: {
                 display: false,

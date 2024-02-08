@@ -28,11 +28,13 @@ describe('PriceForm', () => {
     await datasource.initialize();
 
     eur = await Commodity.create({
+      guid: 'eur',
       mnemonic: 'EUR',
       namespace: 'CURRENCY',
     }).save();
 
     usd = await Commodity.create({
+      guid: 'usd',
       mnemonic: 'USD',
       namespace: 'CURRENCY',
     }).save();
@@ -109,6 +111,27 @@ describe('PriceForm', () => {
     // Can't check with toBeVisible due tailwindcss not being understood by jest
     expect(fieldsets[1]).toHaveClass('hidden');
     expect(fieldsets[2]).toHaveClass('hidden');
+  });
+
+  it('passed commodity is not shown as a currency option', async () => {
+    const user = userEvent.setup();
+    render(
+      <PriceForm
+        action="add"
+        onSave={() => {}}
+        defaultValues={{
+          fk_commodity: eur,
+        }}
+        hideDefaults
+      />,
+    );
+
+    const currencyInput = screen.getByRole('combobox', { name: 'currencyInput' });
+    await user.click(currencyInput);
+
+    const options = await screen.findAllByRole('option');
+    expect(options).toHaveLength(1);
+    expect(options[0].textContent).toEqual('USD');
   });
 
   it('adds new Price and saves', async () => {

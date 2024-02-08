@@ -112,6 +112,7 @@ describe('Onboarding', () => {
         placeholder: true,
         type: 'EQUITY',
         name: 'Equity',
+        hidden: true,
       }),
       expect.objectContaining({
         fk_commodity: eur,
@@ -154,12 +155,12 @@ describe('Onboarding', () => {
 
     expect(screen.getByText('add')).toBeEnabled();
     await user.click(screen.getByText('add'));
-    const bankAccount = await Account.findOneByOrFail({ name: 'My bank account' });
+    const bankAccount = await Account.findOneByOrFail({ name: 'My bank' });
     expect(bankAccount).toEqual(expect.objectContaining({
       fk_commodity: eur,
       placeholder: false,
       type: 'BANK',
-      name: 'My bank account',
+      name: 'My bank',
       parentId: accounts[2].guid,
     }));
 

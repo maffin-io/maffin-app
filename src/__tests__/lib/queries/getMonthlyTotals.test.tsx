@@ -123,11 +123,13 @@ describe('getMonthlyTotals', () => {
       {} as PriceDBMap,
     );
 
-    expect(monthlyTotals.asset['01/2023'].toString()).toEqual('-200.00 EUR');
+    // For asset and liabilities, we accumulate the total
+    expect(monthlyTotals.asset['01/2023'].toString()).toEqual('-600.00 EUR');
     expect(monthlyTotals.asset['02/2022'].toString()).toEqual('-400.00 EUR');
-    expect(monthlyTotals.abcdef['01/2023'].toString()).toEqual('-200.00 EUR');
+    expect(monthlyTotals.abcdef['01/2023'].toString()).toEqual('-600.00 EUR');
     expect(monthlyTotals.abcdef['02/2022'].toString()).toEqual('-400.00 EUR');
 
+    // For expense/income we store the monthly splits
     expect(monthlyTotals.expense['01/2023'].toString()).toEqual('200.00 EUR');
     expect(monthlyTotals.expense['02/2022'].toString()).toEqual('400.00 EUR');
     expect(monthlyTotals.ghijk['01/2023'].toString()).toEqual('200.00 EUR');
@@ -203,7 +205,15 @@ describe('getMonthlyTotals', () => {
     expect(monthlyTotals.expense['01/2023'].toString()).toEqual('600.00 EUR');
   });
 
-  it('converts children totals when different currency', async () => {
+  /**
+   * This test checks that we aggregate total networth (asset) by converting prices
+   * using the correct exchange rates.
+   *
+   * For this, we create two transactions to a bank account in USD from an expense in EUR
+   * with different dates. Then we check that the total asset value of the parent account
+   * of the bank which is in euro is the bank * exchange_rate found IN THAT MONTH
+   */
+  it('converts children totals when asset account is different currency', async () => {
     const usd = await Commodity.create({
       namespace: 'CURRENCY',
       mnemonic: 'USD',
@@ -225,14 +235,14 @@ describe('getMonthlyTotals', () => {
       fk_currency: eur,
       splits: [
         Split.create({
-          valueNum: 98,
+          valueNum: 80,
           valueDenom: 1,
-          quantityNum: 98,
+          quantityNum: 80,
           quantityDenom: 1,
           fk_account: expensesAccount,
         }),
         Split.create({
-          valueNum: -98,
+          valueNum: -80,
           valueDenom: 1,
           quantityNum: -100,
           quantityDenom: 1,
@@ -242,22 +252,22 @@ describe('getMonthlyTotals', () => {
     }).save();
     await Transaction.create({
       description: 'description',
-      date: DateTime.fromISO('2023-01-01'),
+      date: DateTime.fromISO('2023-02-01'),
       fk_currency: eur,
       splits: [
         Split.create({
-          valueNum: 400,
+          valueNum: 90,
           valueDenom: 1,
-          quantityNum: 400,
+          quantityNum: 90,
           quantityDenom: 1,
           fk_account: expensesAccount,
         }),
         Split.create({
-          valueNum: -400,
+          valueNum: -90,
           valueDenom: 1,
-          quantityNum: -400,
+          quantityNum: -100,
           quantityDenom: 1,
-          fk_account: assetAccount,
+          fk_account: childAccount,
         }),
       ],
     }).save();
@@ -269,18 +279,33 @@ describe('getMonthlyTotals', () => {
         [expensesAccount.guid]: expensesAccount,
         [childAccount.guid]: childAccount,
       },
-      {
-        getPrice: (from, to, date) => ({
-          guid: `${from}.${to}.${date}`,
-          value: 0.98,
+      new PriceDBMap([
+        Price.create({
+          date: DateTime.fromISO('2023-01-30'),
+          fk_commodity: usd,
+          fk_currency: eur,
+          valueNum: 80,
+          valueDenom: 100,
         }),
-      } as PriceDBMap,
+        Price.create({
+          date: DateTime.fromISO('2023-02-28'),
+          fk_commodity: usd,
+          fk_currency: eur,
+          valueNum: 90,
+          valueDenom: 100,
+        }),
+      ]),
     );
 
-    // 400 EUR + 100USD * 0.98
-    expect(monthlyTotals.asset['01/2023'].toString()).toEqual('-498.00 EUR');
     expect(monthlyTotals.bank['01/2023'].toString()).toEqual('-100.00 USD');
-    expect(monthlyTotals.expense['01/2023'].toString()).toEqual('498.00 EUR');
+    // 100USD * 0.8 (which is the exchange rate on Jan)
+    expect(monthlyTotals.asset['01/2023'].toString()).toEqual('-80.00 EUR');
+    expect(monthlyTotals.expense['01/2023'].toString()).toEqual('80.00 EUR');
+
+    expect(monthlyTotals.bank['02/2023'].toString()).toEqual('-200.00 USD');
+    // 200USD * 0.9 (which is the exchange rate on Feb)
+    expect(monthlyTotals.asset['02/2023'].toString()).toEqual('-180.00 EUR');
+    expect(monthlyTotals.expense['02/2023'].toString()).toEqual('90.00 EUR');
   });
 
   /**

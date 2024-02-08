@@ -86,7 +86,7 @@ export default function NetWorthHistogram({
         },
         formatter: (value) => moneyToString(value, unit),
         align: 'end',
-        backgroundColor: '#0E749066',
+        backgroundColor: '#0E7490FF',
         borderRadius: 5,
         color: '#FFF',
       },
@@ -95,15 +95,11 @@ export default function NetWorthHistogram({
 
   dates.forEach(date => {
     const monthYear = (date as DateTime).toFormat('MM/yyyy');
-    const assetTotal = (
-      datasets[0].data[datasets[0].data.length - 1] as number || 0
-    ) + (assetSeries?.[monthYear]?.toNumber() || 0);
+    const assetTotal = assetSeries?.[monthYear]?.toNumber() || 0;
     datasets[0].data.push(assetTotal);
 
     if (liabilitiesSeries) {
-      const liabilityTotal = (
-        datasets[1].data[datasets[1].data.length - 1] as number || 0
-      ) + (liabilitiesSeries?.[monthYear]?.toNumber() || 0);
+      const liabilityTotal = liabilitiesSeries?.[monthYear]?.toNumber() || 0;
       datasets[1].data.push(liabilityTotal);
       datasets[2].data.push(assetTotal + liabilityTotal);
     }
@@ -126,6 +122,11 @@ export default function NetWorthHistogram({
           datasets,
         }}
         options={{
+          layout: {
+            padding: {
+              right: 15,
+            },
+          },
           maintainAspectRatio: false,
           interaction: {
             mode: 'index',
@@ -151,6 +152,7 @@ export default function NetWorthHistogram({
               },
             },
             y: {
+              grace: 1,
               position: 'left',
               border: {
                 display: false,

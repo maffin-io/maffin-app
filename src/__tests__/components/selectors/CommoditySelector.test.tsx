@@ -60,7 +60,7 @@ describe('CommoditySelector', () => {
       } as Commodity,
       {
         mnemonic: 'IDVY.AS',
-        namespace: 'EQUITY',
+        namespace: 'STOCK',
       } as Commodity,
     ];
     jest.spyOn(apiHook, 'useCommodities').mockReturnValue(
@@ -69,12 +69,47 @@ describe('CommoditySelector', () => {
       } as SWRResponse,
     );
 
-    render(<CommoditySelector namespace="EQUITY" />);
+    render(<CommoditySelector namespace="STOCK" />);
 
     await screen.findByTestId('Selector');
     expect(Selector).toHaveBeenCalledWith(
       expect.objectContaining({
         options: [options[2]],
+      }),
+      {},
+    );
+  });
+
+  it('filters by ignore', async () => {
+    const options = [
+      {
+        guid: '1',
+        mnemonic: 'EUR',
+        namespace: 'CURRENCY',
+      } as Commodity,
+      {
+        guid: '2',
+        mnemonic: 'USD',
+        namespace: 'CURRENCY',
+      } as Commodity,
+      {
+        guid: '3',
+        mnemonic: 'IDVY.AS',
+        namespace: 'STOCK',
+      } as Commodity,
+    ];
+    jest.spyOn(apiHook, 'useCommodities').mockReturnValue(
+      {
+        data: options,
+      } as SWRResponse,
+    );
+
+    render(<CommoditySelector ignore={['2', '3']} />);
+
+    await screen.findByTestId('Selector');
+    expect(Selector).toHaveBeenCalledWith(
+      expect.objectContaining({
+        options: [options[0]],
       }),
       {},
     );

@@ -67,19 +67,23 @@ function getTreeTotals(
   current.childrenIds.forEach(childId => {
     const childAccount = accounts[childId];
     if (!childAccount.hidden) {
-      leaves.push(getTreeTotals(accounts[childId], accounts, monthlyTotals, selectedDate));
+      leaves.push(getTreeTotals(childAccount, accounts, monthlyTotals, selectedDate));
     }
   });
 
-  const accountTotal = Object.entries(monthlyTotals[current.guid] || {}).reduce(
-    (total, [monthYear, amount]) => {
-      if (DateTime.fromFormat(monthYear, 'MM/yyyy') <= selectedDate) {
-        return total.add(amount);
-      }
-      return total;
-    },
-    new Money(0, current.commodity?.mnemonic || ''),
-  );
+  let accountTotal = (monthlyTotals[current.guid] || {})[selectedDate.toFormat('MM/yyyy')]
+    || new Money(0, current.commodity?.mnemonic || '');
+  if (!isAsset(current) && !isLiability(current)) {
+    accountTotal = Object.entries(monthlyTotals[current.guid] || {}).reduce(
+      (total, [monthYear, amount]) => {
+        if (DateTime.fromFormat(monthYear, 'MM/yyyy') <= selectedDate) {
+          return total.add(amount);
+        }
+        return total;
+      },
+      new Money(0, current.commodity?.mnemonic || ''),
+    );
+  }
 
   return {
     account: current,
