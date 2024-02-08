@@ -1212,13 +1212,12 @@ describe('TransactionForm', () => {
     expect(screen.getByText('add')).toBeEnabled();
     await user.click(screen.getByText('add'));
 
-    expect(swr.mutate).toBeCalledTimes(6);
+    expect(swr.mutate).toBeCalledTimes(5);
     expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/account_guid_1');
-    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/investments', undefined);
-    expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/investments/stock_account');
-    expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/splits/stock_account');
-    expect(swr.mutate).toHaveBeenNthCalledWith(5, '/api/monthly-totals', undefined);
-    expect(swr.mutate).toHaveBeenNthCalledWith(6, '/api/txs/latest', undefined);
+    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/investments/stock_account');
+    expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/splits/stock_account');
+    expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/monthly-totals', undefined);
+    expect(swr.mutate).toHaveBeenNthCalledWith(5, '/api/txs/latest', undefined);
   });
 
   describe('actions', () => {
