@@ -43,7 +43,7 @@ export type SplitFieldData = {
 export default function AccountForm({
   action = 'add',
   defaultValues,
-  onSave = () => {},
+  onSave = () => { },
   hideDefaults = false,
 }: AccountFormProps): JSX.Element {
   const router = useRouter();
@@ -315,14 +315,6 @@ async function onSubmit(
   // The code is not different from when we add an account and it works there...
   account.setPath();
 
-   // Define a variable to track if the account type is changing to or from 'INVESTMENT'
-  let isInvestmentTypeChange = false;
-
-  // Check if the account is being updated and the account type is changing
-  if (action === 'update' && account.type !== data.type) {
-    isInvestmentTypeChange = account.type === 'INVESTMENT' || data.type === 'INVESTMENT';
-  }
-
   if (action === 'add') {
     await account.save();
     mutate(`/api/accounts/${account.guid}`);
@@ -334,11 +326,7 @@ async function onSubmit(
     await account.save();
     mutate(`/api/accounts/${account.guid}`);
     mutate('/api/accounts');
-
-    // If the account type is changing to or from 'INVESTMENT', update the cached data
-    if (isInvestmentTypeChange) {
-      mutate('/api/investments');
-    }
+    mutate('/api/investments')
   } else if (action === 'delete') {
     await Account.remove(account);
     mutate(`/api/accounts/${account.guid}`);
