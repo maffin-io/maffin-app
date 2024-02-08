@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { DateTime } from 'luxon';
 import type { SWRResponse } from 'swr';
 
 import { AccountsTable } from '@/components/pages/accounts';
@@ -20,6 +21,7 @@ jest.mock('@/hooks/api', () => ({
 
 describe('AccountsTable', () => {
   beforeEach(() => {
+    jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-01') as DateTime<true>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue({ data: undefined } as SWRResponse);
   });
@@ -66,7 +68,7 @@ describe('AccountsTable', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('creates table with expected params', async () => {
+  it('creates table with expected params when ASSET', async () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: {
@@ -104,6 +106,7 @@ describe('AccountsTable', () => {
         data: {
           a1: {
             '01/2023': new Money(100, 'EUR'),
+            '02/2023': new Money(200, 'EUR'), // Will be ignored
           },
           a2: {
             '01/2023': new Money(-100, 'EUR'),
@@ -117,23 +120,7 @@ describe('AccountsTable', () => {
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
     expect(Table).toHaveBeenLastCalledWith(
-      {
-        id: 'accounts-table',
-        columns: [
-          {
-            header: '',
-            id: 'name',
-            enableSorting: false,
-            accessorKey: 'name',
-            cell: expect.any(Function),
-          },
-          {
-            header: '',
-            id: 'total',
-            accessorFn: expect.any(Function),
-            cell: expect.any(Function),
-          },
-        ],
+      expect.objectContaining({
         data: [
           {
             account: {
@@ -164,21 +151,78 @@ describe('AccountsTable', () => {
             total: expect.any(Money),
           },
         ],
-        initialSort: {
-          desc: true,
-          id: 'total',
-        },
-        isExpanded: false,
-        showHeader: false,
-        showPagination: false,
-        tdClassName: 'p-2',
-        getSubRows: expect.any(Function),
-      },
+      }),
       {},
     );
 
     expect((Table as jest.Mock).mock.calls[0][0].data[0].total.toString()).toEqual('100.00 EUR');
     expect((Table as jest.Mock).mock.calls[0][0].data[1].total.toString()).toEqual('100.00 EUR');
+  });
+
+  it('creates table with expected params when EXPENSE', async () => {
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+      {
+        data: {
+          type_root: {
+            guid: 'root',
+            name: 'Root',
+            type: 'ROOT',
+            childrenIds: ['a1'],
+          } as Account,
+          a1: {
+            guid: 'a1',
+            name: 'Expense',
+            description: 'description',
+            commodity: {
+              mnemonic: 'EUR',
+            },
+            type: 'EXPENSE',
+            childrenIds: [] as string[],
+            placeholder: true,
+          },
+        },
+      } as SWRResponse,
+    );
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+      {
+        data: {
+          a1: {
+            '12/2022': new Money(100, 'EUR'),
+            '01/2023': new Money(100, 'EUR'),
+            '02/2023': new Money(100, 'EUR'), // will be ignored
+          },
+        },
+      } as SWRResponse,
+    );
+
+    render(<AccountsTable />);
+
+    await screen.findByTestId('Table');
+    expect(Table).toBeCalledTimes(1);
+    expect(Table).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        data: [
+          {
+            account: {
+              guid: 'a1',
+              name: 'Expense',
+              type: 'EXPENSE',
+              description: 'description',
+              commodity: {
+                mnemonic: 'EUR',
+              },
+              childrenIds: [],
+              placeholder: true,
+            },
+            leaves: [],
+            total: expect.any(Money),
+          },
+        ],
+      }),
+      {},
+    );
+
+    expect((Table as jest.Mock).mock.calls[0][0].data[0].total.toString()).toEqual('200.00 EUR');
   });
 
   it('ignores hidden accounts', async () => {

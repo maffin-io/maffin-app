@@ -95,6 +95,7 @@ export default function PriceForm({
                   placeholder="Convert to"
                   onChange={field.onChange}
                   namespace="CURRENCY"
+                  ignore={[(defaultValues?.fk_commodity as Commodity)?.guid || '']}
                   isDisabled={disabled || action !== 'add'}
                   defaultValue={defaultValues?.fk_currency as Commodity}
                 />

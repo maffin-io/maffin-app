@@ -233,7 +233,6 @@ exports[`LatestTransactions renders with empty txs 1`] = `
     <p>
       Latest transactions
     </p>
-    0
   </div>
 </div>
 `;

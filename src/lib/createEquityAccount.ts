@@ -22,6 +22,7 @@ export default async function createEquityAccount(
       fk_commodity: await getMainCurrency(),
       description: 'Equity accounts are used to store the opening balances when you create new accounts',
       parent: root,
+      hidden: true,
     }).save();
   }
 

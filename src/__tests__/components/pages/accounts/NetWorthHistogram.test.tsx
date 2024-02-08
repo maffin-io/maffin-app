@@ -49,6 +49,11 @@ describe('NetWorthHistogram', () => {
           labels: [],
         },
         options: {
+          layout: {
+            padding: {
+              right: 15,
+            },
+          },
           maintainAspectRatio: false,
           interaction: {
             mode: 'index',
@@ -127,6 +132,7 @@ describe('NetWorthHistogram', () => {
               type: 'time',
             },
             y: {
+              grace: 1,
               border: {
                 display: false,
               },
@@ -149,10 +155,13 @@ describe('NetWorthHistogram', () => {
         data: {
           asset: {
             '11/2022': new Money(800, 'EUR'),
-            '12/2022': new Money(400, 'EUR'),
+            '12/2022': new Money(1200, 'EUR'),
+            '01/2023': new Money(1200, 'EUR'),
           },
           liability: {
             '11/2022': new Money(-200, 'EUR'),
+            '12/2022': new Money(-200, 'EUR'),
+            '01/2023': new Money(-200, 'EUR'),
           },
         },
       } as SWRResponse,

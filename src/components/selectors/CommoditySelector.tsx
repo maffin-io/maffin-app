@@ -14,11 +14,13 @@ false,
 GroupBase<Commodity>
 > {
   namespace?: 'OTHER' | 'STOCK' | 'MUTUAL' | 'CURRENCY' | undefined,
+  ignore?: string[], // guid of Commodities to not show
 }
 
 export default function CommoditySelector(
   {
     namespace,
+    ignore,
     placeholder = 'Choose commodity',
     id = 'commoditySelector',
     ...props
@@ -30,6 +32,12 @@ export default function CommoditySelector(
   if (namespace) {
     commodities = commodities.filter(
       commodity => namespace === commodity.namespace,
+    );
+  }
+
+  if (ignore) {
+    commodities = commodities.filter(
+      commodity => !ignore.includes(commodity.guid),
     );
   }
 

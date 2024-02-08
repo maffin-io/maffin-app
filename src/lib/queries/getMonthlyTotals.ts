@@ -1,11 +1,12 @@
-import { DateTime } from 'luxon';
+import { DateTime, Interval } from 'luxon';
 
 import { Split } from '@/book/entities';
 import Money from '@/book/Money';
-import { isInvestment } from '@/book/helpers/accountType';
+import { isAsset, isInvestment, isLiability } from '@/book/helpers/accountType';
 import type { Account } from '@/book/entities';
 import type { AccountsMap } from '@/types/book';
 import type { PriceDBMap } from '@/book/prices';
+import getEarliestDate from './getEarliestDate';
 
 export type MonthlyTotals = {
   [guid: string]: {
@@ -14,9 +15,21 @@ export type MonthlyTotals = {
 };
 
 /**
- * For each account, it aggregates the splits monthly. Not only the ones belonging to the
+ * For each account, it aggregates quantities monthly. Not only the ones belonging to the
  * account but also the ones from the children. The monthly aggregations are converted to
- * the currency of the account
+ * the currency of the account/
+ *
+ * It behaves a bit differently depending on the account type:
+ *
+ * - For Asset and Liability accounts, each month is an aggregate of the TOTAL value. This is
+ *   because usually you want to represent TOTAL value for a specific date rather than the
+ *   transactions you've done. This allows for calculating the TOTAL for that specific date
+ *   taking into account the exchange rates for that specific month.
+ *
+ * - For Income and Expense, we aggregate monthly splits because when calculating TOTAL
+ *   expense for a month, you want the one for that month specifically. Even when you calculate
+ *   TOTAL expense for a month, the quantities are fixed because an EXPENSE/INCOME is something
+ *   that already happened.
  */
 export default async function getMonthlyTotals(
   accounts: AccountsMap,
@@ -34,6 +47,7 @@ export default async function getMonthlyTotals(
       GROUP BY 
         accountId, date
       HAVING SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) != 0
+      ORDER BY date
     `);
 
   const monthlyTotals: MonthlyTotals = {};
@@ -48,10 +62,25 @@ export default async function getMonthlyTotals(
     );
   });
 
+  const startDate = await getEarliestDate();
+  const interval = Interval.fromDateTimes(startDate, DateTime.now());
+  const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).endOf('month'));
+
   accounts.type_root?.childrenIds.forEach(
     (childId: string) => {
+      const account = accounts[childId];
+      if (isAsset(account) || isLiability(account)) {
+        aggregateMonthlyWorth(
+          account,
+          accounts,
+          prices,
+          monthlyTotals,
+          dates,
+        );
+      }
+
       aggregateChildrenTotals(
-        accounts[childId],
+        account,
         accounts,
         prices,
         monthlyTotals,
@@ -64,6 +93,45 @@ export default async function getMonthlyTotals(
   return monthlyTotals;
 }
 
+/**
+ * Asset and Liability accounts are something that accumulate value over time.
+ *
+ * If you ask what's my current net worth, this depends on today's exchange rates.
+ * Same for questions in the past, you want to check according to the exchange rates
+ * at that time.
+ */
+function aggregateMonthlyWorth(
+  current: Account,
+  accounts: AccountsMap,
+  prices: PriceDBMap,
+  monthlyTotals: MonthlyTotals,
+  dates: DateTime[],
+) {
+  current.childrenIds.forEach(childId => {
+    aggregateMonthlyWorth(accounts[childId], accounts, prices, monthlyTotals, dates);
+  });
+
+  dates.forEach(d => {
+    if (!(current.guid in monthlyTotals)) {
+      monthlyTotals[current.guid] = {};
+    }
+    const totals = monthlyTotals[current.guid];
+
+    const previousMonthTotal = totals[d.minus({ month: 1 }).toFormat('MM/yyyy')]
+      || new Money(0, current.commodity.mnemonic);
+    const currentMonthTotal = totals[d.toFormat('MM/yyyy')]
+      || new Money(0, current.commodity.mnemonic);
+    totals[d.toFormat('MM/yyyy')] = currentMonthTotal.add(previousMonthTotal);
+  });
+}
+
+/**
+ * Expense and Income accounts are something that happen when a given transaction is entered
+ * If you want to count how much you spent, you use the rate at that specific moment.
+ *
+ * If you ask how much I spent in the last year, you don't want this amount to change depending
+ * on the current exchange rates.
+ */
 function aggregateChildrenTotals(
   current: Account,
   accounts: AccountsMap,
@@ -78,10 +146,15 @@ function aggregateChildrenTotals(
       let rate = 1;
       const childAccount = accounts[childId];
       let childCurrency = childAccount.commodity.mnemonic;
+      // We are aggregating a monthly total so we try to find the latest exchange rate
+      let date = DateTime.fromFormat(key, 'MM/yyyy').endOf('month');
+      if (date > DateTime.now()) {
+        date = DateTime.now();
+      }
       if (isInvestment(childAccount)) {
         const stockPrice = prices.getInvestmentPrice(
           childAccount.commodity.mnemonic,
-          DateTime.now(),
+          date,
         );
         rate = stockPrice.value;
         childCurrency = stockPrice.currency.mnemonic;
@@ -90,7 +163,7 @@ function aggregateChildrenTotals(
         rate *= prices.getPrice(
           childCurrency,
           commodity.mnemonic,
-          DateTime.now(),
+          date,
         ).value;
       }
       if (!(current.guid in monthlyTotals)) {

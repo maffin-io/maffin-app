@@ -53,12 +53,11 @@ describe('IncomeExpenseHistogram', () => {
               data: [],
               label: 'Savings',
               datalabels: {
-                clip: true,
                 anchor: 'end',
                 display: true,
                 formatter: expect.any(Function),
                 align: 'end',
-                backgroundColor: '#06B6D466',
+                backgroundColor: '#06B6D4FF',
                 borderRadius: 5,
                 color: '#FFF',
               },
@@ -67,6 +66,11 @@ describe('IncomeExpenseHistogram', () => {
           labels: [],
         },
         options: {
+          layout: {
+            padding: {
+              right: 15,
+            },
+          },
           maintainAspectRatio: false,
           interaction: {
             mode: 'index',
@@ -142,6 +146,7 @@ describe('IncomeExpenseHistogram', () => {
               type: 'time',
             },
             y: {
+              grace: 1,
               border: {
                 display: false,
               },
@@ -165,9 +170,6 @@ describe('IncomeExpenseHistogram', () => {
           income: {
             '11/2022': new Money(-600, 'EUR'),
             '12/2022': new Money(-400, 'EUR'),
-          },
-          equity: {
-            '11/2022': new Money(-200, 'EUR'),
           },
           expense: {
             '11/2022': new Money(400, 'EUR'),
@@ -196,7 +198,7 @@ describe('IncomeExpenseHistogram', () => {
               label: 'Expenses',
             }),
             expect.objectContaining({
-              data: [-0, -0, 200, -100, -0],
+              data: [0, 0, 200, -100, 0],
               label: 'Savings',
             }),
           ],

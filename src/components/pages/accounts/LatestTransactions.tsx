@@ -70,7 +70,7 @@ export default function LatestTransactions(): JSX.Element {
               </div>
             );
           })
-        )
+        ) || ''
       }
     </div>
   );

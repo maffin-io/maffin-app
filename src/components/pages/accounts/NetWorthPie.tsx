@@ -20,26 +20,8 @@ export default function NetWorthPie({
   const { data: currency } = API.useMainCurrency();
   const unit = currency?.mnemonic || '';
 
-  let assetsTotal = 0;
-  let liabilitiesTotal = 0;
-  assetsTotal = Object.entries(assetsSeries || {}).reduce(
-    (total, [monthYear, amount]) => {
-      if (DateTime.fromFormat(monthYear, 'MM/yyyy') <= selectedDate) {
-        return total.add(amount);
-      }
-      return total;
-    },
-    new Money(0, unit),
-  ).toNumber();
-  liabilitiesTotal = Object.entries(liabilitiesSeries || {}).reduce(
-    (total, [monthYear, amount]) => {
-      if (DateTime.fromFormat(monthYear, 'MM/yyyy') <= selectedDate) {
-        return total.add(amount);
-      }
-      return total;
-    },
-    new Money(0, unit),
-  ).toNumber() * -1;
+  const assetsTotal = assetsSeries?.[selectedDate.toFormat('MM/yyyy')] || new Money(0, unit);
+  const liabilitiesTotal = liabilitiesSeries?.[selectedDate.toFormat('MM/yyyy')] || new Money(0, unit);
 
   return (
     <>
@@ -49,7 +31,7 @@ export default function NetWorthPie({
           datasets: [
             {
               backgroundColor: ['#06B6D4', '#F97316'],
-              data: [assetsTotal, liabilitiesTotal],
+              data: [assetsTotal.toNumber(), Math.abs(liabilitiesTotal.toNumber())],
             },
           ],
         }}
@@ -75,11 +57,6 @@ export default function NetWorthPie({
                 }
                 return '';
               },
-              font: {
-                weight: 300,
-                family: 'Intervariable',
-                size: 14,
-              },
               padding: 6,
             },
           },
@@ -87,7 +64,9 @@ export default function NetWorthPie({
       />
       <div className="-mt-12">
         <p className="flex justify-center">Net worth</p>
-        <p className="flex justify-center text-xl">{moneyToString(assetsTotal - liabilitiesTotal, unit)}</p>
+        <p className="flex justify-center text-xl">
+          {moneyToString(assetsTotal.toNumber() + liabilitiesTotal.toNumber(), unit)}
+        </p>
       </div>
     </>
   );

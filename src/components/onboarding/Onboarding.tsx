@@ -126,7 +126,7 @@ export default function Onboarding({
                 }}
                 hideDefaults
                 defaultValues={{
-                  name: 'My bank account',
+                  name: 'My bank',
                   parent: accounts.type_asset as Account,
                   type: 'BANK',
                   fk_commodity: useMainCurrency().data as Commodity,
@@ -339,6 +339,7 @@ async function createInitialAccounts(setAccounts: Function, currency: Commodity)
       placeholder: true,
       fk_commodity: currency,
       parent: root,
+      hidden: true,
     }),
   ]);
 
