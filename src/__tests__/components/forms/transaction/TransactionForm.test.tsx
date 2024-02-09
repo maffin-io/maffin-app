@@ -272,7 +272,7 @@ describe('TransactionForm', () => {
       expect(mockSave).toHaveBeenCalledTimes(1);
       expect(swr.mutate).toBeCalledTimes(4);
       expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/account_guid_1');
-      expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/splits/account_guid_2');
+      expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/splits/account_guid_2', undefined);
       expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/monthly-totals', undefined);
       expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/txs/latest', undefined);
     });
@@ -1214,8 +1214,8 @@ describe('TransactionForm', () => {
 
     expect(swr.mutate).toBeCalledTimes(5);
     expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/splits/account_guid_1');
-    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/investments/stock_account');
-    expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/splits/stock_account');
+    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/splits/stock_account', undefined);
+    expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/investments/stock_account', undefined);
     expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/monthly-totals', undefined);
     expect(swr.mutate).toHaveBeenNthCalledWith(5, '/api/txs/latest', undefined);
   });

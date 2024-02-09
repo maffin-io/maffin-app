@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { BiEdit, BiXCircle, BiPlusCircle } from 'react-icons/bi';
 import { DateTime } from 'luxon';
 import { Tooltip } from 'react-tooltip';
+import { useRouter } from 'next/navigation';
 
 import FormButton from '@/components/buttons/FormButton';
 import AccountForm from '@/components/forms/account/AccountForm';
@@ -24,6 +25,7 @@ export default function Header({
 }: HeaderProps): JSX.Element {
   const { data: parent } = useAccount(account.parentId);
   const { data: splits } = useSplits(account.guid);
+  const router = useRouter();
 
   const latestDate = splits?.[0]?.transaction?.date;
   const deletable = splits?.length === 0;
@@ -95,6 +97,9 @@ export default function Header({
                 ...account,
                 parent,
               }}
+              onSave={
+                () => { router.replace('/dashboard/accounts'); }
+              }
             />
           </FormButton>
           {

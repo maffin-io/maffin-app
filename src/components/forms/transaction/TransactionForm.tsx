@@ -148,14 +148,35 @@ async function onSubmit(data: FormValues, action: 'add' | 'update' | 'delete', o
     await transaction.remove();
   }
 
-  transaction.splits.forEach(split => {
-    if (split.account.commodity.namespace !== 'CURRENCY') {
-      mutate(`/api/investments/${split.account.guid}`);
-    }
-    mutate(`/api/splits/${split.account.guid}`);
-  });
-
+  mutateRelatedAccounts(transaction);
   mutate('/api/monthly-totals', undefined);
   mutate('/api/txs/latest', undefined);
   onSave();
+}
+
+/**
+ * Given a transaction, make sure we mutate the related keys to the
+ * splits' accounts.
+ *
+ * - We mutate /api/investment/account.guid
+ * - We mutate /api/splits/account.guid
+ *
+ * For the first split we don't pass undefined because we have a hook
+ * rendered and it will trigger the re-validation. For the non rendered
+ * keys, we must set `undefined` so it re-renders.
+ *
+ * More in https://swr.vercel.app/docs/mutation.en-US#global-mutate
+ */
+function mutateRelatedAccounts(transaction: Transaction) {
+  mutate(`/api/splits/${transaction.splits[0].account.guid}`);
+  if (transaction.splits[0].account.type === 'INVESTMENT') {
+    mutate(`/api/investments/${transaction.splits[0].account.guid}`);
+  }
+
+  transaction.splits.slice(1).forEach(split => {
+    mutate(`/api/splits/${split.account.guid}`, undefined);
+    if (split.account.type === 'INVESTMENT') {
+      mutate(`/api/investments/${split.account.guid}`, undefined);
+    }
+  });
 }

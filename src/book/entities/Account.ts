@@ -6,6 +6,7 @@ import {
   OneToMany,
   RelationId,
   BeforeInsert,
+  BeforeUpdate,
   Tree,
   TreeParent,
   TreeChildren,
@@ -68,6 +69,7 @@ export default class Account extends BaseEntity {
     type!: string;
 
   @BeforeInsert()
+  @BeforeUpdate()
   async setPath() {
     if (this.type === 'ROOT' || this.parent?.type === 'ROOT') {
       this.path = this.name;

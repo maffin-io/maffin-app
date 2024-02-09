@@ -1,4 +1,4 @@
-export { default as getAccounts } from './getAccounts';
+export { getAccounts, getAccount } from './getAccounts';
 export { default as getPrices } from './getPrices';
 
 export { getInvestments, getInvestment } from './getInvestments';

@@ -22,7 +22,7 @@ export function useInvestment(guid: string): SWRResponse<InvestmentAccount> {
       '/api/investments',
       (investments: InvestmentAccount[] | undefined) => {
         if (!investments) {
-          return [result.data];
+          return undefined;
         }
 
         const index = investments.findIndex(i => i.account.guid === result.data.account.guid);

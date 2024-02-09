@@ -40,7 +40,13 @@ describe('useInvestment', () => {
     expect(queries.getInvestment).toBeCalledTimes(1);
   });
 
-  it('modifies useInvestments key', async () => {
+  /**
+   * When useInvestments has not been called yet, we leave it's data as
+   * undefined as it's the only way to make sure to trigger the fetcher
+   * for it.
+   */
+  it('useInvestments is triggered when no data', async () => {
+    jest.spyOn(queries, 'getInvestments').mockResolvedValue([investment]);
     const { result: r } = renderHook(() => useInvestment('guid'));
 
     // wait for the hook to populate the data
@@ -48,11 +54,16 @@ describe('useInvestment', () => {
 
     const { result } = renderHook(() => useInvestments());
 
-    expect(queries.getInvestments).toBeCalledTimes(0);
+    expect(queries.getInvestments).toBeCalledTimes(1);
     await waitFor(() => expect(result.current.data).toEqual([investment]));
   });
 
-  it('appends investment in useInvestments if it doesnt exist yet', async () => {
+  /**
+   * When adding a new investment account, if we modify
+   * the /api/investments/guid key, we want it also to append this new investment
+   * to the general /api/investments
+   */
+  it('appends investment when it doesnt exist in /api/investments', async () => {
     const existingInvestment = { account: { guid: '1' } };
     mutate('/api/investments', [existingInvestment]);
     const { result: r } = renderHook(() => useInvestment('guid'));
@@ -66,7 +77,12 @@ describe('useInvestment', () => {
     await waitFor(() => expect(result.current.data).toEqual([existingInvestment, investment]));
   });
 
-  it('replaces investment in useInvestments if it exists already', async () => {
+  /**
+   * When updating an investment account, we want to make sure that there is
+   * consistency in /api/investments so we replace the already existing one
+   * with the updated one
+   */
+  it('replaces investment when existing in /api/investments', async () => {
     const previousInvestment = { account: { guid: 'guid', type: 'ASSET' } };
     mutate('/api/investments', [previousInvestment]);
     const { result: r } = renderHook(() => useInvestment('guid'));

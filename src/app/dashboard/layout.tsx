@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Modal from 'react-modal';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { useDataSource, DataSourceContext } from '@/hooks';
 import Footer from '@/layout/Footer';
@@ -13,6 +14,18 @@ import useSession from '@/hooks/useSession';
 import { useRouter } from 'next/navigation';
 
 Modal.setAppElement('#modals');
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
+      gcTime: 3600000,
+    },
+  },
+});
 
 export default function DashboardLayout({
   children,
@@ -48,10 +61,12 @@ export default function DashboardLayout({
     <div className="w-full h-full overflow-hidden">
       <LeftSidebar />
       <div className="mt-20 ml-20 p-3 pb-7">
-        <DataSourceContext.Provider value={hookData}>
-          <Topbar />
-          {children}
-        </DataSourceContext.Provider>
+        <QueryClientProvider client={queryClient}>
+          <DataSourceContext.Provider value={hookData}>
+            <Topbar />
+            {children}
+          </DataSourceContext.Provider>
+        </QueryClientProvider>
       </div>
       <Footer />
     </div>
