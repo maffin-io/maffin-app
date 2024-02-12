@@ -1,14 +1,19 @@
 import { renderHook } from '@testing-library/react';
 import * as swrImmutable from 'swr/immutable';
 import * as swr from 'swr';
+import * as query from '@tanstack/react-query';
 import { BareFetcher, SWRResponse } from 'swr';
 
-import { Account, Commodity } from '@/book/entities';
+import { Commodity } from '@/book/entities';
 import { PriceDBMap } from '@/book/prices';
 import * as API from '@/hooks/api';
 import * as queries from '@/lib/queries';
+import { InvestmentAccount } from '@/book/models';
+import { AccountsMap } from '@/types/book';
 
 jest.mock('swr');
+
+jest.mock('@tanstack/react-query');
 
 jest.mock('@/lib/queries');
 
@@ -48,7 +53,7 @@ describe('API', () => {
 
   it.each([
     ['useCommodities', '/api/commodities', jest.spyOn(Commodity, 'find')],
-    ['useAccounts', '/api/accounts', queries.getAccounts],
+    ['useInvestments', '/api/investments', queries.getInvestments],
     ['useStartDate', '/api/start-date', queries.getEarliestDate],
     ['useMainCurrency', '/api/main-currency', queries.getMainCurrency],
     ['useLatestTxs', '/api/txs/latest', queries.getLatestTxs],
@@ -66,7 +71,7 @@ describe('API', () => {
   });
 
   it.each([
-    ['useAccount', '/api/accounts/guid', queries.getAccounts],
+    ['useInvestment', '/api/investments/guid', queries.getInvestment],
     ['useSplits', '/api/splits/guid', queries.getSplits],
   ])('calls useSWRImmutable with expected params for %s', (name, key, f) => {
     // @ts-ignore
@@ -109,8 +114,8 @@ describe('API', () => {
   });
 
   it.each([
-    'useAccount',
-    'useAccounts',
+    'useInvestment',
+    'useInvestments',
     'useCommodity',
     'useCommodities',
   ])('propagates error for %s', (name) => {
@@ -121,15 +126,16 @@ describe('API', () => {
 
   describe('useAccountsMonthlyTotals', () => {
     it('calls useSWRImmutable with expected params for useAccountsMonthlyTotals', () => {
-      const accounts = { a: { guid: 'a' } };
+      const accounts = { a: { guid: 'a' } } as AccountsMap;
       const todayPrices = new PriceDBMap();
+      jest.spyOn(query, 'useQuery')
+        .mockReturnValueOnce({ data: accounts } as query.UseQueryResult<AccountsMap>);
       jest.spyOn(swrImmutable, 'default')
-        .mockReturnValueOnce({ data: accounts } as SWRResponse)
         .mockReturnValueOnce({ data: todayPrices } as SWRResponse);
       renderHook(() => API.useAccountsMonthlyTotals());
 
       expect(swrImmutable.default).toHaveBeenNthCalledWith(
-        3,
+        2,
         '/api/monthly-totals',
         expect.any(Function),
       );
@@ -152,22 +158,30 @@ describe('API', () => {
     });
   });
 
-  describe('useAccounts', () => {
+  describe('useInvestments', () => {
     it('mutates detail keys', () => {
       jest.spyOn(swrImmutable, 'default').mockReturnValue({
-        data: {
-          1: { guid: '1' } as Account,
-          2: { guid: '2' } as Account,
-        },
+        data: [
+          { account: { guid: '1' } } as InvestmentAccount,
+          { account: { guid: '2' } } as InvestmentAccount,
+        ],
       } as SWRResponse);
-      renderHook(() => API.useAccounts());
+      renderHook(() => API.useInvestments());
 
       expect(swrImmutable.default).toBeCalledWith(
-        '/api/accounts',
+        '/api/investments',
         expect.any(Function),
       );
-      expect(swr.mutate).toBeCalledWith('/api/accounts/1', { guid: '1' }, { revalidate: false });
-      expect(swr.mutate).toBeCalledWith('/api/accounts/2', { guid: '2' }, { revalidate: false });
+      expect(swr.mutate).toBeCalledWith(
+        '/api/investments/1',
+        { account: { guid: '1' } },
+        { revalidate: false },
+      );
+      expect(swr.mutate).toBeCalledWith(
+        '/api/investments/2',
+        { account: { guid: '2' } },
+        { revalidate: false },
+      );
     });
   });
 });

@@ -10,7 +10,9 @@ import {
   Tree,
   TreeParent,
   TreeChildren,
+  SaveOptions,
 } from 'typeorm';
+import type { QueryClient } from '@tanstack/react-query';
 
 import {
   isInvestment,
@@ -18,6 +20,7 @@ import {
   ASSET_ACCOUNTS,
   LIABILITY_ACCOUNTS,
 } from '@/book/helpers/accountType';
+import { AccountsMap } from '@/types/book';
 import type Commodity from './Commodity';
 import type Split from './Split';
 import BaseEntity from './BaseEntity';
@@ -138,6 +141,77 @@ export default class Account extends BaseEntity {
     // Placeholders are hierarchical accounts that don't containg
     // transactions, they are just parents of other accounts
     placeholder!: boolean;
+
+  async save(options?: SaveOptions): Promise<this> {
+    const account = await super.save(options);
+
+    const queryClient = Account.getRepository().manager.connection.options.extra?.queryClient;
+    if (queryClient) {
+      updateCache({ queryClient, account: this });
+    }
+
+    return account;
+  }
+
+  async remove(options?: SaveOptions): Promise<this> {
+    const queryClient = Account.getRepository().manager.connection.options.extra?.queryClient;
+    if (queryClient) {
+      updateCache({ queryClient, account: this, isDelete: true });
+    }
+
+    const account = await super.remove(options);
+    return account;
+  }
+}
+
+export async function updateCache(
+  {
+    queryClient,
+    account,
+    isDelete = false,
+  }: {
+    queryClient: QueryClient,
+    account: Account,
+    isDelete?: boolean,
+  },
+) {
+  // We need this to reload childrenIds... haven't explored much
+  // maybe there is a better way.
+  await account.reload();
+
+  queryClient.setQueryData(
+    ['/api/accounts'],
+    (accounts: AccountsMap | undefined) => {
+      if (!accounts) {
+        return undefined;
+      }
+
+      const newAccounts = {
+        ...accounts,
+        [account.guid]: account,
+      };
+
+      if (account.type !== 'ROOT') {
+        const parentAccount = accounts[account.parentId];
+        const index = parentAccount.childrenIds.findIndex((guid: string) => guid === account.guid);
+        if (index < 0) {
+          parentAccount.childrenIds.push(account.guid);
+        } else if (isDelete) {
+          parentAccount.childrenIds.splice(index, 1);
+          delete newAccounts[account.guid];
+        }
+
+        newAccounts[account.parentId] = parentAccount;
+      }
+
+      return newAccounts;
+    },
+  );
+
+  queryClient.setQueryData(
+    ['/api/accounts', { guid: account.guid }],
+    !isDelete ? account : null,
+  );
 }
 
 // https://github.com/typeorm/typeorm/issues/4714

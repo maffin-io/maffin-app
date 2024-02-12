@@ -3,15 +3,14 @@ import { mutate, SWRResponse } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
 import { Commodity } from '@/book/entities';
+import { InvestmentAccount } from '@/book/models';
 import * as queries from '@/lib/queries';
 import type { PriceDBMap } from '@/book/prices';
 import type { AccountsMap } from '@/types/book';
 import type { Split, Transaction } from '@/book/entities';
-import fetcher from './fetcher';
 import { useAccounts } from './useAccounts';
 
-export { useInvestment, useInvestments } from './useInvestments';
-export { useAccount, useAccounts } from './useAccounts';
+export { useAccount, useAccounts } from '@/hooks/api/useAccounts';
 
 export function useStartDate(): SWRResponse<DateTime> {
   const key = '/api/start-date';
@@ -96,6 +95,46 @@ export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
   return result;
 }
 
+export function useInvestment(guid: string): SWRResponse<InvestmentAccount> {
+  const key = `/api/investments/${guid}`;
+
+  const result = useSWRImmutable(
+    key,
+    fetcher(() => queries.getInvestment(guid), key),
+  );
+
+  if (result.error) {
+    throw new Error(result.error);
+  }
+
+  return result;
+}
+
+export function useInvestments(): SWRResponse<InvestmentAccount[]> {
+  const key = '/api/investments';
+
+  const result = useSWRImmutable(
+    key,
+    fetcher(() => queries.getInvestments(), key),
+  );
+
+  if (result.error) {
+    throw new Error(result.error);
+  }
+
+  if (result.data) {
+    result.data.forEach(
+      (investment: InvestmentAccount) => mutate(
+        `/api/investments/${investment.account.guid}`,
+        investment,
+        { revalidate: false },
+      ),
+    );
+  }
+
+  return result;
+}
+
 export function useSplits(guid: string): SWRResponse<Split[]> {
   const key = `/api/splits/${guid}`;
   return useSWRImmutable(
@@ -113,4 +152,14 @@ export function usePrices(c: Commodity | undefined): SWRResponse<PriceDBMap> {
     c?.guid ? key : null,
     fetcher(async () => queries.getPrices({ from: c }), key),
   );
+}
+
+function fetcher(f: () => Promise<any>, key: string) {
+  return async () => {
+    const start = performance.now();
+    const r = await f();
+    const end = performance.now();
+    console.log(`${key}: ${end - start}ms`);
+    return r;
+  };
 }

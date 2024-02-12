@@ -2,6 +2,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { InitSqlJsStatic } from 'sql.js';
 import type { DataSource } from 'typeorm';
 import * as swr from 'swr';
+import * as query from '@tanstack/react-query';
 
 import { Account, Book, Commodity } from '@/book/entities';
 import useDataSource from '@/hooks/useDataSource';
@@ -9,6 +10,7 @@ import * as storageHooks from '@/hooks/useBookStorage';
 import * as gnucash from '@/lib/gnucash';
 import * as queries from '@/lib/queries';
 import type BookStorage from '@/lib/storage/GDriveBookStorage';
+import type { QueryClient } from '@tanstack/react-query';
 
 jest.mock('swr', () => ({
   __esModule: true,
@@ -20,6 +22,8 @@ jest.mock('swr', () => ({
   }),
   mutate: jest.fn(),
 }));
+
+jest.mock('@tanstack/react-query');
 
 jest.mock('@/hooks/useBookStorage', () => ({
   __esModule: true,
@@ -53,6 +57,7 @@ jest.mock('typeorm', () => ({
       },
       runMigrations: jest.fn(),
       initialize: mockInitialize,
+      setOptions: jest.fn(),
       sqljsManager: {
         loadDatabase: jest.fn(),
         exportDatabase: jest.fn().mockReturnValue(new Uint8Array([22, 33])),
@@ -70,6 +75,7 @@ jest.mock('sql.js', () => ({
 
 describe('useDataSource', () => {
   beforeEach(() => {
+    jest.spyOn(query, 'useQueryClient').mockReturnValue({ clear: () => {} } as QueryClient);
     jest.spyOn(storageHooks, 'default').mockReturnValue({ storage: null });
     jest.spyOn(queries, 'getAccounts').mockResolvedValue({
       type_asset: {
@@ -108,7 +114,7 @@ describe('useDataSource', () => {
     expect(datasource.sqljsManager.loadDatabase).toBeCalledTimes(0);
   });
 
-  it('initializes datasource with rawBook if storage available', async () => {
+  it('initializes datasource with rawBook and queryClient if storage available', async () => {
     const rawBook = new Uint8Array([21, 31]);
     const mockStorageGet = jest.fn().mockResolvedValue(rawBook) as typeof BookStorage.prototype.get;
     jest.spyOn(storageHooks, 'default').mockReturnValue({
@@ -135,6 +141,11 @@ describe('useDataSource', () => {
     expect(datasource.initialize).toBeCalledTimes(1);
     expect(datasource.sqljsManager.loadDatabase).toBeCalledTimes(1);
     expect(datasource.sqljsManager.loadDatabase).toHaveBeenCalledWith(rawBook);
+    expect(datasource.setOptions).toBeCalledWith(expect.objectContaining({
+      extra: {
+        queryClient: { clear: expect.any(Function) },
+      },
+    }));
     expect(datasource.runMigrations).toBeCalledTimes(1);
   });
 
