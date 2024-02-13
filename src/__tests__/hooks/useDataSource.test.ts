@@ -62,6 +62,14 @@ jest.mock('typeorm', () => ({
         loadDatabase: jest.fn(),
         exportDatabase: jest.fn().mockReturnValue(new Uint8Array([22, 33])),
       },
+      options: {
+        extra: {
+          queryClient: {
+            setQueryData: jest.fn(),
+            removeQueries: jest.fn(),
+          },
+        },
+      },
     };
   }),
 }));
@@ -176,13 +184,15 @@ describe('useDataSource', () => {
       isLoaded: true,
     });
 
-    expect(swr.mutate).toHaveBeenNthCalledWith(
+    expect(
+      result.current.datasource?.options.extra.queryClient.setQueryData,
+    ).toHaveBeenNthCalledWith(
       1,
-      '/api/main-currency',
+      ['/api/commodities', { guid: 'main' }],
       { mnemonic: 'EUR' },
     );
     expect(swr.mutate).toHaveBeenNthCalledWith(
-      2,
+      1,
       '/api/monthly-totals',
       expect.any(Function),
     );
@@ -283,13 +293,13 @@ describe('useDataSource', () => {
 
         await result.current.save();
         expect(swr.mutate).toHaveBeenNthCalledWith(
-          3,
+          2,
           '/state/save',
           true,
           { revalidate: false },
         );
         expect(swr.mutate).toHaveBeenNthCalledWith(
-          4,
+          3,
           '/state/save',
           false,
           { revalidate: false },
@@ -307,15 +317,6 @@ describe('useDataSource', () => {
       });
 
       it('loads datasource database, mutates and saves', async () => {
-        const mockCacheDelete = jest.fn();
-        jest.spyOn(swr, 'useSWRConfig').mockReturnValue({
-          cache: {
-            keys: jest.fn().mockReturnValue(['/api/accounts/account1', 'key2']),
-            delete: mockCacheDelete,
-            get: jest.fn(),
-            set: jest.fn(),
-          },
-        });
         const { result } = renderHook(() => useDataSource());
 
         await waitFor(() => expect(result.current.isLoaded).toBe(true));
@@ -330,44 +331,41 @@ describe('useDataSource', () => {
         expect(swr.mutate).toBeCalledWith(expect.any(Function), undefined);
         const mockMutate = swr.mutate as jest.Mock;
         // verify the function we pass behaves as expected
-        expect(mockMutate.mock.calls[2][0]('/api/test')).toBe(true);
-        expect(mockMutate.mock.calls[2][0]('/api/asd/asd')).toBe(true);
-        expect(mockMutate.mock.calls[2][0]('/state')).toBe(false);
+        expect(mockMutate.mock.calls[1][0]('/api/test')).toBe(true);
+        expect(mockMutate.mock.calls[1][0]('/api/asd/asd')).toBe(true);
+        expect(mockMutate.mock.calls[1][0]('/state')).toBe(false);
 
-        expect(mockCacheDelete).toBeCalledTimes(1);
-        expect(mockCacheDelete).toBeCalledWith('/api/accounts/account1');
+        expect(
+          result.current.datasource?.options.extra.queryClient.removeQueries,
+        ).toBeCalledWith({
+          queryKey: ['/api/accounts'],
+        });
 
-        // First happens when we load the hook
+        expect(
+          result.current.datasource?.options.extra.queryClient.setQueryData,
+        ).toHaveBeenNthCalledWith(
+          1,
+          ['/api/commodities', { guid: 'main' }],
+          { mnemonic: 'EUR' },
+        );
         expect(swr.mutate).toHaveBeenNthCalledWith(
           1,
-          '/api/main-currency',
-          { mnemonic: 'EUR' },
-        );
-        expect(swr.mutate).toHaveBeenNthCalledWith(
-          2,
           '/api/monthly-totals',
           expect.any(Function),
         );
-
-        // Second happens when we run import (we have to reset with new values)
+        expect(swr.mutate).toHaveBeenNthCalledWith(
+          3,
+          '/api/monthly-totals',
+          expect.any(Function),
+        );
         expect(swr.mutate).toHaveBeenNthCalledWith(
           4,
-          '/api/main-currency',
-          { mnemonic: 'EUR' },
-        );
-        expect(swr.mutate).toHaveBeenNthCalledWith(
-          5,
-          '/api/monthly-totals',
-          expect.any(Function),
-        );
-        expect(swr.mutate).toHaveBeenNthCalledWith(
-          6,
           '/state/save',
           true,
           { revalidate: false },
         );
         expect(swr.mutate).toHaveBeenNthCalledWith(
-          7,
+          5,
           '/state/save',
           false,
           { revalidate: false },

@@ -1,6 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import Money from '@/book/Money';
 import { Account } from '@/book/entities';
@@ -9,6 +10,7 @@ import { InvestmentAccount } from '@/book/models';
 import WeightsChart from '@/components/pages/investments/WeightsChart';
 import Tree from '@/components/charts/Tree';
 import * as apiHook from '@/hooks/api';
+import type { Commodity } from '@/book/entities';
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
@@ -22,6 +24,7 @@ jest.mock('@/components/charts/Tree', () => jest.fn(
 describe('WeightsChart', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
   });
 
   afterEach(() => {

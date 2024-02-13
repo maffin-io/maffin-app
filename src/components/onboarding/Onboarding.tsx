@@ -1,7 +1,6 @@
 import React from 'react';
 import Joyride from 'react-joyride';
 import Image from 'next/image';
-import { mutate } from 'swr';
 
 import { useMainCurrency } from '@/hooks/api';
 import { Account, Commodity, Split } from '@/book/entities';
@@ -20,7 +19,7 @@ type OnboardingProps = {
 export default function Onboarding({
   show = false,
 }: OnboardingProps): JSX.Element {
-  const { save } = React.useContext(DataSourceContext);
+  const { save, datasource } = React.useContext(DataSourceContext);
   const [run] = React.useState(show);
   const [stepIndex, setStepIndex] = React.useState(0);
   const [accounts, setAccounts] = React.useState<{ [key: string]: Account }>({});
@@ -60,10 +59,9 @@ export default function Onboarding({
               <div className="flex justify-center">
                 <CurrencyForm
                   onSave={async (currency: Commodity) => {
-                    mutate(
-                      '/api/main-currency',
+                    datasource?.options.extra?.queryClient.setQueryData(
+                      [Commodity.CACHE_KEY, { guid: 'main' }],
                       currency,
-                      { revalidate: false },
                     );
                     await createInitialAccounts(setAccounts, currency);
                     save();
@@ -117,7 +115,6 @@ export default function Onboarding({
               </span>
               <AccountForm
                 onSave={(account: Account) => {
-                  mutate('/api/start-date');
                   setAccounts({
                     ...accounts,
                     bank: account,
@@ -315,7 +312,7 @@ async function createInitialAccounts(setAccounts: Function, currency: Commodity)
     }).save(),
   });
 
-  await Account.insert([
+  await Promise.all([
     Account.create({
       name: 'Liabilities',
       type: 'LIABILITY',
@@ -323,7 +320,7 @@ async function createInitialAccounts(setAccounts: Function, currency: Commodity)
       placeholder: true,
       fk_commodity: currency,
       parent: root,
-    }),
+    }).save(),
     Account.create({
       name: 'Income',
       type: 'INCOME',
@@ -331,7 +328,7 @@ async function createInitialAccounts(setAccounts: Function, currency: Commodity)
       placeholder: true,
       fk_commodity: currency,
       parent: root,
-    }),
+    }).save(),
     Account.create({
       name: 'Equity',
       type: 'EQUITY',
@@ -340,10 +337,10 @@ async function createInitialAccounts(setAccounts: Function, currency: Commodity)
       fk_commodity: currency,
       parent: root,
       hidden: true,
-    }),
+    }).save(),
   ]);
 
-  await Account.insert([
+  await Promise.all([
     Account.create({
       name: `Opening balances - ${currency.mnemonic}`,
       type: 'EQUITY',
@@ -351,14 +348,14 @@ async function createInitialAccounts(setAccounts: Function, currency: Commodity)
       placeholder: false,
       fk_commodity: currency,
       parent: await Account.findOneByOrFail({ type: 'EQUITY' }),
-    }),
+    }).save(),
     Account.create({
       name: 'Salary',
       type: 'INCOME',
       placeholder: false,
       fk_commodity: currency,
       parent: await Account.findOneByOrFail({ type: 'INCOME' }),
-    }),
+    }).save(),
     Account.create({
       name: 'Electricity',
       type: 'EXPENSE',
@@ -366,7 +363,7 @@ async function createInitialAccounts(setAccounts: Function, currency: Commodity)
       placeholder: false,
       fk_commodity: currency,
       parent: expensesAccount,
-    }),
+    }).save(),
     Account.create({
       name: 'Water',
       type: 'EXPENSE',
@@ -374,8 +371,6 @@ async function createInitialAccounts(setAccounts: Function, currency: Commodity)
       placeholder: false,
       fk_commodity: currency,
       parent: expensesAccount,
-    }),
+    }).save(),
   ]);
-
-  mutate('/api/accounts');
 }

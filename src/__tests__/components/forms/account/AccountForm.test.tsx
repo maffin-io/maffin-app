@@ -420,9 +420,7 @@ describe('AccountForm', () => {
       },
     ]);
 
-    expect(swr.mutate).toBeCalledTimes(2);
-    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/monthly-totals', undefined);
-    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/txs/latest', undefined);
+    expect(swr.mutate).toBeCalledWith('/api/monthly-totals', undefined);
   });
 
   it.each([

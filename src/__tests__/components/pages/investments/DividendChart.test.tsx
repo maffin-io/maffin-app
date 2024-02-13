@@ -2,12 +2,14 @@ import React from 'react';
 import { DateTime } from 'luxon';
 import { render, act } from '@testing-library/react';
 import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import Money from '@/book/Money';
 import { InvestmentAccount } from '@/book/models';
 import Bar from '@/components/charts/Bar';
 import { DividendChart } from '@/components/pages/investments';
 import * as apiHook from '@/hooks/api';
+import type { Commodity } from '@/book/entities';
 
 jest.mock('@/components/charts/Bar', () => jest.fn(
   () => <div data-testid="Bar" />,
@@ -23,7 +25,7 @@ describe('DividendChart', () => {
 
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(now as DateTime<true>);
-    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
     jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
@@ -32,7 +34,7 @@ describe('DividendChart', () => {
   });
 
   it('creates Bar with no data', () => {
-    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
 
     render(
       <DividendChart />,

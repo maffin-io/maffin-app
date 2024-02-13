@@ -2,11 +2,13 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { DateTime } from 'luxon';
 import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import Money from '@/book/Money';
 import Bar from '@/components/charts/Bar';
 import NetWorthHistogram from '@/components/pages/accounts/NetWorthHistogram';
 import * as apiHook from '@/hooks/api';
+import type { Commodity } from '@/book/entities';
 
 jest.mock('@/components/charts/Bar', () => jest.fn(
   () => <div data-testid="Bar" />,
@@ -21,6 +23,7 @@ describe('NetWorthHistogram', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02') as DateTime<true>);
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
   });
 
   afterEach(() => {

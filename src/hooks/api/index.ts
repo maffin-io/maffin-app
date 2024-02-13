@@ -32,12 +32,11 @@ export function useStartDate(): UseQueryResult<DateTime> {
   });
 }
 
-export function useMainCurrency(): SWRResponse<Commodity> {
-  const key = '/api/main-currency';
-  return useSWRImmutable(
-    key,
-    fetcher(queries.getMainCurrency, key),
-  );
+export function useMainCurrency(): UseQueryResult<Commodity> {
+  return useQuery({
+    queryKey: [Commodity.CACHE_KEY, { guid: 'main' }],
+    queryFn: fetcher(queries.getMainCurrency, `${Commodity.CACHE_KEY}/main`),
+  });
 }
 
 export function useLatestTxs(): UseQueryResult<Transaction[]> {

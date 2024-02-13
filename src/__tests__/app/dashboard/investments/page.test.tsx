@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import { Commodity } from '@/book/entities';
 import InvestmentsPage from '@/app/dashboard/investments/page';
@@ -43,7 +44,7 @@ jest.mock('@/components/Loading', () => jest.fn(
 describe('InvestmentsPage', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as SWRResponse);
-    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
   });
 
   afterEach(() => {
@@ -80,7 +81,7 @@ describe('InvestmentsPage', () => {
     } as InvestmentAccount;
 
     jest.spyOn(apiHook, 'useInvestments').mockReturnValueOnce({ data: [investment1] } as SWRResponse);
-    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValueOnce({ data: mainCurrency } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: mainCurrency } as UseQueryResult<Commodity>);
 
     const { container } = render(<InvestmentsPage />);
 
@@ -153,7 +154,7 @@ describe('InvestmentsPage', () => {
     } as InvestmentAccount;
 
     jest.spyOn(apiHook, 'useInvestments').mockReturnValueOnce({ data: [investment1] } as SWRResponse);
-    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValueOnce({ data: mainCurrency } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: mainCurrency } as UseQueryResult<Commodity>);
 
     const { container } = render(<InvestmentsPage />);
 
