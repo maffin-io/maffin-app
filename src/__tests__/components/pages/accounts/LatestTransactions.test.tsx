@@ -1,10 +1,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { DateTime } from 'luxon';
-import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import { LatestTransactions } from '@/components/pages/accounts';
 import * as apiHook from '@/hooks/api';
+import type { Transaction } from '@/book/entities';
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
@@ -13,7 +14,7 @@ jest.mock('@/hooks/api', () => ({
 
 describe('LatestTransactions', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useLatestTxs').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useLatestTxs').mockReturnValue({ data: undefined } as UseQueryResult<Transaction[]>);
   });
 
   it('renders with empty txs', () => {
@@ -65,7 +66,7 @@ describe('LatestTransactions', () => {
           ],
         },
       ],
-    } as SWRResponse);
+    } as UseQueryResult<Transaction[]>);
     const { container } = render(<LatestTransactions />);
 
     screen.getByText('Account 1');
@@ -108,7 +109,7 @@ describe('LatestTransactions', () => {
           ],
         },
       ],
-    } as SWRResponse);
+    } as UseQueryResult<Transaction[]>);
     const { container } = render(<LatestTransactions />);
 
     screen.getByText('Account 1');
