@@ -17,14 +17,14 @@ import Loading from '@/components/Loading';
 import DateRangeInput from '@/components/DateRangeInput';
 import Onboarding from '@/components/onboarding/Onboarding';
 import * as API from '@/hooks/api';
+import mapAccounts from '@/helpers/mapAccounts';
 
 const NetWorthHistogram = dynamic(() => import('@/components/pages/accounts/NetWorthHistogram'), { ssr: false });
 const IncomeExpenseHistogram = dynamic(() => import('@/components/pages/accounts/IncomeExpenseHistogram'), { ssr: false });
 
 export default function AccountsPage(): JSX.Element {
   const { data: earliestDate } = API.useStartDate();
-  let { data: accounts } = API.useAccounts();
-  const { isLoading } = API.useAccounts();
+  const { data, isLoading } = API.useAccounts();
 
   const [selectedDate, setSelectedDate] = React.useState(DateTime.now());
 
@@ -38,8 +38,8 @@ export default function AccountsPage(): JSX.Element {
     );
   }
 
-  accounts = accounts || { root: { childrenIds: [] } };
-  const showOnboarding = Object.keys(accounts).length <= 2;
+  const accountsMap = mapAccounts(data);
+  const showOnboarding = Object.keys(accountsMap).length <= 2;
 
   return (
     <>
@@ -100,7 +100,9 @@ export default function AccountsPage(): JSX.Element {
           </div>
           <div className="card col-span-4">
             <MonthlyTotalHistogram
-              accounts={accounts?.type_income?.childrenIds.map((guid: string) => accounts?.[guid])}
+              accounts={
+                accountsMap?.type_income?.childrenIds.map((guid: string) => accountsMap?.[guid])
+              }
               title="Income"
               selectedDate={selectedDate}
             />
@@ -113,7 +115,9 @@ export default function AccountsPage(): JSX.Element {
           </div>
           <div className="card col-span-4">
             <MonthlyTotalHistogram
-              accounts={accounts?.type_expense?.childrenIds.map((guid: string) => accounts?.[guid])}
+              accounts={
+                accountsMap?.type_expense?.childrenIds.map((guid: string) => accountsMap?.[guid])
+              }
               title="Expenses"
               selectedDate={selectedDate}
             />

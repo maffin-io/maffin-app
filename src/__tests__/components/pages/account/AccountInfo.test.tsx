@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { DateTime } from 'luxon';
-import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import {
   AccountInfo,
@@ -10,7 +10,7 @@ import {
 } from '@/components/pages/account';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import * as apiHook from '@/hooks/api';
-import type { Account } from '@/book/entities';
+import type { Account, Split } from '@/book/entities';
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
@@ -32,7 +32,7 @@ jest.mock('@/components/StatisticsWidget', () => jest.fn(
 describe('AccountInfo', () => {
   let account: Account;
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as UseQueryResult<Split[]>);
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-03-01') as DateTime<true>);
     account = {
       guid: 'guid',
@@ -102,7 +102,7 @@ describe('AccountInfo', () => {
           quantity: 50,
         },
       ],
-    } as SWRResponse);
+    } as UseQueryResult<Split[]>);
 
     render(
       <AccountInfo account={account} />,

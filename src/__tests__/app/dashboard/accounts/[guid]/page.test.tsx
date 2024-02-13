@@ -4,7 +4,7 @@ import {
   render,
   screen,
 } from '@testing-library/react';
-import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import AccountPage from '@/app/dashboard/accounts/[guid]/page';
 import FormButton from '@/components/buttons/FormButton';
@@ -57,8 +57,8 @@ jest.mock('@/components/Loading', () => jest.fn(
 describe('AccountPage', () => {
   beforeEach(() => {
     jest.spyOn(Split, 'create').mockReturnValue({ guid: 'createdSplit' } as Split);
-    jest.spyOn(apiHook, 'useAccount').mockReturnValue({ data: undefined } as SWRResponse);
-    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccount').mockReturnValue({ data: undefined } as UseQueryResult<Account>);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as UseQueryResult<Split[]>);
   });
 
   afterEach(() => {
@@ -66,7 +66,7 @@ describe('AccountPage', () => {
   });
 
   it('displays loading while accounts is empty', async () => {
-    jest.spyOn(apiHook, 'useAccount').mockReturnValue({ isLoading: true } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccount').mockReturnValue({ isLoading: true } as UseQueryResult<Account>);
     const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
 
     await screen.findByTestId('Loading');
@@ -113,8 +113,8 @@ describe('AccountPage', () => {
       } as Split,
     ];
 
-    jest.spyOn(apiHook, 'useAccount').mockReturnValueOnce({ data: account } as SWRResponse);
-    jest.spyOn(apiHook, 'useSplits').mockReturnValueOnce({ data: splits } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccount').mockReturnValueOnce({ data: account } as UseQueryResult<Account>);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValueOnce({ data: splits } as UseQueryResult<Split[]>);
 
     const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
 
@@ -212,8 +212,8 @@ describe('AccountPage', () => {
       parentId: 'parent',
     } as Account;
 
-    jest.spyOn(apiHook, 'useAccount').mockReturnValueOnce({ data: account } as SWRResponse);
-    jest.spyOn(apiHook, 'useSplits').mockReturnValueOnce({ data: [] } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccount').mockReturnValueOnce({ data: account } as UseQueryResult<Account>);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValueOnce({ data: [] as Split[] } as UseQueryResult<Split[]>);
 
     render(<AccountPage params={{ guid: 'guid' }} />);
 

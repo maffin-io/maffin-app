@@ -5,9 +5,10 @@ import {
   screen,
 } from '@testing-library/react';
 import type { LinkProps } from 'next/link';
-import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import {
+  Account,
   Commodity,
   Split,
   Transaction,
@@ -16,7 +17,6 @@ import Table from '@/components/Table';
 import { TransactionsTable } from '@/components/pages/account';
 import FormButton from '@/components/buttons/FormButton';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
-import type { AccountsMap } from '@/types/book';
 import * as apiHook from '@/hooks/api';
 
 jest.mock('next/link', () => jest.fn(
@@ -51,7 +51,7 @@ jest.mock('@/hooks/api', () => ({
 
 describe('TransactionsTable', () => {
   let eur: Commodity;
-  let accounts: AccountsMap;
+  let accounts: Account[];
   let split: Split;
 
   beforeEach(async () => {
@@ -61,25 +61,32 @@ describe('TransactionsTable', () => {
       mnemonic: 'EUR',
     } as Commodity;
 
-    accounts = {
-      account_guid_1: {
+    accounts = [
+      {
         guid: 'account_guid_1',
         name: 'bank',
+        parentId: 'root',
         type: 'ASSET',
         commodity: eur,
         path: 'Assets:bank',
       },
-      account_guid_2: {
+      {
         guid: 'account_guid_2',
         name: 'expense',
+        parentId: 'root',
         type: 'EXPENSE',
         path: 'Expenses:expense',
         commodity: eur,
       },
-    };
+      {
+        guid: 'root',
+        name: 'root',
+        type: 'ROOT',
+      },
+    ] as Account[];
 
     split = new Split();
-    split.fk_account = accounts.account_guid_1;
+    [split.fk_account] = accounts;
     split.guid = 'split_guid_1';
     split.value = 100;
     split.quantity = 100;
@@ -91,7 +98,7 @@ describe('TransactionsTable', () => {
     splitA.quantity = split.quantity;
 
     const splitB = new Split();
-    splitB.fk_account = accounts.account_guid_2;
+    [, splitB.fk_account] = accounts;
     splitB.guid = 'splits_guid_2';
     splitB.value = -100;
     splitB.quantity = -100;
@@ -106,8 +113,8 @@ describe('TransactionsTable', () => {
       splits: [splitA, splitB],
     } as Transaction;
 
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: accounts } as SWRResponse);
-    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: [split] } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: accounts } as UseQueryResult<Account[]>);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: [split] } as UseQueryResult<Split[]>);
   });
 
   afterEach(async () => {
@@ -115,10 +122,10 @@ describe('TransactionsTable', () => {
   });
 
   it('creates empty Table with expected params', async () => {
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
-    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as UseQueryResult<Split[]>);
 
-    render(<TransactionsTable account={accounts.account_guid_1} />);
+    render(<TransactionsTable account={accounts[0]} />);
 
     await screen.findByTestId('Table');
     expect(Table).toHaveBeenLastCalledWith(
@@ -168,7 +175,7 @@ describe('TransactionsTable', () => {
   it('creates Table with expected params', async () => {
     render(
       <TransactionsTable
-        account={accounts.account_guid_1}
+        account={accounts[0]}
       />,
     );
 
@@ -216,7 +223,7 @@ describe('TransactionsTable', () => {
   });
 
   it('renders Date column as expected', async () => {
-    render(<TransactionsTable account={accounts.account_guid_1} />);
+    render(<TransactionsTable account={accounts[0]} />);
 
     await screen.findByTestId('Table');
     const dateCol = TableMock.mock.calls[0][0].columns[0];
@@ -240,7 +247,7 @@ describe('TransactionsTable', () => {
   });
 
   it('renders FromTo column as expected', async () => {
-    render(<TransactionsTable account={accounts.account_guid_1} />);
+    render(<TransactionsTable account={accounts[0]} />);
 
     await screen.findByTestId('Table');
     const fromToCol = TableMock.mock.calls[0][0].columns[2];
@@ -259,7 +266,7 @@ describe('TransactionsTable', () => {
   });
 
   it('renders Amount column as expected', async () => {
-    render(<TransactionsTable account={accounts.account_guid_1} />);
+    render(<TransactionsTable account={accounts[0]} />);
 
     await screen.findByTestId('Table');
     const amountCol = TableMock.mock.calls[0][0].columns[3];
@@ -291,7 +298,7 @@ describe('TransactionsTable', () => {
   it('renders Total column as expected', async () => {
     render(
       <TransactionsTable
-        account={accounts.account_guid_1}
+        account={accounts[0]}
       />,
     );
 
@@ -304,14 +311,14 @@ describe('TransactionsTable', () => {
       original: {
         guid: 'split0',
         quantity: 100,
-        account: accounts.account_guid_1,
+        account: accounts[0],
       },
     };
     const row2 = {
       original: {
         guid: 'split1',
         quantity: 150,
-        account: accounts.account_guid_1,
+        account: accounts[0],
       },
     };
     const { container } = render(
@@ -330,7 +337,7 @@ describe('TransactionsTable', () => {
   it('renders Actions column as expected', async () => {
     render(
       <TransactionsTable
-        account={accounts.account_guid_1}
+        account={accounts[0]}
       />,
     );
 

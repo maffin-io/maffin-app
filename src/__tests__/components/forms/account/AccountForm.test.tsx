@@ -8,7 +8,6 @@ import {
 import userEvent from '@testing-library/user-event';
 import { DataSource } from 'typeorm';
 import * as swr from 'swr';
-import type { SWRResponse } from 'swr';
 import * as navigation from 'next/navigation';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import type { UseQueryResult } from '@tanstack/react-query';
@@ -23,7 +22,6 @@ import {
 } from '@/book/entities';
 import AccountForm from '@/components/forms/account/AccountForm';
 import * as apiHook from '@/hooks/api';
-import type { AccountsMap } from '@/types/book';
 
 jest.mock('swr');
 
@@ -80,10 +78,10 @@ describe('AccountForm', () => {
     assetAccount.path = 'Assets';
     expenseAccount.path = 'Expenses';
 
-    jest.spyOn(apiHook, 'useCommodities').mockReturnValue({ data: [eur] } as SWRResponse);
+    jest.spyOn(apiHook, 'useCommodities').mockReturnValue({ data: [eur] } as UseQueryResult<Commodity[]>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({
-      data: { root, assetAccount, expenseAccount } as AccountsMap,
-    } as UseQueryResult<AccountsMap>);
+      data: [root, assetAccount, expenseAccount],
+    } as UseQueryResult<Account[]>);
   });
 
   afterEach(async () => {
@@ -217,13 +215,13 @@ describe('AccountForm', () => {
     stockAccount.path = 'Assets:Stock';
 
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({
-      data: {
+      data: [
         root,
         assetAccount,
         expenseAccount,
         stockAccount,
-      } as AccountsMap,
-    } as UseQueryResult<AccountsMap>);
+      ],
+    } as UseQueryResult<Account[]>);
 
     render(
       <AccountForm
@@ -453,14 +451,14 @@ describe('AccountForm', () => {
     bankAccount.path = 'Assets:Bank';
 
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({
-      data: {
+      data: [
         root,
         assetAccount,
         expenseAccount,
         incomeAccount,
         bankAccount,
-      } as AccountsMap,
-    } as UseQueryResult<AccountsMap>);
+      ],
+    } as UseQueryResult<Account[]>);
 
     const user = userEvent.setup();
     render(

@@ -8,6 +8,7 @@ import { DateTime } from 'luxon';
 import userEvent from '@testing-library/user-event';
 import { useForm } from 'react-hook-form';
 import type { SWRResponse } from 'swr';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import MainSplit from '@/components/forms/transaction/MainSplit';
 import * as queries from '@/lib/queries';
@@ -39,7 +40,7 @@ describe('MainSplit', () => {
 
     jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
     jest.spyOn(apiHook, 'useAccounts')
-      .mockReturnValue({ data: undefined } as SWRResponse);
+      .mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
     // @ts-ignore
     jest.spyOn(Price, 'create').mockReturnValue({ value: 1 });
   });

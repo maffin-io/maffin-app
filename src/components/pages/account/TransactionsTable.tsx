@@ -19,6 +19,7 @@ import * as API from '@/hooks/api';
 import type { Commodity } from '@/book/entities';
 import { isAsset } from '@/book/helpers';
 import { isLiability } from '@/book/helpers/accountType';
+import mapAccounts from '@/helpers/mapAccounts';
 
 export type TransactionsTableProps = {
   account: Account,
@@ -27,10 +28,10 @@ export type TransactionsTableProps = {
 export default function TransactionsTable({
   account,
 }: TransactionsTableProps): JSX.Element {
-  let { data: accounts } = API.useAccounts();
+  const { data } = API.useAccounts();
   let { data: splits } = API.useSplits(account.guid);
 
-  accounts = accounts || { root: { childrenIds: [] } };
+  const accounts = mapAccounts(data);
   splits = splits || [];
 
   columns[2].cell = FromToAccountPartial(accounts);

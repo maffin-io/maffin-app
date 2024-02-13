@@ -1,12 +1,12 @@
 import { waitFor } from '@testing-library/react';
-import { DataSource, BaseEntity } from 'typeorm';
-import type { AccountsMap } from '@/types/book';
+import { DataSource, BaseEntity as BE } from 'typeorm';
 
 import {
   Account,
   Commodity,
   Split,
   Transaction,
+  BaseEntity,
 } from '../../entities';
 
 describe('Account', () => {
@@ -185,14 +185,12 @@ describe('caching', () => {
   let datasource: DataSource;
   let root: Account;
   let eur: Commodity;
-  let accountsCache: AccountsMap;
 
   beforeEach(async () => {
-    accountsCache = {};
     mockSetQueryData = jest.fn()
-      .mockImplementation((_: string, callback: Account | Function): AccountsMap | Account => {
+      .mockImplementation((_: string, callback: Account | Function): Account[] | Account => {
         if (callback instanceof Function) {
-          return callback(accountsCache);
+          return callback(undefined);
         }
 
         return root;
@@ -218,6 +216,11 @@ describe('caching', () => {
       mnemonic: 'EUR',
     }).save();
 
+    // @ts-ignore
+    jest.spyOn(BaseEntity.prototype, 'save').mockImplementation(BE.prototype.save);
+    // @ts-ignore
+    jest.spyOn(BaseEntity.prototype, 'remove').mockImplementation(BE.prototype.remove);
+
     root = await Account.create({
       name: 'Root',
       type: 'ROOT',
@@ -228,129 +231,60 @@ describe('caching', () => {
     jest.clearAllMocks();
   });
 
-  describe('add', () => {
-    it('calls setQueryData with expected params', async () => {
-      await waitFor(() => expect(mockSetQueryData).toBeCalledTimes(2));
-      expect(mockSetQueryData).toHaveBeenNthCalledWith(
-        1,
-        ['/api/accounts'],
-        expect.any(Function),
-      );
-      expect(mockSetQueryData).toHaveBeenNthCalledWith(
-        2,
-        ['/api/accounts', { guid: root.guid }],
-        root,
-      );
+  it('returns empty accounts map when /api/accounts is undefined', async () => {
+    await waitFor(() => expect(mockSetQueryData.mock.results[0].value).toBeUndefined());
+  });
 
-      expect(mockSetQueryData.mock.results[0].value).toEqual({ [root.guid]: root });
-    });
+  it('adds account to parent childrenIds /api/accounts', async () => {
+    mockSetQueryData
+      .mockImplementation((_: string, callback: Account | Function): Account[] | Account => {
+        if (callback instanceof Function) {
+          return callback([root]);
+        }
 
-    it('returns empty accounts map when /api/accounts is undefined', async () => {
-      mockSetQueryData
-        .mockImplementation((_: string, callback: Account | Function): AccountsMap | Account => {
-          if (callback instanceof Function) {
-            return callback(undefined);
-          }
+        return root;
+      })
+      .mockName('setQueryData');
 
-          return root;
-        })
-        .mockName('setQueryData');
+    // Wait for the first updateCache to execute so we don't have race conditions
+    await waitFor(() => expect(mockSetQueryData.mock.results).toHaveLength(1));
 
-      await waitFor(() => expect(mockSetQueryData.mock.results[0].value).toBeUndefined());
-    });
+    const account = await Account.create({
+      name: 'name',
+      type: 'ASSET',
+      parent: root,
+      fk_commodity: eur,
+    }).save();
 
-    it('adds account to existing /api/accounts', async () => {
-      mockSetQueryData
-        .mockImplementation((_: string, callback: Account | Function): AccountsMap | Account => {
-          if (callback instanceof Function) {
-            return callback({ [root.guid]: root });
-          }
+    await waitFor(() => expect(mockSetQueryData.mock.results).toHaveLength(2));
+    const result = mockSetQueryData.mock.results[1].value;
+    expect(result[0].childrenIds).toContain(account.guid);
+  });
 
-          return root;
-        })
-        .mockName('setQueryData');
+  it('deletes account in /api/accounts', async () => {
+    mockSetQueryData
+      .mockImplementation((_: string, callback: Account | Function): Account[] | Account => {
+        if (callback instanceof Function) {
+          return callback([root]);
+        }
 
-      // Wait for the first updateCache to execute so we don't have race conditions
-      await waitFor(() => expect(mockSetQueryData.mock.results).toHaveLength(2));
+        return root;
+      })
+      .mockName('setQueryData');
 
-      const account = await Account.create({
-        name: 'name',
-        type: 'ASSET',
-        parent: root,
-        fk_commodity: eur,
-      }).save();
+    const account = await Account.create({
+      name: 'name',
+      type: 'ASSET',
+      parent: root,
+      fk_commodity: eur,
+    }).save();
 
-      await waitFor(() => expect(mockSetQueryData.mock.results).toHaveLength(4));
-      const result = mockSetQueryData.mock.results[2].value;
-      await waitFor(() => expect(result).toEqual({
-        [root.guid]: root,
-        [account.guid]: account,
-      }));
-      expect(result[root.guid].childrenIds).toContain(account.guid);
-    });
+    await waitFor(() => expect(mockSetQueryData.mock.results).toHaveLength(2));
 
-    it('updates existing account in /api/accounts', async () => {
-      mockSetQueryData
-        .mockImplementation((_: string, callback: Account | Function): AccountsMap | Account => {
-          if (callback instanceof Function) {
-            return callback({ [root.guid]: root });
-          }
+    await account.remove();
 
-          return root;
-        })
-        .mockName('setQueryData');
-
-      // Wait for the first updateCache to execute so we don't have race conditions
-      await waitFor(() => expect(mockSetQueryData.mock.results).toHaveLength(2));
-
-      root.name = 'hello';
-      await root.save();
-
-      await waitFor(() => expect(mockSetQueryData.mock.results).toHaveLength(4));
-      const result = mockSetQueryData.mock.results[2].value;
-      expect(result[root.guid].name).toEqual('hello');
-      expect(result[root.guid].path).toEqual('hello');
-    });
-
-    it('deletes account in /api/accounts', async () => {
-      mockSetQueryData
-        .mockImplementation((_: string, callback: Account | Function): AccountsMap | Account => {
-          if (callback instanceof Function) {
-            return callback({ [root.guid]: root });
-          }
-
-          return root;
-        })
-        .mockName('setQueryData');
-
-      const account = await Account.create({
-        name: 'name',
-        type: 'ASSET',
-        parent: root,
-        fk_commodity: eur,
-      }).save();
-
-      await waitFor(() => expect(mockSetQueryData.mock.results[2].value).toEqual({
-        [root.guid]: root,
-        [account.guid]: account,
-      }));
-
-      // need to do this because 'remove' sets guid to undefined
-      const accountGuid = account.guid;
-      await account.remove();
-
-      await waitFor(() => expect(mockSetQueryData.mock.results).toHaveLength(6));
-      const result = mockSetQueryData.mock.results[4].value;
-      await waitFor(() => expect(result).toEqual({
-        [root.guid]: root,
-      }));
-      expect(result[root.guid].childrenIds).toHaveLength(0);
-
-      expect(mockSetQueryData).toHaveBeenNthCalledWith(
-        6,
-        ['/api/accounts', { guid: accountGuid }],
-        null,
-      );
-    });
+    await waitFor(() => expect(mockSetQueryData.mock.results).toHaveLength(3));
+    const result = mockSetQueryData.mock.results[2].value;
+    expect(result[0].childrenIds).toHaveLength(0);
   });
 });

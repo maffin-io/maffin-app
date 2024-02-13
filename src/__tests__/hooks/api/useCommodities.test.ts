@@ -1,20 +1,20 @@
 import { renderHook } from '@testing-library/react';
 import * as query from '@tanstack/react-query';
 
-import { useAccount, useAccounts } from '@/hooks/api';
-import { Account } from '@/book/entities';
+import { useCommodity, useCommodities } from '@/hooks/api';
+import { Commodity } from '@/book/entities';
 
 jest.mock('@tanstack/react-query');
 
-describe('useAccount', () => {
-  let account: Account;
+describe('useCommodity', () => {
+  let commodity: Commodity;
 
   beforeEach(() => {
-    account = {
+    commodity = {
       guid: 'guid',
-    } as Account;
+    } as Commodity;
     // @ts-ignore
-    jest.spyOn(Account, 'findOneBy').mockResolvedValue(account);
+    jest.spyOn(Commodity, 'findOneBy').mockResolvedValue(commodity);
     jest.spyOn(query, 'useQuery');
   });
 
@@ -23,31 +23,31 @@ describe('useAccount', () => {
   });
 
   it('calls query as expected', async () => {
-    renderHook(() => useAccount('guid'));
+    renderHook(() => useCommodity('guid'));
 
     expect(query.useQuery).toBeCalledWith({
-      queryKey: ['/api/accounts', { guid: 'guid' }],
+      queryKey: ['/api/commodities', { guid: 'guid' }],
       queryFn: expect.any(Function),
     });
 
     const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];
     callArgs.queryFn();
-    expect(Account.findOneBy).toBeCalledWith({ guid: 'guid' });
+    expect(Commodity.findOneBy).toBeCalledWith({ guid: 'guid' });
   });
 });
 
-describe('useAccounts', () => {
-  let account1: Account;
-  let account2: Account;
+describe('useCommodities', () => {
+  let commodity1: Commodity;
+  let commodity2: Commodity;
 
   beforeEach(() => {
-    account1 = {
+    commodity1 = {
       guid: 'guid1',
-    } as Account;
-    account2 = {
+    } as Commodity;
+    commodity2 = {
       guid: 'guid2',
-    } as Account;
-    jest.spyOn(Account, 'find').mockResolvedValue([account1, account2]);
+    } as Commodity;
+    jest.spyOn(Commodity, 'find').mockResolvedValue([commodity1, commodity2]);
     jest.spyOn(query, 'useQuery');
   });
 
@@ -56,15 +56,15 @@ describe('useAccounts', () => {
   });
 
   it('calls query as expected', async () => {
-    renderHook(() => useAccounts());
+    renderHook(() => useCommodities());
 
     expect(query.useQuery).toBeCalledWith({
-      queryKey: ['/api/accounts'],
+      queryKey: ['/api/commodities'],
       queryFn: expect.any(Function),
     });
 
     const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];
     callArgs.queryFn();
-    expect(Account.find).toBeCalledWith();
+    expect(Commodity.find).toBeCalledWith();
   });
 });

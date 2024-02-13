@@ -5,6 +5,7 @@ import {
 } from '@testing-library/react';
 import { DateTime } from 'luxon';
 import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import type { Account } from '@/book/entities';
 import AccountsPage from '@/app/dashboard/accounts/page';
@@ -79,7 +80,7 @@ describe('AccountsPage', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02') as DateTime<true>);
     jest.spyOn(apiHook, 'useStartDate').mockReturnValue({ data: undefined } as SWRResponse);
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
   });
 
   afterEach(() => {
@@ -87,7 +88,7 @@ describe('AccountsPage', () => {
   });
 
   it('shows loading when loading data', async () => {
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ isLoading: true } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ isLoading: true } as UseQueryResult<Account[]>);
     render(<AccountsPage />);
 
     await screen.findByTestId('Loading');
@@ -196,54 +197,58 @@ describe('AccountsPage', () => {
   });
 
   it('passes data as expected when available', async () => {
-    const accounts = {
-      root: {
+    const accounts = [
+      {
         guid: 'root',
         name: 'Root',
         type: 'ROOT',
         childrenIds: ['a3', 'a5'],
       } as Account,
-      type_expense: {
+      {
         guid: 'a3',
         name: 'Expenses',
         commodity: {
           mnemonic: 'EUR',
         },
         type: 'EXPENSE',
+        parentId: 'root',
         childrenIds: ['a4'] as string[],
       } as Account,
-      a4: {
+      {
         guid: 'a4',
         name: 'Groceries',
         commodity: {
           mnemonic: 'EUR',
         },
         type: 'EXPENSE',
+        parentId: 'a3',
         childrenIds: [] as string[],
       } as Account,
-      type_income: {
+      {
         guid: 'a5',
         name: 'Income',
+        parentId: 'root',
         commodity: {
           mnemonic: 'EUR',
         },
         type: 'INCOME',
         childrenIds: ['a6'] as string[],
       } as Account,
-      a6: {
+      {
         guid: 'a6',
         name: 'Salary',
         commodity: {
           mnemonic: 'EUR',
         },
+        parentId: 'a5',
         type: 'INCOME',
         childrenIds: [] as string[],
       } as Account,
-    };
+    ];
 
     const date = DateTime.fromISO('2022-01-01');
     jest.spyOn(apiHook, 'useStartDate').mockReturnValueOnce({ data: date } as SWRResponse);
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValueOnce({ data: accounts } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValueOnce({ data: accounts } as UseQueryResult<Account[]>);
 
     render(<AccountsPage />);
 
@@ -283,7 +288,7 @@ describe('AccountsPage', () => {
       {
         title: 'Income',
         selectedDate: DateTime.fromISO('2023-01-02'),
-        accounts: [accounts.a6],
+        accounts: [accounts[4]],
       },
       {},
     );
@@ -292,7 +297,7 @@ describe('AccountsPage', () => {
       {
         title: 'Expenses',
         selectedDate: DateTime.fromISO('2023-01-02'),
-        accounts: [accounts.a4],
+        accounts: [accounts[2]],
       },
       {},
     );

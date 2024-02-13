@@ -23,17 +23,9 @@ export default function AccountSelector(
     ...props
   }: AccountSelectorProps,
 ): JSX.Element {
-  let { data: accounts } = useAccounts();
+  const { data: accounts } = useAccounts();
 
-  accounts = accounts || {};
-  let options: Account[] = [];
-
-  // Filter out duplicates that can be accessed via `type_`
-  Object.entries(accounts).forEach(([key, account]) => {
-    if (!key.startsWith('type_')) {
-      options.push(account);
-    }
-  });
+  let options = accounts || [];
 
   options = options.filter(account => account && !(ignoreAccounts).includes(account.type));
   if (!showRoot) {
