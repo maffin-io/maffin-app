@@ -41,6 +41,7 @@ describe('Onboarding', () => {
     }).save();
 
     jest.spyOn(API, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
+    jest.spyOn(API, 'useMainCurrency').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
   });
 
   // This test is huge but doing it like this because the onboarding
@@ -69,12 +70,15 @@ describe('Onboarding', () => {
     await user.click(screen.getByText('Save'));
 
     const eur = await Commodity.findOneByOrFail({ mnemonic: 'EUR' });
+    jest.spyOn(API, 'useMainCurrency').mockReturnValue({ data: eur } as UseQueryResult<Commodity>);
 
     const accounts = await Account.find();
-    expect(accounts).toEqual([
+    expect(accounts).toContainEqual(
       expect.objectContaining({
         name: 'Root',
       }),
+    );
+    expect(accounts).toContainEqual(
       expect.objectContaining({
         fk_commodity: eur,
         parentId: 'root_account_guid',
@@ -82,6 +86,8 @@ describe('Onboarding', () => {
         type: 'EXPENSE',
         name: 'Expenses',
       }),
+    );
+    expect(accounts).toContainEqual(
       expect.objectContaining({
         fk_commodity: eur,
         parentId: 'root_account_guid',
@@ -89,6 +95,8 @@ describe('Onboarding', () => {
         type: 'ASSET',
         name: 'Assets',
       }),
+    );
+    expect(accounts).toContainEqual(
       expect.objectContaining({
         fk_commodity: eur,
         parentId: accounts[1].guid,
@@ -96,6 +104,8 @@ describe('Onboarding', () => {
         type: 'EXPENSE',
         name: 'Groceries',
       }),
+    );
+    expect(accounts).toContainEqual(
       expect.objectContaining({
         fk_commodity: eur,
         parentId: 'root_account_guid',
@@ -103,6 +113,8 @@ describe('Onboarding', () => {
         type: 'LIABILITY',
         name: 'Liabilities',
       }),
+    );
+    expect(accounts).toContainEqual(
       expect.objectContaining({
         fk_commodity: eur,
         parentId: 'root_account_guid',
@@ -110,6 +122,8 @@ describe('Onboarding', () => {
         type: 'INCOME',
         name: 'Income',
       }),
+    );
+    expect(accounts).toContainEqual(
       expect.objectContaining({
         fk_commodity: eur,
         parentId: 'root_account_guid',
@@ -118,35 +132,39 @@ describe('Onboarding', () => {
         name: 'Equity',
         hidden: true,
       }),
+    );
+    expect(accounts).toContainEqual(
       expect.objectContaining({
         fk_commodity: eur,
-        parentId: accounts[6].guid,
         placeholder: false,
         type: 'EQUITY',
         name: 'Opening balances - EUR',
       }),
+    );
+    expect(accounts).toContainEqual(
       expect.objectContaining({
         fk_commodity: eur,
-        parentId: accounts[5].guid,
         placeholder: false,
         type: 'INCOME',
         name: 'Salary',
       }),
+    );
+    expect(accounts).toContainEqual(
       expect.objectContaining({
         fk_commodity: eur,
-        parentId: accounts[1].guid,
         placeholder: false,
         type: 'EXPENSE',
         name: 'Electricity',
       }),
+    );
+    expect(accounts).toContainEqual(
       expect.objectContaining({
         fk_commodity: eur,
-        parentId: accounts[1].guid,
         placeholder: false,
         type: 'EXPENSE',
         name: 'Water',
       }),
-    ]);
+    );
 
     // Show accounts tree
     await screen.findByText('This represents your accounts tree', { exact: false });

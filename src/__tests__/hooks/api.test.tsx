@@ -53,7 +53,6 @@ describe('API', () => {
 
   it.each([
     ['useInvestments', '/api/investments', queries.getInvestments],
-    ['useMainCurrency', '/api/main-currency', queries.getMainCurrency],
   ])('calls useSWRImmutable with expected params for %s', (name, key, f) => {
     // @ts-ignore
     renderHook(() => API[name]());
@@ -116,6 +115,21 @@ describe('API', () => {
       const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];
       callArgs.queryFn();
       expect(queries.getEarliestDate).toBeCalled();
+    });
+  });
+
+  describe('useMainCurrency', () => {
+    it('calls query as expected', async () => {
+      renderHook(() => API.useMainCurrency());
+
+      expect(query.useQuery).toBeCalledWith({
+        queryKey: ['/api/commodities', { guid: 'main' }],
+        queryFn: expect.any(Function),
+      });
+
+      const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];
+      callArgs.queryFn();
+      expect(queries.getMainCurrency).toBeCalled();
     });
   });
 

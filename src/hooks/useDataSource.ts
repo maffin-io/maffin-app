@@ -1,7 +1,7 @@
 import React from 'react';
 import { DataSource } from 'typeorm';
 import initSqlJs from 'sql.js';
-import { useSWRConfig, mutate, Cache } from 'swr';
+import { mutate } from 'swr';
 import pako from 'pako';
 
 import * as queries from '@/lib/queries';
@@ -46,7 +46,6 @@ export const DataSourceContext = React.createContext<DataSourceContextType>({
 
 export default function useDataSource(): DataSourceContextType {
   const { storage } = useBookStorage();
-  const { cache } = useSWRConfig();
   const [isLoaded, setIsLoaded] = React.useState(DATASOURCE.isInitialized);
   const queryClient = useQueryClient();
 
@@ -104,7 +103,7 @@ export default function useDataSource(): DataSourceContextType {
   return {
     datasource: DATASOURCE,
     save: () => save(storage as BookStorage),
-    importBook: (rawData: Uint8Array) => importBook(storage as BookStorage, rawData, cache),
+    importBook: (rawData: Uint8Array) => importBook(storage as BookStorage, rawData),
     isLoaded,
   };
 }
@@ -116,7 +115,7 @@ async function save(storage: BookStorage) {
   mutate('/state/save', false, { revalidate: false });
 }
 
-async function importBook(storage: BookStorage, rawData: Uint8Array, cache: Cache) {
+async function importBook(storage: BookStorage, rawData: Uint8Array) {
   let parsedData;
   try {
     parsedData = pako.ungzip(rawData);
@@ -127,10 +126,8 @@ async function importBook(storage: BookStorage, rawData: Uint8Array, cache: Cach
   const rawBook = await importGnucashBook(parsedData);
   await DATASOURCE.sqljsManager.loadDatabase(rawBook);
 
-  Array.from(cache.keys()).forEach(key => {
-    if (key.startsWith('/api/accounts/')) {
-      cache.delete(key);
-    }
+  DATASOURCE.options.extra.queryClient.removeQueries({
+    queryKey: [Account.CACHE_KEY],
   });
   mutate((key: string) => key?.startsWith('/api'), undefined);
   await preloadData();
@@ -165,7 +162,10 @@ async function preloadData() {
   const accounts = await Account.find();
   const accountsMap = mapAccounts(accounts);
   const mainCurrency = accountsMap.type_asset?.commodity;
-  mutate('/api/main-currency', mainCurrency);
+  DATASOURCE.options.extra.queryClient.setQueryData(
+    [Commodity.CACHE_KEY, { guid: 'main' }],
+    mainCurrency,
+  );
 
   if (!isStaging() && mainCurrency) {
     try {

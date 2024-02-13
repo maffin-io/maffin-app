@@ -356,5 +356,4 @@ async function createBalance(
   }).save();
 
   mutate('/api/monthly-totals', undefined);
-  mutate('/api/txs/latest', undefined);
 }

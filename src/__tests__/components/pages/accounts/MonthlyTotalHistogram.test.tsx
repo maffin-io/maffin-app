@@ -2,9 +2,10 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { DateTime } from 'luxon';
 import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import Money from '@/book/Money';
-import { Account } from '@/book/entities';
+import { Account, Commodity } from '@/book/entities';
 import Bar from '@/components/charts/Bar';
 import { MonthlyTotalHistogram } from '@/components/pages/accounts';
 import * as apiHook from '@/hooks/api';
@@ -23,7 +24,7 @@ describe('MonthlyTotalHistogram', () => {
 
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(now);
-    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
@@ -32,7 +33,7 @@ describe('MonthlyTotalHistogram', () => {
   });
 
   it('creates Bar with no data', () => {
-    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
 
     render(
       <MonthlyTotalHistogram

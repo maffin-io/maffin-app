@@ -2,11 +2,13 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { DateTime } from 'luxon';
 import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import Money from '@/book/Money';
 import Pie from '@/components/charts/Pie';
 import { NetWorthPie } from '@/components/pages/accounts';
 import * as apiHook from '@/hooks/api';
+import type { Commodity } from '@/book/entities';
 
 jest.mock('@/components/charts/Pie', () => jest.fn(
   () => <div data-testid="Pie" />,
@@ -19,7 +21,7 @@ jest.mock('@/hooks/api', () => ({
 
 describe('NetWorthPie', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
@@ -28,7 +30,7 @@ describe('NetWorthPie', () => {
   });
 
   it('creates Pie with no data when no data', () => {
-    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
     render(<NetWorthPie />);
 
     expect(Pie).toBeCalledWith(
