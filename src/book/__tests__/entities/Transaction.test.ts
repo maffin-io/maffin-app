@@ -244,3 +244,62 @@ describe('Transaction', () => {
     });
   });
 });
+
+describe('caching', () => {
+  let mockInvalidateQueries: jest.Mock;
+  let datasource: DataSource;
+
+  beforeEach(async () => {
+    mockInvalidateQueries = jest.fn();
+
+    datasource = new DataSource({
+      type: 'sqljs',
+      dropSchema: true,
+      entities: [Account, Commodity, Split, Transaction],
+      synchronize: true,
+      logging: false,
+      extra: {
+        queryClient: {
+          invalidateQueries: mockInvalidateQueries,
+        },
+      },
+    });
+
+    await datasource.initialize();
+
+    // @ts-ignore
+    jest.spyOn(BaseEntity.prototype, 'save').mockImplementation();
+    // @ts-ignore
+    jest.spyOn(BaseEntity.prototype, 'remove').mockImplementation();
+  });
+
+  it('invalidates keys when saving', async () => {
+    const tx = new Transaction();
+
+    await tx.save();
+
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['/api/txs', { name: 'latest' }],
+      refetchType: 'all',
+    });
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['/api/txs', { name: 'latest' }],
+      refetchType: 'all',
+    });
+  });
+
+  it('invalidates keys when deleting', async () => {
+    const tx = new Transaction();
+
+    await tx.remove();
+
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['/api/txs', { name: 'latest' }],
+      refetchType: 'all',
+    });
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['/api/txs', { name: 'latest' }],
+      refetchType: 'all',
+    });
+  });
+});

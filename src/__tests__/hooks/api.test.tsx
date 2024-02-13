@@ -53,9 +53,7 @@ describe('API', () => {
 
   it.each([
     ['useInvestments', '/api/investments', queries.getInvestments],
-    ['useStartDate', '/api/start-date', queries.getEarliestDate],
     ['useMainCurrency', '/api/main-currency', queries.getMainCurrency],
-    ['useLatestTxs', '/api/txs/latest', queries.getLatestTxs],
   ])('calls useSWRImmutable with expected params for %s', (name, key, f) => {
     // @ts-ignore
     renderHook(() => API[name]());
@@ -104,6 +102,36 @@ describe('API', () => {
     jest.spyOn(swrImmutable, 'default').mockReturnValue({ error: 'error' } as SWRResponse);
     // @ts-ignore
     renderHook(() => expect(() => API[name]()).toThrow('error'));
+  });
+
+  describe('useStartDate', () => {
+    it('calls query as expected', async () => {
+      renderHook(() => API.useStartDate());
+
+      expect(query.useQuery).toBeCalledWith({
+        queryKey: ['/api/txs', { name: 'start' }],
+        queryFn: expect.any(Function),
+      });
+
+      const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];
+      callArgs.queryFn();
+      expect(queries.getEarliestDate).toBeCalled();
+    });
+  });
+
+  describe('useLatestTxs', () => {
+    it('calls query as expected', async () => {
+      renderHook(() => API.useLatestTxs());
+
+      expect(query.useQuery).toBeCalledWith({
+        queryKey: ['/api/txs', { name: 'latest' }],
+        queryFn: expect.any(Function),
+      });
+
+      const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];
+      callArgs.queryFn();
+      expect(queries.getLatestTxs).toBeCalled();
+    });
   });
 
   describe('useAccountsMonthlyTotals', () => {

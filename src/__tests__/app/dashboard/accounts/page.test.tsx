@@ -4,7 +4,6 @@ import {
   render,
 } from '@testing-library/react';
 import { DateTime } from 'luxon';
-import type { SWRResponse } from 'swr';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import type { Account } from '@/book/entities';
@@ -79,7 +78,7 @@ jest.mock('@/components/Loading', () => jest.fn(
 describe('AccountsPage', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02') as DateTime<true>);
-    jest.spyOn(apiHook, 'useStartDate').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useStartDate').mockReturnValue({ data: undefined } as UseQueryResult<DateTime>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
   });
 
@@ -96,7 +95,7 @@ describe('AccountsPage', () => {
 
   it('renders as expected when no data showing onboarding', async () => {
     const date = DateTime.fromISO('2022-01-01');
-    jest.spyOn(apiHook, 'useStartDate').mockReturnValueOnce({ data: date } as SWRResponse);
+    jest.spyOn(apiHook, 'useStartDate').mockReturnValueOnce({ data: date } as UseQueryResult<DateTime>);
     const { container } = render(<AccountsPage />);
 
     await screen.findByTestId('FormButton');
@@ -247,7 +246,7 @@ describe('AccountsPage', () => {
     ];
 
     const date = DateTime.fromISO('2022-01-01');
-    jest.spyOn(apiHook, 'useStartDate').mockReturnValueOnce({ data: date } as SWRResponse);
+    jest.spyOn(apiHook, 'useStartDate').mockReturnValueOnce({ data: date } as UseQueryResult<DateTime>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValueOnce({ data: accounts } as UseQueryResult<Account[]>);
 
     render(<AccountsPage />);

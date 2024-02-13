@@ -1,12 +1,16 @@
 import { DateTime } from 'luxon';
 import { mutate, SWRResponse } from 'swr';
 import useSWRImmutable from 'swr/immutable';
+import {
+  useQuery,
+  UseQueryResult,
+} from '@tanstack/react-query';
 
-import { Commodity } from '@/book/entities';
+import { Commodity, Transaction } from '@/book/entities';
 import { InvestmentAccount } from '@/book/models';
 import * as queries from '@/lib/queries';
 import type { PriceDBMap } from '@/book/prices';
-import type { Account, Split, Transaction } from '@/book/entities';
+import type { Account, Split } from '@/book/entities';
 import { useAccounts } from './useAccounts';
 import fetcher from './fetcher';
 
@@ -21,12 +25,11 @@ export function useSplits(guid: string): SWRResponse<Split[]> {
   );
 }
 
-export function useStartDate(): SWRResponse<DateTime> {
-  const key = '/api/start-date';
-  return useSWRImmutable(
-    key,
-    fetcher(queries.getEarliestDate, key),
-  );
+export function useStartDate(): UseQueryResult<DateTime> {
+  return useQuery({
+    queryKey: [Transaction.CACHE_KEY, { name: 'start' }],
+    queryFn: fetcher(queries.getEarliestDate, `${Transaction.CACHE_KEY}/start`),
+  });
 }
 
 export function useMainCurrency(): SWRResponse<Commodity> {
@@ -37,12 +40,11 @@ export function useMainCurrency(): SWRResponse<Commodity> {
   );
 }
 
-export function useLatestTxs(): SWRResponse<Transaction[]> {
-  const key = '/api/txs/latest';
-  return useSWRImmutable(
-    key,
-    fetcher(queries.getLatestTxs, key),
-  );
+export function useLatestTxs(): UseQueryResult<Transaction[]> {
+  return useQuery({
+    queryKey: [Transaction.CACHE_KEY, { name: 'latest' }],
+    queryFn: fetcher(queries.getLatestTxs, `${Transaction.CACHE_KEY}/latest`),
+  });
 }
 
 export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {

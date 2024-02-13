@@ -6,9 +6,11 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  SaveOptions,
 } from 'typeorm';
 import * as v from 'class-validator';
 import { Type } from 'class-transformer';
+import type { QueryClient } from '@tanstack/react-query';
 
 import { toFixed } from '@/helpers/number';
 import { isInvestment } from '../helpers/accountType';
@@ -75,6 +77,50 @@ export default class Transaction extends BaseEntity {
   })
   @v.Length(1, 2048)
     description!: string;
+
+  async save(options?: SaveOptions): Promise<this> {
+    const account = await super.save(options);
+
+    if (this.queryClient) {
+      updateCache({ queryClient: this.queryClient, entity: this });
+    }
+
+    return account;
+  }
+
+  async remove(options?: SaveOptions): Promise<this> {
+    if (this.queryClient) {
+      updateCache({ queryClient: this.queryClient, entity: this, isDelete: true });
+    }
+
+    const account = await super.remove(options);
+    return account;
+  }
+}
+
+/**
+ * Update some detail keys for consistency
+ *
+ * - /api/txs/latest -> Latest 5 transactions that happened
+ * - /api/txs/start -> The transaction date that happened the earliest
+ */
+export async function updateCache(
+  {
+    queryClient,
+  }: {
+    queryClient: QueryClient,
+    entity: Transaction,
+    isDelete?: boolean,
+  },
+) {
+  queryClient.invalidateQueries({
+    queryKey: [Transaction.CACHE_KEY, { name: 'latest' }],
+    refetchType: 'all',
+  });
+  queryClient.invalidateQueries({
+    queryKey: [Transaction.CACHE_KEY, { name: 'start' }],
+    refetchType: 'all',
+  });
 }
 
 // https://github.com/typeorm/typeorm/issues/4714

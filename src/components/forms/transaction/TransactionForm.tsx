@@ -157,6 +157,5 @@ async function onSubmit(data: FormValues, action: 'add' | 'update' | 'delete', o
   });
 
   mutate('/api/monthly-totals', undefined);
-  mutate('/api/txs/latest', undefined);
   onSave();
 }
