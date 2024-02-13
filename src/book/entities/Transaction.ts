@@ -32,6 +32,8 @@ import { DateTimeTransformer } from './transformers';
 
 @Entity('transactions')
 export default class Transaction extends BaseEntity {
+  static CACHE_KEY = '/api/txs';
+
   @ManyToOne('Commodity', { eager: true })
   @JoinColumn({ name: 'currency_guid' })
   @v.IsNotEmpty({ message: 'date is required' })

@@ -77,14 +77,21 @@ describe('useDataSource', () => {
   beforeEach(() => {
     jest.spyOn(query, 'useQueryClient').mockReturnValue({ clear: () => {} } as QueryClient);
     jest.spyOn(storageHooks, 'default').mockReturnValue({ storage: null });
-    jest.spyOn(queries, 'getAccounts').mockResolvedValue({
-      type_asset: {
+    jest.spyOn(Account, 'find').mockResolvedValue([
+      {
+        name: 'root',
+        type: 'ROOT',
+        childrenIds: ['1'],
+      } as Account,
+      {
+        guid: '1',
+        name: 'assets',
         type: 'ASSET',
         commodity: {
           mnemonic: 'EUR',
         },
-      },
-    });
+      } as Account,
+    ]);
     jest.spyOn(queries, 'getMonthlyTotals').mockImplementation();
     jest.spyOn(queries, 'getPrices').mockImplementation();
   });

@@ -8,6 +8,7 @@ import { DateTime } from 'luxon';
 import userEvent from '@testing-library/user-event';
 import { useForm } from 'react-hook-form';
 import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import {
   Account,
@@ -45,7 +46,7 @@ describe('SplitField', () => {
     jest.spyOn(apiHook, 'usePrices')
       .mockReturnValue({ data: undefined } as SWRResponse);
     jest.spyOn(apiHook, 'useAccounts')
-      .mockReturnValue({ data: undefined } as SWRResponse);
+      .mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
     // @ts-ignore
     jest.spyOn(Price, 'create').mockReturnValue({ value: 1 });
   });
@@ -85,7 +86,7 @@ describe('SplitField', () => {
             },
           } as Account,
         ],
-      } as SWRResponse,
+      } as UseQueryResult<Account[]>,
     );
 
     render(<FormWrapper />);
@@ -140,7 +141,7 @@ describe('SplitField', () => {
               commodity: eur,
             } as Account,
           ],
-        } as SWRResponse,
+        } as UseQueryResult<Account[]>,
       );
     });
 
@@ -167,7 +168,7 @@ describe('SplitField', () => {
               },
             } as Account,
           ],
-        } as SWRResponse,
+        } as UseQueryResult<Account[]>,
       );
       jest.spyOn(Price, 'findOneByOrFail').mockResolvedValue({
         // @ts-ignore
@@ -285,7 +286,7 @@ describe('SplitField', () => {
               commodity: usd,
             } as Account,
           ],
-        } as SWRResponse,
+        } as UseQueryResult<Account[]>,
       );
       const mockSubmit = jest.fn();
 
@@ -333,7 +334,7 @@ describe('SplitField', () => {
               },
             } as Account,
           ],
-        } as SWRResponse,
+        } as UseQueryResult<Account[]>,
       );
       const mockSubmit = jest.fn();
 
@@ -375,7 +376,7 @@ describe('SplitField', () => {
               },
             } as Account,
           ],
-        } as SWRResponse,
+        } as UseQueryResult<Account[]>,
       );
 
       render(<FormWrapper />);
@@ -429,7 +430,7 @@ describe('SplitField', () => {
               commodity: usd,
             } as Account,
           ],
-        } as SWRResponse,
+        } as UseQueryResult<Account[]>,
       );
 
       render(<FormWrapper />);
@@ -479,7 +480,7 @@ describe('SplitField', () => {
               commodity: ticker,
             } as Account,
           ],
-        } as SWRResponse,
+        } as UseQueryResult<Account[]>,
       );
 
       render(<FormWrapper />);
@@ -534,7 +535,7 @@ describe('SplitField', () => {
               commodity: eur,
             } as Account,
           ],
-        } as SWRResponse,
+        } as UseQueryResult<Account[]>,
       );
 
       render(<FormWrapper />);
@@ -600,7 +601,7 @@ describe('SplitField', () => {
               commodity: usd,
             } as Account,
           ],
-        } as SWRResponse,
+        } as UseQueryResult<Account[]>,
       );
 
       render(
@@ -678,7 +679,7 @@ describe('SplitField', () => {
               commodity: usd,
             } as Account,
           ],
-        } as SWRResponse,
+        } as UseQueryResult<Account[]>,
       );
 
       render(<FormWrapper />);

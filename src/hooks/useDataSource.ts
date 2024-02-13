@@ -20,6 +20,7 @@ import type BookStorage from '@/lib/storage/BookStorage';
 import { MIGRATIONS } from '@/book/migrations';
 import { isStaging } from '@/helpers/env';
 import { useQueryClient } from '@tanstack/react-query';
+import mapAccounts from '@/helpers/mapAccounts';
 
 export type DataSourceContextType = {
   datasource: DataSource | null,
@@ -161,8 +162,9 @@ async function createEmptyBook() {
  * and prices).
  */
 async function preloadData() {
-  const accounts = await queries.getAccounts();
-  const mainCurrency = accounts.type_asset?.commodity;
+  const accounts = await Account.find();
+  const accountsMap = mapAccounts(accounts);
+  const mainCurrency = accountsMap.type_asset?.commodity;
   mutate('/api/main-currency', mainCurrency);
 
   if (!isStaging() && mainCurrency) {

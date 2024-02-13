@@ -9,7 +9,6 @@ import Table from '@/components/Table';
 import { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import * as apiHook from '@/hooks/api';
-import { AccountsMap } from '@/types/book';
 
 jest.mock('@/components/Table', () => jest.fn(
   () => <div data-testid="Table" />,
@@ -24,7 +23,7 @@ jest.mock('@/hooks/api', () => ({
 describe('AccountsTable', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-01') as DateTime<true>);
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<AccountsMap>);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
@@ -73,14 +72,14 @@ describe('AccountsTable', () => {
   it('creates table with expected params when ASSET', async () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: {
-          type_root: {
+        data: [
+          {
             guid: 'root',
             name: 'Root',
             type: 'ROOT',
             childrenIds: ['a1', 'a2'],
           } as Account,
-          a1: {
+          {
             guid: 'a1',
             name: 'Assets',
             description: 'description',
@@ -92,7 +91,7 @@ describe('AccountsTable', () => {
             childrenIds: [] as string[],
             placeholder: true,
           },
-          a2: {
+          {
             guid: 'a2',
             name: 'Salary',
             commodity: {
@@ -102,8 +101,8 @@ describe('AccountsTable', () => {
             parentId: 'root',
             childrenIds: [] as string[],
           },
-        } as AccountsMap,
-      } as UseQueryResult<AccountsMap>,
+        ] as Account[],
+      } as UseQueryResult<Account[]>,
     );
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
       {
@@ -168,14 +167,14 @@ describe('AccountsTable', () => {
   it('creates table with expected params when EXPENSE', async () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: {
-          type_root: {
+        data: [
+          {
             guid: 'root',
             name: 'Root',
             type: 'ROOT',
             childrenIds: ['a1'],
           } as Account,
-          a1: {
+          {
             guid: 'a1',
             name: 'Expense',
             description: 'description',
@@ -187,8 +186,8 @@ describe('AccountsTable', () => {
             childrenIds: [] as string[],
             placeholder: true,
           },
-        } as AccountsMap,
-      } as UseQueryResult<AccountsMap>,
+        ] as Account[],
+      } as UseQueryResult<Account[]>,
     );
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
       {
@@ -236,14 +235,14 @@ describe('AccountsTable', () => {
   it('ignores hidden accounts', async () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: {
-          type_root: {
+        data: [
+          {
             guid: 'root',
             name: 'Root',
             type: 'ROOT',
             childrenIds: ['a1'],
           } as Account,
-          a1: {
+          {
             guid: 'a1',
             name: 'Assets',
             description: 'description',
@@ -254,8 +253,8 @@ describe('AccountsTable', () => {
             childrenIds: [] as string[],
             hidden: true,
           },
-        } as AccountsMap,
-      } as UseQueryResult<AccountsMap>,
+        ] as Account[],
+      } as UseQueryResult<Account[]>,
     );
 
     render(<AccountsTable />);

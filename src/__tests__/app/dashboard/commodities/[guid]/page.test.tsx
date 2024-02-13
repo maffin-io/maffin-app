@@ -4,6 +4,7 @@ import {
   screen,
 } from '@testing-library/react';
 import type { SWRResponse } from 'swr';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import { Commodity, Price } from '@/book/entities';
 import CommodityPage from '@/app/dashboard/commodities/[guid]/page';
@@ -49,7 +50,7 @@ jest.mock('@/components/Loading', () => jest.fn(
 
 describe('CommodityPage', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useCommodity').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useCommodity').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
@@ -58,7 +59,7 @@ describe('CommodityPage', () => {
   });
 
   it('shows loading when loading data', async () => {
-    jest.spyOn(apiHook, 'useCommodity').mockReturnValue({ isLoading: true } as SWRResponse);
+    jest.spyOn(apiHook, 'useCommodity').mockReturnValue({ isLoading: true } as UseQueryResult<Commodity>);
     render(<CommodityPage params={{ guid: 'guid' }} />);
 
     await screen.findByTestId('Loading');
@@ -75,7 +76,7 @@ describe('CommodityPage', () => {
 
   it('loads when no prices', async () => {
     jest.spyOn(apiHook, 'useCommodity').mockReturnValue(
-      { data: { guid: 'guid', mnemonic: 'EUR' } as Commodity } as SWRResponse,
+      { data: { guid: 'guid', mnemonic: 'EUR' } as Commodity } as UseQueryResult<Commodity>,
     );
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: new PriceDBMap([]) } as SWRResponse);
 
@@ -86,7 +87,7 @@ describe('CommodityPage', () => {
 
   it('renders as expected with commodity', async () => {
     jest.spyOn(apiHook, 'useCommodity').mockReturnValue(
-      { data: { guid: 'guid', mnemonic: 'EUR' } as Commodity } as SWRResponse,
+      { data: { guid: 'guid', mnemonic: 'EUR' } as Commodity } as UseQueryResult<Commodity>,
     );
     const prices = [
       {
@@ -199,7 +200,7 @@ describe('CommodityPage', () => {
 
   it('calls PriceButton with fk_currency when not CURRENCY', async () => {
     jest.spyOn(apiHook, 'useCommodity').mockReturnValue(
-      { data: { guid: 'guid', mnemonic: 'GOOGL', namespace: 'STOCK' } as Commodity } as SWRResponse,
+      { data: { guid: 'guid', mnemonic: 'GOOGL', namespace: 'STOCK' } as Commodity } as UseQueryResult<Commodity>,
     );
     const prices = [
       {

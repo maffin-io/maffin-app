@@ -66,7 +66,7 @@ describe('getMonthlyTotals', () => {
   });
 
   it('returns empty when no transactions', async () => {
-    const monthlyTotals = await getMonthlyTotals({}, {} as PriceDBMap);
+    const monthlyTotals = await getMonthlyTotals([], {} as PriceDBMap);
 
     expect(monthlyTotals).toEqual({});
   });
@@ -115,11 +115,7 @@ describe('getMonthlyTotals', () => {
       ],
     }).save();
     const monthlyTotals = await getMonthlyTotals(
-      {
-        type_root: root,
-        [assetAccount.guid]: assetAccount,
-        [expensesAccount.guid]: expensesAccount,
-      },
+      [root, assetAccount, expensesAccount],
       {} as PriceDBMap,
     );
 
@@ -191,12 +187,7 @@ describe('getMonthlyTotals', () => {
     }).save();
 
     const monthlyTotals = await getMonthlyTotals(
-      {
-        type_root: root,
-        [assetAccount.guid]: assetAccount,
-        [expensesAccount.guid]: expensesAccount,
-        [childAccount.guid]: childAccount,
-      },
+      [root, assetAccount, expensesAccount, childAccount],
       {} as PriceDBMap,
     );
 
@@ -273,12 +264,7 @@ describe('getMonthlyTotals', () => {
     }).save();
 
     const monthlyTotals = await getMonthlyTotals(
-      {
-        type_root: root,
-        [assetAccount.guid]: assetAccount,
-        [expensesAccount.guid]: expensesAccount,
-        [childAccount.guid]: childAccount,
-      },
+      [root, assetAccount, expensesAccount, childAccount],
       new PriceDBMap([
         Price.create({
           date: DateTime.fromISO('2023-01-30'),
@@ -379,14 +365,14 @@ describe('getMonthlyTotals', () => {
     }).save();
 
     const monthlyTotals = await getMonthlyTotals(
-      {
-        type_root: root,
-        [assetAccount.guid]: assetAccount,
-        [brokerAccount.guid]: brokerAccount,
-        [expensesAccount.guid]: expensesAccount,
-        [investmentsAccount.guid]: investmentsAccount,
-        [stockAccount.guid]: stockAccount,
-      },
+      [
+        root,
+        assetAccount,
+        brokerAccount,
+        expensesAccount,
+        investmentsAccount,
+        stockAccount,
+      ],
       new PriceDBMap([
         Price.create({
           fk_commodity: stock,
@@ -411,38 +397,5 @@ describe('getMonthlyTotals', () => {
     expect(monthlyTotals.investments['01/2023'].toString()).toEqual('98.00 EUR');
     expect(monthlyTotals.broker['01/2023'].toString()).toEqual('-100.00 USD');
     expect(monthlyTotals.asset['01/2023'].toString()).toEqual('0.00 EUR');
-  });
-
-  it('ignores account months with 0', async () => {
-    const commodity = await Commodity.create({
-      namespace: 'NASDAQ',
-      mnemonic: 'GOOGL',
-    }).save();
-
-    const split1 = new Split();
-    split1.value = 0;
-    split1.quantity = 0;
-    split1.fk_account = await Account.create({
-      name: 'GOOGL',
-      type: 'INVESTMENT',
-      fk_commodity: commodity,
-      parent: assetAccount,
-    }).save();
-
-    await Transaction.create({
-      description: 'description',
-      fk_currency: eur,
-      date: DateTime.fromISO('2023-01-01'),
-      splits: [split1],
-    }).save();
-
-    const monthlyTotals = await getMonthlyTotals(
-      {
-        [assetAccount.guid]: assetAccount,
-      },
-      {} as PriceDBMap,
-    );
-
-    expect(monthlyTotals).toEqual({});
   });
 });

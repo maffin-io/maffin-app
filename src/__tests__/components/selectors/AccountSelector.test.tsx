@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import Selector from '@/components/selectors/Selector';
 import { Account, Commodity } from '@/book/entities';
@@ -18,7 +18,7 @@ jest.mock('@/hooks/api', () => ({
 
 describe('AccountSelector', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
   });
 
   afterEach(() => {
@@ -65,42 +65,11 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: {
-          guid1: options[0],
-          guid2: options[1],
-        },
-      } as SWRResponse,
-    );
-
-    render(<AccountSelector />);
-
-    await screen.findByTestId('Selector');
-    expect(Selector).toHaveBeenCalledWith(
-      expect.objectContaining({
-        options,
-      }),
-      {},
-    );
-  });
-
-  it('removes type_ duplicates', async () => {
-    const options = [
-      {
-        guid: 'guid1',
-        path: 'path1',
-        type: 'TYPE1',
-        commodity: {
-          mnemonic: 'USD',
-        } as Commodity,
-      } as Account,
-    ];
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: {
-          guid1: options[0],
-          type_type1: options[0],
-        },
-      } as SWRResponse,
+        data: [
+          options[0],
+          options[1],
+        ],
+      } as UseQueryResult<Account[]>,
     );
 
     render(<AccountSelector />);
@@ -135,11 +104,11 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: {
-          guid1: options[0],
-          guid2: options[1],
-        },
-      } as SWRResponse,
+        data: [
+          options[0],
+          options[1],
+        ],
+      } as UseQueryResult<Account[]>,
     );
 
     render(
@@ -178,11 +147,11 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: {
-          guid1: options[0],
-          guid2: options[1],
-        },
-      } as SWRResponse,
+        data: [
+          options[0],
+          options[1],
+        ],
+      } as UseQueryResult<Account[]>,
     );
 
     render(<AccountSelector />);
@@ -217,11 +186,11 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: {
-          guid1: options[0],
-          guid2: options[1],
-        },
-      } as SWRResponse,
+        data: [
+          options[0],
+          options[1],
+        ],
+      } as UseQueryResult<Account[]>,
     );
 
     render(<AccountSelector showRoot />);
@@ -257,11 +226,11 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: {
-          guid1: options[0],
-          guid2: options[1],
-        },
-      } as SWRResponse,
+        data: [
+          options[0],
+          options[1],
+        ],
+      } as UseQueryResult<Account[]>,
     );
 
     render(
@@ -299,11 +268,11 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: {
-          guid1: options[0],
-          guid2: options[1],
-        },
-      } as SWRResponse,
+        data: [
+          options[0],
+          options[1],
+        ],
+      } as UseQueryResult<Account[]>,
     );
 
     render(

@@ -6,6 +6,7 @@ import { isAsset, isInvestment, isLiability } from '@/book/helpers/accountType';
 import type { Account } from '@/book/entities';
 import type { AccountsMap } from '@/types/book';
 import type { PriceDBMap } from '@/book/prices';
+import mapAccounts from '@/helpers/mapAccounts';
 import getEarliestDate from './getEarliestDate';
 
 export type MonthlyTotals = {
@@ -32,7 +33,7 @@ export type MonthlyTotals = {
  *   that already happened.
  */
 export default async function getMonthlyTotals(
-  accounts: AccountsMap,
+  accounts: Account[],
   prices: PriceDBMap,
 ): Promise<MonthlyTotals> {
   const rows: { date: string, total: number, accountId: string }[] = await Split
@@ -50,6 +51,8 @@ export default async function getMonthlyTotals(
       ORDER BY date
     `);
 
+  const accountsMap = mapAccounts(accounts);
+
   const monthlyTotals: MonthlyTotals = {};
   rows.forEach(row => {
     if (!(row.accountId in monthlyTotals)) {
@@ -58,7 +61,7 @@ export default async function getMonthlyTotals(
 
     monthlyTotals[row.accountId][row.date] = new Money(
       row.total,
-      accounts[row.accountId].commodity.mnemonic,
+      accountsMap[row.accountId].commodity.mnemonic,
     );
   });
 
@@ -66,13 +69,13 @@ export default async function getMonthlyTotals(
   const interval = Interval.fromDateTimes(startDate, DateTime.now());
   const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).endOf('month'));
 
-  accounts.type_root?.childrenIds.forEach(
+  accountsMap.type_root?.childrenIds.forEach(
     (childId: string) => {
-      const account = accounts[childId];
+      const account = accountsMap[childId];
       if (isAsset(account) || isLiability(account)) {
         aggregateMonthlyWorth(
           account,
-          accounts,
+          accountsMap,
           prices,
           monthlyTotals,
           dates,
@@ -81,12 +84,12 @@ export default async function getMonthlyTotals(
 
       aggregateChildrenTotals(
         account,
-        accounts,
+        accountsMap,
         prices,
         monthlyTotals,
       );
 
-      monthlyTotals[accounts[childId].type.toLowerCase()] = monthlyTotals[childId];
+      monthlyTotals[accountsMap[childId].type.toLowerCase()] = monthlyTotals[childId];
     },
   );
 

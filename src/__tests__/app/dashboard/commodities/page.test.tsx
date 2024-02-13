@@ -3,12 +3,13 @@ import {
   screen,
   render,
 } from '@testing-library/react';
-import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import * as apiHook from '@/hooks/api';
 import CommoditiesPage from '@/app/dashboard/commodities/page';
 import FormButton from '@/components/buttons/FormButton';
 import CommodityForm from '@/components/forms/commodity/CommodityForm';
+import type { Commodity } from '@/book/entities';
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
@@ -33,7 +34,7 @@ jest.mock('@/components/forms/commodity/CommodityForm', () => jest.fn(
 
 describe('CommoditiesPage', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useCommodities').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useCommodities').mockReturnValue({ data: undefined } as UseQueryResult<Commodity[]>);
   });
 
   afterEach(() => {
@@ -41,7 +42,7 @@ describe('CommoditiesPage', () => {
   });
 
   it('shows loading when loading data', async () => {
-    jest.spyOn(apiHook, 'useCommodities').mockReturnValue({ isLoading: true } as SWRResponse);
+    jest.spyOn(apiHook, 'useCommodities').mockReturnValue({ isLoading: true } as UseQueryResult<Commodity[]>);
     render(<CommoditiesPage />);
 
     await screen.findByTestId('Loading');
@@ -67,7 +68,7 @@ describe('CommoditiesPage', () => {
           full_name: 'Loyalty points',
         },
       ],
-    } as SWRResponse);
+    } as UseQueryResult<Commodity[]>);
 
     const { container } = render(<CommoditiesPage />);
 

@@ -20,7 +20,6 @@ import SplitsField from '@/components/forms/transaction/SplitsField';
 import * as queries from '@/lib/queries';
 import * as apiHook from '@/hooks/api';
 import type { FormValues } from '@/components/forms/transaction/types';
-import type { AccountsMap } from '@/types/book';
 
 jest.mock('@/lib/queries', () => ({
   __esModule: true,
@@ -38,7 +37,7 @@ describe('SplitsField', () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: undefined,
-      } as UseQueryResult<AccountsMap>,
+      } as UseQueryResult<Account[]>,
     );
     datasource = new DataSource({
       type: 'sqljs',
@@ -82,15 +81,15 @@ describe('SplitsField', () => {
 
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: {
-          account_guid_1: {
+        data: [
+          {
             guid: 'account_guid_1',
             path: 'path1',
             type: 'ASSET',
             commodity: eur,
           } as Account,
-        } as AccountsMap,
-      } as UseQueryResult<AccountsMap>,
+        ],
+      } as UseQueryResult<Account[]>,
     );
 
     render(<FormWrapper />);

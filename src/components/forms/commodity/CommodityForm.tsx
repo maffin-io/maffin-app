@@ -1,7 +1,6 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
-import { mutate } from 'swr';
 import classNames from 'classnames';
 
 import { Commodity } from '@/book/entities';
@@ -112,8 +111,6 @@ async function onSubmit(
 
   if (action === 'add' || action === 'update') {
     await commodity.save();
-    mutate(`/api/commodities/${commodity.guid}`);
-    mutate('/api/commodities');
   }
 
   onSave(commodity);

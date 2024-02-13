@@ -20,7 +20,6 @@ import {
   ASSET_ACCOUNTS,
   LIABILITY_ACCOUNTS,
 } from '@/book/helpers/accountType';
-import { AccountsMap } from '@/types/book';
 import type Commodity from './Commodity';
 import type Split from './Split';
 import BaseEntity from './BaseEntity';
@@ -44,6 +43,7 @@ import BaseEntity from './BaseEntity';
 @Entity('accounts')
 @Tree('nested-set')
 export default class Account extends BaseEntity {
+  static CACHE_KEY = '/api/accounts';
   static TYPES = [
     'ROOT',
     'EQUITY',
@@ -145,18 +145,16 @@ export default class Account extends BaseEntity {
   async save(options?: SaveOptions): Promise<this> {
     const account = await super.save(options);
 
-    const queryClient = Account.getRepository().manager.connection.options.extra?.queryClient;
-    if (queryClient) {
-      updateCache({ queryClient, account: this });
+    if (this.queryClient) {
+      updateCache({ queryClient: this.queryClient, entity: this });
     }
 
     return account;
   }
 
   async remove(options?: SaveOptions): Promise<this> {
-    const queryClient = Account.getRepository().manager.connection.options.extra?.queryClient;
-    if (queryClient) {
-      updateCache({ queryClient, account: this, isDelete: true });
+    if (this.queryClient) {
+      updateCache({ queryClient: this.queryClient, entity: this, isDelete: true });
     }
 
     const account = await super.remove(options);
@@ -164,53 +162,52 @@ export default class Account extends BaseEntity {
   }
 }
 
+/**
+ * Because accounts have parent/children relations,
+ * whenever an account is updated or deleted we need to update
+ * those relations
+ */
 export async function updateCache(
   {
     queryClient,
-    account,
+    entity,
     isDelete = false,
   }: {
     queryClient: QueryClient,
-    account: Account,
+    entity: Account,
     isDelete?: boolean,
   },
 ) {
   // We need this to reload childrenIds... haven't explored much
   // maybe there is a better way.
-  await account.reload();
+  await entity.reload();
 
   queryClient.setQueryData(
-    ['/api/accounts'],
-    (accounts: AccountsMap | undefined) => {
-      if (!accounts) {
+    [Account.CACHE_KEY],
+    (entities: Account[] | undefined) => {
+      if (!entities) {
         return undefined;
       }
 
-      const newAccounts = {
-        ...accounts,
-        [account.guid]: account,
-      };
+      const newEntities = [...entities];
 
-      if (account.type !== 'ROOT') {
-        const parentAccount = accounts[account.parentId];
-        const index = parentAccount.childrenIds.findIndex((guid: string) => guid === account.guid);
-        if (index < 0) {
-          parentAccount.childrenIds.push(account.guid);
+      if (entity.type !== 'ROOT') {
+        const parentIndex = entities.findIndex(e => e.guid === entity.parentId) as number;
+        const parentAccount = entities[parentIndex];
+        const childIndex = parentAccount.childrenIds.findIndex(
+          (guid: string) => guid === entity.guid,
+        );
+        if (childIndex < 0) {
+          parentAccount.childrenIds.push(entity.guid);
         } else if (isDelete) {
-          parentAccount.childrenIds.splice(index, 1);
-          delete newAccounts[account.guid];
+          parentAccount.childrenIds.splice(childIndex, 1);
         }
 
-        newAccounts[account.parentId] = parentAccount;
+        newEntities[parentIndex] = parentAccount;
       }
 
-      return newAccounts;
+      return newEntities;
     },
-  );
-
-  queryClient.setQueryData(
-    ['/api/accounts', { guid: account.guid }],
-    !isDelete ? account : null,
   );
 }
 

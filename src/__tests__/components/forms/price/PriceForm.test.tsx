@@ -6,9 +6,16 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DataSource } from 'typeorm';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import PriceForm from '@/components/forms/price/PriceForm';
 import { Price, Commodity } from '@/book/entities';
+import * as apiHook from '@/hooks/api';
+
+jest.mock('@/hooks/api', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/api'),
+}));
 
 describe('PriceForm', () => {
   let datasource: DataSource;
@@ -38,6 +45,8 @@ describe('PriceForm', () => {
       mnemonic: 'USD',
       namespace: 'CURRENCY',
     }).save();
+
+    jest.spyOn(apiHook, 'useCommodities').mockReturnValue({ data: [eur, usd] } as UseQueryResult<Commodity[]>);
   });
 
   beforeEach(async () => {
@@ -45,6 +54,7 @@ describe('PriceForm', () => {
   });
 
   afterAll(async () => {
+    jest.clearAllMocks();
     await datasource.destroy();
   });
 

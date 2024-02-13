@@ -3,26 +3,22 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 
-import { getAccounts, getAccount } from '@/lib/queries';
-import type { Account } from '@/book/entities';
-import type { AccountsMap } from '@/types/book';
+import { Account } from '@/book/entities';
 import fetcher from './fetcher';
-
-const KEY = '/api/accounts';
 
 export function useAccount(guid: string): UseQueryResult<Account> {
   const result = useQuery({
-    queryKey: [KEY, { guid }],
-    queryFn: fetcher(() => getAccount(guid), `${KEY}/${guid}`),
+    queryKey: [Account.CACHE_KEY, { guid }],
+    queryFn: fetcher(() => Account.findOneBy({ guid }), `${Account.CACHE_KEY}/${guid}`),
   });
 
   return result;
 }
 
-export function useAccounts(): UseQueryResult<AccountsMap> {
+export function useAccounts(): UseQueryResult<Account[]> {
   const result = useQuery({
-    queryKey: [KEY],
-    queryFn: fetcher(() => getAccounts(), KEY),
+    queryKey: [Account.CACHE_KEY],
+    queryFn: fetcher(() => Account.find(), Account.CACHE_KEY),
   });
 
   return result;

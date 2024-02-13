@@ -3,7 +3,7 @@ import {
   render,
   screen,
 } from '@testing-library/react';
-import type { SWRResponse } from 'swr';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import Selector from '@/components/selectors/Selector';
 import { Commodity } from '@/book/entities';
@@ -21,7 +21,7 @@ jest.mock('@/hooks/api', () => ({
 
 describe('CommoditySelector', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useCommodities').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useCommodities').mockReturnValue({ data: undefined } as UseQueryResult<Commodity[]>);
   });
 
   afterEach(() => {
@@ -66,7 +66,7 @@ describe('CommoditySelector', () => {
     jest.spyOn(apiHook, 'useCommodities').mockReturnValue(
       {
         data: options,
-      } as SWRResponse,
+      } as UseQueryResult<Commodity[]>,
     );
 
     render(<CommoditySelector namespace="STOCK" />);
@@ -101,7 +101,7 @@ describe('CommoditySelector', () => {
     jest.spyOn(apiHook, 'useCommodities').mockReturnValue(
       {
         data: options,
-      } as SWRResponse,
+      } as UseQueryResult<Commodity[]>,
     );
 
     render(<CommoditySelector ignore={['2', '3']} />);

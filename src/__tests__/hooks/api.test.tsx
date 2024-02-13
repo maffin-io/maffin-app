@@ -52,7 +52,6 @@ describe('API', () => {
   });
 
   it.each([
-    ['useCommodities', '/api/commodities', jest.spyOn(Commodity, 'find')],
     ['useInvestments', '/api/investments', queries.getInvestments],
     ['useStartDate', '/api/start-date', queries.getEarliestDate],
     ['useMainCurrency', '/api/main-currency', queries.getMainCurrency],
@@ -72,7 +71,6 @@ describe('API', () => {
 
   it.each([
     ['useInvestment', '/api/investments/guid', queries.getInvestment],
-    ['useSplits', '/api/splits/guid', queries.getSplits],
   ])('calls useSWRImmutable with expected params for %s', (name, key, f) => {
     // @ts-ignore
     renderHook(() => API[name]('guid'));
@@ -99,25 +97,9 @@ describe('API', () => {
     expect(queries.getPrices).toBeCalledWith({ from: { guid: 'guid' } });
   });
 
-  it('calls useSWRImmutable with expected params for useCommodity', () => {
-    const f = jest.spyOn(Commodity, 'findOneByOrFail');
-    // @ts-ignore
-    renderHook(() => API.useCommodity('guid'));
-
-    expect(swrImmutable.default).toBeCalledWith(
-      '/api/commodities/guid',
-      expect.any(Function),
-    );
-
-    expect(f).toBeCalledTimes(1);
-    expect(f).toBeCalledWith({ guid: 'guid' });
-  });
-
   it.each([
     'useInvestment',
     'useInvestments',
-    'useCommodity',
-    'useCommodities',
   ])('propagates error for %s', (name) => {
     jest.spyOn(swrImmutable, 'default').mockReturnValue({ error: 'error' } as SWRResponse);
     // @ts-ignore
@@ -140,21 +122,6 @@ describe('API', () => {
         expect.any(Function),
       );
       expect(queries.getMonthlyTotals).toBeCalledWith(accounts, todayPrices);
-    });
-  });
-
-  describe('useCommodities', () => {
-    it('mutates detail keys', () => {
-      jest.spyOn(swrImmutable, 'default').mockReturnValue({
-        data: [
-          { guid: '1' } as Commodity,
-          { guid: '2' } as Commodity,
-        ],
-      } as SWRResponse);
-      renderHook(() => API.useCommodities());
-
-      expect(swr.mutate).toBeCalledWith('/api/commodities/1', { guid: '1' }, { revalidate: false });
-      expect(swr.mutate).toBeCalledWith('/api/commodities/2', { guid: '2' }, { revalidate: false });
     });
   });
 

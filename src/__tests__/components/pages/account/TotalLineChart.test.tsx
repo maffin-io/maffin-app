@@ -1,7 +1,7 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 import { render } from '@testing-library/react';
-import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import type { Account, Split } from '@/book/entities';
 import Line from '@/components/charts/Line';
@@ -19,7 +19,7 @@ jest.mock('@/hooks/api', () => ({
 
 describe('TotalLineChart', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as UseQueryResult<Split[]>);
   });
 
   afterEach(() => {
@@ -118,7 +118,7 @@ describe('TotalLineChart', () => {
             quantity: 200,
           } as Split,
         ],
-      } as SWRResponse,
+      } as UseQueryResult<Split[]>,
     );
 
     render(
@@ -177,7 +177,7 @@ describe('TotalLineChart', () => {
             quantity: -200,
           } as Split,
         ],
-      } as SWRResponse,
+      } as UseQueryResult<Split[]>,
     );
 
     render(

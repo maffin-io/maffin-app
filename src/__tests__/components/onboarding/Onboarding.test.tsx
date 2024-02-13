@@ -1,9 +1,10 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import { DataSource } from 'typeorm';
-import type { SWRResponse } from 'swr';
 import { DateTime } from 'luxon';
 import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import Onboarding from '@/components/onboarding/Onboarding';
 import {
@@ -39,21 +40,24 @@ describe('Onboarding', () => {
       type: 'ROOT',
     }).save();
 
-    jest.spyOn(API, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(API, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
   });
 
   // This test is huge but doing it like this because the onboarding
   // steps are linked one after the other
   it('full onboarding', async () => {
+    const queryClient = new QueryClient();
     const user = userEvent.setup();
     render(
-      <div>
-        <span id="save-button" />
-        <span id="theme-button" />
-        <span id="add-account" />
-        <span id="accounts-table" />
-        <Onboarding show />
-      </div>,
+      <QueryClientProvider client={queryClient}>
+        <div>
+          <span id="save-button" />
+          <span id="theme-button" />
+          <span id="add-account" />
+          <span id="accounts-table" />
+          <Onboarding show />
+        </div>
+      </QueryClientProvider>,
     );
 
     // Select main currency and create initial accounts

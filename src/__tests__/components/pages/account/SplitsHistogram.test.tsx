@@ -1,7 +1,7 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 import { render } from '@testing-library/react';
-import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import type { Account, Split } from '@/book/entities';
 import Bar from '@/components/charts/Bar';
@@ -19,7 +19,7 @@ jest.mock('@/hooks/api', () => ({
 
 describe('SplitsHistogram', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as UseQueryResult<Split[]>);
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-12-31') as DateTime<true>);
   });
 
@@ -142,7 +142,7 @@ describe('SplitsHistogram', () => {
             quantity: -200,
           } as Split,
         ],
-      } as SWRResponse,
+      } as UseQueryResult<Split[]>,
     );
 
     render(
@@ -197,7 +197,7 @@ describe('SplitsHistogram', () => {
             quantity: -200,
           } as Split,
         ],
-      } as SWRResponse,
+      } as UseQueryResult<Split[]>,
     );
 
     render(

@@ -1,15 +1,17 @@
-import { Account } from '@/book/entities';
+import type { Account } from '@/book/entities';
 import type { AccountsMap } from '@/types/book';
 
 /**
- * Retrieves all the accounts and returns them in a map where the key
+ * Returns the passed accounts in a map where the key
  * is the account guid.
  *
  * For first level accounts, the key is also the type of the account prefixed
  * with type, same for the root account.
  */
-export async function getAccounts(): Promise<AccountsMap> {
-  const accounts = await Account.find();
+export default function mapAccounts(accounts: Account[] | undefined): AccountsMap {
+  if (!accounts || accounts.length === 0) {
+    return { type_root: { childrenIds: [] } };
+  }
 
   const accountsMap: AccountsMap = {};
   accounts.forEach(account => {
@@ -27,9 +29,4 @@ export async function getAccounts(): Promise<AccountsMap> {
   });
 
   return accountsMap;
-}
-
-export async function getAccount(guid: string): Promise<Account | null> {
-  const account = await Account.findOneBy({ guid });
-  return account;
 }
