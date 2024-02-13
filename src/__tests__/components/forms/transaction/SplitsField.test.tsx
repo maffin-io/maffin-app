@@ -7,7 +7,7 @@ import {
   render,
   screen,
 } from '@testing-library/react';
-import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import {
   Account,
@@ -20,6 +20,7 @@ import SplitsField from '@/components/forms/transaction/SplitsField';
 import * as queries from '@/lib/queries';
 import * as apiHook from '@/hooks/api';
 import type { FormValues } from '@/components/forms/transaction/types';
+import type { AccountsMap } from '@/types/book';
 
 jest.mock('@/lib/queries', () => ({
   __esModule: true,
@@ -34,6 +35,11 @@ jest.mock('@/hooks/api', () => ({
 describe('SplitsField', () => {
   let datasource: DataSource;
   beforeEach(async () => {
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+      {
+        data: undefined,
+      } as UseQueryResult<AccountsMap>,
+    );
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
@@ -76,15 +82,15 @@ describe('SplitsField', () => {
 
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: [
-          {
+        data: {
+          account_guid_1: {
             guid: 'account_guid_1',
             path: 'path1',
             type: 'ASSET',
             commodity: eur,
           } as Account,
-        ],
-      } as SWRResponse,
+        } as AccountsMap,
+      } as UseQueryResult<AccountsMap>,
     );
 
     render(<FormWrapper />);

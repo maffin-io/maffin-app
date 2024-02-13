@@ -7,7 +7,7 @@ import {
   Split,
   Transaction,
 } from '@/book/entities';
-import { getAccounts } from '@/lib/queries';
+import { getAccount, getAccounts } from '@/lib/queries';
 import type { AccountsMap } from '@/types/book';
 
 describe('getAccounts', () => {
@@ -66,9 +66,43 @@ describe('getAccounts', () => {
     expect(accounts.abcdef.guid).toEqual('abcdef');
     expect(accounts.ghijk.guid).toEqual('ghijk');
   });
+});
+
+describe('getAccount', () => {
+  let datasource: DataSource;
+
+  beforeEach(async () => {
+    datasource = new DataSource({
+      type: 'sqljs',
+      dropSchema: true,
+      entities: [Account, Commodity, Price, Split, Transaction],
+      synchronize: true,
+      logging: false,
+    });
+    await datasource.initialize();
+
+    const eur = await Commodity.create({
+      namespace: 'CURRENCY',
+      mnemonic: 'EUR',
+    }).save();
+
+    const root = await Account.create({
+      guid: 'a',
+      type: 'ROOT',
+      name: 'Root',
+    }).save();
+
+    await Account.create({
+      guid: 'abcdef',
+      name: 'Assets',
+      type: 'ASSET',
+      fk_commodity: eur,
+      parent: root,
+    }).save();
+  });
 
   it('returns single account when guid is passed', async () => {
-    const account = await getAccounts('abcdef') as Account;
+    const account = await getAccount('abcdef') as Account;
 
     expect(account.guid).toEqual('abcdef');
   });

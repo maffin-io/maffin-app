@@ -11,6 +11,7 @@ import * as swr from 'swr';
 import type { SWRResponse } from 'swr';
 import * as navigation from 'next/navigation';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import { getAllowedSubAccounts } from '@/book/helpers/accountType';
 import {
@@ -22,6 +23,7 @@ import {
 } from '@/book/entities';
 import AccountForm from '@/components/forms/account/AccountForm';
 import * as apiHook from '@/hooks/api';
+import type { AccountsMap } from '@/types/book';
 
 jest.mock('swr');
 
@@ -79,7 +81,9 @@ describe('AccountForm', () => {
     expenseAccount.path = 'Expenses';
 
     jest.spyOn(apiHook, 'useCommodities').mockReturnValue({ data: [eur] } as SWRResponse);
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: [root, assetAccount, expenseAccount] } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({
+      data: { root, assetAccount, expenseAccount } as AccountsMap,
+    } as UseQueryResult<AccountsMap>);
   });
 
   afterEach(async () => {
@@ -212,9 +216,14 @@ describe('AccountForm', () => {
 
     stockAccount.path = 'Assets:Stock';
 
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      { data: [root, assetAccount, expenseAccount, stockAccount] } as SWRResponse,
-    );
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({
+      data: {
+        root,
+        assetAccount,
+        expenseAccount,
+        stockAccount,
+      } as AccountsMap,
+    } as UseQueryResult<AccountsMap>);
 
     render(
       <AccountForm
@@ -229,7 +238,7 @@ describe('AccountForm', () => {
     expect(screen.queryByText('Mutual')).toBeNull();
   });
 
-  it('creates account with expected params, mutates and saves', async () => {
+  it('creates account with expected params and saves', async () => {
     const user = userEvent.setup();
     const mockSave = jest.fn();
 
@@ -267,9 +276,6 @@ describe('AccountForm', () => {
       hidden: false,
     });
     expect(mockSave).toHaveBeenCalledTimes(1);
-    expect(swr.mutate).toBeCalledTimes(2);
-    expect(swr.mutate).toHaveBeenNthCalledWith(1, `/api/accounts/${account.guid}`);
-    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/accounts');
   });
 
   it('updates account', async () => {
@@ -338,7 +344,6 @@ describe('AccountForm', () => {
 
     expect(accounts).toHaveLength(2);
     expect(account.guid in accounts).toBe(false);
-    expect(mockRouterReplace).toBeCalledWith('/dashboard/accounts');
   });
 
   it('creates bank account with opening balance', async () => {
@@ -417,12 +422,9 @@ describe('AccountForm', () => {
       },
     ]);
 
-    expect(swr.mutate).toBeCalledTimes(5);
-    expect(swr.mutate).toHaveBeenNthCalledWith(1, `/api/accounts/${account.guid}`);
-    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/accounts');
-    expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/accounts', expect.any(Function), { revalidate: false });
-    expect(swr.mutate).toHaveBeenNthCalledWith(4, '/api/monthly-totals', undefined);
-    expect(swr.mutate).toHaveBeenNthCalledWith(5, '/api/txs/latest', undefined);
+    expect(swr.mutate).toBeCalledTimes(2);
+    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/monthly-totals', undefined);
+    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/txs/latest', undefined);
   });
 
   it.each([
@@ -450,9 +452,15 @@ describe('AccountForm', () => {
     }).save();
     bankAccount.path = 'Assets:Bank';
 
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      { data: [root, assetAccount, expenseAccount, incomeAccount, bankAccount] } as SWRResponse,
-    );
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({
+      data: {
+        root,
+        assetAccount,
+        expenseAccount,
+        incomeAccount,
+        bankAccount,
+      } as AccountsMap,
+    } as UseQueryResult<AccountsMap>);
 
     const user = userEvent.setup();
     render(

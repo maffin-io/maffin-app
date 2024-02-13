@@ -19,6 +19,7 @@ import {
 import type BookStorage from '@/lib/storage/BookStorage';
 import { MIGRATIONS } from '@/book/migrations';
 import { isStaging } from '@/helpers/env';
+import { useQueryClient } from '@tanstack/react-query';
 
 export type DataSourceContextType = {
   datasource: DataSource | null,
@@ -46,11 +47,12 @@ export default function useDataSource(): DataSourceContextType {
   const { storage } = useBookStorage();
   const { cache } = useSWRConfig();
   const [isLoaded, setIsLoaded] = React.useState(DATASOURCE.isInitialized);
+  const queryClient = useQueryClient();
 
   React.useEffect(() => {
     async function load() {
       let rawBook: Uint8Array;
-      if (storage && !DATASOURCE.isInitialized) {
+      if (storage && !DATASOURCE.isInitialized && queryClient) {
         ([, rawBook] = await Promise.all([
           initSqlJs({ locateFile: file => `/${file}` }),
           storage.get(),
@@ -59,6 +61,16 @@ export default function useDataSource(): DataSourceContextType {
         // Due to async nature, this value can change between this and the previous statement
         // as it's a shared global
         if (!DATASOURCE.isInitialized) {
+          DATASOURCE.setOptions({
+            type: 'sqljs',
+            synchronize: true,
+            logging: false,
+            entities: [Account, Book, Commodity, Price, Split, Transaction],
+            migrations: MIGRATIONS,
+            extra: {
+              queryClient,
+            },
+          });
           const start = performance.now();
           await DATASOURCE.initialize();
 
@@ -77,7 +89,7 @@ export default function useDataSource(): DataSourceContextType {
     }
 
     load();
-  }, [storage]);
+  }, [storage, queryClient]);
 
   if (!isLoaded) {
     return {

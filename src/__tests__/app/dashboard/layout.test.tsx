@@ -1,12 +1,12 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import * as swr from 'swr';
 import * as navigation from 'next/navigation';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 import type { DataSourceContextType } from '@/hooks';
 import DashboardLayout from '@/app/dashboard/layout';
-import Topbar from '@/layout/Topbar';
+import DashboardPage from '@/layout/DashboardPage';
 import LeftSidebar from '@/layout/LeftSidebar';
 import Footer from '@/layout/Footer';
 import * as dataSourceHooks from '@/hooks/useDataSource';
@@ -32,8 +32,8 @@ jest.mock('@/layout/Footer', () => jest.fn(
   () => <div data-testid="Footer" />,
 ));
 
-jest.mock('@/layout/Topbar', () => jest.fn(
-  () => <div data-testid="Topbar" />,
+jest.mock('@/layout/DashboardPage', () => jest.fn(
+  () => <div data-testid="DashboardPage" />,
 ));
 
 jest.mock('react-modal', () => ({
@@ -57,26 +57,6 @@ describe('DashboardLayout', () => {
     jest.spyOn(sessionHook, 'default').mockReturnValue({
       isAuthenticated: true,
     } as sessionHook.SessionReturn);
-  });
-
-  it('returns loading when datasource not available', async () => {
-    jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
-      { isLoaded: false } as DataSourceContextType,
-    );
-    const { container } = render(
-      <DashboardLayout>
-        <span data-testid="child">child</span>
-      </DashboardLayout>,
-    );
-
-    const html = document.documentElement;
-    await waitFor(() => expect(html).toHaveClass('dark'));
-
-    expect(screen.queryByTestId('child')).not.toBeInTheDocument();
-    expect(Topbar).toBeCalledTimes(0);
-    expect(LeftSidebar).toBeCalledTimes(0);
-    expect(Footer).toBeCalledTimes(0);
-    expect(container).toMatchSnapshot();
   });
 
   it('sets system theme', async () => {
@@ -103,14 +83,14 @@ describe('DashboardLayout', () => {
   });
 
   it('renders as expected when datasource available', async () => {
+    const children = <span data-testid="child">child</span>;
     const { container } = render(
       <DashboardLayout>
-        <span data-testid="child">child</span>
+        {children}
       </DashboardLayout>,
     );
 
-    await screen.findByTestId('child');
-    expect(Topbar).toHaveBeenLastCalledWith({}, {});
+    await waitFor(() => expect(DashboardPage).toHaveBeenLastCalledWith({ children }, {}));
     expect(LeftSidebar).toHaveBeenLastCalledWith({}, {});
     expect(Footer).toHaveBeenLastCalledWith({}, {});
     expect(container).toMatchSnapshot();

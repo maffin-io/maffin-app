@@ -9,6 +9,7 @@ import userEvent from '@testing-library/user-event';
 import { DataSource, IsNull } from 'typeorm';
 import * as swr from 'swr';
 import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import {
   Account,
@@ -21,6 +22,7 @@ import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import * as queries from '@/lib/queries';
 import * as apiHook from '@/hooks/api';
 import { PriceDBMap } from '@/book/prices';
+import type { AccountsMap } from '@/types/book';
 
 jest.mock('swr');
 
@@ -65,7 +67,7 @@ describe('TransactionForm', () => {
     }).save();
 
     jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: [] } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<AccountsMap>);
     jest.spyOn(apiHook, 'usePrices')
       .mockReturnValue({ data: undefined } as SWRResponse);
 
@@ -189,8 +191,11 @@ describe('TransactionForm', () => {
       const user = userEvent.setup();
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
-          data: [assetAccount, expenseAccount],
-        } as SWRResponse,
+          data: {
+            [assetAccount.guid]: assetAccount,
+            [expenseAccount.guid]: expenseAccount,
+          },
+        } as UseQueryResult<AccountsMap>,
       );
       const mockSave = jest.fn();
 
@@ -317,8 +322,11 @@ describe('TransactionForm', () => {
       await assetAccount.save();
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
-          data: [assetAccount, expenseAccount],
-        } as SWRResponse,
+          data: {
+            [assetAccount.guid]: assetAccount,
+            [expenseAccount.guid]: expenseAccount,
+          },
+        } as UseQueryResult<AccountsMap>,
       );
       const mockSave = jest.fn();
 
@@ -424,8 +432,11 @@ describe('TransactionForm', () => {
       await expenseAccount.save();
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
-          data: [assetAccount, expenseAccount],
-        } as SWRResponse,
+          data: {
+            [assetAccount.guid]: assetAccount,
+            [expenseAccount.guid]: expenseAccount,
+          },
+        } as UseQueryResult<AccountsMap>,
       );
       const mockSave = jest.fn();
 
@@ -462,7 +473,9 @@ describe('TransactionForm', () => {
       await waitFor(() => expect(q1).toHaveValue(100));
 
       await user.click(screen.getByRole('combobox', { name: 'splits.1.account' }));
-      await user.click(screen.getByText('Expenses:random'));
+      // after saving we are setting the right account path so we need to use "Random"
+      // coz parent is root
+      await user.click(screen.getByText('Random'));
 
       // At this point v1 becomes available because txCurrency is EUR
       const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value' });
@@ -568,8 +581,11 @@ describe('TransactionForm', () => {
 
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
-          data: [assetAccount, tickerAccount],
-        } as SWRResponse,
+          data: {
+            [assetAccount.guid]: assetAccount,
+            [tickerAccount.guid]: tickerAccount,
+          },
+        } as UseQueryResult<AccountsMap>,
       );
       const mockSave = jest.fn();
 
@@ -711,8 +727,11 @@ describe('TransactionForm', () => {
 
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
-          data: [assetAccount, tickerAccount],
-        } as SWRResponse,
+          data: {
+            [assetAccount.guid]: assetAccount,
+            [tickerAccount.guid]: tickerAccount,
+          },
+        } as UseQueryResult<AccountsMap>,
       );
       const mockSave = jest.fn();
 
@@ -855,8 +874,12 @@ describe('TransactionForm', () => {
 
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
-          data: [assetAccount, tickerAccount, expenseAccount],
-        } as SWRResponse,
+          data: {
+            [assetAccount.guid]: assetAccount,
+            [tickerAccount.guid]: tickerAccount,
+            [expenseAccount.guid]: expenseAccount,
+          },
+        } as UseQueryResult<AccountsMap>,
       );
       const mockSave = jest.fn();
 
@@ -1034,8 +1057,12 @@ describe('TransactionForm', () => {
 
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
-          data: [assetAccount, tickerAccount, expenseAccount],
-        } as SWRResponse,
+          data: {
+            [assetAccount.guid]: assetAccount,
+            [tickerAccount.guid]: tickerAccount,
+            [expenseAccount.guid]: expenseAccount,
+          },
+        } as UseQueryResult<AccountsMap>,
       );
       const mockSave = jest.fn();
 
@@ -1159,8 +1186,11 @@ describe('TransactionForm', () => {
     const user = userEvent.setup();
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: [assetAccount, expenseAccount],
-      } as SWRResponse,
+        data: {
+          [assetAccount.guid]: assetAccount,
+          [expenseAccount.guid]: expenseAccount,
+        },
+      } as UseQueryResult<AccountsMap>,
     );
     const mockSave = jest.fn();
 
@@ -1226,8 +1256,11 @@ describe('TransactionForm', () => {
       const user = userEvent.setup();
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
-          data: [assetAccount, expenseAccount],
-        } as SWRResponse,
+          data: {
+            [assetAccount.guid]: assetAccount,
+            [expenseAccount.guid]: expenseAccount,
+          },
+        } as UseQueryResult<AccountsMap>,
       );
       const mockSave = jest.fn();
 
@@ -1300,8 +1333,12 @@ describe('TransactionForm', () => {
 
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
-          data: [assetAccount, expenseAccount, extraExpenseAccount],
-        } as SWRResponse,
+          data: {
+            [assetAccount.guid]: assetAccount,
+            [expenseAccount.guid]: expenseAccount,
+            [extraExpenseAccount.guid]: extraExpenseAccount,
+          },
+        } as UseQueryResult<AccountsMap>,
       );
       const mockSave = jest.fn();
 
@@ -1392,8 +1429,11 @@ describe('TransactionForm', () => {
       const user = userEvent.setup();
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
-          data: [assetAccount, expenseAccount],
-        } as SWRResponse,
+          data: {
+            [assetAccount.guid]: assetAccount,
+            [expenseAccount.guid]: expenseAccount,
+          },
+        } as UseQueryResult<AccountsMap>,
       );
       const mockSave = jest.fn();
 

@@ -7,7 +7,10 @@ import { InvestmentAccount } from '@/book/models';
 import * as queries from '@/lib/queries';
 import type { PriceDBMap } from '@/book/prices';
 import type { AccountsMap } from '@/types/book';
-import type { Account, Split, Transaction } from '@/book/entities';
+import type { Split, Transaction } from '@/book/entities';
+import { useAccounts } from './useAccounts';
+
+export { useAccount, useAccounts } from '@/hooks/api/useAccounts';
 
 export function useStartDate(): SWRResponse<DateTime> {
   const key = '/api/start-date';
@@ -71,42 +74,6 @@ export function useLatestTxs(): SWRResponse<Transaction[]> {
     key,
     fetcher(queries.getLatestTxs, key),
   );
-}
-
-export function useAccount(guid: string): SWRResponse<Account> {
-  const key = `/api/accounts/${guid}`;
-
-  const result = useSWRImmutable(
-    key,
-    fetcher(() => queries.getAccounts(guid), key),
-  );
-
-  if (result.error) {
-    throw new Error(result.error);
-  }
-
-  return result;
-}
-
-export function useAccounts(): SWRResponse<AccountsMap> {
-  const key = '/api/accounts';
-
-  const result = useSWRImmutable(
-    key,
-    fetcher(() => queries.getAccounts(), key),
-  );
-
-  if (result.error) {
-    throw new Error(result.error);
-  }
-
-  if (result.data) {
-    Object.values(result.data as AccountsMap).forEach(
-      (account: Account) => mutate(`/api/accounts/${account.guid}`, account, { revalidate: false }),
-    );
-  }
-
-  return result;
 }
 
 export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {

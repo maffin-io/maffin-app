@@ -43,7 +43,8 @@ export default function FormButton({
             React.cloneElement(
               children,
               {
-                onSave: () => {
+                onSave: (e: unknown) => {
+                  children.props.onSave?.(e);
                   save();
                   setIsModalOpen(false);
                 },

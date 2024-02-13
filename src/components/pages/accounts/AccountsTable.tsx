@@ -66,7 +66,7 @@ function getTreeTotals(
   const leaves: AccountsTableRow[] = [];
   current.childrenIds.forEach(childId => {
     const childAccount = accounts[childId];
-    if (!childAccount.hidden) {
+    if (!childAccount.hidden && childAccount.parentId === current.guid) {
       leaves.push(getTreeTotals(childAccount, accounts, monthlyTotals, selectedDate));
     }
   });

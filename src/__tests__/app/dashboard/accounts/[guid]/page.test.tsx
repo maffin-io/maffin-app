@@ -182,6 +182,7 @@ describe('AccountPage', () => {
         defaultValues: {
           ...account,
         },
+        onSave: expect.any(Function),
       },
       {},
     );

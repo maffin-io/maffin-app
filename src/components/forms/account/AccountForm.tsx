@@ -3,8 +3,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 import { DateTime } from 'luxon';
 import { mutate } from 'swr';
-import { useRouter } from 'next/navigation';
-import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import classNames from 'classnames';
 
 import {
@@ -20,7 +18,6 @@ import {
 } from '@/components/selectors';
 import { getAllowedSubAccounts } from '@/book/helpers/accountType';
 import { toAmountWithScale } from '@/helpers/number';
-import type { AccountsMap } from '@/types/book';
 import createEquityAccount from '@/lib/createEquityAccount';
 import { Tooltip } from 'react-tooltip';
 import type { FormValues } from '@/components/forms/account/types';
@@ -46,7 +43,6 @@ export default function AccountForm({
   onSave = () => {},
   hideDefaults = false,
 }: AccountFormProps): JSX.Element {
-  const router = useRouter();
   const form = useForm<FormValues>({
     defaultValues,
     mode: 'onChange',
@@ -64,7 +60,7 @@ export default function AccountForm({
   const type = form.watch('type');
 
   return (
-    <form onSubmit={form.handleSubmit((data) => onSubmit(data, action, router, onSave))}>
+    <form onSubmit={form.handleSubmit((data) => onSubmit(data, action, onSave))}>
       <div className="grid grid-cols-12 text-sm my-5 gap-2">
         <fieldset className="col-span-6">
           <label htmlFor="nameInput" className="inline-block mb-2">Name</label>
@@ -302,41 +298,29 @@ export default function AccountForm({
 async function onSubmit(
   data: FormValues,
   action: 'add' | 'update' | 'delete',
-  router: AppRouterInstance,
   onSave: Function,
 ) {
-  // TODO: check if currency exists, if not, calculate the rate
-  // against the parent and against main currency
   const account = Account.create({
     ...data,
     guid: data.guid || undefined,
   });
-  // For some reason the beforeInsert doesn't work when updating an account.
-  // The code is not different from when we add an account and it works there...
-  account.setPath();
 
-  if (action === 'add') {
+  if (action === 'add' || action === 'update') {
     await account.save();
-    mutate(`/api/accounts/${account.guid}`);
-    mutate('/api/accounts');
-    if (data.balance) {
+    if (action === 'add' && data.balance) {
       await createBalance(data, account);
     }
-  } else if (action === 'update') {
-    await account.save();
-    mutate(`/api/accounts/${account.guid}`);
-    mutate('/api/accounts');
   } else if (action === 'delete') {
-    await Account.remove(account);
-    mutate(`/api/accounts/${account.guid}`);
-    mutate('/api/accounts');
-    router.replace('/dashboard/accounts');
+    await account.remove();
   }
 
   onSave(account);
 }
 
-async function createBalance(data: FormValues, account: Account) {
+async function createBalance(
+  data: FormValues,
+  account: Account,
+) {
   let equityAccount = await Account.findOneBy({
     type: 'EQUITY',
     name: `Opening balances - ${account.commodity.mnemonic}`,
@@ -344,22 +328,6 @@ async function createBalance(data: FormValues, account: Account) {
 
   if (!equityAccount) {
     equityAccount = await createEquityAccount(account.commodity);
-
-    mutate(
-      '/api/accounts',
-      async (accounts: AccountsMap) => {
-        const [equity, equityRoot] = await Promise.all([
-          Account.findOneByOrFail({ guid: equityAccount?.guid }),
-          Account.findOneByOrFail({ guid: equityAccount?.parent.guid }),
-        ]);
-        return {
-          ...accounts,
-          [equity.guid]: equity,
-          [equityRoot.guid]: equityRoot,
-        };
-      },
-      { revalidate: false },
-    );
   }
 
   const { amount, scale } = toAmountWithScale(data.balance as number);

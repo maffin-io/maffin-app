@@ -2,12 +2,14 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { DateTime } from 'luxon';
 import type { SWRResponse } from 'swr';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import { AccountsTable } from '@/components/pages/accounts';
 import Table from '@/components/Table';
 import { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import * as apiHook from '@/hooks/api';
+import { AccountsMap } from '@/types/book';
 
 jest.mock('@/components/Table', () => jest.fn(
   () => <div data-testid="Table" />,
@@ -22,7 +24,7 @@ jest.mock('@/hooks/api', () => ({
 describe('AccountsTable', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-01') as DateTime<true>);
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<AccountsMap>);
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue({ data: undefined } as SWRResponse);
   });
 
@@ -86,6 +88,7 @@ describe('AccountsTable', () => {
               mnemonic: 'EUR',
             },
             type: 'ASSET',
+            parentId: 'root',
             childrenIds: [] as string[],
             placeholder: true,
           },
@@ -96,10 +99,11 @@ describe('AccountsTable', () => {
               mnemonic: 'EUR',
             },
             type: 'INCOME',
+            parentId: 'root',
             childrenIds: [] as string[],
           },
-        },
-      } as SWRResponse,
+        } as AccountsMap,
+      } as UseQueryResult<AccountsMap>,
     );
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
       {
@@ -127,6 +131,7 @@ describe('AccountsTable', () => {
               guid: 'a1',
               name: 'Assets',
               type: 'ASSET',
+              parentId: 'root',
               description: 'description',
               commodity: {
                 mnemonic: 'EUR',
@@ -142,6 +147,7 @@ describe('AccountsTable', () => {
               guid: 'a2',
               name: 'Salary',
               type: 'INCOME',
+              parentId: 'root',
               commodity: {
                 mnemonic: 'EUR',
               },
@@ -177,11 +183,12 @@ describe('AccountsTable', () => {
               mnemonic: 'EUR',
             },
             type: 'EXPENSE',
+            parentId: 'root',
             childrenIds: [] as string[],
             placeholder: true,
           },
-        },
-      } as SWRResponse,
+        } as AccountsMap,
+      } as UseQueryResult<AccountsMap>,
     );
     jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
       {
@@ -207,6 +214,7 @@ describe('AccountsTable', () => {
               guid: 'a1',
               name: 'Expense',
               type: 'EXPENSE',
+              parentId: 'root',
               description: 'description',
               commodity: {
                 mnemonic: 'EUR',
@@ -246,8 +254,8 @@ describe('AccountsTable', () => {
             childrenIds: [] as string[],
             hidden: true,
           },
-        },
-      } as SWRResponse,
+        } as AccountsMap,
+      } as UseQueryResult<AccountsMap>,
     );
 
     render(<AccountsTable />);
