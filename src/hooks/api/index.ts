@@ -6,23 +6,27 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 
-import { Commodity, Price, Transaction } from '@/book/entities';
+import {
+  Commodity,
+  Price,
+  Split,
+  Transaction,
+} from '@/book/entities';
 import { InvestmentAccount } from '@/book/models';
 import * as queries from '@/lib/queries';
 import type { PriceDBMap } from '@/book/prices';
-import type { Account, Split } from '@/book/entities';
+import type { Account } from '@/book/entities';
 import { useAccounts } from './useAccounts';
 import fetcher from './fetcher';
 
 export { useAccount, useAccounts } from '@/hooks/api/useAccounts';
 export { useCommodity, useCommodities } from '@/hooks/api/useCommodities';
 
-export function useSplits(guid: string): SWRResponse<Split[]> {
-  const key = `/api/splits/${guid}`;
-  return useSWRImmutable(
-    key,
-    fetcher(async () => queries.getSplits(guid), key),
-  );
+export function useSplits(guid: string): UseQueryResult<Split[]> {
+  return useQuery({
+    queryKey: [Split.CACHE_KEY, { account: guid }],
+    queryFn: fetcher(() => queries.getSplits(guid), `${Split.CACHE_KEY}/${guid}`),
+  });
 }
 
 export function useStartDate(): UseQueryResult<DateTime> {

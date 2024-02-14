@@ -275,30 +275,64 @@ describe('caching', () => {
 
   it('invalidates keys when saving', async () => {
     const tx = new Transaction();
+    tx.splits = [
+      {
+        fk_account: { guid: '1' } as Account,
+      } as Split,
+      {
+        fk_account: { guid: '2' } as Account,
+      } as Split,
+    ];
 
     await tx.save();
 
+    expect(mockInvalidateQueries).toBeCalledTimes(4);
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['/api/txs', { name: 'latest' }],
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['/api/txs', { name: 'latest' }],
+      refetchType: 'all',
+    });
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['/api/splits', { account: '1' }],
+      refetchType: 'all',
+    });
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['/api/splits', { account: '2' }],
       refetchType: 'all',
     });
   });
 
   it('invalidates keys when deleting', async () => {
     const tx = new Transaction();
+    tx.splits = [
+      {
+        fk_account: { guid: '1' } as Account,
+      } as Split,
+      {
+        fk_account: { guid: '2' } as Account,
+      } as Split,
+    ];
 
     await tx.remove();
 
+    expect(mockInvalidateQueries).toBeCalledTimes(4);
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['/api/txs', { name: 'latest' }],
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['/api/txs', { name: 'latest' }],
+      refetchType: 'all',
+    });
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['/api/splits', { account: '1' }],
+      refetchType: 'all',
+    });
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['/api/splits', { account: '2' }],
       refetchType: 'all',
     });
   });
