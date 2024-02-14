@@ -6,7 +6,7 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 
-import { Commodity, Transaction } from '@/book/entities';
+import { Commodity, Price, Transaction } from '@/book/entities';
 import { InvestmentAccount } from '@/book/models';
 import * as queries from '@/lib/queries';
 import type { PriceDBMap } from '@/book/prices';
@@ -108,10 +108,9 @@ export function useInvestments(): SWRResponse<InvestmentAccount[]> {
 /**
  * Returns prices for a given commodity
  */
-export function usePrices(c: Commodity | undefined): SWRResponse<PriceDBMap> {
-  const key = `/api/prices/${c?.guid}`;
-  return useSWRImmutable(
-    c?.guid ? key : null,
-    fetcher(async () => queries.getPrices({ from: c }), key),
-  );
+export function usePrices(c: Commodity | undefined): UseQueryResult<PriceDBMap> {
+  return useQuery({
+    queryKey: [Price.CACHE_KEY, { commodity: c?.guid }],
+    queryFn: fetcher(() => queries.getPrices({ from: c }), `${Price.CACHE_KEY}/${c?.guid}`),
+  });
 }

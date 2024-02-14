@@ -5,7 +5,9 @@ import {
   ManyToOne,
   JoinColumn,
   Index,
+  SaveOptions,
 } from 'typeorm';
+import type { QueryClient } from '@tanstack/react-query';
 
 import type Commodity from './Commodity';
 import { DateTimeTransformer } from './transformers';
@@ -30,6 +32,8 @@ import { toAmountWithScale } from '../../helpers/number';
 @Entity('prices')
 @Index(['fk_commodity', 'fk_currency', 'date'], { unique: true })
 export default class Price extends BaseEntity {
+  static CACHE_KEY = '/api/prices';
+
   @ManyToOne('Commodity', { eager: true })
   @JoinColumn({ name: 'commodity_guid' })
     fk_commodity!: Commodity | string;
@@ -93,6 +97,64 @@ export default class Price extends BaseEntity {
 
   get id(): string {
     return `${this.date.toISODate()}.${this.commodity.mnemonic}.${this.currency.mnemonic}`;
+  }
+
+  async save(): Promise<this> {
+    await Price.upsert(
+      [this],
+      {
+        conflictPaths: ['fk_commodity', 'fk_currency', 'date'],
+      },
+    );
+
+    if (this.queryClient) {
+      updateCache({ queryClient: this.queryClient, entity: this });
+    }
+
+    return this;
+  }
+
+  async remove(options?: SaveOptions): Promise<this> {
+    if (this.queryClient) {
+      updateCache({ queryClient: this.queryClient, entity: this, isDelete: true });
+    }
+
+    const price = await super.remove(options);
+    return price;
+  }
+}
+
+/**
+ * Invalidate /api/prices/<commodity> key so prices are refreshed
+ * whenever there is a change for that given commodity.
+ *
+ * If fk_commodity is a CURRENCY, we also refresh /api/prices/<currency>
+ * so when visiting the other currency we see updated (reversed) prices too.
+ *
+ * Note that if we want to optimise this with pre-computing, we need to take
+ * into account that we are doing upserts so it's not enough to check existence
+ * via guid, we also need to check for collisions with the same commodity-currency-date
+ */
+export async function updateCache(
+  {
+    queryClient,
+    entity,
+  }: {
+    queryClient: QueryClient,
+    entity: Price,
+    isDelete?: boolean,
+  },
+) {
+  queryClient.invalidateQueries({
+    queryKey: [Price.CACHE_KEY, { commodity: (entity.fk_commodity as Commodity).guid }],
+    refetchType: 'all',
+  });
+
+  if ((entity.fk_commodity as Commodity).namespace === 'CURRENCY') {
+    queryClient.invalidateQueries({
+      queryKey: [Price.CACHE_KEY, { commodity: (entity.fk_currency as Commodity).guid }],
+      refetchType: 'all',
+    });
   }
 }
 

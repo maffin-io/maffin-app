@@ -3,8 +3,7 @@ import {
   render,
   screen,
 } from '@testing-library/react';
-import type { SWRResponse } from 'swr';
-import { UseQueryResult } from '@tanstack/react-query';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import { Commodity, Price } from '@/book/entities';
 import CommodityPage from '@/app/dashboard/commodities/[guid]/page';
@@ -51,7 +50,7 @@ jest.mock('@/components/Loading', () => jest.fn(
 describe('CommodityPage', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'useCommodity').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
-    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
   });
 
   afterEach(() => {
@@ -78,7 +77,7 @@ describe('CommodityPage', () => {
     jest.spyOn(apiHook, 'useCommodity').mockReturnValue(
       { data: { guid: 'guid', mnemonic: 'EUR' } as Commodity } as UseQueryResult<Commodity>,
     );
-    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: new PriceDBMap([]) } as SWRResponse);
+    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: new PriceDBMap([]) } as UseQueryResult<PriceDBMap>);
 
     render(<CommodityPage params={{ guid: 'guid' }} />);
 
@@ -113,7 +112,7 @@ describe('CommodityPage', () => {
         },
       } as Price,
     ];
-    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: new PriceDBMap(prices) } as SWRResponse);
+    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: new PriceDBMap(prices) } as UseQueryResult<PriceDBMap>);
 
     const { container } = render(<CommodityPage params={{ guid: 'guid' }} />);
 
@@ -219,7 +218,7 @@ describe('CommodityPage', () => {
         },
       } as Price,
     ];
-    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: new PriceDBMap(prices) } as SWRResponse);
+    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: new PriceDBMap(prices) } as UseQueryResult<PriceDBMap>);
     render(<CommodityPage params={{ guid: 'guid' }} />);
 
     await screen.findByText('GOOGL');

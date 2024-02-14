@@ -283,7 +283,6 @@ describe('PriceForm', () => {
       fk_currency: usd,
       valueDenom: 1,
       valueNum: 120,
-      source: null,
     });
   });
 

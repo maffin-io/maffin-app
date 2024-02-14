@@ -81,19 +81,6 @@ describe('API', () => {
     expect(f).toBeCalledWith('guid');
   });
 
-  it('calls useSWRImmutable with expected params for usePrices', () => {
-    // @ts-ignore
-    renderHook(() => API.usePrices({ guid: 'guid' }));
-
-    expect(swrImmutable.default).toBeCalledWith(
-      '/api/prices/guid',
-      expect.any(Function),
-    );
-
-    expect(queries.getPrices).toBeCalledTimes(1);
-    expect(queries.getPrices).toBeCalledWith({ from: { guid: 'guid' } });
-  });
-
   it.each([
     'useInvestment',
     'useInvestments',
@@ -130,6 +117,21 @@ describe('API', () => {
       const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];
       callArgs.queryFn();
       expect(queries.getMainCurrency).toBeCalled();
+    });
+  });
+
+  describe('usePrices', () => {
+    it('calls query as expected', async () => {
+      renderHook(() => API.usePrices({ guid: 'guid' } as Commodity));
+
+      expect(query.useQuery).toBeCalledWith({
+        queryKey: ['/api/prices', { commodity: 'guid' }],
+        queryFn: expect.any(Function),
+      });
+
+      const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];
+      callArgs.queryFn();
+      expect(queries.getPrices).toBeCalledWith({ from: { guid: 'guid' } });
     });
   });
 

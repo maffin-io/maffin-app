@@ -2,7 +2,6 @@ import React from 'react';
 import { DateTime } from 'luxon';
 import { useForm, Controller } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
-import { mutate } from 'swr';
 import classNames from 'classnames';
 
 import { Price } from '@/book/entities';
@@ -150,16 +149,10 @@ async function onSubmit(
   });
 
   if (action === 'add' || action === 'update') {
-    await Price.upsert(
-      [price],
-      {
-        conflictPaths: ['fk_commodity', 'fk_currency', 'date'],
-      },
-    );
+    await price.save();
   } else if (action === 'delete') {
-    await Price.remove(price);
+    await price.remove();
   }
-  mutate(`/api/prices/${price.commodity.guid}`);
 
   onSave(price);
 }
