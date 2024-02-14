@@ -20,7 +20,7 @@ const queryClient = new QueryClient({
       refetchOnMount: false,
       refetchOnReconnect: false,
       refetchOnWindowFocus: false,
-      gcTime: 3600000,
+      gcTime: 300000,
     },
   },
 });

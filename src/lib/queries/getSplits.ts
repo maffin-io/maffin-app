@@ -1,4 +1,9 @@
-import { Split } from '@/book/entities';
+import type {
+  FindOptionsWhere,
+  FindOptionsRelations,
+} from 'typeorm';
+
+import { Account, Split } from '@/book/entities';
 
 /**
  * Returns splits associated to the received account
@@ -6,20 +11,18 @@ import { Split } from '@/book/entities';
  * The splits are ordered by transaction date and quantity. This is so it's
  * easy to display the splits as the account ledger.
  */
-export default async function getSplits(account: string): Promise<Split[]> {
+export default async function getSplits(
+  account: FindOptionsWhere<Account>,
+  relations?: FindOptionsRelations<Split>,
+): Promise<Split[]> {
   const splits = await Split.find({
     where: {
       fk_account: {
-        guid: account,
+        ...account,
       },
     },
     relations: {
-      fk_transaction: {
-        splits: {
-          fk_account: true,
-        },
-      },
-      fk_account: true,
+      ...relations,
     },
     order: {
       fk_transaction: {

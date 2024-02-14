@@ -25,7 +25,7 @@ export default function InvestmentChart({
     return <Loading />;
   }
 
-  if (!investment.account.splits.length) {
+  if (!investment.splits.length) {
     return (
       <div className="flex h-full text-sm place-content-center place-items-center">
         <span>You don&apos;t have any transactions for this investment yet!</span>
@@ -33,7 +33,7 @@ export default function InvestmentChart({
     );
   }
 
-  const startDate = investment.account.splits[0].transaction.date;
+  const startDate = investment.splits[investment.splits.length - 1].transaction.date;
   const prices = pricesMap.prices || [];
   const currency = (prices.length && prices[0].currency.mnemonic) || '';
 

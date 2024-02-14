@@ -51,7 +51,7 @@ describe('InvestmentsPage', () => {
   });
 
   it('shows loading when loading data', async () => {
-    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ isLoading: true } as UseQueryResult<InvestmentAccount[]>);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ isPending: true } as UseQueryResult<InvestmentAccount[]>);
     render(<InvestmentsPage />);
 
     await screen.findByTestId('Loading');

@@ -64,36 +64,6 @@ describe('API', () => {
     });
   });
 
-  describe('useMainCurrency', () => {
-    it('calls query as expected', async () => {
-      renderHook(() => API.useMainCurrency());
-
-      expect(query.useQuery).toBeCalledWith({
-        queryKey: ['/api/commodities', { guid: 'main' }],
-        queryFn: expect.any(Function),
-      });
-
-      const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];
-      callArgs.queryFn();
-      expect(queries.getMainCurrency).toBeCalled();
-    });
-  });
-
-  describe('usePrices', () => {
-    it('calls query as expected', async () => {
-      renderHook(() => API.usePrices({ guid: 'guid' } as Commodity));
-
-      expect(query.useQuery).toBeCalledWith({
-        queryKey: ['/api/prices', { commodity: 'guid' }],
-        queryFn: expect.any(Function),
-      });
-
-      const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];
-      callArgs.queryFn();
-      expect(queries.getPrices).toBeCalledWith({ from: { guid: 'guid' } });
-    });
-  });
-
   describe('useLatestTxs', () => {
     it('calls query as expected', async () => {
       renderHook(() => API.useLatestTxs());

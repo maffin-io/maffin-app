@@ -1,64 +1,28 @@
-import { Account, Commodity } from '@/book/entities';
+import { Account, Commodity, Split } from '@/book/entities';
 import { InvestmentAccount } from '@/book/models';
 import { PriceDBMap } from '@/book/prices';
-import getMainCurrency from '@/lib/queries/getMainCurrency';
 import getPrices from '@/lib/queries/getPrices';
 
-export async function getInvestments(): Promise<InvestmentAccount[]> {
-  const mainCurrency = await getMainCurrency();
-  const accounts = await Account.find({
-    where: { type: 'INVESTMENT' },
-    relations: {
-      // This is very similar to `getSplits` query. In the future
-      // we may want to try to re-use it
-      splits: {
-        fk_transaction: {
-          splits: {
-            fk_account: true,
-          },
-        },
-      },
-    },
-    order: {
-      splits: {
-        fk_transaction: {
-          date: 'ASC',
-        },
-      },
-    },
-  });
-
+export async function getInvestments(
+  accounts: Account[],
+  mainCurrency: Commodity,
+  splits: Split[],
+): Promise<InvestmentAccount[]> {
   const investments = await Promise.all(
-    accounts.map(account => initInvestment(account, mainCurrency)),
+    accounts.map(account => initInvestment(
+      account,
+      mainCurrency,
+      splits.filter(s => s.account.guid === account.guid),
+    )),
   );
 
   return investments;
 }
 
-export async function getInvestment(guid: string): Promise<InvestmentAccount> {
-  const mainCurrency = await getMainCurrency();
-  const account = await Account.findOneOrFail({
-    where: { guid },
-    relations: {
-      // This is very similar to `getSplits` query. In the future
-      // we may want to try to re-use it
-      splits: {
-        fk_transaction: {
-          splits: {
-            fk_account: true,
-          },
-        },
-      },
-    },
-  });
-
-  const investment = await initInvestment(account, mainCurrency);
-  return investment;
-}
-
-async function initInvestment(
+export async function initInvestment(
   account: Account,
   mainCurrency: Commodity,
+  splits: Split[],
 ): Promise<InvestmentAccount> {
   const prices = await getPrices({ from: account.commodity });
 
@@ -77,6 +41,7 @@ async function initInvestment(
   ]);
   const investment = new InvestmentAccount(
     account,
+    splits,
     mainCurrency.mnemonic,
     pricesMap,
   );

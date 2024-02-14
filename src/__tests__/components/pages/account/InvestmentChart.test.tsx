@@ -32,7 +32,7 @@ jest.mock('@/hooks/api', () => ({
 describe('InvestmentChart', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
-    jest.spyOn(apiHook, 'useInvestment').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestment').mockReturnValue({ data: undefined } as UseQueryResult<InvestmentAccount>);
     jest.spyOn(Price, 'create').mockReturnValue({
       guid: 'missing_price',
       date: DateTime.now(),
@@ -91,6 +91,7 @@ describe('InvestmentChart', () => {
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
       data: new InvestmentAccount(
         account,
+        account.splits,
         'EUR',
         new PriceDBMap([
           // @ts-ignore
@@ -105,7 +106,7 @@ describe('InvestmentChart', () => {
           } as Price,
         ]),
       ),
-    } as SWRResponse);
+    } as UseQueryResult<InvestmentAccount>);
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-02-02') as DateTime<true>);
 
     render(
@@ -176,6 +177,7 @@ describe('InvestmentChart', () => {
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
       data: new InvestmentAccount(
         account,
+        account.splits,
         'EUR',
         new PriceDBMap([
           // @ts-ignore
@@ -190,7 +192,7 @@ describe('InvestmentChart', () => {
           } as Price,
         ]),
       ),
-    } as SWRResponse);
+    } as UseQueryResult<InvestmentAccount>);
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-04-01') as DateTime<true>);
 
     render(
@@ -420,6 +422,7 @@ describe('InvestmentChart', () => {
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
       data: new InvestmentAccount(
         account,
+        account.splits,
         'EUR',
         new PriceDBMap([
           // @ts-ignore

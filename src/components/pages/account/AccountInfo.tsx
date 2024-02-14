@@ -15,7 +15,7 @@ export type AccountInfoProps = {
 export default function AccountInfo({
   account,
 }: AccountInfoProps): JSX.Element {
-  let { data: splits } = useSplits(account.guid);
+  let { data: splits } = useSplits({ guid: account.guid });
   splits = splits || [];
 
   const total = new Money(splits.reduce(

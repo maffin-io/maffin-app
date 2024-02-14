@@ -126,7 +126,7 @@ export async function updateCache(
 
   entity.splits.forEach(split => {
     queryClient.invalidateQueries({
-      queryKey: [Split.CACHE_KEY, { account: split.fk_account.guid }],
+      queryKey: [Split.CACHE_KEY, { guid: split.fk_account.guid }],
       refetchType: 'all',
     });
   });
