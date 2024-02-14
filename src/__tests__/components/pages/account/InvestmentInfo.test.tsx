@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { DateTime } from 'luxon';
 import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import { InvestmentInfo } from '@/components/pages/account';
 import InvestmentChart from '@/components/pages/account/InvestmentChart';
@@ -34,7 +35,7 @@ describe('InvestmentInfo', () => {
   let ticker: Commodity;
 
   beforeEach(() => {
-    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({ data: undefined } as SWRResponse);
     jest.spyOn(Price, 'create').mockImplementation();
 
@@ -90,7 +91,7 @@ describe('InvestmentInfo', () => {
           commodity: ticker,
         } as Price,
       ]),
-    } as SWRResponse);
+    } as UseQueryResult<PriceDBMap>);
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
       data: {
         cost: new Money(100, 'EUR'),
@@ -186,7 +187,7 @@ describe('InvestmentInfo', () => {
           commodity: ticker,
         } as Price,
       ]),
-    } as SWRResponse);
+    } as UseQueryResult<PriceDBMap>);
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
       data: {
         cost: new Money(100, 'EUR'),

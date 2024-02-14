@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { BiEdit, BiPlusCircle } from 'react-icons/bi';
+import Link from 'next/link';
 
 import { useCommodity, usePrices } from '@/hooks/api';
 import FormButton from '@/components/buttons/FormButton';
@@ -102,7 +103,14 @@ export default function CommodityPage({ params }: CommodityPageProps): JSX.Eleme
               <div key={key}>
                 <div className="header">
                   <span className="title text-lg">
-                    {`${commodity.mnemonic} - ${byCurrencyPrices[0].currency.mnemonic} price data`}
+                    {`${commodity.mnemonic} - `}
+                    <Link
+                      href={`/dashboard/commodities/${byCurrencyPrices[0].currency.guid}`}
+                    >
+                      {byCurrencyPrices[0].currency.mnemonic}
+                    </Link>
+                    {' '}
+                    price data
                   </span>
                 </div>
                 <div className="grid grid-cols-12 card">

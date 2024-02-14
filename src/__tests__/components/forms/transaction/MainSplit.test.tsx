@@ -7,8 +7,7 @@ import {
 import { DateTime } from 'luxon';
 import userEvent from '@testing-library/user-event';
 import { useForm } from 'react-hook-form';
-import type { SWRResponse } from 'swr';
-import { UseQueryResult } from '@tanstack/react-query';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import MainSplit from '@/components/forms/transaction/MainSplit';
 import * as queries from '@/lib/queries';
@@ -41,6 +40,8 @@ describe('MainSplit', () => {
     jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
     jest.spyOn(apiHook, 'useAccounts')
       .mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
+    jest.spyOn(apiHook, 'usePrices')
+      .mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
     // @ts-ignore
     jest.spyOn(Price, 'create').mockReturnValue({ value: 1 });
   });
@@ -140,7 +141,7 @@ describe('MainSplit', () => {
             commodity: eur,
             value: 1.013,
           } as Price]),
-        } as SWRResponse);
+        } as UseQueryResult<PriceDBMap>);
 
       render(
         <FormWrapper
@@ -181,7 +182,7 @@ describe('MainSplit', () => {
             currency: eur,
             value: 500,
           } as Price]),
-        } as SWRResponse);
+        } as UseQueryResult<PriceDBMap>);
 
       render(
         <FormWrapper
@@ -242,7 +243,7 @@ describe('MainSplit', () => {
               value: 0.987,
             } as Price,
           ]),
-        } as SWRResponse);
+        } as UseQueryResult<PriceDBMap>);
 
       render(
         <FormWrapper

@@ -2,6 +2,7 @@ import React from 'react';
 import { DateTime } from 'luxon';
 import { render, screen } from '@testing-library/react';
 import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import Line from '@/components/charts/Line';
 import {
@@ -30,7 +31,7 @@ jest.mock('@/hooks/api', () => ({
 
 describe('InvestmentChart', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({ data: undefined } as SWRResponse);
     jest.spyOn(Price, 'create').mockReturnValue({
       guid: 'missing_price',
@@ -67,14 +68,17 @@ describe('InvestmentChart', () => {
       mnemonic: 'EUR',
     };
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({
-      data: [
+      data: new PriceDBMap([
         {
           date: DateTime.fromISO('2023-01-01'),
           value: 100,
+          commodity: {
+            mnemonic: 'USD',
+          },
           currency: eur,
-        },
-      ],
-    } as SWRResponse);
+        } as Price,
+      ]),
+    } as UseQueryResult<PriceDBMap>);
 
     const account = {
       guid: 'guid',
@@ -168,7 +172,7 @@ describe('InvestmentChart', () => {
           commodity: googl,
         } as Price,
       ]),
-    } as SWRResponse);
+    } as UseQueryResult<PriceDBMap>);
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
       data: new InvestmentAccount(
         account,
@@ -412,7 +416,7 @@ describe('InvestmentChart', () => {
           commodity: googl,
         } as Price,
       ]),
-    } as SWRResponse);
+    } as UseQueryResult<PriceDBMap>);
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
       data: new InvestmentAccount(
         account,

@@ -7,7 +7,6 @@ import {
 import { DateTime } from 'luxon';
 import userEvent from '@testing-library/user-event';
 import { useForm } from 'react-hook-form';
-import type { SWRResponse } from 'swr';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import {
@@ -44,7 +43,7 @@ describe('SplitField', () => {
 
     jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
     jest.spyOn(apiHook, 'usePrices')
-      .mockReturnValue({ data: undefined } as SWRResponse);
+      .mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
     jest.spyOn(apiHook, 'useAccounts')
       .mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
     // @ts-ignore
@@ -419,7 +418,7 @@ describe('SplitField', () => {
             commodity: usd,
             value: 0.987,
           } as Price]),
-        } as SWRResponse);
+        } as UseQueryResult<PriceDBMap>);
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
           data: [
@@ -469,7 +468,7 @@ describe('SplitField', () => {
             currency: eur,
             value: 500,
           } as Price]),
-        } as SWRResponse);
+        } as UseQueryResult<PriceDBMap>);
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
           data: [
@@ -518,7 +517,7 @@ describe('SplitField', () => {
             commodity: usd,
             value: 0.987,
           } as Price]),
-        } as SWRResponse);
+        } as UseQueryResult<PriceDBMap>);
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
           data: [
@@ -590,7 +589,7 @@ describe('SplitField', () => {
             currency: eur,
             value: 0.987,
           } as Price]),
-        } as SWRResponse);
+        } as UseQueryResult<PriceDBMap>);
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
           data: [
@@ -667,7 +666,7 @@ describe('SplitField', () => {
               value: 1.05,
             } as Price,
           ]),
-        } as SWRResponse);
+        } as UseQueryResult<PriceDBMap>);
 
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {

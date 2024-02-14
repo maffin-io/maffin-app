@@ -94,5 +94,117 @@ describe('Price', () => {
       expect(price.valueNum).toEqual(1000);
       expect(price.valueDenom).toEqual(1);
     });
+
+    it('upserts price', async () => {
+      let prices = await Price.find();
+      expect(prices).toHaveLength(1);
+      expect(prices[0].value).toEqual(0.1);
+
+      await Price.create({
+        fk_commodity: commodity1,
+        fk_currency: commodity2,
+        date: DateTime.fromISO('2023-01-01'),
+        source: `maffin::${JSON.stringify({
+          changeAbs: 10.1,
+          changePct: 1.1,
+        })}`,
+        valueNum: 20,
+        valueDenom: 100,
+      }).save();
+
+      prices = await Price.find();
+      expect(prices).toHaveLength(1);
+      expect(prices[0].value).toEqual(0.2);
+    });
+  });
+});
+
+describe('caching', () => {
+  let mockInvalidateQueries: jest.Mock;
+  let datasource: DataSource;
+
+  beforeEach(async () => {
+    mockInvalidateQueries = jest.fn();
+
+    datasource = new DataSource({
+      type: 'sqljs',
+      dropSchema: true,
+      entities: [Commodity, Price],
+      synchronize: true,
+      logging: false,
+      extra: {
+        queryClient: {
+          invalidateQueries: mockInvalidateQueries,
+        },
+      },
+    });
+
+    await datasource.initialize();
+
+    // @ts-ignore
+    jest.spyOn(Price, 'upsert').mockImplementation();
+    // @ts-ignore
+    jest.spyOn(BaseEntity.prototype, 'remove').mockImplementation();
+  });
+
+  it('invalidates keys when saving', async () => {
+    const price = new Price();
+    price.fk_commodity = {
+      guid: 'ticker',
+      namespace: 'CUSTOM',
+    } as Commodity;
+
+    await price.save();
+
+    expect(mockInvalidateQueries).toBeCalledTimes(1);
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['/api/prices', { commodity: 'ticker' }],
+      refetchType: 'all',
+    });
+    expect(Price.upsert).toBeCalledWith(
+      [price],
+      {
+        conflictPaths: ['fk_commodity', 'fk_currency', 'date'],
+      },
+    );
+  });
+
+  it('invalidates currency keys when commodity is currency', async () => {
+    const price = new Price();
+    price.fk_commodity = {
+      guid: 'eur',
+      namespace: 'CURRENCY',
+    } as Commodity;
+    price.fk_currency = {
+      guid: 'usd',
+    } as Commodity;
+
+    await price.save();
+
+    expect(mockInvalidateQueries).toBeCalledTimes(2);
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['/api/prices', { commodity: 'eur' }],
+      refetchType: 'all',
+    });
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['/api/prices', { commodity: 'usd' }],
+      refetchType: 'all',
+    });
+  });
+
+  it('invalidates keys when deleting', async () => {
+    const price = new Price();
+    price.fk_commodity = {
+      guid: 'ticker',
+      namespace: 'CUSTOM',
+    } as Commodity;
+
+    await price.remove();
+
+    expect(mockInvalidateQueries).toBeCalledTimes(1);
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['/api/prices', { commodity: 'ticker' }],
+      refetchType: 'all',
+    });
   });
 });

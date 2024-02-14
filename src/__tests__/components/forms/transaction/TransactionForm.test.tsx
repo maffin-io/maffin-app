@@ -8,7 +8,6 @@ import {
 import userEvent from '@testing-library/user-event';
 import { DataSource, IsNull } from 'typeorm';
 import * as swr from 'swr';
-import type { SWRResponse } from 'swr';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import {
@@ -68,7 +67,7 @@ describe('TransactionForm', () => {
     jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
     jest.spyOn(apiHook, 'usePrices')
-      .mockReturnValue({ data: undefined } as SWRResponse);
+      .mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
 
     root = await Account.create({
       guid: 'root_account_guid',
@@ -304,7 +303,7 @@ describe('TransactionForm', () => {
               value: 0.7,
             } as Price,
           ]),
-        } as SWRResponse);
+        } as UseQueryResult<PriceDBMap>);
     });
 
     /**
@@ -567,7 +566,7 @@ describe('TransactionForm', () => {
               value: 1 / 0.7,
             } as Price,
           ]),
-        } as SWRResponse);
+        } as UseQueryResult<PriceDBMap>);
 
       const tickerAccount = await Account.create({
         guid: 'account_guid_3',
@@ -712,7 +711,7 @@ describe('TransactionForm', () => {
               value: 1 / 0.7,
             } as Price,
           ]),
-        } as SWRResponse);
+        } as UseQueryResult<PriceDBMap>);
 
       const tickerAccount = await Account.create({
         guid: 'account_guid_3',
@@ -860,7 +859,7 @@ describe('TransactionForm', () => {
               value: 1 / 0.7,
             } as Price,
           ]),
-        } as SWRResponse);
+        } as UseQueryResult<PriceDBMap>);
 
       const tickerAccount = await Account.create({
         guid: 'account_guid_3',
@@ -1042,7 +1041,7 @@ describe('TransactionForm', () => {
               value: 1 / 0.7,
             } as Price,
           ]),
-        } as SWRResponse);
+        } as UseQueryResult<PriceDBMap>);
 
       const tickerAccount = await Account.create({
         guid: 'account_guid_3',

@@ -20,6 +20,7 @@ import SplitsField from '@/components/forms/transaction/SplitsField';
 import * as queries from '@/lib/queries';
 import * as apiHook from '@/hooks/api';
 import type { FormValues } from '@/components/forms/transaction/types';
+import type { PriceDBMap } from '@/book/prices';
 
 jest.mock('@/lib/queries', () => ({
   __esModule: true,
@@ -34,11 +35,10 @@ jest.mock('@/hooks/api', () => ({
 describe('SplitsField', () => {
   let datasource: DataSource;
   beforeEach(async () => {
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: undefined,
-      } as UseQueryResult<Account[]>,
-    );
+    jest.spyOn(apiHook, 'useAccounts')
+      .mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
+    jest.spyOn(apiHook, 'usePrices')
+      .mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,

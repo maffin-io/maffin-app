@@ -41,7 +41,14 @@ exports[`CommodityPage renders as expected with commodity 1`] = `
         <span
           class="title text-lg"
         >
-          EUR - USD price data
+          EUR - 
+          <a
+            href="/dashboard/commodities/c1"
+          >
+            USD
+          </a>
+           
+          price data
         </span>
       </div>
       <div
@@ -70,7 +77,14 @@ exports[`CommodityPage renders as expected with commodity 1`] = `
         <span
           class="title text-lg"
         >
-          EUR - SGD price data
+          EUR - 
+          <a
+            href="/dashboard/commodities/c2"
+          >
+            SGD
+          </a>
+           
+          price data
         </span>
       </div>
       <div
