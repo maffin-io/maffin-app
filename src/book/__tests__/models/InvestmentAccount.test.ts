@@ -352,6 +352,14 @@ describe('InvestmentAccount', () => {
               },
             },
           },
+          order: {
+            splits: {
+              fk_transaction: {
+                date: 'DESC',
+                enterDate: 'DESC',
+              },
+            },
+          },
         });
         const instance = new InvestmentAccount(
           account,
@@ -407,6 +415,14 @@ describe('InvestmentAccount', () => {
             splits: {
               fk_transaction: {
                 splits: true,
+              },
+            },
+          },
+          order: {
+            splits: {
+              fk_transaction: {
+                date: 'DESC',
+                enterDate: 'DESC',
               },
             },
           },
@@ -466,6 +482,14 @@ describe('InvestmentAccount', () => {
               },
             },
           },
+          order: {
+            splits: {
+              fk_transaction: {
+                date: 'DESC',
+                enterDate: 'DESC',
+              },
+            },
+          },
         });
         const instance = new InvestmentAccount(
           account,
@@ -513,6 +537,14 @@ describe('InvestmentAccount', () => {
             splits: {
               fk_transaction: {
                 splits: true,
+              },
+            },
+          },
+          order: {
+            splits: {
+              fk_transaction: {
+                date: 'DESC',
+                enterDate: 'DESC',
               },
             },
           },
@@ -571,6 +603,14 @@ describe('InvestmentAccount', () => {
               },
             },
           },
+          order: {
+            splits: {
+              fk_transaction: {
+                date: 'DESC',
+                enterDate: 'DESC',
+              },
+            },
+          },
         });
         const instance = new InvestmentAccount(
           account,
@@ -623,6 +663,14 @@ describe('InvestmentAccount', () => {
             splits: {
               fk_transaction: {
                 splits: true,
+              },
+            },
+          },
+          order: {
+            splits: {
+              fk_transaction: {
+                date: 'DESC',
+                enterDate: 'DESC',
               },
             },
           },
@@ -680,6 +728,14 @@ describe('InvestmentAccount', () => {
               },
             },
           },
+          order: {
+            splits: {
+              fk_transaction: {
+                date: 'DESC',
+                enterDate: 'DESC',
+              },
+            },
+          },
         });
         const instance = new InvestmentAccount(
           account,
@@ -732,6 +788,14 @@ describe('InvestmentAccount', () => {
               },
             },
           },
+          order: {
+            splits: {
+              fk_transaction: {
+                date: 'DESC',
+                enterDate: 'DESC',
+              },
+            },
+          },
         });
         const instance = new InvestmentAccount(
           account,
@@ -781,6 +845,14 @@ describe('InvestmentAccount', () => {
             splits: {
               fk_transaction: {
                 splits: true,
+              },
+            },
+          },
+          order: {
+            splits: {
+              fk_transaction: {
+                date: 'DESC',
+                enterDate: 'DESC',
               },
             },
           },
@@ -855,6 +927,14 @@ describe('InvestmentAccount', () => {
                 splits: {
                   fk_account: true,
                 },
+              },
+            },
+          },
+          order: {
+            splits: {
+              fk_transaction: {
+                date: 'DESC',
+                enterDate: 'DESC',
               },
             },
           },
@@ -947,6 +1027,14 @@ describe('InvestmentAccount', () => {
               },
             },
           },
+          order: {
+            splits: {
+              fk_transaction: {
+                date: 'DESC',
+                enterDate: 'DESC',
+              },
+            },
+          },
         });
         const instance = new InvestmentAccount(
           account,
@@ -976,6 +1064,14 @@ describe('InvestmentAccount', () => {
                 splits: {
                   fk_account: true,
                 },
+              },
+            },
+          },
+          order: {
+            splits: {
+              fk_transaction: {
+                date: 'DESC',
+                enterDate: 'DESC',
               },
             },
           },
@@ -1011,6 +1107,14 @@ describe('InvestmentAccount', () => {
                 splits: {
                   fk_account: true,
                 },
+              },
+            },
+          },
+          order: {
+            splits: {
+              fk_transaction: {
+                date: 'DESC',
+                enterDate: 'DESC',
               },
             },
           },
@@ -1053,6 +1157,14 @@ describe('InvestmentAccount', () => {
           splits: {
             fk_transaction: {
               splits: true,
+            },
+          },
+        },
+        order: {
+          splits: {
+            fk_transaction: {
+              date: 'DESC',
+              enterDate: 'DESC',
             },
           },
         },
