@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { mutate, SWRResponse } from 'swr';
+import { SWRResponse } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import {
   useQuery,
@@ -12,7 +12,6 @@ import {
   Split,
   Transaction,
 } from '@/book/entities';
-import { InvestmentAccount } from '@/book/models';
 import * as queries from '@/lib/queries';
 import type { PriceDBMap } from '@/book/prices';
 import type { Account } from '@/book/entities';
@@ -21,6 +20,7 @@ import fetcher from './fetcher';
 
 export { useAccount, useAccounts } from '@/hooks/api/useAccounts';
 export { useCommodity, useCommodities } from '@/hooks/api/useCommodities';
+export { useInvestment, useInvestments } from '@/hooks/api/useInvestments';
 
 export function useSplits(guid: string): UseQueryResult<Split[]> {
   return useQuery({
@@ -65,46 +65,6 @@ export function useAccountsMonthlyTotals(): SWRResponse<queries.MonthlyTotals> {
       key,
     ),
   );
-
-  return result;
-}
-
-export function useInvestment(guid: string): SWRResponse<InvestmentAccount> {
-  const key = `/api/investments/${guid}`;
-
-  const result = useSWRImmutable(
-    key,
-    fetcher(() => queries.getInvestment(guid), key),
-  );
-
-  if (result.error) {
-    throw new Error(result.error);
-  }
-
-  return result;
-}
-
-export function useInvestments(): SWRResponse<InvestmentAccount[]> {
-  const key = '/api/investments';
-
-  const result = useSWRImmutable(
-    key,
-    fetcher(() => queries.getInvestments(), key),
-  );
-
-  if (result.error) {
-    throw new Error(result.error);
-  }
-
-  if (result.data) {
-    result.data.forEach(
-      (investment: InvestmentAccount) => mutate(
-        `/api/investments/${investment.account.guid}`,
-        investment,
-        { revalidate: false },
-      ),
-    );
-  }
 
   return result;
 }

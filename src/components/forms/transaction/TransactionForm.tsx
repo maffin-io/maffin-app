@@ -148,13 +148,6 @@ async function onSubmit(data: FormValues, action: 'add' | 'update' | 'delete', o
     await transaction.remove();
   }
 
-  transaction.splits.forEach(split => {
-    if (split.account.commodity.namespace !== 'CURRENCY') {
-      mutate('/api/investments', undefined);
-      mutate(`/api/investments/${split.account.guid}`);
-    }
-  });
-
   mutate('/api/monthly-totals', undefined);
   onSave();
 }
