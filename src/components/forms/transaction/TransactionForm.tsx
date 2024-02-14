@@ -153,7 +153,6 @@ async function onSubmit(data: FormValues, action: 'add' | 'update' | 'delete', o
       mutate('/api/investments', undefined);
       mutate(`/api/investments/${split.account.guid}`);
     }
-    mutate(`/api/splits/${split.account.guid}`);
   });
 
   mutate('/api/monthly-totals', undefined);

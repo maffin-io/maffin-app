@@ -103,9 +103,11 @@ export default class Transaction extends BaseEntity {
  *
  * - /api/txs/latest -> Latest 5 transactions that happened
  * - /api/txs/start -> The transaction date that happened the earliest
+ * - /api/splits/<account> -> For each split in the transaction, we invalidate this key
  */
 export async function updateCache(
   {
+    entity,
     queryClient,
   }: {
     queryClient: QueryClient,
@@ -120,6 +122,13 @@ export async function updateCache(
   queryClient.invalidateQueries({
     queryKey: [Transaction.CACHE_KEY, { name: 'start' }],
     refetchType: 'all',
+  });
+
+  entity.splits.forEach(split => {
+    queryClient.invalidateQueries({
+      queryKey: [Split.CACHE_KEY, { account: split.fk_account.guid }],
+      refetchType: 'all',
+    });
   });
 }
 
