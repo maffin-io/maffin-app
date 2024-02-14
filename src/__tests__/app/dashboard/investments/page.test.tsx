@@ -1,6 +1,5 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import type { SWRResponse } from 'swr';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import { Commodity } from '@/book/entities';
@@ -43,7 +42,7 @@ jest.mock('@/components/Loading', () => jest.fn(
 
 describe('InvestmentsPage', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as UseQueryResult<InvestmentAccount[]>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
   });
 
@@ -52,14 +51,14 @@ describe('InvestmentsPage', () => {
   });
 
   it('shows loading when loading data', async () => {
-    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ isLoading: true } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ isPending: true } as UseQueryResult<InvestmentAccount[]>);
     render(<InvestmentsPage />);
 
     await screen.findByTestId('Loading');
   });
 
   it('renders while loading data', async () => {
-    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: [] } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: [] as InvestmentAccount[] } as UseQueryResult<InvestmentAccount[]>);
     render(<InvestmentsPage />);
     await screen.findByText('You have no investments yet!');
   });
@@ -80,7 +79,7 @@ describe('InvestmentsPage', () => {
       realizedDividendsInCurrency: new Money(5, 'EUR'),
     } as InvestmentAccount;
 
-    jest.spyOn(apiHook, 'useInvestments').mockReturnValueOnce({ data: [investment1] } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValueOnce({ data: [investment1] } as UseQueryResult<InvestmentAccount[]>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: mainCurrency } as UseQueryResult<Commodity>);
 
     const { container } = render(<InvestmentsPage />);
@@ -153,7 +152,7 @@ describe('InvestmentsPage', () => {
       realizedDividendsInCurrency: new Money(5, 'USD'),
     } as InvestmentAccount;
 
-    jest.spyOn(apiHook, 'useInvestments').mockReturnValueOnce({ data: [investment1] } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValueOnce({ data: [investment1] } as UseQueryResult<InvestmentAccount[]>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: mainCurrency } as UseQueryResult<Commodity>);
 
     const { container } = render(<InvestmentsPage />);

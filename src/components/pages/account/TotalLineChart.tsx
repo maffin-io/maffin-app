@@ -12,7 +12,7 @@ export type TotalLineChartProps = {
 export default function TotalLineChart({
   account,
 }: TotalLineChartProps): JSX.Element {
-  let { data: splits } = API.useSplits(account.guid);
+  let { data: splits } = API.useSplits({ guid: account.guid });
   splits = splits || [];
 
   let totalAggregate = 0;

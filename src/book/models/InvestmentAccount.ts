@@ -7,7 +7,10 @@ import { PriceDBMap } from '../prices';
 import type { QuoteInfo } from '../types';
 
 export default class InvestmentAccount {
+  static CACHE_KEY = '/api/investments';
+
   readonly account: Account;
+  readonly splits: Split[];
   quantity: Money;
   realizedProfit: Money;
   realizedProfitInCurrency: Money;
@@ -23,8 +26,14 @@ export default class InvestmentAccount {
   private _avgPriceInCurrency = 0;
   private _priceDBMap: PriceDBMap;
 
-  constructor(account: Account, mainCurrency: string, priceDBMap: PriceDBMap) {
+  constructor(
+    account: Account,
+    splits: Split[],
+    mainCurrency: string,
+    priceDBMap: PriceDBMap,
+  ) {
     this.account = account;
+    this.splits = splits;
     this.mainCurrency = mainCurrency;
 
     this._priceDBMap = priceDBMap;
@@ -152,11 +161,7 @@ export default class InvestmentAccount {
     this.realizedProfit = new Money(0, this.currency);
     this.dividends.splice(0, this.dividends.length);
 
-    const sortedSplits = this.account.splits.sort(
-      (a, b) => a.transaction.date.toMillis() - b.transaction.date.toMillis(),
-    );
-
-    sortedSplits.filter(
+    this.splits.filter(
       split => split.transaction.date <= (date || DateTime.now()),
     ).forEach((split) => {
       const numSplits = split.transaction.splits.length;

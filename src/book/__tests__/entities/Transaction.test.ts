@@ -292,15 +292,15 @@ describe('caching', () => {
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/txs', { name: 'latest' }],
+      queryKey: ['/api/txs', { name: 'start' }],
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/splits', { account: '1' }],
+      queryKey: ['/api/splits', { guid: '1' }],
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/splits', { account: '2' }],
+      queryKey: ['/api/splits', { guid: '2' }],
       refetchType: 'all',
     });
   });
@@ -324,15 +324,15 @@ describe('caching', () => {
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/txs', { name: 'latest' }],
+      queryKey: ['/api/txs', { name: 'start' }],
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/splits', { account: '1' }],
+      queryKey: ['/api/splits', { guid: '1' }],
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/splits', { account: '2' }],
+      queryKey: ['/api/splits', { guid: '2' }],
       refetchType: 'all',
     });
   });

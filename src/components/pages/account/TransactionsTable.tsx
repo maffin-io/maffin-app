@@ -29,7 +29,7 @@ export default function TransactionsTable({
   account,
 }: TransactionsTableProps): JSX.Element {
   const { data } = API.useAccounts();
-  let { data: splits } = API.useSplits(account.guid);
+  let { data: splits } = API.useSplits({ guid: account.guid });
 
   const accounts = mapAccounts(data);
   splits = splits || [];

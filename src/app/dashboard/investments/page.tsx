@@ -15,11 +15,11 @@ import Money from '@/book/Money';
 import * as API from '@/hooks/api';
 
 export default function InvestmentsPage(): JSX.Element {
-  const { data: investments, isLoading } = API.useInvestments();
+  const { data: investments, isPending } = API.useInvestments();
   const { data: currency } = API.useMainCurrency();
   const mainCurrency = currency?.mnemonic || 'EUR';
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="h-screen">
         <div className="flex text-sm h-3/4 place-content-center place-items-center">

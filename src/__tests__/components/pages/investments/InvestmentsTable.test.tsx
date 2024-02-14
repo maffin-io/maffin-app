@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import type { SWRResponse } from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import Money from '@/book/Money';
 import { InvestmentAccount } from '@/book/models';
@@ -19,7 +19,7 @@ jest.mock('@/hooks/api', () => ({
 
 describe('InvestmentsTable', () => {
   it('creates empty Table with expected params', async () => {
-    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as UseQueryResult<InvestmentAccount[]>);
 
     render(<InvestmentsTable />);
 
@@ -98,7 +98,7 @@ describe('InvestmentsTable', () => {
             realizedDividendsInCurrency: new Money(5, 'EUR'),
           } as InvestmentAccount,
         ],
-      } as SWRResponse,
+      } as UseQueryResult<InvestmentAccount[]>,
     );
 
     render(<InvestmentsTable />);

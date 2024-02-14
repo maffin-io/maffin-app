@@ -1,6 +1,5 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import type { SWRResponse } from 'swr';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import Money from '@/book/Money';
@@ -23,7 +22,7 @@ jest.mock('@/components/charts/Tree', () => jest.fn(
 
 describe('WeightsChart', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as UseQueryResult<InvestmentAccount[]>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
   });
 
@@ -105,7 +104,7 @@ describe('WeightsChart', () => {
             } as Account,
           } as InvestmentAccount,
         ],
-      } as SWRResponse,
+      } as UseQueryResult<InvestmentAccount[]>,
     );
 
     render(<WeightsChart totalValue={new Money(600, 'EUR')} />);

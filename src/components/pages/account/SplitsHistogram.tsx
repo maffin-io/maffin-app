@@ -14,7 +14,7 @@ export type SplitsHistogramProps = {
 export default function SplitsHistogram({
   account,
 }: SplitsHistogramProps): JSX.Element {
-  let { data: splits } = API.useSplits(account.guid);
+  let { data: splits } = API.useSplits({ guid: account.guid });
   splits = splits || [];
 
   let datasets: ChartDataset<'bar'>[] = [];

@@ -24,7 +24,7 @@ export default function Header({
   account,
 }: HeaderProps): JSX.Element {
   const { data: parent } = useAccount(account.parentId);
-  const { data: splits } = useSplits(account.guid);
+  const { data: splits } = useSplits({ guid: account.guid });
   const router = useRouter();
 
   const latestDate = splits?.[0]?.transaction?.date;

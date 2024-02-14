@@ -1,7 +1,5 @@
 export { default as getPrices } from './getPrices';
 
-export { getInvestments, getInvestment } from './getInvestments';
-
 export { default as getSplits } from './getSplits';
 export { default as getMonthlyTotals } from './getMonthlyTotals';
 export { default as getMainCurrency } from './getMainCurrency';

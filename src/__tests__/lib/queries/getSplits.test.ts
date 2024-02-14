@@ -61,7 +61,7 @@ describe('getSplits', () => {
   });
 
   it('returns empty when no transactions', async () => {
-    const splits = await getSplits(assetAccount.guid);
+    const splits = await getSplits({ guid: assetAccount.guid });
     expect(splits).toEqual([]);
   });
 
@@ -130,7 +130,17 @@ describe('getSplits', () => {
       ],
     }).save();
 
-    const splits = await getSplits(assetAccount.guid);
+    const splits = await getSplits(
+      { guid: assetAccount.guid },
+      {
+        fk_transaction: {
+          splits: {
+            fk_account: true,
+          },
+        },
+        fk_account: true,
+      },
+    );
 
     expect(splits[0].transaction.date.year).toEqual(2023);
     expect(splits[1].transaction.date.year).toEqual(2022);

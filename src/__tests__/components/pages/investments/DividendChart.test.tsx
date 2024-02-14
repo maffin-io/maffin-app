@@ -1,7 +1,6 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 import { render, act } from '@testing-library/react';
-import type { SWRResponse } from 'swr';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import Money from '@/book/Money';
@@ -26,7 +25,7 @@ describe('DividendChart', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(now as DateTime<true>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
-    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as UseQueryResult<InvestmentAccount[]>);
   });
 
   afterEach(() => {
@@ -191,7 +190,7 @@ describe('DividendChart', () => {
             ],
           } as InvestmentAccount,
         ],
-      } as SWRResponse,
+      } as UseQueryResult<InvestmentAccount[]>,
     );
 
     const { container } = render(<DividendChart />);
@@ -254,7 +253,7 @@ describe('DividendChart', () => {
             ],
           } as InvestmentAccount,
         ],
-      } as SWRResponse,
+      } as UseQueryResult<InvestmentAccount[]>,
     );
 
     render(<DividendChart />);
@@ -323,7 +322,7 @@ describe('DividendChart', () => {
             ],
           } as InvestmentAccount,
         ],
-      } as SWRResponse,
+      } as UseQueryResult<InvestmentAccount[]>,
     );
 
     render(<DividendChart />);

@@ -1237,10 +1237,8 @@ describe('TransactionForm', () => {
     expect(screen.getByText('add')).toBeEnabled();
     await user.click(screen.getByText('add'));
 
-    expect(swr.mutate).toBeCalledTimes(3);
-    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/investments', undefined);
-    expect(swr.mutate).toHaveBeenNthCalledWith(2, '/api/investments/stock_account');
-    expect(swr.mutate).toHaveBeenNthCalledWith(3, '/api/monthly-totals', undefined);
+    expect(swr.mutate).toBeCalledTimes(1);
+    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/monthly-totals', undefined);
   });
 
   describe('actions', () => {

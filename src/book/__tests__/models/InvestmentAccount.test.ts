@@ -88,10 +88,10 @@ describe('InvestmentAccount', () => {
           splits: true,
         },
       });
-      const investment = new InvestmentAccount(account, 'EUR', priceMap);
+      const investment = new InvestmentAccount(account, account.splits, 'EUR', priceMap);
 
       expect(investment.account).toEqual(account);
-      expect(investment.account.splits).toEqual([]);
+      expect(investment.splits).toEqual([]);
 
       expect(investment.mainCurrency).toEqual('EUR');
       expect(investment.currency).toEqual('EUR');
@@ -141,10 +141,10 @@ describe('InvestmentAccount', () => {
           splits: true,
         },
       });
-      const investment = new InvestmentAccount(account, 'EUR', priceMap);
+      const investment = new InvestmentAccount(account, account.splits, 'EUR', priceMap);
 
       expect(investment.account).toEqual(account);
-      expect(investment.account.splits).toEqual([]);
+      expect(investment.splits).toEqual([]);
 
       expect(investment.mainCurrency).toEqual('EUR');
       expect(investment.currency).toEqual('USD');
@@ -189,7 +189,7 @@ describe('InvestmentAccount', () => {
           splits: true,
         },
       });
-      const investment = new InvestmentAccount(account, 'EUR', priceMap);
+      const investment = new InvestmentAccount(account, account.splits, 'EUR', priceMap);
 
       investment.setTodayQuoteInfo({
         price: 1000,
@@ -225,7 +225,7 @@ describe('InvestmentAccount', () => {
         },
       });
       expect(
-        () => new InvestmentAccount(account, 'EUR', priceMap),
+        () => new InvestmentAccount(account, account.splits, 'EUR', priceMap),
       ).toThrow('No price found for TICKER');
     });
   });
@@ -355,6 +355,7 @@ describe('InvestmentAccount', () => {
         });
         const instance = new InvestmentAccount(
           account,
+          account.splits,
           mainCurrency,
           new PriceDBMap([stockPrice, currencyPrice, todayCurrencyPrice]),
         );
@@ -412,6 +413,7 @@ describe('InvestmentAccount', () => {
         });
         const instance = new InvestmentAccount(
           account,
+          account.splits,
           mainCurrency,
           new PriceDBMap([stockPrice, currencyPrice, currencyPrice2, todayCurrencyPrice]),
         );
@@ -467,6 +469,7 @@ describe('InvestmentAccount', () => {
         });
         const instance = new InvestmentAccount(
           account,
+          account.splits,
           mainCurrency,
           new PriceDBMap([stockPrice, currencyPrice]),
         );
@@ -516,6 +519,7 @@ describe('InvestmentAccount', () => {
         });
         const instance = new InvestmentAccount(
           account,
+          account.splits,
           mainCurrency,
           new PriceDBMap([stockPrice, currencyPrice]),
         );
@@ -570,6 +574,7 @@ describe('InvestmentAccount', () => {
         });
         const instance = new InvestmentAccount(
           account,
+          account.splits,
           mainCurrency,
           new PriceDBMap([stockPrice, currencyPrice]),
         );
@@ -624,6 +629,7 @@ describe('InvestmentAccount', () => {
         });
         const instance = new InvestmentAccount(
           account,
+          account.splits,
           mainCurrency,
           new PriceDBMap([stockPrice, currencyPrice, todayCurrencyPrice]),
         );
@@ -677,6 +683,7 @@ describe('InvestmentAccount', () => {
         });
         const instance = new InvestmentAccount(
           account,
+          account.splits,
           mainCurrency,
           new PriceDBMap([stockPrice, currencyPrice, todayCurrencyPrice]),
         );
@@ -728,6 +735,7 @@ describe('InvestmentAccount', () => {
         });
         const instance = new InvestmentAccount(
           account,
+          account.splits,
           mainCurrency,
           new PriceDBMap([stockPrice, currencyPrice, todayCurrencyPrice]),
         );
@@ -779,6 +787,7 @@ describe('InvestmentAccount', () => {
         });
         const instance = new InvestmentAccount(
           account,
+          account.splits,
           mainCurrency,
           new PriceDBMap([stockPrice, currencyPrice, todayCurrencyPrice]),
         );
@@ -853,6 +862,7 @@ describe('InvestmentAccount', () => {
 
         const instance = new InvestmentAccount(
           account,
+          account.splits,
           mainCurrency,
           new PriceDBMap([stockPrice, currencyPrice]),
         );
@@ -940,6 +950,7 @@ describe('InvestmentAccount', () => {
         });
         const instance = new InvestmentAccount(
           account,
+          account.splits,
           mainCurrency,
           new PriceDBMap([stockPrice, currencyPrice]),
         );
@@ -971,6 +982,7 @@ describe('InvestmentAccount', () => {
         });
         const instance = new InvestmentAccount(
           account,
+          account.splits,
           'EUR',
           new PriceDBMap([stockPrice, currencyPrice]),
         );
@@ -1005,6 +1017,7 @@ describe('InvestmentAccount', () => {
         });
         const instance = new InvestmentAccount(
           account,
+          account.splits,
           'EUR',
           new PriceDBMap([stockPrice, currencyPrice]),
         );
@@ -1047,6 +1060,7 @@ describe('InvestmentAccount', () => {
       expect(
         () => new InvestmentAccount(
           account,
+          account.splits,
           mainCurrency,
           new PriceDBMap([stockPrice, currencyPrice]),
         ),
