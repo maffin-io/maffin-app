@@ -23,15 +23,15 @@ export function useAccountsTotals(): UseQueryResult<MonthlyTotals> {
   const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
   const { data: prices, dataUpdatedAt: pricesUpdatedAt } = usePrices({});
 
-  const key = '/api/aggregations/accounts/totals';
+  const key = ['api', 'aggregations', 'accounts', 'totals'];
   const result = useQuery({
-    queryKey: [key, { accountsUpdatedAt, pricesUpdatedAt }],
+    queryKey: [...key, { accountsUpdatedAt, pricesUpdatedAt }],
     queryFn: fetcher(
       () => getMonthlyTotals(
         accounts as Account[],
         prices as PriceDBMap,
       ),
-      key,
+      `/${key.join('/')}`,
     ),
     enabled: !!accounts && !!prices,
   });

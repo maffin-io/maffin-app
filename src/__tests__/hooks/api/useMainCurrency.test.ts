@@ -12,7 +12,7 @@ describe('useMainCurrency', () => {
     renderHook(() => useMainCurrency());
 
     expect(query.useQuery).toBeCalledWith({
-      queryKey: ['/api/commodities', { guid: 'main' }],
+      queryKey: ['api', 'commodities', { guid: 'main' }],
       queryFn: expect.any(Function),
     });
 

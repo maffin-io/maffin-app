@@ -15,7 +15,7 @@ import fetcher from './fetcher';
  */
 export function useSplits(findOptions: FindOptionsWhere<Account>): UseQueryResult<Split[]> {
   return useQuery({
-    queryKey: [Split.CACHE_KEY, findOptions],
+    queryKey: [...Split.CACHE_KEY, findOptions],
     queryFn: fetcher(
       () => getSplits(
         findOptions,
@@ -28,7 +28,7 @@ export function useSplits(findOptions: FindOptionsWhere<Account>): UseQueryResul
           fk_account: true,
         },
       ),
-      `${Split.CACHE_KEY}/${JSON.stringify(findOptions)}`,
+      `/${Split.CACHE_KEY.join('/')}/${JSON.stringify(findOptions)}`,
     ),
   });
 }

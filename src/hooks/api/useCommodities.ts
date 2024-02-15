@@ -8,8 +8,8 @@ import fetcher from './fetcher';
 
 export function useCommodity(guid: string): UseQueryResult<Commodity> {
   const result = useQuery({
-    queryKey: [Commodity.CACHE_KEY, { guid }],
-    queryFn: fetcher(() => Commodity.findOneBy({ guid }), `${Commodity.CACHE_KEY}/${guid}`),
+    queryKey: [...Commodity.CACHE_KEY, { guid }],
+    queryFn: fetcher(() => Commodity.findOneBy({ guid }), `/${Commodity.CACHE_KEY.join('/')}/${guid}`),
   });
 
   return result;
@@ -17,8 +17,8 @@ export function useCommodity(guid: string): UseQueryResult<Commodity> {
 
 export function useCommodities(): UseQueryResult<Commodity[]> {
   const result = useQuery({
-    queryKey: [Commodity.CACHE_KEY],
-    queryFn: fetcher(() => Commodity.find(), Commodity.CACHE_KEY),
+    queryKey: [...Commodity.CACHE_KEY],
+    queryFn: fetcher(() => Commodity.find(), `/${Commodity.CACHE_KEY.join('/')}`),
   });
 
   return result;

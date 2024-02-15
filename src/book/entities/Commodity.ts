@@ -26,7 +26,7 @@ import BaseEntity from './BaseEntity';
 @Entity('commodities')
 @Index(['mnemonic', 'namespace'], { unique: true })
 export default class Commodity extends BaseEntity {
-  static CACHE_KEY = '/api/commodities';
+  static CACHE_KEY = ['api', 'commodities'];
 
   @Column({
     type: 'text',

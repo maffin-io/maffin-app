@@ -294,6 +294,7 @@ describe('useDataSource', () => {
         expect(datasource.sqljsManager.loadDatabase).toBeCalledWith(new Uint8Array([44, 55]));
 
         expect(datasource.options.extra.queryClient.refetchQueries).toBeCalledWith({
+          queryKey: ['api'],
           type: 'all',
         });
 

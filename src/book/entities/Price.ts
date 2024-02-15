@@ -32,7 +32,7 @@ import { toAmountWithScale } from '../../helpers/number';
 @Entity('prices')
 @Index(['fk_commodity', 'fk_currency', 'date'], { unique: true })
 export default class Price extends BaseEntity {
-  static CACHE_KEY = '/api/prices';
+  static CACHE_KEY = ['api', 'prices'];
 
   @ManyToOne('Commodity', { eager: true })
   @JoinColumn({ name: 'commodity_guid' })
@@ -146,13 +146,13 @@ export async function updateCache(
   },
 ) {
   queryClient.invalidateQueries({
-    queryKey: [Price.CACHE_KEY, { from: (entity.fk_commodity as Commodity).guid }],
+    queryKey: [...Price.CACHE_KEY, { from: (entity.fk_commodity as Commodity).guid }],
     refetchType: 'all',
   });
 
   if ((entity.fk_commodity as Commodity).namespace === 'CURRENCY') {
     queryClient.invalidateQueries({
-      queryKey: [Price.CACHE_KEY, { from: (entity.fk_currency as Commodity).guid }],
+      queryKey: [...Price.CACHE_KEY, { from: (entity.fk_currency as Commodity).guid }],
       refetchType: 'all',
     });
   }

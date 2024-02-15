@@ -7,7 +7,7 @@ import { PriceDBMap } from '../prices';
 import type { QuoteInfo } from '../types';
 
 export default class InvestmentAccount {
-  static CACHE_KEY = '/api/investments';
+  static CACHE_KEY = ['api', 'investments'];
 
   readonly account: Account;
   readonly splits: Split[];

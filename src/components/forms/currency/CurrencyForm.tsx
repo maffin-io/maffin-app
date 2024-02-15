@@ -2,7 +2,6 @@ import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 import { SingleValue } from 'react-select';
-import { mutate } from 'swr';
 
 import { Commodity } from '@/book/entities';
 import Selector from '@/components/selectors/Selector';
@@ -75,6 +74,5 @@ async function onSubmit(data: Commodity, onSave: Function) {
   const mainCommodity = await Commodity.create({
     ...data,
   }).save();
-  mutate('/api/commodities');
   await onSave(mainCommodity);
 }

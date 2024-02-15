@@ -34,7 +34,7 @@ import { DateTimeTransformer } from './transformers';
 
 @Entity('transactions')
 export default class Transaction extends BaseEntity {
-  static CACHE_KEY = '/api/txs';
+  static CACHE_KEY = ['api', 'txs'];
 
   @ManyToOne('Commodity', { eager: true })
   @JoinColumn({ name: 'currency_guid' })
@@ -116,23 +116,23 @@ export async function updateCache(
   },
 ) {
   queryClient.invalidateQueries({
-    queryKey: [Transaction.CACHE_KEY, { name: 'latest' }],
+    queryKey: [...Transaction.CACHE_KEY, { name: 'latest' }],
     refetchType: 'all',
   });
   queryClient.invalidateQueries({
-    queryKey: [Transaction.CACHE_KEY, { name: 'start' }],
+    queryKey: [...Transaction.CACHE_KEY, { name: 'start' }],
     refetchType: 'all',
   });
 
   entity.splits.forEach(split => {
     queryClient.invalidateQueries({
-      queryKey: [Split.CACHE_KEY, { guid: split.fk_account.guid }],
+      queryKey: [...Split.CACHE_KEY, { guid: split.fk_account.guid }],
       refetchType: 'all',
     });
   });
 
   queryClient.invalidateQueries({
-    queryKey: ['/api/aggregations/accounts/totals'],
+    queryKey: ['api', 'aggregations', 'accounts', 'totals'],
     refetchType: 'all',
   });
 }

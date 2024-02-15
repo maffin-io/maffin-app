@@ -43,7 +43,7 @@ import BaseEntity from './BaseEntity';
 @Entity('accounts')
 @Tree('nested-set')
 export default class Account extends BaseEntity {
-  static CACHE_KEY = '/api/accounts';
+  static CACHE_KEY = ['api', 'accounts'];
   static TYPES = [
     'ROOT',
     'EQUITY',
@@ -183,7 +183,7 @@ export async function updateCache(
   await entity.reload();
 
   queryClient.setQueryData(
-    [Account.CACHE_KEY],
+    [...Account.CACHE_KEY],
     (entities: Account[] | undefined) => {
       if (!entities) {
         return undefined;

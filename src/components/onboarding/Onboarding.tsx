@@ -60,7 +60,7 @@ export default function Onboarding({
                 <CurrencyForm
                   onSave={async (currency: Commodity) => {
                     datasource?.options.extra?.queryClient.setQueryData(
-                      [Commodity.CACHE_KEY, { guid: 'main' }],
+                      [...Commodity.CACHE_KEY, { guid: 'main' }],
                       currency,
                     );
                     await createInitialAccounts(setAccounts, currency);

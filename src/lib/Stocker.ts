@@ -82,6 +82,13 @@ export async function insertTodayPrices(): Promise<void> {
     },
   );
 
+  if (prices.length) {
+    prices[0]?.queryClient?.invalidateQueries({
+      queryKey: ['api', 'prices'],
+      refetchType: 'all',
+    });
+  }
+
   const end = performance.now();
   console.log(`/stocker/api/prices: ${end - start}ms`);
 }
