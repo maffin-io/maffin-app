@@ -12,19 +12,15 @@ exports[`AccountInfo renders as expected when no splits 1`] = `
         class="grid grid-cols-12"
       >
         <div
-          class="col-span-6"
+          class="col-span-4"
         >
           <div
             data-testid="StatisticsWidget"
           />
         </div>
         <div
-          class="col-span-6"
-        >
-          <div
-            data-testid="StatisticsWidget"
-          />
-        </div>
+          class="col-span-8"
+        />
         <div
           class="card col-span-12"
         >

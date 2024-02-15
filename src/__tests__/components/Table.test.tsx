@@ -44,6 +44,7 @@ describe('Table', () => {
         id="table"
         columns={columns}
         data={[]}
+        showPagination
       />,
     );
 

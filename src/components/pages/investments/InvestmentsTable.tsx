@@ -29,7 +29,6 @@ export default function InvestmentsTable(): JSX.Element {
       columns={columns}
       data={investments}
       initialSort={{ id: 'unrealizedProfit', desc: true }}
-      showPagination={false}
     />
   );
 }

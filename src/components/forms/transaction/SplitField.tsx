@@ -86,13 +86,13 @@ export default function SplitField({
 
                   if (a) {
                     const nonCurrencySplit = splits.find(
-                      split => split.fk_account.commodity.namespace !== 'CURRENCY',
+                      split => (split.fk_account as Account).commodity.namespace !== 'CURRENCY',
                     );
 
                     if (nonCurrencySplit) {
                       const price = await Price.findOneByOrFail({
                         fk_commodity: {
-                          guid: nonCurrencySplit.fk_account.commodity.guid,
+                          guid: (nonCurrencySplit.fk_account as Account).commodity.guid,
                         },
                       });
                       form.setValue('fk_currency', price.currency);
@@ -100,7 +100,7 @@ export default function SplitField({
                       if (a.commodity.guid === mainCurrency?.guid) {
                         form.setValue('fk_currency', mainCurrency);
                       } else {
-                        form.setValue('fk_currency', splits[0].fk_account.commodity);
+                        form.setValue('fk_currency', (splits[0].fk_account as Account).commodity);
                       }
                     }
                   }

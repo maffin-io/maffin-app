@@ -31,7 +31,7 @@ export function useAccountsTotals(): UseQueryResult<MonthlyTotals> {
         accounts as Account[],
         prices as PriceDBMap,
       ),
-      `/${key.join('/')}`,
+      key,
     ),
     enabled: !!accounts && !!prices,
   });

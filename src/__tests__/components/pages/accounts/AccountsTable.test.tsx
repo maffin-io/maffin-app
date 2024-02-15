@@ -60,7 +60,6 @@ describe('AccountsTable', () => {
         },
         isExpanded: false,
         showHeader: false,
-        showPagination: false,
         tdClassName: 'p-2',
         getSubRows: expect.any(Function),
       },

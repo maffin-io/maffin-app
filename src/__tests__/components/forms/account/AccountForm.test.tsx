@@ -398,6 +398,7 @@ describe('AccountForm', () => {
     expect(splits).toEqual([
       {
         accountId: account.guid,
+        txId: expect.any(String),
         action: '',
         guid: expect.any(String),
         quantityDenom: 10,
@@ -407,6 +408,7 @@ describe('AccountForm', () => {
       },
       {
         accountId: equity.guid,
+        txId: expect.any(String),
         action: '',
         guid: expect.any(String),
         quantityDenom: 10,

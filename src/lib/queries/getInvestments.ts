@@ -12,7 +12,7 @@ export async function getInvestments(
     accounts.map(account => initInvestment(
       account,
       mainCurrency,
-      splits.filter(s => s.account.guid === account.guid),
+      splits.filter(s => s.accountId === account.guid),
     )),
   );
 

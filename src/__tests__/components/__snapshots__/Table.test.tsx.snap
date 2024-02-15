@@ -115,30 +115,6 @@ exports[`Table renders headers with empty data 1`] = `
   <div
     class="flex text-center text-sm items-center px-2 pb-1"
   >
-    <label
-      class="mr-1"
-    >
-      Display:
-    </label>
-    <select
-      class="input"
-    >
-      <option
-        value="5"
-      >
-        5
-      </option>
-      <option
-        value="10"
-      >
-        10
-      </option>
-      <option
-        value="50"
-      >
-        50
-      </option>
-    </select>
     <span
       class="mx-5"
     >

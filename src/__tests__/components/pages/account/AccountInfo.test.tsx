@@ -10,7 +10,7 @@ import {
 } from '@/components/pages/account';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import * as apiHook from '@/hooks/api';
-import type { Account, Split } from '@/book/entities';
+import type { Account } from '@/book/entities';
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
@@ -32,7 +32,7 @@ jest.mock('@/components/StatisticsWidget', () => jest.fn(
 describe('AccountInfo', () => {
   let account: Account;
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as UseQueryResult<Split[]>);
+    jest.spyOn(apiHook, 'useSplitsTotal').mockReturnValue({ data: undefined } as UseQueryResult<number>);
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-03-01') as DateTime<true>);
     account = {
       guid: 'guid',
@@ -68,18 +68,9 @@ describe('AccountInfo', () => {
       1,
       {
         className: 'mr-2',
-        title: 'You have a total of',
+        title: 'This account has a total of',
+        description: '',
         stats: '€0.00',
-        description: 'with an average of €0.00 per month',
-      },
-      {},
-    );
-    expect(StatisticsWidget).toHaveBeenNthCalledWith(
-      2,
-      {
-        title: 'This year you have',
-        stats: '€0.00',
-        description: 'in this account',
       },
       {},
     );
@@ -87,22 +78,9 @@ describe('AccountInfo', () => {
   });
 
   it('renders as expected with splits', () => {
-    jest.spyOn(apiHook, 'useSplits').mockReturnValue({
-      data: [
-        {
-          transaction: {
-            date: DateTime.fromISO('2023-01-01'),
-          },
-          quantity: 10,
-        },
-        {
-          transaction: {
-            date: DateTime.fromISO('2023-03-01'),
-          },
-          quantity: 50,
-        },
-      ],
-    } as UseQueryResult<Split[]>);
+    jest.spyOn(apiHook, 'useSplitsTotal').mockReturnValue({
+      data: 100,
+    } as UseQueryResult<number>);
 
     render(
       <AccountInfo account={account} />,
@@ -112,18 +90,9 @@ describe('AccountInfo', () => {
       1,
       {
         className: 'mr-2',
-        title: 'You have a total of',
-        stats: '€60.00',
-        description: 'with an average of -€30.00 per month',
-      },
-      {},
-    );
-    expect(StatisticsWidget).toHaveBeenNthCalledWith(
-      2,
-      {
-        title: 'This year you have',
-        stats: '€60.00',
-        description: 'in this account',
+        title: 'This account has a total of',
+        description: '',
+        stats: '€100.00',
       },
       {},
     );

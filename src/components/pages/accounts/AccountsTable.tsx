@@ -49,7 +49,6 @@ export default function AccountsTable(
       data={tree.leaves}
       initialSort={{ id: 'total', desc: true }}
       showHeader={false}
-      showPagination={false}
       tdClassName="p-2"
       getSubRows={row => row.leaves}
       isExpanded={isExpanded}

@@ -3,46 +3,23 @@ import { Table } from '@tanstack/react-table';
 
 type PaginationProps<T> = {
   table: Table<T>,
-  showPageSize?: boolean,
 };
 
 export default function Pagination<T>({
   table,
-  showPageSize = true,
 }: PaginationProps<T>): JSX.Element {
   const { pagination } = table.getState();
   return (
     <div className="flex text-center text-sm items-center px-2 pb-1">
-      {
-        showPageSize
-        && (
-          <>
-            <label className="mr-1">Display:</label>
-            <select
-              value={pagination.pageSize}
-              className="input"
-              onChange={(e) => {
-                table.setPageSize(Number(e.target.value));
-              }}
-            >
-              {sizePerPageList.map((pageSize, index) => (
-                <option key={index} value={pageSize.value}>
-                  {pageSize.text}
-                </option>
-              ))}
-            </select>
-          </>
-        )
-      }
       <span className="mx-5">
         Page
         {' '}
         <strong>
-          {pagination.pageIndex + 1}
+          {table.getState().pagination.pageIndex + 1}
           {' '}
           of
           {' '}
-          {table.getPageOptions().length}
+          {table.getPageCount()}
         </strong>
         {' '}
       </span>
@@ -101,18 +78,3 @@ export default function Pagination<T>({
     </div>
   );
 }
-
-const sizePerPageList = [
-  {
-    text: '5',
-    value: 5,
-  },
-  {
-    text: '10',
-    value: 10,
-  },
-  {
-    text: '50',
-    value: 50,
-  },
-];

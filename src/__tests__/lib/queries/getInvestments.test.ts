@@ -197,15 +197,15 @@ describe('getInvestments', () => {
         [account1, account2],
         eur,
         [
-          { guid: 'split1', account: { guid: account1.guid } } as Split,
-          { guid: 'split2', account: { guid: account2.guid } } as Split,
+          { guid: 'split1', accountId: account1.guid } as Split,
+          { guid: 'split2', accountId: account2.guid } as Split,
         ],
       );
 
       expect(InvestmentAccount).toHaveBeenNthCalledWith(
         1,
         account1,
-        [{ account: { guid: account1.guid }, guid: 'split1' }],
+        [{ accountId: account1.guid, guid: 'split1' }],
         'EUR',
         new PriceDBMap([price1]),
       );
@@ -213,7 +213,7 @@ describe('getInvestments', () => {
       expect(InvestmentAccount).toHaveBeenNthCalledWith(
         2,
         account2,
-        [{ account: { guid: account2.guid }, guid: 'split2' }],
+        [{ accountId: account2.guid, guid: 'split2' }],
         'EUR',
         new PriceDBMap([price2]),
       );
