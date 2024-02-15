@@ -13,7 +13,7 @@ import { QueryClient } from '@tanstack/react-query';
  * we want and adds validation before saving or updating entities
  */
 export default class BaseEntity extends BE {
-  static CACHE_KEY = '';
+  static CACHE_KEY: string[] = [];
 
   @BeforeInsert()
   @BeforeUpdate()
@@ -80,7 +80,7 @@ export async function updateCache(
   const key = entity.constructor.CACHE_KEY;
 
   queryClient.setQueryData(
-    [key],
+    [...key],
     (entities: BaseEntity[] | undefined) => {
       if (!entities) {
         return undefined;
@@ -102,7 +102,7 @@ export async function updateCache(
   );
 
   queryClient.setQueryData(
-    [key, { guid: entity.guid }],
+    [...key, { guid: entity.guid }],
     !isDelete ? entity : null,
   );
 }

@@ -26,7 +26,7 @@ describe('useCommodity', () => {
     renderHook(() => useCommodity('guid'));
 
     expect(query.useQuery).toBeCalledWith({
-      queryKey: ['/api/commodities', { guid: 'guid' }],
+      queryKey: ['api', 'commodities', { guid: 'guid' }],
       queryFn: expect.any(Function),
     });
 
@@ -59,7 +59,7 @@ describe('useCommodities', () => {
     renderHook(() => useCommodities());
 
     expect(query.useQuery).toBeCalledWith({
-      queryKey: ['/api/commodities'],
+      queryKey: ['api', 'commodities'],
       queryFn: expect.any(Function),
     });
 

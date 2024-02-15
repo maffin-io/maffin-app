@@ -72,7 +72,7 @@ describe('useAccount', () => {
 
     expect(query.useQuery).toBeCalledWith({
       queryKey: [
-        '/api/aggregations/accounts/totals',
+        'api', 'aggregations', 'accounts', 'totals',
         {
           accountsUpdatedAt: 1,
           pricesUpdatedAt: 2,

@@ -40,7 +40,7 @@ export function useInvestment(guid: string): UseQueryResult<InvestmentAccount> {
 
   const result = useQuery({
     queryKey: [
-      InvestmentAccount.CACHE_KEY,
+      ...InvestmentAccount.CACHE_KEY,
       {
         account: guid,
         accountUpdatedAt,
@@ -56,7 +56,7 @@ export function useInvestment(guid: string): UseQueryResult<InvestmentAccount> {
           splits as Split[],
         );
         queryClient.setQueryData(
-          [InvestmentAccount.CACHE_KEY],
+          [...InvestmentAccount.CACHE_KEY],
           (entities: InvestmentAccount[]) => {
             if (!entities) {
               return undefined;
@@ -77,7 +77,7 @@ export function useInvestment(guid: string): UseQueryResult<InvestmentAccount> {
 
         return investment;
       },
-      `${InvestmentAccount.CACHE_KEY}/${guid}`,
+      `/${InvestmentAccount.CACHE_KEY.join('/')}/${guid}`,
     ),
     enabled: !!account && !!splits && !!mainCurrency,
     placeholderData: keepPreviousData,
@@ -103,14 +103,14 @@ export function useInvestments(): UseQueryResult<InvestmentAccount[]> {
   const { data: splits } = useSplits({ type: 'INVESTMENT' });
 
   const result = useQuery({
-    queryKey: [InvestmentAccount.CACHE_KEY],
+    queryKey: [...InvestmentAccount.CACHE_KEY],
     queryFn: fetcher(
       () => getInvestments(
         (accounts as Account[]).filter(a => a.type === 'INVESTMENT'),
         mainCurrency as Commodity,
         splits as Split[],
       ),
-      InvestmentAccount.CACHE_KEY,
+      `/${InvestmentAccount.CACHE_KEY.join('/')}`,
     ),
     enabled: !!accounts && !!splits && !!mainCurrency,
   });

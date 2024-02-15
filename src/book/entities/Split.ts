@@ -34,7 +34,7 @@ import { toAmountWithScale } from '../../helpers/number';
 */
 @Entity('splits')
 export default class Split extends BaseEntity {
-  static CACHE_KEY = '/api/splits';
+  static CACHE_KEY = ['api', 'splits'];
 
   @ManyToOne('Transaction')
   @JoinColumn({ name: 'tx_guid' })

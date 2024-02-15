@@ -50,7 +50,7 @@ describe('API', () => {
       renderHook(() => API.useStartDate());
 
       expect(query.useQuery).toBeCalledWith({
-        queryKey: ['/api/txs', { name: 'start' }],
+        queryKey: ['api', 'txs', { name: 'start' }],
         queryFn: expect.any(Function),
       });
 
@@ -65,7 +65,7 @@ describe('API', () => {
       renderHook(() => API.useLatestTxs());
 
       expect(query.useQuery).toBeCalledWith({
-        queryKey: ['/api/txs', { name: 'latest' }],
+        queryKey: ['api', 'txs', { name: 'latest' }],
         queryFn: expect.any(Function),
       });
 

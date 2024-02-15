@@ -125,10 +125,11 @@ async function importBook(storage: BookStorage, rawData: Uint8Array) {
   await DATASOURCE.sqljsManager.loadDatabase(rawBook);
 
   DATASOURCE.options.extra.queryClient.refetchQueries({
+    queryKey: ['api'],
     type: 'all',
   });
 
-  await loadStockerPrices();
+  loadStockerPrices();
   await save(storage);
 }
 

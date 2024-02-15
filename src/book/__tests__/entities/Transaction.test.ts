@@ -288,23 +288,23 @@ describe('caching', () => {
 
     expect(mockInvalidateQueries).toBeCalledTimes(5);
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/txs', { name: 'latest' }],
+      queryKey: ['api', 'txs', { name: 'latest' }],
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/txs', { name: 'start' }],
+      queryKey: ['api', 'txs', { name: 'start' }],
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/splits', { guid: '1' }],
+      queryKey: ['api', 'splits', { guid: '1' }],
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/splits', { guid: '2' }],
+      queryKey: ['api', 'splits', { guid: '2' }],
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/aggregations/accounts/totals'],
+      queryKey: ['api', 'aggregations', 'accounts', 'totals'],
       refetchType: 'all',
     });
   });
@@ -324,23 +324,23 @@ describe('caching', () => {
 
     expect(mockInvalidateQueries).toBeCalledTimes(5);
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/txs', { name: 'latest' }],
+      queryKey: ['api', 'txs', { name: 'latest' }],
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/txs', { name: 'start' }],
+      queryKey: ['api', 'txs', { name: 'start' }],
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/splits', { guid: '1' }],
+      queryKey: ['api', 'splits', { guid: '1' }],
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/splits', { guid: '2' }],
+      queryKey: ['api', 'splits', { guid: '2' }],
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/aggregations/accounts/totals'],
+      queryKey: ['api', 'aggregations', 'accounts', 'totals'],
       refetchType: 'all',
     });
   });

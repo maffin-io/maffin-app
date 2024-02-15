@@ -31,7 +31,7 @@ describe('useSplits', () => {
     renderHook(() => useSplits({ guid: 'guid' }));
 
     expect(query.useQuery).toBeCalledWith({
-      queryKey: ['/api/splits', { guid: 'guid' }],
+      queryKey: ['api', 'splits', { guid: 'guid' }],
       queryFn: expect.any(Function),
     });
 

@@ -123,7 +123,7 @@ describe('useInvestment', () => {
     expect(useSplitsHook.useSplits).toBeCalledWith({ guid: 'guid' });
     expect(query.useQuery).toBeCalledWith({
       queryKey: [
-        '/api/investments',
+        'api', 'investments',
         {
           account: 'guid',
           accountUpdatedAt: 1,
@@ -243,7 +243,7 @@ describe('useInvestments', () => {
     expect(useAccountsHook.useAccounts).toBeCalledWith();
     expect(useSplitsHook.useSplits).toBeCalledWith({ type: 'INVESTMENT' });
     expect(query.useQuery).toBeCalledWith({
-      queryKey: ['/api/investments'],
+      queryKey: ['api', 'investments'],
       queryFn: expect.any(Function),
       enabled: true,
     });

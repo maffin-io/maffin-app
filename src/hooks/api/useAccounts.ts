@@ -8,8 +8,8 @@ import fetcher from './fetcher';
 
 export function useAccount(guid: string): UseQueryResult<Account> {
   const result = useQuery({
-    queryKey: [Account.CACHE_KEY, { guid }],
-    queryFn: fetcher(() => Account.findOneBy({ guid }), `${Account.CACHE_KEY}/${guid}`),
+    queryKey: [...Account.CACHE_KEY, { guid }],
+    queryFn: fetcher(() => Account.findOneBy({ guid }), `/${Account.CACHE_KEY.join('/')}/${guid}`),
   });
 
   return result;
@@ -17,8 +17,8 @@ export function useAccount(guid: string): UseQueryResult<Account> {
 
 export function useAccounts(): UseQueryResult<Account[]> {
   const result = useQuery({
-    queryKey: [Account.CACHE_KEY],
-    queryFn: fetcher(() => Account.find(), Account.CACHE_KEY),
+    queryKey: [...Account.CACHE_KEY],
+    queryFn: fetcher(() => Account.find(), `/${Account.CACHE_KEY.join('/')}`),
   });
 
   return result;

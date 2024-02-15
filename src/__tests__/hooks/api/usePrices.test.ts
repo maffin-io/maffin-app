@@ -17,7 +17,7 @@ describe('usePrices', () => {
     renderHook(() => usePrices({ from: { guid: 'guid' } as Commodity }));
 
     expect(query.useQuery).toBeCalledWith({
-      queryKey: ['/api/prices', { from: 'guid' }],
+      queryKey: ['api', 'prices', { from: 'guid' }],
       queryFn: expect.any(Function),
       enabled: true,
     });
@@ -34,7 +34,7 @@ describe('usePrices', () => {
     }));
 
     expect(query.useQuery).toBeCalledWith({
-      queryKey: ['/api/prices', { from: 'guid', to: 'to' }],
+      queryKey: ['api', 'prices', { from: 'guid', to: 'to' }],
       queryFn: expect.any(Function),
       enabled: true,
     });

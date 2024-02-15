@@ -38,7 +38,7 @@ describe('BaseEntity', () => {
   describe('caching', () => {
     let mockSetQueryData: jest.Mock;
     class Account extends BaseEntity {
-      static CACHE_KEY = '/api/accounts';
+      static CACHE_KEY = ['api', 'accounts'];
     }
 
     beforeEach(() => {
@@ -76,12 +76,12 @@ describe('BaseEntity', () => {
       expect(BE.prototype.save).toBeCalledWith(undefined);
       expect(mockSetQueryData).toHaveBeenNthCalledWith(
         1,
-        ['/api/accounts'],
+        ['api', 'accounts'],
         expect.any(Function),
       );
       expect(mockSetQueryData).toHaveBeenNthCalledWith(
         2,
-        ['/api/accounts', { guid: instance.guid }],
+        ['api', 'accounts', { guid: instance.guid }],
         instance,
       );
     });
@@ -114,13 +114,7 @@ describe('BaseEntity', () => {
 
     it('updates existing account in /api/accounts', async () => {
       jest.spyOn(BE.prototype, 'save')
-        .mockResolvedValueOnce(instance)
-        .mockResolvedValueOnce({
-          ...instance,
-          // @ts-ignore
-          name: 'updated', // Fake attribute to show we update
-        });
-
+        .mockResolvedValueOnce(instance);
       await instance.save();
       mockSetQueryData
         .mockImplementation((_: string, callback: Account | Function): Account[] | Account => {
@@ -130,6 +124,11 @@ describe('BaseEntity', () => {
 
           return instance;
         });
+
+      // @ts-ignore fake attribute to prove we update
+      instance.name = 'updated';
+      jest.spyOn(BE.prototype, 'save')
+        .mockResolvedValueOnce(instance);
       await instance.save();
 
       await waitFor(() => expect(mockSetQueryData.mock.results).toHaveLength(4));
@@ -163,7 +162,7 @@ describe('BaseEntity', () => {
 
       expect(mockSetQueryData).toHaveBeenNthCalledWith(
         4,
-        ['/api/accounts', { guid: instance.guid }],
+        ['api', 'accounts', { guid: instance.guid }],
         null,
       );
     });

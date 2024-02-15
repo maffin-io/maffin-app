@@ -26,7 +26,7 @@ describe('useAccount', () => {
     renderHook(() => useAccount('guid'));
 
     expect(query.useQuery).toBeCalledWith({
-      queryKey: ['/api/accounts', { guid: 'guid' }],
+      queryKey: ['api', 'accounts', { guid: 'guid' }],
       queryFn: expect.any(Function),
     });
 
@@ -59,7 +59,7 @@ describe('useAccounts', () => {
     renderHook(() => useAccounts());
 
     expect(query.useQuery).toBeCalledWith({
-      queryKey: ['/api/accounts'],
+      queryKey: ['api', 'accounts'],
       queryFn: expect.any(Function),
     });
 
