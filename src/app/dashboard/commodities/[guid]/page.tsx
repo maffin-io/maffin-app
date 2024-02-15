@@ -20,7 +20,7 @@ export type CommodityPageProps = {
 
 export default function CommodityPage({ params }: CommodityPageProps): JSX.Element {
   const { data: commodity, isLoading } = useCommodity(params.guid);
-  const { data: prices } = usePrices(commodity);
+  const { data: prices } = usePrices({ from: commodity });
 
   if (isLoading) {
     return (

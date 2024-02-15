@@ -3,6 +3,7 @@
 import React from 'react';
 import Modal from 'react-modal';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import Footer from '@/layout/Footer';
 import LeftSidebar from '@/layout/LeftSidebar';
@@ -51,6 +52,7 @@ export default function DashboardLayout({
       <LeftSidebar />
       <div className="mt-20 ml-20 p-3 pb-7">
         <QueryClientProvider client={queryClient}>
+          <ReactQueryDevtools initialIsOpen={false} />
           <DashboardPage>
             {children}
           </DashboardPage>

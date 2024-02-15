@@ -17,7 +17,7 @@ export default function InvestmentInfo({
   account,
 }: InvestmentInfoProps): JSX.Element {
   const { data: investment } = useInvestment(account.guid);
-  let { data: prices } = usePrices(account.commodity);
+  let { data: prices } = usePrices({ from: account.commodity });
 
   if (!investment || !prices) {
     return <Loading />;

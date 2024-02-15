@@ -7,7 +7,6 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DataSource, IsNull } from 'typeorm';
-import * as swr from 'swr';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import {
@@ -21,8 +20,6 @@ import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import * as queries from '@/lib/queries';
 import * as apiHook from '@/hooks/api';
 import { PriceDBMap } from '@/book/prices';
-
-jest.mock('swr');
 
 jest.mock('@/lib/queries', () => ({
   __esModule: true,
@@ -273,8 +270,6 @@ describe('TransactionForm', () => {
       });
       expect(tx.guid.length).toEqual(31);
       expect(mockSave).toHaveBeenCalledTimes(1);
-      expect(swr.mutate).toBeCalledTimes(1);
-      expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/monthly-totals', undefined);
     });
   });
 
@@ -1236,9 +1231,6 @@ describe('TransactionForm', () => {
 
     expect(screen.getByText('add')).toBeEnabled();
     await user.click(screen.getByText('add'));
-
-    expect(swr.mutate).toBeCalledTimes(1);
-    expect(swr.mutate).toHaveBeenNthCalledWith(1, '/api/monthly-totals', undefined);
   });
 
   describe('actions', () => {

@@ -2,7 +2,6 @@ import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 import { DateTime } from 'luxon';
-import { mutate } from 'swr';
 import classNames from 'classnames';
 
 import {
@@ -354,6 +353,4 @@ async function createBalance(
     ],
     date: data.balanceDate ? DateTime.fromISO(data.balanceDate as string) : DateTime.now(),
   }).save();
-
-  mutate('/api/monthly-totals', undefined);
 }

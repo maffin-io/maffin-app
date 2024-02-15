@@ -1,7 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { DateTime } from 'luxon';
-import type { SWRResponse } from 'swr';
 import { UseQueryResult } from '@tanstack/react-query';
 
 import { AccountsTable } from '@/components/pages/accounts';
@@ -9,6 +8,7 @@ import Table from '@/components/Table';
 import { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import * as apiHook from '@/hooks/api';
+import type { MonthlyTotals } from '@/lib/queries';
 
 jest.mock('@/components/Table', () => jest.fn(
   () => <div data-testid="Table" />,
@@ -24,7 +24,7 @@ describe('AccountsTable', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-01') as DateTime<true>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<MonthlyTotals>);
   });
 
   afterEach(() => {
@@ -104,7 +104,7 @@ describe('AccountsTable', () => {
         ] as Account[],
       } as UseQueryResult<Account[]>,
     );
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
       {
         data: {
           a1: {
@@ -114,8 +114,8 @@ describe('AccountsTable', () => {
           a2: {
             '01/2023': new Money(-100, 'EUR'),
           },
-        },
-      } as SWRResponse,
+        } as MonthlyTotals,
+      } as UseQueryResult<MonthlyTotals>,
     );
 
     render(<AccountsTable />);
@@ -189,7 +189,7 @@ describe('AccountsTable', () => {
         ] as Account[],
       } as UseQueryResult<Account[]>,
     );
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
       {
         data: {
           a1: {
@@ -197,8 +197,8 @@ describe('AccountsTable', () => {
             '01/2023': new Money(100, 'EUR'),
             '02/2023': new Money(100, 'EUR'), // will be ignored
           },
-        },
-      } as SWRResponse,
+        } as MonthlyTotals,
+      } as UseQueryResult<MonthlyTotals>,
     );
 
     render(<AccountsTable />);

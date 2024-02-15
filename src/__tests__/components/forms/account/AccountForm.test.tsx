@@ -7,7 +7,6 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DataSource } from 'typeorm';
-import * as swr from 'swr';
 import * as navigation from 'next/navigation';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import type { UseQueryResult } from '@tanstack/react-query';
@@ -23,10 +22,7 @@ import {
 import AccountForm from '@/components/forms/account/AccountForm';
 import * as apiHook from '@/hooks/api';
 
-jest.mock('swr');
-
 jest.mock('next/navigation');
-
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
   ...jest.requireActual('@/hooks/api'),
@@ -419,8 +415,6 @@ describe('AccountForm', () => {
         valueNum: -10001,
       },
     ]);
-
-    expect(swr.mutate).toBeCalledWith('/api/monthly-totals', undefined);
   });
 
   it.each([

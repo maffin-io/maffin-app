@@ -83,7 +83,7 @@ export async function insertTodayPrices(): Promise<void> {
   );
 
   const end = performance.now();
-  console.log(`/api/prices: ${end - start}ms`);
+  console.log(`/stocker/api/prices: ${end - start}ms`);
 }
 
 export type LiveSummary = {

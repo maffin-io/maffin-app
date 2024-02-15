@@ -1,7 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { DateTime } from 'luxon';
-import type { SWRResponse } from 'swr';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import Money from '@/book/Money';
@@ -9,6 +8,7 @@ import Bar from '@/components/charts/Bar';
 import IncomeExpenseHistogram from '@/components/pages/accounts/IncomeExpenseHistogram';
 import * as apiHook from '@/hooks/api';
 import type { Commodity } from '@/book/entities';
+import type { MonthlyTotals } from '@/lib/queries';
 
 jest.mock('@/components/charts/Bar', () => jest.fn(
   () => <div data-testid="Bar" />,
@@ -22,7 +22,7 @@ jest.mock('@/hooks/api', () => ({
 describe('IncomeExpenseHistogram', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02') as DateTime<true>);
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<MonthlyTotals>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
   });
 
@@ -167,7 +167,7 @@ describe('IncomeExpenseHistogram', () => {
   });
 
   it('generates datasets as expected', () => {
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
       {
         data: {
           income: {
@@ -178,8 +178,8 @@ describe('IncomeExpenseHistogram', () => {
             '11/2022': new Money(400, 'EUR'),
             '12/2022': new Money(500, 'EUR'),
           },
-        },
-      } as SWRResponse,
+        } as MonthlyTotals,
+      } as UseQueryResult<MonthlyTotals>,
     );
 
     render(

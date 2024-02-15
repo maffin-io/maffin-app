@@ -19,7 +19,7 @@ export default function InvestmentChart({
   account,
 }: InvestmentChartProps): JSX.Element {
   const { data: investment } = useInvestment(account.guid);
-  const { data: pricesMap } = usePrices(account.commodity);
+  const { data: pricesMap } = usePrices({ from: account.commodity });
 
   if (!investment || !pricesMap) {
     return <Loading />;
