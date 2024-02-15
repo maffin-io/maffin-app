@@ -130,6 +130,11 @@ export async function updateCache(
       refetchType: 'all',
     });
   });
+
+  queryClient.invalidateQueries({
+    queryKey: ['/api/aggregations/accounts/totals'],
+    refetchType: 'all',
+  });
 }
 
 // https://github.com/typeorm/typeorm/issues/4714

@@ -27,7 +27,7 @@ export default function SplitField({
   const account = form.watch(`splits.${index}.fk_account`) as Account;
   const txCurrency = form.watch('fk_currency');
   const date = form.watch('date');
-  const { data: prices } = usePrices(account?.commodity);
+  const { data: prices } = usePrices({ from: account?.commodity });
   const [exchangeRate, setExchangeRate] = React.useState(
     Price.create({ valueNum: 1, valueDenom: 1, fk_currency: txCurrency }),
   );

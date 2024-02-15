@@ -89,6 +89,14 @@ export function useInvestment(guid: string): UseQueryResult<InvestmentAccount> {
   return result;
 }
 
+/**
+ * Returns all InvestmentAccount for accounts that are INVESTMENT. Note that
+ * if there are changes to `/api/accounts/` or any of the other dependencies the
+ * data here WILL NOT be refetched because we don't change the key.
+ *
+ * The data in this key is refreshed via the useInvestment hook as it updates for
+ * each account that changes. This hook is only for the initial load.
+ */
 export function useInvestments(): UseQueryResult<InvestmentAccount[]> {
   const { data: accounts } = useAccounts();
   const { data: mainCurrency } = useMainCurrency();

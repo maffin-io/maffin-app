@@ -1,7 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { DateTime } from 'luxon';
-import type { SWRResponse } from 'swr';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import Money from '@/book/Money';
@@ -9,6 +8,7 @@ import { Account, Commodity } from '@/book/entities';
 import Bar from '@/components/charts/Bar';
 import { MonthlyTotalHistogram } from '@/components/pages/accounts';
 import * as apiHook from '@/hooks/api';
+import type { MonthlyTotals } from '@/lib/queries';
 
 jest.mock('@/components/charts/Bar', () => jest.fn(
   () => <div data-testid="Bar" />,
@@ -25,7 +25,7 @@ describe('MonthlyTotalHistogram', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(now);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<MonthlyTotals>);
   });
 
   afterEach(() => {
@@ -133,15 +133,15 @@ describe('MonthlyTotalHistogram', () => {
     undefined,
     now.minus({ months: 3 }),
   ])('selects default date now - 9 months', (date) => {
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
       {
         data: {
           salary: {
             '11/2022': new Money(-1000, 'EUR'),
             '12/2022': new Money(-1000, 'EUR'),
           },
-        },
-      } as SWRResponse,
+        } as MonthlyTotals,
+      } as UseQueryResult<MonthlyTotals>,
     );
 
     render(
@@ -180,15 +180,15 @@ describe('MonthlyTotalHistogram', () => {
   });
 
   it('selects date range of 9 months in the past', () => {
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
       {
         data: {
           salary: {
             '11/2021': new Money(-1000, 'EUR'),
             '12/2021': new Money(-1000, 'EUR'),
           },
-        },
-      } as SWRResponse,
+        } as MonthlyTotals,
+      } as UseQueryResult<MonthlyTotals>,
     );
 
     const selectedDate = now.minus({ years: 1 });
@@ -228,7 +228,7 @@ describe('MonthlyTotalHistogram', () => {
   });
 
   it('generates data as expected', () => {
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
       {
         data: {
           salary: {
@@ -239,8 +239,8 @@ describe('MonthlyTotalHistogram', () => {
             '11/2022': new Money(-150, 'EUR'),
             '12/2022': new Money(-50, 'EUR'),
           },
-        },
-      } as SWRResponse,
+        } as MonthlyTotals,
+      } as UseQueryResult<MonthlyTotals>,
     );
 
     render(

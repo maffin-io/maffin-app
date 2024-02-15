@@ -286,7 +286,7 @@ describe('caching', () => {
 
     await tx.save();
 
-    expect(mockInvalidateQueries).toBeCalledTimes(4);
+    expect(mockInvalidateQueries).toBeCalledTimes(5);
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['/api/txs', { name: 'latest' }],
       refetchType: 'all',
@@ -301,6 +301,10 @@ describe('caching', () => {
     });
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['/api/splits', { guid: '2' }],
+      refetchType: 'all',
+    });
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['/api/aggregations/accounts/totals'],
       refetchType: 'all',
     });
   });
@@ -318,7 +322,7 @@ describe('caching', () => {
 
     await tx.remove();
 
-    expect(mockInvalidateQueries).toBeCalledTimes(4);
+    expect(mockInvalidateQueries).toBeCalledTimes(5);
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['/api/txs', { name: 'latest' }],
       refetchType: 'all',
@@ -333,6 +337,10 @@ describe('caching', () => {
     });
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['/api/splits', { guid: '2' }],
+      refetchType: 'all',
+    });
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['/api/aggregations/accounts/totals'],
       refetchType: 'all',
     });
   });

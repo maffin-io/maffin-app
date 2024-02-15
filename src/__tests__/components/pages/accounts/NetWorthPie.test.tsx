@@ -1,7 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { DateTime } from 'luxon';
-import type { SWRResponse } from 'swr';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import Money from '@/book/Money';
@@ -9,6 +8,7 @@ import Pie from '@/components/charts/Pie';
 import { NetWorthPie } from '@/components/pages/accounts';
 import * as apiHook from '@/hooks/api';
 import type { Commodity } from '@/book/entities';
+import type { MonthlyTotals } from '@/lib/queries';
 
 jest.mock('@/components/charts/Pie', () => jest.fn(
   () => <div data-testid="Pie" />,
@@ -22,7 +22,7 @@ jest.mock('@/hooks/api', () => ({
 describe('NetWorthPie', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<MonthlyTotals>);
   });
 
   afterEach(() => {
@@ -72,7 +72,7 @@ describe('NetWorthPie', () => {
 
   it('shows net worth as expected', () => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-02-20') as DateTime<true>);
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
       {
         data: {
           asset: {
@@ -83,8 +83,8 @@ describe('NetWorthPie', () => {
             '01/2023': new Money(-50, 'EUR'),
             '02/2023': new Money(-100, 'EUR'),
           },
-        },
-      } as SWRResponse,
+        } as MonthlyTotals,
+      } as UseQueryResult<MonthlyTotals>,
     );
 
     render(<NetWorthPie />);
@@ -106,15 +106,15 @@ describe('NetWorthPie', () => {
   });
 
   it('shows net worth when no liabilities', () => {
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
       {
         data: {
           asset: {
             '01/2023': new Money(500, 'EUR'),
             '02/2023': new Money(1000, 'EUR'),
           },
-        },
-      } as SWRResponse,
+        } as MonthlyTotals,
+      } as UseQueryResult<MonthlyTotals>,
     );
 
     render(<NetWorthPie />);
@@ -136,7 +136,7 @@ describe('NetWorthPie', () => {
   });
 
   it('filters by selected date', () => {
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotals').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
       {
         data: {
           asset: {
@@ -147,8 +147,8 @@ describe('NetWorthPie', () => {
             '01/2023': new Money(-50, 'EUR'),
             '02/2023': new Money(-100, 'EUR'),
           },
-        },
-      } as SWRResponse,
+        } as MonthlyTotals,
+      } as UseQueryResult<MonthlyTotals>,
     );
 
     render(

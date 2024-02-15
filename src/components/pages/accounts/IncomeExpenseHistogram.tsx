@@ -6,7 +6,7 @@ import zoomPlugin from 'chartjs-plugin-zoom';
 
 import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
-import * as API from '@/hooks/api';
+import { useAccountsTotals, useMainCurrency } from '@/hooks/api';
 
 export type IncomeExpenseHistogramProps = {
   startDate?: DateTime,
@@ -21,11 +21,11 @@ export default function IncomeExpenseHistogram({
   startDate,
   selectedDate = DateTime.now().minus({ months: 3 }),
 }: IncomeExpenseHistogramProps): JSX.Element {
-  const { data: monthlyTotals } = API.useAccountsMonthlyTotals();
+  const { data: monthlyTotals } = useAccountsTotals();
   const incomeSeries = monthlyTotals?.income;
   const expenseSeries = monthlyTotals?.expense;
 
-  const { data: currency } = API.useMainCurrency();
+  const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
 
   const now = DateTime.now();

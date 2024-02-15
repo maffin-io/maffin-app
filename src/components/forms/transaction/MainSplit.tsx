@@ -26,7 +26,7 @@ export default function MainSplit({
   const date = form.watch('date');
   const txCurrency = form.watch('fk_currency');
   const quantity = form.watch('splits.0.quantity');
-  const { data: prices } = usePrices(account?.commodity);
+  const { data: prices } = usePrices({ from: account?.commodity });
   const [exchangeRate, setExchangeRate] = React.useState(
     Price.create({ valueNum: 1, valueDenom: 1, fk_currency: txCurrency }),
   );

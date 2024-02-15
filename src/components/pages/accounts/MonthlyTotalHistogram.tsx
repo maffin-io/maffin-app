@@ -4,7 +4,7 @@ import type { ChartDataset } from 'chart.js';
 
 import Bar from '@/components/charts/Bar';
 import type { Account } from '@/book/entities';
-import * as API from '@/hooks/api';
+import { useAccountsTotals, useMainCurrency } from '@/hooks/api';
 import { moneyToString } from '@/helpers/number';
 
 export type MonthlyTotalHistogramProps = {
@@ -18,10 +18,10 @@ export default function MonthlyTotalHistogram({
   selectedDate = DateTime.now().minus({ months: 4 }),
   accounts = [],
 }: MonthlyTotalHistogramProps): JSX.Element {
-  const { data: monthlyTotals } = API.useAccountsMonthlyTotals();
+  const { data: monthlyTotals } = useAccountsTotals();
   const now = DateTime.now();
 
-  const { data: currency } = API.useMainCurrency();
+  const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
 
   if (now.diff(selectedDate, ['months']).months < 4) {

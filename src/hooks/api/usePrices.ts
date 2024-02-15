@@ -10,10 +10,20 @@ import fetcher from './fetcher';
 /**
  * Returns prices for a given commodity
  */
-export function usePrices(c: Commodity | undefined): UseQueryResult<PriceDBMap> {
+export function usePrices(params: {
+  from?: Commodity,
+  to?: Commodity,
+}): UseQueryResult<PriceDBMap> {
   return useQuery({
-    queryKey: [Price.CACHE_KEY, { commodity: c?.guid }],
-    queryFn: fetcher(() => getPrices({ from: c }), `${Price.CACHE_KEY}/${c?.guid}`),
-    enabled: !!c,
+    queryKey: [Price.CACHE_KEY, { from: params.from?.guid, to: params.to?.guid }],
+    queryFn: fetcher(
+      () => getPrices(params),
+      `${Price.CACHE_KEY}/${params.from?.guid}.${params.to?.guid}`,
+    ),
+    enabled: (
+      !!('from' in params && params.from)
+      || !!('to' in params && params.to)
+      || (!('from' in params) && !('to' in params))
+    ),
   });
 }

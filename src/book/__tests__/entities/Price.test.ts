@@ -158,7 +158,7 @@ describe('caching', () => {
 
     expect(mockInvalidateQueries).toBeCalledTimes(1);
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/prices', { commodity: 'ticker' }],
+      queryKey: ['/api/prices', { from: 'ticker' }],
       refetchType: 'all',
     });
     expect(Price.upsert).toBeCalledWith(
@@ -183,11 +183,11 @@ describe('caching', () => {
 
     expect(mockInvalidateQueries).toBeCalledTimes(2);
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/prices', { commodity: 'eur' }],
+      queryKey: ['/api/prices', { from: 'eur' }],
       refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/prices', { commodity: 'usd' }],
+      queryKey: ['/api/prices', { from: 'usd' }],
       refetchType: 'all',
     });
   });
@@ -203,7 +203,7 @@ describe('caching', () => {
 
     expect(mockInvalidateQueries).toBeCalledTimes(1);
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['/api/prices', { commodity: 'ticker' }],
+      queryKey: ['/api/prices', { from: 'ticker' }],
       refetchType: 'all',
     });
   });

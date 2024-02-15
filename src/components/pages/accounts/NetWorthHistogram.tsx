@@ -10,7 +10,7 @@ import zoomPlugin from 'chartjs-plugin-zoom';
 
 import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
-import * as API from '@/hooks/api';
+import { useAccountsTotals, useMainCurrency } from '@/hooks/api';
 
 // We are using Bar chart here but one of the axis uses Line so
 // we have to register here or otherwise we get an error.
@@ -30,11 +30,11 @@ export default function NetWorthHistogram({
   startDate,
   selectedDate = DateTime.now().minus({ months: 3 }),
 }: NetWorthHistogramProps): JSX.Element {
-  const { data: monthlyTotals } = API.useAccountsMonthlyTotals();
+  const { data: monthlyTotals } = useAccountsTotals();
   const assetSeries = monthlyTotals?.asset;
   const liabilitiesSeries = monthlyTotals?.liability;
 
-  const { data: currency } = API.useMainCurrency();
+  const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
 
   const now = DateTime.now();

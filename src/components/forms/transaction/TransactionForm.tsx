@@ -2,7 +2,6 @@ import React from 'react';
 import { DateTime } from 'luxon';
 import { useForm } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
-import { mutate } from 'swr';
 import { IsNull } from 'typeorm';
 import { Tooltip } from 'react-tooltip';
 import classNames from 'classnames';
@@ -148,6 +147,5 @@ async function onSubmit(data: FormValues, action: 'add' | 'update' | 'delete', o
     await transaction.remove();
   }
 
-  mutate('/api/monthly-totals', undefined);
   onSave();
 }

@@ -4,7 +4,6 @@ import initSqlJs from 'sql.js';
 import { mutate } from 'swr';
 import pako from 'pako';
 
-import * as queries from '@/lib/queries';
 import { insertTodayPrices } from '@/lib/Stocker';
 import useBookStorage from '@/hooks/useBookStorage';
 import { importBook as importGnucashBook } from '@/lib/gnucash';
@@ -16,11 +15,10 @@ import {
   Split,
   Transaction,
 } from '@/book/entities';
-import type BookStorage from '@/lib/storage/BookStorage';
 import { MIGRATIONS } from '@/book/migrations';
 import { isStaging } from '@/helpers/env';
 import { useQueryClient } from '@tanstack/react-query';
-import mapAccounts from '@/helpers/mapAccounts';
+import type BookStorage from '@/lib/storage/BookStorage';
 
 export type DataSourceContextType = {
   datasource: DataSource | null,
@@ -83,7 +81,7 @@ export default function useDataSource(): DataSourceContextType {
           const end = performance.now();
           console.log(`init datasource: ${end - start}ms`);
         }
-        await preloadData();
+        await loadStockerPrices();
         setIsLoaded(true);
       }
     }
@@ -126,11 +124,11 @@ async function importBook(storage: BookStorage, rawData: Uint8Array) {
   const rawBook = await importGnucashBook(parsedData);
   await DATASOURCE.sqljsManager.loadDatabase(rawBook);
 
-  DATASOURCE.options.extra.queryClient.removeQueries({
-    queryKey: [Account.CACHE_KEY],
+  DATASOURCE.options.extra.queryClient.refetchQueries({
+    type: 'all',
   });
-  mutate((key: string) => key?.startsWith('/api'), undefined);
-  await preloadData();
+
+  await loadStockerPrices();
   await save(storage);
 }
 
@@ -151,33 +149,14 @@ async function createEmptyBook() {
   );
 }
 
-/**
- * Preloads data that is important to render the main page quickly.
- *
- * Without this, we need to wait for SWR to load monthly-totals
- * "naturally" which takes seconds (because it depends on accounts
- * and prices).
- */
-async function preloadData() {
-  const accounts = await Account.find();
-  const accountsMap = mapAccounts(accounts);
-  const mainCurrency = accountsMap.type_asset?.commodity;
-  DATASOURCE.options.extra.queryClient.setQueryData(
-    [Commodity.CACHE_KEY, { guid: 'main' }],
-    mainCurrency,
-  );
-
-  if (!isStaging() && mainCurrency) {
+async function loadStockerPrices() {
+  if (!isStaging()) {
     try {
+      // We have to await because we use Price.upsert. Once we correct this,
+      // saving Price already updates the local cache so we don't need await
       await insertTodayPrices();
     } catch (e) {
       console.warn(`Retrieving live prices failed ${e}`);
     }
   }
-
-  const prices = await queries.getPrices({});
-  mutate(
-    '/api/monthly-totals',
-    async () => queries.getMonthlyTotals(accounts, prices),
-  );
 }

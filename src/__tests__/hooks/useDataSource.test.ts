@@ -65,8 +65,7 @@ jest.mock('typeorm', () => ({
       options: {
         extra: {
           queryClient: {
-            setQueryData: jest.fn(),
-            removeQueries: jest.fn(),
+            refetchQueries: jest.fn(),
           },
         },
       },
@@ -83,7 +82,7 @@ jest.mock('sql.js', () => ({
 
 describe('useDataSource', () => {
   beforeEach(() => {
-    jest.spyOn(query, 'useQueryClient').mockReturnValue({ clear: () => {} } as QueryClient);
+    jest.spyOn(query, 'useQueryClient').mockReturnValue({} as QueryClient);
     jest.spyOn(storageHooks, 'default').mockReturnValue({ storage: null });
     jest.spyOn(Account, 'find').mockResolvedValue([
       {
@@ -158,44 +157,10 @@ describe('useDataSource', () => {
     expect(datasource.sqljsManager.loadDatabase).toHaveBeenCalledWith(rawBook);
     expect(datasource.setOptions).toBeCalledWith(expect.objectContaining({
       extra: {
-        queryClient: { clear: expect.any(Function) },
+        queryClient: {},
       },
     }));
     expect(datasource.runMigrations).toBeCalledTimes(1);
-  });
-
-  it('preloads data', async () => {
-    const rawBook = new Uint8Array([21, 31]);
-    const mockStorageGet = jest.fn().mockResolvedValue(rawBook) as typeof BookStorage.prototype.get;
-    jest.spyOn(storageHooks, 'default').mockReturnValue({
-      storage: {
-        get: mockStorageGet,
-      } as BookStorage,
-    });
-
-    const { result } = renderHook(() => useDataSource());
-
-    await waitFor(() => expect(result.current.isLoaded).toBe(true));
-
-    expect(result.current).toMatchObject({
-      datasource: {
-        isInitialized: true,
-      },
-      isLoaded: true,
-    });
-
-    expect(
-      result.current.datasource?.options.extra.queryClient.setQueryData,
-    ).toHaveBeenNthCalledWith(
-      1,
-      ['/api/commodities', { guid: 'main' }],
-      { mnemonic: 'EUR' },
-    );
-    expect(swr.mutate).toHaveBeenNthCalledWith(
-      1,
-      '/api/monthly-totals',
-      expect.any(Function),
-    );
   });
 
   it('creates empty book when no data from storage', async () => {
@@ -293,13 +258,13 @@ describe('useDataSource', () => {
 
         await result.current.save();
         expect(swr.mutate).toHaveBeenNthCalledWith(
-          2,
+          1,
           '/state/save',
           true,
           { revalidate: false },
         );
         expect(swr.mutate).toHaveBeenNthCalledWith(
-          3,
+          2,
           '/state/save',
           false,
           { revalidate: false },
@@ -328,44 +293,18 @@ describe('useDataSource', () => {
         expect(gnucash.importBook).toHaveBeenCalledWith(rawData);
         expect(datasource.sqljsManager.loadDatabase).toBeCalledWith(new Uint8Array([44, 55]));
 
-        expect(swr.mutate).toBeCalledWith(expect.any(Function), undefined);
-        const mockMutate = swr.mutate as jest.Mock;
-        // verify the function we pass behaves as expected
-        expect(mockMutate.mock.calls[1][0]('/api/test')).toBe(true);
-        expect(mockMutate.mock.calls[1][0]('/api/asd/asd')).toBe(true);
-        expect(mockMutate.mock.calls[1][0]('/state')).toBe(false);
-
-        expect(
-          result.current.datasource?.options.extra.queryClient.removeQueries,
-        ).toBeCalledWith({
-          queryKey: ['/api/accounts'],
+        expect(datasource.options.extra.queryClient.refetchQueries).toBeCalledWith({
+          type: 'all',
         });
 
-        expect(
-          result.current.datasource?.options.extra.queryClient.setQueryData,
-        ).toHaveBeenNthCalledWith(
-          1,
-          ['/api/commodities', { guid: 'main' }],
-          { mnemonic: 'EUR' },
-        );
         expect(swr.mutate).toHaveBeenNthCalledWith(
           1,
-          '/api/monthly-totals',
-          expect.any(Function),
-        );
-        expect(swr.mutate).toHaveBeenNthCalledWith(
-          3,
-          '/api/monthly-totals',
-          expect.any(Function),
-        );
-        expect(swr.mutate).toHaveBeenNthCalledWith(
-          4,
           '/state/save',
           true,
           { revalidate: false },
         );
         expect(swr.mutate).toHaveBeenNthCalledWith(
-          5,
+          2,
           '/state/save',
           false,
           { revalidate: false },
