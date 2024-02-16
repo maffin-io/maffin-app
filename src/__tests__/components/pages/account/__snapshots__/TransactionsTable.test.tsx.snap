@@ -78,6 +78,14 @@ exports[`TransactionsTable renders Date column as expected 1`] = `
 </div>
 `;
 
+exports[`TransactionsTable renders Description column as expected 1`] = `
+<div>
+  <span>
+    Tx description
+  </span>
+</div>
+`;
+
 exports[`TransactionsTable renders FromTo column as expected 1`] = `
 <div>
   <ul>
@@ -87,6 +95,14 @@ exports[`TransactionsTable renders FromTo column as expected 1`] = `
         href="/dashboard/accounts/account_guid_2"
       >
         Expenses:expense
+      </a>
+    </li>
+    <li>
+      <a
+        class="badge mb-0.5 hover:text-slate-300 misc info"
+        href="/dashboard/accounts/account_guid_3"
+      >
+        account_guid_3.path
       </a>
     </li>
   </ul>

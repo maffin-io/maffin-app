@@ -79,7 +79,6 @@ describe('InvestmentsTable', () => {
           desc: true,
           id: 'unrealizedProfit',
         },
-        showPagination: false,
       },
       {},
     );

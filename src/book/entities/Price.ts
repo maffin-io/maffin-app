@@ -147,13 +147,11 @@ export async function updateCache(
 ) {
   queryClient.invalidateQueries({
     queryKey: [...Price.CACHE_KEY, { from: (entity.fk_commodity as Commodity).guid }],
-    refetchType: 'all',
   });
 
   if ((entity.fk_commodity as Commodity).namespace === 'CURRENCY') {
     queryClient.invalidateQueries({
       queryKey: [...Price.CACHE_KEY, { from: (entity.fk_currency as Commodity).guid }],
-      refetchType: 'all',
     });
   }
 }

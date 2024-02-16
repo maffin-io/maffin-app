@@ -6,10 +6,10 @@ import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  getPaginationRowModel,
   getExpandedRowModel,
   ColumnSort,
   ExpandedState,
+  getPaginationRowModel,
 } from '@tanstack/react-table';
 import classNames from 'classnames';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
@@ -21,46 +21,37 @@ export type TableProps<T extends object> = {
   columns: ColumnDef<T>[],
   data: T[],
   initialSort?: ColumnSort,
-  pageSize?: number,
   showHeader?: boolean,
   showPagination?: boolean,
   tdClassName?: string,
-  getSubRows?: (originalRow: T, index: number) => T[] | undefined,
   isExpanded?: boolean,
-};
+} & Partial<TableOptions<T>>;
 
 export default function Table<T extends object = {}>(
   {
     id,
-    columns,
-    data,
     initialSort,
-    pageSize,
     showHeader = true,
-    showPagination = true,
+    showPagination = false,
     tdClassName = 'px-6 py-4',
-    getSubRows,
     isExpanded = false,
+    ...props
   }: TableProps<T>,
 ): JSX.Element {
   const tableConfig: TableOptions<T> = {
-    columns,
-    data,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
     enableExpanding: true,
-    getSubRows,
     initialState: {
-      pagination: {
-        pageSize: pageSize || 10,
-      },
+      ...props.initialState,
       sorting: (initialSort && [initialSort]) || undefined,
       expanded: isExpanded as ExpandedState,
     },
+    ...props,
   };
 
-  if (showPagination) {
+  if (showPagination && !props.manualPagination) {
     tableConfig.getPaginationRowModel = getPaginationRowModel();
   }
 
@@ -140,7 +131,7 @@ export default function Table<T extends object = {}>(
 
       {
         showPagination
-        && <Pagination<T> table={table} showPageSize={!pageSize} />
+        && <Pagination<T> table={table} />
       }
     </>
   );

@@ -4,6 +4,7 @@ import {
   render,
   screen,
 } from '@testing-library/react';
+import * as query from '@tanstack/react-query';
 import type { LinkProps } from 'next/link';
 import type { UseQueryResult } from '@tanstack/react-query';
 
@@ -19,6 +20,7 @@ import FormButton from '@/components/buttons/FormButton';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import * as apiHook from '@/hooks/api';
 
+jest.mock('@tanstack/react-query');
 jest.mock('next/link', () => jest.fn(
   (
     props: LinkProps & { children?: React.ReactNode } & React.HTMLAttributes<HTMLAnchorElement>,
@@ -51,7 +53,7 @@ jest.mock('@/hooks/api', () => ({
 
 describe('TransactionsTable', () => {
   let eur: Commodity;
-  let accounts: Account[];
+  let account: Account;
   let split: Split;
 
   beforeEach(async () => {
@@ -61,60 +63,30 @@ describe('TransactionsTable', () => {
       mnemonic: 'EUR',
     } as Commodity;
 
-    accounts = [
-      {
-        guid: 'account_guid_1',
-        name: 'bank',
-        parentId: 'root',
-        type: 'ASSET',
-        commodity: eur,
-        path: 'Assets:bank',
-      },
-      {
-        guid: 'account_guid_2',
-        name: 'expense',
-        parentId: 'root',
-        type: 'EXPENSE',
-        path: 'Expenses:expense',
-        commodity: eur,
-      },
-      {
-        guid: 'root',
-        name: 'root',
-        type: 'ROOT',
-      },
-    ] as Account[];
+    account = {
+      guid: 'account_guid_1',
+      name: 'bank',
+      parentId: 'root',
+      type: 'ASSET',
+      commodity: eur,
+      path: 'Assets:bank',
+    } as Account;
 
     split = new Split();
-    [split.fk_account] = accounts;
+    split.accountId = 'account_guid_1';
     split.guid = 'split_guid_1';
     split.value = 100;
     split.quantity = 100;
-
-    const splitA = new Split();
-    splitA.fk_account = split.fk_account;
-    splitA.guid = split.guid;
-    splitA.value = split.value;
-    splitA.quantity = split.quantity;
-
-    const splitB = new Split();
-    [, splitB.fk_account] = accounts;
-    splitB.guid = 'splits_guid_2';
-    splitB.value = -100;
-    splitB.quantity = -100;
-
+    split.txId = 'tx_guid';
+    split.balance = 250;
     split.fk_transaction = {
-      guid: 'tx_guid',
-      description: 'random expense',
       date: DateTime.fromISO('2023-01-01'),
-      fk_currency: {
-        mnemonic: 'EUR',
-      } as Commodity,
-      splits: [splitA, splitB],
     } as Transaction;
 
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: accounts } as UseQueryResult<Account[]>);
-    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: [split] } as UseQueryResult<Split[]>);
+    jest.spyOn(apiHook, 'useSplitsCount').mockReturnValue({ data: 1 } as UseQueryResult<number>);
+    jest.spyOn(apiHook, 'useSplitsPagination').mockReturnValue(
+      { data: [split] } as UseQueryResult<Split[]>,
+    );
   });
 
   afterEach(async () => {
@@ -122,15 +94,27 @@ describe('TransactionsTable', () => {
   });
 
   it('creates empty Table with expected params', async () => {
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
-    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as UseQueryResult<Split[]>);
+    jest.spyOn(apiHook, 'useSplitsCount').mockReturnValue({ data: undefined } as UseQueryResult<number>);
+    jest.spyOn(apiHook, 'useSplitsPagination').mockReturnValue(
+      { data: undefined } as UseQueryResult<Split[]>,
+    );
 
-    render(<TransactionsTable account={accounts[0]} />);
+    render(<TransactionsTable account={account} />);
 
     await screen.findByTestId('Table');
     expect(Table).toHaveBeenLastCalledWith(
       {
         id: 'transactions-table',
+        manualPagination: true,
+        onPaginationChange: expect.any(Function),
+        pageCount: 0,
+        showPagination: true,
+        state: {
+          pagination: {
+            pageIndex: 0,
+            pageSize: 10,
+          },
+        },
         columns: [
           {
             header: 'Date',
@@ -142,7 +126,7 @@ describe('TransactionsTable', () => {
           {
             header: 'Description',
             enableSorting: false,
-            accessorFn: expect.any(Function),
+            cell: expect.any(Function),
           },
           {
             header: 'From/To',
@@ -175,55 +159,21 @@ describe('TransactionsTable', () => {
   it('creates Table with expected params', async () => {
     render(
       <TransactionsTable
-        account={accounts[0]}
+        account={account}
       />,
     );
 
     await screen.findByTestId('Table');
 
-    expect(Table).toHaveBeenLastCalledWith({
+    expect(Table).toHaveBeenLastCalledWith(expect.objectContaining({
       id: 'transactions-table',
-      columns: [
-        {
-          header: 'Date',
-          id: 'date',
-          enableSorting: false,
-          accessorFn: expect.any(Function),
-          cell: expect.any(Function),
-        },
-        {
-          header: 'Description',
-          enableSorting: false,
-          accessorFn: expect.any(Function),
-        },
-        {
-          header: 'From/To',
-          enableSorting: false,
-          cell: expect.any(Function),
-        },
-        {
-          accessorKey: 'value',
-          header: 'Amount',
-          enableSorting: false,
-          cell: expect.any(Function),
-        },
-        {
-          header: 'Total',
-          enableSorting: false,
-          cell: expect.any(Function),
-        },
-        {
-          header: 'Actions',
-          enableSorting: false,
-          cell: expect.any(Function),
-        },
-      ],
+      pageCount: 1,
       data: [split],
-    }, {});
+    }), {});
   });
 
   it('renders Date column as expected', async () => {
-    render(<TransactionsTable account={accounts[0]} />);
+    render(<TransactionsTable account={account} />);
 
     await screen.findByTestId('Table');
     const dateCol = TableMock.mock.calls[0][0].columns[0];
@@ -246,8 +196,58 @@ describe('TransactionsTable', () => {
     expect(container).toMatchSnapshot();
   });
 
+  it('renders Description column as expected', async () => {
+    jest.spyOn(query, 'useQuery').mockReturnValue({
+      data: {
+        guid: 'tx_guid',
+        description: 'Tx description',
+      },
+    } as UseQueryResult<Transaction>);
+    render(<TransactionsTable account={account} />);
+
+    await screen.findByTestId('Table');
+    const descriptionCol = TableMock.mock.calls[0][0].columns[1];
+
+    expect(descriptionCol.cell).not.toBeUndefined();
+    const { container } = render(
+      // @ts-ignore
+      descriptionCol.cell({
+        row: {
+          original: split,
+        },
+      }),
+    );
+
+    expect(query.useQuery).toBeCalledWith(expect.objectContaining({
+      queryKey: ['api', 'txs', 'tx_guid'],
+    }));
+    expect(container).toMatchSnapshot();
+  });
+
   it('renders FromTo column as expected', async () => {
-    render(<TransactionsTable account={accounts[0]} />);
+    jest.spyOn(query, 'useQuery').mockReturnValue({
+      data: {
+        guid: 'tx_guid',
+        splits: [
+          split,
+          {
+            accountId: 'account_guid_2',
+            account: {
+              type: 'EXPENSE',
+              path: 'Expenses:expense',
+            },
+          },
+          {
+            accountId: 'account_guid_3',
+            account: {
+              type: 'INVESTMENT',
+              path: 'account_guid_3.path',
+            },
+          },
+        ],
+      },
+    } as UseQueryResult<Transaction>);
+    render(<TransactionsTable account={account} />);
 
     await screen.findByTestId('Table');
     const fromToCol = TableMock.mock.calls[0][0].columns[2];
@@ -262,11 +262,14 @@ describe('TransactionsTable', () => {
       }),
     );
 
+    expect(query.useQuery).toBeCalledWith(expect.objectContaining({
+      queryKey: ['api', 'txs', 'tx_guid'],
+    }));
     expect(container).toMatchSnapshot();
   });
 
   it('renders Amount column as expected', async () => {
-    render(<TransactionsTable account={accounts[0]} />);
+    render(<TransactionsTable account={account} />);
 
     await screen.findByTestId('Table');
     const amountCol = TableMock.mock.calls[0][0].columns[3];
@@ -298,7 +301,7 @@ describe('TransactionsTable', () => {
   it('renders Total column as expected', async () => {
     render(
       <TransactionsTable
-        account={accounts[0]}
+        account={account}
       />,
     );
 
@@ -306,27 +309,11 @@ describe('TransactionsTable', () => {
     const totalCol = TableMock.mock.calls[0][0].columns[4];
 
     expect(totalCol.cell).not.toBeUndefined();
-
-    const row1 = {
-      original: {
-        guid: 'split0',
-        quantity: 100,
-        account: accounts[0],
-      },
-    };
-    const row2 = {
-      original: {
-        guid: 'split1',
-        quantity: 150,
-        account: accounts[0],
-      },
-    };
     const { container } = render(
       // @ts-ignore
       totalCol.cell({
-        row: row1,
-        table: {
-          getCoreRowModel: () => ({ rows: [row1, row2] }),
+        row: {
+          original: split,
         },
       }),
     );
@@ -335,9 +322,29 @@ describe('TransactionsTable', () => {
   });
 
   it('renders Actions column as expected', async () => {
+    const tx = {
+      guid: 'tx_guid',
+      date: DateTime.fromISO('2023-01-01'),
+      splits: [
+        split,
+        {
+          accountId: 'account_guid_2',
+          value: 100,
+          quantity: 100,
+          account: {
+            type: 'EXPENSE',
+            path: 'Expenses:expense',
+          },
+        },
+      ],
+    };
+    jest.spyOn(query, 'useQuery').mockReturnValue({
+      data: tx,
+    } as UseQueryResult<Transaction>);
+
     render(
       <TransactionsTable
-        account={accounts[0]}
+        account={account}
       />,
     );
 
@@ -369,9 +376,9 @@ describe('TransactionsTable', () => {
       {
         action: 'update',
         defaultValues: {
-          ...split.transaction,
+          ...tx,
           date: '2023-01-01',
-          splits: split.transaction.splits.map(s => ({
+          splits: tx.splits.map(s => ({
             ...s,
             value: s.value,
             quantity: s.quantity,
@@ -394,9 +401,9 @@ describe('TransactionsTable', () => {
       {
         action: 'delete',
         defaultValues: {
-          ...split.transaction,
+          ...tx,
           date: '2023-01-01',
-          splits: split.transaction.splits.map(s => ({
+          splits: tx.splits.map(s => ({
             ...s,
             value: s.value,
             quantity: s.quantity,

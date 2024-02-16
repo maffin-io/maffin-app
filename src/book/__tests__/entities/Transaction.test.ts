@@ -277,10 +277,10 @@ describe('caching', () => {
     const tx = new Transaction();
     tx.splits = [
       {
-        fk_account: { guid: '1' } as Account,
+        accountId: '1',
       } as Split,
       {
-        fk_account: { guid: '2' } as Account,
+        accountId: '2',
       } as Split,
     ];
 
@@ -289,23 +289,18 @@ describe('caching', () => {
     expect(mockInvalidateQueries).toBeCalledTimes(5);
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['api', 'txs', { name: 'latest' }],
-      refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['api', 'txs', { name: 'start' }],
-      refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['api', 'splits', { guid: '1' }],
-      refetchType: 'all',
+      queryKey: ['api', 'splits', '1'],
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['api', 'splits', { guid: '2' }],
-      refetchType: 'all',
+      queryKey: ['api', 'splits', '2'],
     });
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['api', 'aggregations', 'accounts', 'totals'],
-      refetchType: 'all',
     });
   });
 
@@ -313,10 +308,10 @@ describe('caching', () => {
     const tx = new Transaction();
     tx.splits = [
       {
-        fk_account: { guid: '1' } as Account,
+        accountId: '1',
       } as Split,
       {
-        fk_account: { guid: '2' } as Account,
+        accountId: '2',
       } as Split,
     ];
 
@@ -325,23 +320,18 @@ describe('caching', () => {
     expect(mockInvalidateQueries).toBeCalledTimes(5);
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['api', 'txs', { name: 'latest' }],
-      refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['api', 'txs', { name: 'start' }],
-      refetchType: 'all',
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['api', 'splits', { guid: '1' }],
-      refetchType: 'all',
+      queryKey: ['api', 'splits', '1'],
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['api', 'splits', { guid: '2' }],
-      refetchType: 'all',
+      queryKey: ['api', 'splits', '2'],
     });
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['api', 'aggregations', 'accounts', 'totals'],
-      refetchType: 'all',
     });
   });
 });

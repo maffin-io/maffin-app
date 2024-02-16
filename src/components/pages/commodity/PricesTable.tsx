@@ -22,7 +22,12 @@ export default function TransactionsTable({
       columns={columns}
       data={prices}
       initialSort={{ id: 'date', desc: true }}
-      pageSize={7}
+      initialState={{
+        pagination: {
+          pageSize: 7,
+        },
+      }}
+      showPagination
     />
   );
 }

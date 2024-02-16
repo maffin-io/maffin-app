@@ -117,23 +117,19 @@ export async function updateCache(
 ) {
   queryClient.invalidateQueries({
     queryKey: [...Transaction.CACHE_KEY, { name: 'latest' }],
-    refetchType: 'all',
   });
   queryClient.invalidateQueries({
     queryKey: [...Transaction.CACHE_KEY, { name: 'start' }],
-    refetchType: 'all',
   });
 
   entity.splits.forEach(split => {
     queryClient.invalidateQueries({
-      queryKey: [...Split.CACHE_KEY, { guid: split.fk_account.guid }],
-      refetchType: 'all',
+      queryKey: [...Split.CACHE_KEY, split.accountId],
     });
   });
 
   queryClient.invalidateQueries({
     queryKey: ['api', 'aggregations', 'accounts', 'totals'],
-    refetchType: 'all',
   });
 }
 

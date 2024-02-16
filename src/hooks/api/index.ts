@@ -11,7 +11,12 @@ import fetcher from './fetcher';
 export { useAccount, useAccounts } from '@/hooks/api/useAccounts';
 export { useCommodity, useCommodities } from '@/hooks/api/useCommodities';
 export { useInvestment, useInvestments } from '@/hooks/api/useInvestments';
-export { useSplits } from '@/hooks/api/useSplits';
+export {
+  useSplits,
+  useSplitsPagination,
+  useSplitsCount,
+  useSplitsTotal,
+} from '@/hooks/api/useSplits';
 export { usePrices } from '@/hooks/api/usePrices';
 export { useMainCurrency } from '@/hooks/api/useMainCurrency';
 export { useAccountsTotals } from '@/hooks/api/useAccountsTotals';

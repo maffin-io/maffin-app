@@ -39,7 +39,12 @@ describe('PricesTable', () => {
           desc: true,
           id: 'date',
         },
-        pageSize: 7,
+        initialState: {
+          pagination: {
+            pageSize: 7,
+          },
+        },
+        showPagination: true,
         data: [],
         columns: [
           {

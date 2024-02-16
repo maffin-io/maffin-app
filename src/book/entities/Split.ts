@@ -40,6 +40,9 @@ export default class Split extends BaseEntity {
   @JoinColumn({ name: 'tx_guid' })
     fk_transaction!: Relation<Transaction> | string;
 
+  @RelationId((split: Split) => split.fk_transaction)
+    txId: string;
+
   get transaction(): Transaction {
     return this.fk_transaction as Transaction;
   }
@@ -48,7 +51,7 @@ export default class Split extends BaseEntity {
   @JoinColumn({ name: 'account_guid' })
   @CheckValueSymbol()
   @v.IsNotEmpty({ message: 'account is required' })
-    fk_account!: Account;
+    fk_account!: Relation<Account> | string;
 
   @RelationId((split: Split) => split.fk_account)
     accountId: string;
@@ -140,6 +143,21 @@ export default class Split extends BaseEntity {
     this.quantityNum = amount;
     this.quantityDenom = parseInt('1'.padEnd(scale + 1, '0'), 10);
   }
+
+  /**
+   * This column is a hack for computing partial balance for an account
+   * when retrieving multiple splits
+   *
+   * See https://github.com/typeorm/typeorm/issues/1822 for more
+   */
+  @Column({
+    type: 'integer',
+    select: false,
+    insert: false,
+    update: false,
+    nullable: true,
+  })
+    balance: number;
 }
 
 // https://github.com/typeorm/typeorm/issues/4714
