@@ -1,6 +1,6 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
 import { DateTime } from 'luxon';
+import { render, screen } from '@testing-library/react';
 import { UseQueryResult } from '@tanstack/react-query';
 
 import { AccountsTable } from '@/components/pages/accounts';
@@ -54,9 +54,8 @@ describe('AccountsTable', () => {
           },
         ],
         data: [],
-        initialSort: {
-          desc: true,
-          id: 'total',
+        initialState: {
+          sorting: [{ id: 'total', desc: true }],
         },
         isExpanded: false,
         showHeader: false,

@@ -1,5 +1,4 @@
 import {
-  keepPreviousData,
   useQuery,
   useQueryClient,
   UseQueryResult,
@@ -80,7 +79,6 @@ export function useInvestment(guid: string): UseQueryResult<InvestmentAccount> {
       `/${InvestmentAccount.CACHE_KEY.join('/')}/${guid}`,
     ),
     enabled: !!account && !!splits && !!mainCurrency,
-    placeholderData: keepPreviousData,
   });
 
   if (result.error) {

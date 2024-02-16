@@ -11,7 +11,7 @@ jest.mock('react-tailwindcss-datepicker', () => jest.fn(
 
 describe('DateRangeInput', () => {
   beforeEach(() => {
-    jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-30'));
+    jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-30') as DateTime<true>);
   });
 
   afterEach(() => {
@@ -45,7 +45,7 @@ describe('DateRangeInput', () => {
         },
         configs: {
           shortcuts: {
-            today: {
+            t: {
               text: 'Today',
               period: {
                 start: DateTime.now().toJSDate(),
@@ -85,7 +85,7 @@ describe('DateRangeInput', () => {
         minDate: DateTime.fromISO('2022-01-01').toJSDate(),
         configs: {
           shortcuts: expect.objectContaining({
-            today: {
+            t: {
               text: 'Today',
               period: {
                 start: DateTime.fromISO('2023-01-30').toJSDate(),

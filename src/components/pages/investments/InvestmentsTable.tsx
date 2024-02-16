@@ -28,7 +28,9 @@ export default function InvestmentsTable(): JSX.Element {
       id="investments-table"
       columns={columns}
       data={investments}
-      initialSort={{ id: 'unrealizedProfit', desc: true }}
+      initialState={{
+        sorting: [{ id: 'unrealizedProfit', desc: true }],
+      }}
     />
   );
 }

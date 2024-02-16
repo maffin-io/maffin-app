@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Modal from 'react-modal';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { keepPreviousData, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import Footer from '@/layout/Footer';
@@ -23,6 +23,7 @@ const queryClient = new QueryClient({
       refetchOnReconnect: false,
       refetchOnWindowFocus: false,
       gcTime: 300000,
+      placeholderData: keepPreviousData,
     },
   },
 });

@@ -21,11 +21,14 @@ export default function TransactionsTable({
       id="prices-table"
       columns={columns}
       data={prices}
-      initialSort={{ id: 'date', desc: true }}
       initialState={{
         pagination: {
           pageSize: 7,
         },
+        sorting: [{
+          id: 'date',
+          desc: true,
+        }],
       }}
       showPagination
     />

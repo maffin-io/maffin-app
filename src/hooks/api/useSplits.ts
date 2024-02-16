@@ -1,5 +1,4 @@
 import {
-  keepPreviousData,
   useQuery,
   UseQueryResult,
 } from '@tanstack/react-query';
@@ -83,7 +82,6 @@ export function useSplitsPagination(
         .getMany(),
       queryKey,
     ),
-    placeholderData: keepPreviousData,
   });
 
   return result;

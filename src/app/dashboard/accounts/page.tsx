@@ -25,7 +25,6 @@ const IncomeExpenseHistogram = dynamic(() => import('@/components/pages/accounts
 export default function AccountsPage(): JSX.Element {
   const { data: earliestDate } = API.useStartDate();
   const { data, isLoading } = API.useAccounts();
-
   const [selectedDate, setSelectedDate] = React.useState(DateTime.now());
 
   if (isLoading) {

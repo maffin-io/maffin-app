@@ -20,7 +20,7 @@ export default function DateRangeInput({
 }: DateRangeInputProps): JSX.Element {
   const now = DateTime.now();
   const shortcuts: { [key: string]: { text: string, period: { start: Date, end: Date } } } = {
-    today: {
+    t: {
       text: 'Today',
       period: {
         start: now.toJSDate(),

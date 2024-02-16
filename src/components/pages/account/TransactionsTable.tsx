@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { BiEdit, BiXCircle } from 'react-icons/bi';
 import { Tooltip } from 'react-tooltip';
-import { keepPreviousData, useQuery, UseQueryResult } from '@tanstack/react-query';
+import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
 import FormButton from '@/components/buttons/FormButton';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
@@ -126,7 +126,6 @@ function useTransaction(guid: string): UseQueryResult<Transaction> {
       }),
       queryKey,
     ),
-    placeholderData: keepPreviousData,
   });
 }
 
