@@ -80,7 +80,7 @@ export default function useDataSource(): DataSourceContextType {
           const end = performance.now();
           console.log(`init datasource: ${end - start}ms`);
         }
-        await loadStockerPrices();
+        loadStockerPrices();
         setIsLoaded(true);
       }
     }
