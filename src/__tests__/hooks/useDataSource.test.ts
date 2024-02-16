@@ -1,7 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import type { InitSqlJsStatic } from 'sql.js';
 import type { DataSource } from 'typeorm';
-import * as swr from 'swr';
 import * as query from '@tanstack/react-query';
 
 import { Account, Book, Commodity } from '@/book/entities';
@@ -11,17 +10,6 @@ import * as gnucash from '@/lib/gnucash';
 import * as queries from '@/lib/queries';
 import type BookStorage from '@/lib/storage/GDriveBookStorage';
 import type { QueryClient } from '@tanstack/react-query';
-
-jest.mock('swr', () => ({
-  __esModule: true,
-  useSWRConfig: jest.fn().mockReturnValue({
-    cache: {
-      keys: jest.fn(),
-      delete: jest.fn(),
-    },
-  }),
-  mutate: jest.fn(),
-}));
 
 jest.mock('@tanstack/react-query');
 
@@ -66,6 +54,7 @@ jest.mock('typeorm', () => ({
         extra: {
           queryClient: {
             refetchQueries: jest.fn(),
+            setQueryData: jest.fn(),
           },
         },
       },
@@ -250,24 +239,22 @@ describe('useDataSource', () => {
     });
 
     describe('save', () => {
-      it('updates datasource, saves storage and mutates save state', async () => {
+      it('updates datasource, saves storage and updates state', async () => {
         const { result } = renderHook(() => useDataSource());
 
         await waitFor(() => expect(result.current.isLoaded).toBe(true));
         const datasource = result.current.datasource as DataSource;
 
         await result.current.save();
-        expect(swr.mutate).toHaveBeenNthCalledWith(
+        expect(datasource.options.extra.queryClient.setQueryData).toHaveBeenNthCalledWith(
           1,
-          '/state/save',
+          ['state', 'isSaving'],
           true,
-          { revalidate: false },
         );
-        expect(swr.mutate).toHaveBeenNthCalledWith(
+        expect(datasource.options.extra.queryClient.setQueryData).toHaveBeenNthCalledWith(
           2,
-          '/state/save',
+          ['state', 'isSaving'],
           false,
-          { revalidate: false },
         );
         expect(datasource.sqljsManager.exportDatabase).toBeCalledWith();
 
@@ -281,7 +268,7 @@ describe('useDataSource', () => {
         jest.spyOn(gnucash, 'importBook').mockResolvedValue(new Uint8Array([44, 55]));
       });
 
-      it('loads datasource database, mutates and saves', async () => {
+      it('loads datasource database, updates state and saves', async () => {
         const { result } = renderHook(() => useDataSource());
 
         await waitFor(() => expect(result.current.isLoaded).toBe(true));
@@ -298,17 +285,15 @@ describe('useDataSource', () => {
           type: 'all',
         });
 
-        expect(swr.mutate).toHaveBeenNthCalledWith(
+        expect(datasource.options.extra.queryClient.setQueryData).toHaveBeenNthCalledWith(
           1,
-          '/state/save',
+          ['state', 'isSaving'],
           true,
-          { revalidate: false },
         );
-        expect(swr.mutate).toHaveBeenNthCalledWith(
+        expect(datasource.options.extra.queryClient.setQueryData).toHaveBeenNthCalledWith(
           2,
-          '/state/save',
+          ['state', 'isSaving'],
           false,
-          { revalidate: false },
         );
 
         const mockStorage = (storageHooks.default as jest.Mock).mock.results[0].value.storage;

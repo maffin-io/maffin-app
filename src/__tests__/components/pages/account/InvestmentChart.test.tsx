@@ -1,7 +1,6 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 import { render, screen } from '@testing-library/react';
-import type { SWRResponse } from 'swr';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import Line from '@/components/charts/Line';
@@ -437,7 +436,7 @@ describe('InvestmentChart', () => {
           } as Price,
         ]),
       ),
-    } as SWRResponse);
+    } as UseQueryResult<InvestmentAccount>);
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-04') as DateTime<true>);
 
     render(

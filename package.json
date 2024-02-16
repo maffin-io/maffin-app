@@ -58,7 +58,6 @@
     "reflect-metadata": "^0.2.1",
     "sharp": "^0.33.2",
     "sql.js": "^1.10.2",
-    "swr": "^2.2.4",
     "typeorm": "^0.3.20",
     "winston-react": "^1.0.0-RC.0"
   },

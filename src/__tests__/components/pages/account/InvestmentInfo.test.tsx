@@ -1,7 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { DateTime } from 'luxon';
-import type { SWRResponse } from 'swr';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import { InvestmentInfo } from '@/components/pages/account';
@@ -12,6 +11,7 @@ import { Price } from '@/book/entities';
 import Money from '@/book/Money';
 import * as apiHook from '@/hooks/api';
 import { PriceDBMap } from '@/book/prices';
+import type { InvestmentAccount } from '@/book/models';
 
 jest.mock('@/components/pages/account/InvestmentChart', () => jest.fn(
   () => <div data-testid="InvestmentChart" />,
@@ -36,7 +36,7 @@ describe('InvestmentInfo', () => {
 
   beforeEach(() => {
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
-    jest.spyOn(apiHook, 'useInvestment').mockReturnValue({ data: undefined } as SWRResponse);
+    jest.spyOn(apiHook, 'useInvestment').mockReturnValue({ data: undefined } as UseQueryResult<InvestmentAccount>);
     jest.spyOn(Price, 'create').mockImplementation();
 
     eur = {

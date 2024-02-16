@@ -1,12 +1,20 @@
 import React from 'react';
 import { render, waitFor } from '@testing-library/react';
-import * as swr from 'swr';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import AccountLayout from '@/app/user/layout';
+import * as stateHooks from '@/hooks/state';
+
+jest.mock('@/hooks/state', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/state'),
+}));
 
 describe('AccountLayout', () => {
   beforeEach(() => {
-    swr.mutate('/state/theme', undefined);
+    jest.spyOn(stateHooks, 'useTheme').mockReturnValue(
+      { data: undefined } as UseQueryResult<'dark' | 'light'>,
+    );
   });
 
   it('renders as expected', async () => {
@@ -15,8 +23,6 @@ describe('AccountLayout', () => {
         <span>child</span>
       </AccountLayout>,
     );
-    const html = document.documentElement;
-    await waitFor(() => expect(html).toHaveClass('dark'));
 
     expect(container).toMatchSnapshot();
   });

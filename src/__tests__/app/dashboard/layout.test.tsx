@@ -1,14 +1,15 @@
 import React from 'react';
 import { render, waitFor } from '@testing-library/react';
-import * as swr from 'swr';
 import * as navigation from 'next/navigation';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import type { DataSourceContextType } from '@/hooks';
 import DashboardLayout from '@/app/dashboard/layout';
 import DashboardPage from '@/layout/DashboardPage';
 import LeftSidebar from '@/layout/LeftSidebar';
 import Footer from '@/layout/Footer';
+import * as stateHooks from '@/hooks/state';
 import * as dataSourceHooks from '@/hooks/useDataSource';
 import * as sessionHook from '@/hooks/useSession';
 
@@ -40,11 +41,18 @@ jest.mock('react-modal', () => ({
   setAppElement: jest.fn(),
 }));
 
+jest.mock('@/hooks/state', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/state'),
+}));
+
 describe('DashboardLayout', () => {
   let mockRouterPush: jest.Mock;
 
   beforeEach(() => {
-    swr.mutate('/state/theme', undefined);
+    jest.spyOn(stateHooks, 'useTheme').mockReturnValue(
+      { data: undefined } as UseQueryResult<'dark' | 'light'>,
+    );
     jest.spyOn(dataSourceHooks, 'default').mockReturnValue(
       { isLoaded: true } as DataSourceContextType,
     );
@@ -57,17 +65,6 @@ describe('DashboardLayout', () => {
     jest.spyOn(sessionHook, 'default').mockReturnValue({
       isAuthenticated: true,
     } as sessionHook.SessionReturn);
-  });
-
-  it('sets system theme', async () => {
-    render(
-      <DashboardLayout>
-        <span data-testid="child">child</span>
-      </DashboardLayout>,
-    );
-    const html = document.documentElement;
-
-    await waitFor(() => expect(html).toHaveClass('dark'));
   });
 
   it('sets localstorage theme', async () => {
