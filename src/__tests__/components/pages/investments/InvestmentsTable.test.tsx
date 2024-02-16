@@ -75,9 +75,8 @@ describe('InvestmentsTable', () => {
           },
         ],
         data: [],
-        initialSort: {
-          desc: true,
-          id: 'unrealizedProfit',
+        initialState: {
+          sorting: [{ id: 'unrealizedProfit', desc: true }],
         },
       },
       {},

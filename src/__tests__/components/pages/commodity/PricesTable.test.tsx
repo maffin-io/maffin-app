@@ -35,14 +35,14 @@ describe('PricesTable', () => {
     expect((Table as jest.Mock)).toHaveBeenLastCalledWith(
       {
         id: 'prices-table',
-        initialSort: {
-          desc: true,
-          id: 'date',
-        },
         initialState: {
           pagination: {
             pageSize: 7,
           },
+          sorting: [{
+            id: 'date',
+            desc: true,
+          }],
         },
         showPagination: true,
         data: [],

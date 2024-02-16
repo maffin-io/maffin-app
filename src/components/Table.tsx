@@ -7,7 +7,6 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   getExpandedRowModel,
-  ColumnSort,
   ExpandedState,
   getPaginationRowModel,
 } from '@tanstack/react-table';
@@ -20,7 +19,6 @@ export type TableProps<T extends object> = {
   id: string,
   columns: ColumnDef<T>[],
   data: T[],
-  initialSort?: ColumnSort,
   showHeader?: boolean,
   showPagination?: boolean,
   tdClassName?: string,
@@ -30,7 +28,6 @@ export type TableProps<T extends object> = {
 export default function Table<T extends object = {}>(
   {
     id,
-    initialSort,
     showHeader = true,
     showPagination = false,
     tdClassName = 'px-6 py-4',
@@ -45,7 +42,6 @@ export default function Table<T extends object = {}>(
     enableExpanding: true,
     initialState: {
       ...props.initialState,
-      sorting: (initialSort && [initialSort]) || undefined,
       expanded: isExpanded as ExpandedState,
     },
     ...props,

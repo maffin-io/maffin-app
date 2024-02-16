@@ -133,7 +133,6 @@ describe('useInvestment', () => {
       ],
       queryFn: expect.any(Function),
       enabled: true,
-      placeholderData: expect.any(Function),
     });
 
     const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];

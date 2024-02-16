@@ -8,9 +8,12 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import '@/css/globals.css';
 import { Auth0Provider } from '@/lib/auth0-provider';
-import { isProd } from '@/helpers/env';
+import { isProd, isStaging } from '@/helpers/env';
 
 Settings.throwOnInvalid = true;
+if (isStaging()) {
+  Settings.now = () => 1704067200000; // 2023-01-01
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,7 +23,7 @@ const queryClient = new QueryClient({
       refetchOnMount: true,
       refetchOnReconnect: false,
       refetchOnWindowFocus: false,
-      gcTime: 300000,
+      gcTime: 300000, // 5 minutes
     },
   },
 });

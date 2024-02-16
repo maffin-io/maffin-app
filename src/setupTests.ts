@@ -37,3 +37,4 @@ window.matchMedia = jest.fn().mockReturnValue({ matches: true });
 
 Settings.defaultZone = 'utc';
 Settings.throwOnInvalid = true;
+Settings.now = () => 1704067200000; // 2023-01-01

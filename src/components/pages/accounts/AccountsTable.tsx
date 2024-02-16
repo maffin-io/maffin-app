@@ -47,7 +47,9 @@ export default function AccountsTable(
       id="accounts-table"
       columns={columns}
       data={tree.leaves}
-      initialSort={{ id: 'total', desc: true }}
+      initialState={{
+        sorting: [{ id: 'total', desc: true }],
+      }}
       showHeader={false}
       tdClassName="p-2"
       getSubRows={row => row.leaves}
