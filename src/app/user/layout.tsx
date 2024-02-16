@@ -6,7 +6,7 @@ import Image from 'next/image';
 import maffinLogo from '@/assets/images/maffin_logo_sm.png';
 import { useTheme } from '@/hooks/state';
 
-export default function AccountLayout({
+export default function UserLayout({
   children,
 }: {
   children: React.ReactNode

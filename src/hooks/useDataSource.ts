@@ -1,7 +1,6 @@
 import React from 'react';
 import { DataSource } from 'typeorm';
 import initSqlJs from 'sql.js';
-import { mutate } from 'swr';
 import pako from 'pako';
 
 import { insertTodayPrices } from '@/lib/Stocker';
@@ -107,10 +106,10 @@ export default function useDataSource(): DataSourceContextType {
 }
 
 async function save(storage: BookStorage) {
-  mutate('/state/save', true, { revalidate: false });
+  DATASOURCE.options.extra.queryClient.setQueryData(['state', 'isSaving'], true);
   const rawBook = DATASOURCE.sqljsManager.exportDatabase();
   await storage.save(rawBook);
-  mutate('/state/save', false, { revalidate: false });
+  DATASOURCE.options.extra.queryClient.setQueryData(['state', 'isSaving'], false);
 }
 
 async function importBook(storage: BookStorage, rawData: Uint8Array) {

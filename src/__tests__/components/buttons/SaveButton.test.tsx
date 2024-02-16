@@ -1,30 +1,32 @@
 import React from 'react';
 import {
-  act,
   render,
   screen,
   fireEvent,
   waitFor,
 } from '@testing-library/react';
-import { SWRConfig, mutate } from 'swr';
+import * as query from '@tanstack/react-query';
 
 import SaveButton from '@/components/buttons/SaveButton';
 import { DataSourceContext } from '@/hooks';
 import type { DataSourceContextType } from '@/hooks';
 import * as helpers_env from '@/helpers/env';
 
+jest.mock('@tanstack/react-query');
 jest.mock('@/helpers/env', () => ({
   __esModule: true,
   isStaging: () => false,
 }));
 
 describe('SaveButton', () => {
+  beforeEach(() => {
+    jest.spyOn(query, 'useQuery').mockReturnValue({ data: false } as query.UseQueryResult<boolean>);
+  });
+
   it('loads while unavailable datasource', async () => {
     const { container } = render(
       <DataSourceContext.Provider value={{ isLoaded: false } as DataSourceContextType}>
-        <SWRConfig value={{ provider: () => new Map() }}>
-          <SaveButton />
-        </SWRConfig>
+        <SaveButton />
       </DataSourceContext.Provider>,
     );
 
@@ -35,9 +37,7 @@ describe('SaveButton', () => {
   it('renders as expected when datasource ready and not saving', async () => {
     const { container } = render(
       <DataSourceContext.Provider value={{ isLoaded: true } as DataSourceContextType}>
-        <SWRConfig value={{ provider: () => new Map() }}>
-          <SaveButton />
-        </SWRConfig>
+        <SaveButton />
       </DataSourceContext.Provider>,
     );
 
@@ -46,15 +46,12 @@ describe('SaveButton', () => {
   });
 
   it('renders as expected when datasource ready and saving', async () => {
+    jest.spyOn(query, 'useQuery').mockReturnValue({ data: true } as query.UseQueryResult<boolean>);
     const { container } = render(
       <DataSourceContext.Provider value={{ isLoaded: true } as DataSourceContextType}>
         <SaveButton />
       </DataSourceContext.Provider>,
     );
-
-    act(() => {
-      mutate('/state/save', true, { revalidate: false });
-    });
 
     expect(screen.getByRole('button')).toBeDisabled();
     expect(container).toMatchSnapshot();
@@ -69,9 +66,7 @@ describe('SaveButton', () => {
           save: mockSave as Function,
         } as DataSourceContextType}
       >
-        <SWRConfig value={{ provider: () => new Map() }}>
-          <SaveButton />
-        </SWRConfig>
+        <SaveButton />
       </DataSourceContext.Provider>,
     );
 

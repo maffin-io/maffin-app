@@ -7,8 +7,6 @@ import * as auth0 from '@auth0/auth0-react';
 import LoginPage from '@/app/user/login/page';
 import * as helpers_env from '@/helpers/env';
 
-jest.mock('swr');
-
 jest.mock('next/navigation');
 
 jest.mock('@auth0/auth0-react', () => ({

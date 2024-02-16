@@ -1,12 +1,11 @@
 import React from 'react';
 import { BiSolidMoon, BiSolidSun } from 'react-icons/bi';
 import { Tooltip } from 'react-tooltip';
-import { mutate } from 'swr';
 
 import { useTheme } from '@/hooks/state';
 
 export default function ThemeButton(): JSX.Element {
-  const { data: theme } = useTheme();
+  const { data: theme, refetch } = useTheme();
 
   let text = 'Change to dark theme';
   if (theme === 'dark') {
@@ -20,7 +19,7 @@ export default function ThemeButton(): JSX.Element {
         aria-label="Toggle theme"
         className="text-2xl cursor-pointer"
         data-tooltip-id="theme-help"
-        onClick={() => toggleTheme(theme)}
+        onClick={() => toggleTheme(theme, refetch)}
       >
         {
           theme === 'dark' ? <BiSolidSun /> : <BiSolidMoon />
@@ -37,14 +36,14 @@ export default function ThemeButton(): JSX.Element {
   );
 }
 
-function toggleTheme(currentTheme: 'dark' | 'light' | undefined) {
+function toggleTheme(currentTheme: 'dark' | 'light' | undefined, refetch: Function) {
   if (currentTheme === 'dark') {
     localStorage.setItem('theme', 'light');
-    mutate('/state/theme', 'light', { revalidate: false });
+    refetch();
     document.documentElement.classList.remove('dark');
   } else {
     localStorage.setItem('theme', 'dark');
-    mutate('/state/theme', 'dark', { revalidate: false });
+    refetch();
     document.documentElement.classList.add('dark');
   }
 }

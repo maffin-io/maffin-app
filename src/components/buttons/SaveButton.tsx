@@ -1,15 +1,15 @@
 import React from 'react';
 import { BiCloudUpload, BiLoader } from 'react-icons/bi';
-import useSWRImmutable from 'swr/immutable';
+import { useQuery } from '@tanstack/react-query';
 
 import { DataSourceContext } from '@/hooks';
 import { isStaging } from '@/helpers/env';
 
 export default function SaveButton(): JSX.Element {
-  const { data: isSaving } = useSWRImmutable(
-    '/state/save',
-    () => false,
-  );
+  const { data: isSaving } = useQuery({
+    queryKey: ['state', 'isSaving'],
+    placeholderData: false,
+  });
   const { isLoaded, save } = React.useContext(DataSourceContext);
 
   if (!isLoaded) {
