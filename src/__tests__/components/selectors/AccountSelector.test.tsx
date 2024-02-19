@@ -36,6 +36,9 @@ describe('AccountSelector', () => {
         placeholder: 'Choose account',
         getOptionLabel: expect.any(Function),
         getOptionValue: expect.any(Function),
+        classNames: {
+          option: expect.any(Function),
+        },
       },
       {},
     );

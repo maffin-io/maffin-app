@@ -23,6 +23,7 @@ describe('useMainCurrency', () => {
     const queryCache = queryClient.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
     expect(queryCache[0].queryKey).toEqual(['state', 'theme']);
+    expect(queryCache[0].gcTime).toEqual(Infinity);
   });
 
   it('returns whatever is set in localstorage', async () => {
@@ -33,6 +34,6 @@ describe('useMainCurrency', () => {
     await waitFor(() => expect(result.current.data).toEqual('light'));
     const queryCache = queryClient.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
-    expect(queryCache[0].queryKey).toEqual(['state', 'theme']);
+    expect(queryCache[0].gcTime).toEqual(Infinity);
   });
 });

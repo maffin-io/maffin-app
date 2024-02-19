@@ -124,7 +124,7 @@ describe('InvestmentInfo', () => {
       {
         className: 'col-span-6',
         title: 'Latest known price',
-        statsTextClass: 'table-caption badge',
+        statsTextClass: 'table-caption badge default',
         stats: '€15.00',
         description: 'on 2/1/2023',
       },
@@ -157,7 +157,7 @@ describe('InvestmentInfo', () => {
       {
         className: 'col-span-5',
         title: 'Total Dividends',
-        statsTextClass: 'badge',
+        statsTextClass: 'badge default',
         stats: '€20.00',
         description: '',
       },
@@ -200,7 +200,7 @@ describe('InvestmentInfo', () => {
         currency: 'EUR',
         realizedDividends: new Money(20, 'USD'),
       },
-    } as SWRResponse);
+    } as UseQueryResult<InvestmentAccount>);
 
     render(
       <InvestmentInfo account={account} />,
@@ -211,7 +211,7 @@ describe('InvestmentInfo', () => {
       {
         className: 'col-span-5',
         title: 'Total Dividends',
-        statsTextClass: 'badge',
+        statsTextClass: 'badge default',
         stats: '$20.00',
         description: '',
       },

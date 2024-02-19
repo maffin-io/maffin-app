@@ -11,6 +11,7 @@ import { useLatestTxs } from '@/hooks/api';
 import { isAsset, isInvestment, isLiability } from '@/book/helpers/accountType';
 import type { Split, Transaction } from '@/book/entities';
 import { moneyToString } from '@/helpers/number';
+import { accountColorCode } from '@/helpers/classNames';
 
 export default function LatestTransactions(): JSX.Element {
   let { data: txs } = useLatestTxs();
@@ -56,10 +57,12 @@ export default function LatestTransactions(): JSX.Element {
                         )}
                       </span>
                       <Link
-                        className={classNames('ml-auto text-xs badge hover:text-slate-300', {
-                          info: selectedSplit?.account && isAsset(selectedSplit.account),
-                          warning: selectedSplit?.account && isLiability(selectedSplit?.account),
-                        })}
+                        className={
+                          accountColorCode(
+                            selectedSplit?.account,
+                            'ml-auto text-xs badge hover:text-slate-300',
+                          )
+                        }
                         href={`/dashboard/accounts/${selectedSplit?.account?.guid}`}
                       >
                         {selectedSplit?.account?.name || '???'}

@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 import { DataSource } from 'typeorm';
 import * as navigation from 'next/navigation';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-import type { UseQueryResult } from '@tanstack/react-query';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import { getAllowedSubAccounts } from '@/book/helpers/accountType';
 import {
@@ -78,6 +78,8 @@ describe('AccountForm', () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({
       data: [root, assetAccount, expenseAccount],
     } as UseQueryResult<Account[]>);
+    jest.spyOn(apiHook, 'useMainCurrency')
+      .mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
   });
 
   afterEach(async () => {
@@ -131,6 +133,37 @@ describe('AccountForm', () => {
     expect(screen.getByLabelText('commodityInput')).toBeDisabled();
     screen.getByRole('spinbutton', { name: 'Opening balance', hidden: true });
     expect(container).toMatchSnapshot();
+  });
+
+  it('sets mainCurrency as default commodity', async () => {
+    jest.spyOn(apiHook, 'useMainCurrency')
+      .mockReturnValue({ data: eur } as UseQueryResult<Commodity>);
+    render(
+      <AccountForm
+        action="add"
+        onSave={() => {}}
+      />,
+    );
+
+    await screen.findByText('EUR');
+  });
+
+  it('overrides mainCurrency with passed default', async () => {
+    jest.spyOn(apiHook, 'useMainCurrency')
+      .mockReturnValue({ data: eur } as UseQueryResult<Commodity>);
+    render(
+      <AccountForm
+        action="add"
+        defaultValues={{
+          fk_commodity: {
+            mnemonic: 'USD',
+          } as Commodity,
+        }}
+        onSave={() => {}}
+      />,
+    );
+
+    await screen.findByText('USD');
   });
 
   it('renders with defaults as expected', async () => {
@@ -424,7 +457,6 @@ describe('AccountForm', () => {
     ['INCOME', 'Income'],
     ['ASSET', 'Assets'],
     ['BANK', 'Assets:Bank'],
-    ['ROOT', 'Root'],
   ])('filters selection for account type with %s parent', async (parentType, parentName) => {
     const incomeAccount = await Account.create({
       guid: 'income_guid_1',

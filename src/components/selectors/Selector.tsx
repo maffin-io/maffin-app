@@ -64,6 +64,11 @@ export default function Selector<T extends object = {}>(
         indicatorSeparator: () => 'hidden',
         singleValue: () => '!text-inherit',
         input: () => '!text-inherit',
+        option: () => {
+          const backgroundClasses = 'bg-light-100 dark:bg-dark-800 hover:bg-white/60 dark:hover:bg-dark-700';
+          return `w-full cursor-default px-4 py-2 ${backgroundClasses}`;
+        },
+        ...props.classNames,
       }}
     />
   );

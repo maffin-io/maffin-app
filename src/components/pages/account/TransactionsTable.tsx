@@ -22,8 +22,7 @@ import {
 } from '@/book/entities';
 import { useSplitsCount, useSplitsPagination } from '@/hooks/api';
 import type { Commodity } from '@/book/entities';
-import { isAsset } from '@/book/helpers';
-import { isLiability } from '@/book/helpers/accountType';
+import { accountColorCode } from '@/helpers/classNames';
 import fetcher from '@/hooks/api/fetcher';
 
 export type TransactionsTableProps = {
@@ -154,13 +153,7 @@ function FromToAccountCell({ row }: CellContext<Split, unknown>): JSX.Element {
           <li key={split.guid}>
             <Link
               href={`/dashboard/accounts/${split.accountId}`}
-              className={classNames('badge mb-0.5 hover:text-slate-300', {
-                success: account.type === 'INCOME',
-                danger: account.type === 'EXPENSE',
-                misc: ['INVESTMENT'].includes(account.type),
-                info: isAsset(account),
-                warning: isLiability(account),
-              })}
+              className={accountColorCode(account, 'badge mb-0.5 hover:text-slate-300')}
             >
               { account?.path }
             </Link>

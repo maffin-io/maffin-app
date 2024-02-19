@@ -1,9 +1,12 @@
 import React from 'react';
 import { Props as SelectProps, GroupBase } from 'react-select';
+import classNames from 'classnames';
 
 import Selector from '@/components/selectors/Selector';
 import { useAccounts } from '@/hooks/api';
 import { Account } from '@/book/entities';
+import { isAsset, isLiability } from '@/book/helpers/accountType';
+import { accountColorCode } from '@/helpers/classNames';
 
 export interface AccountSelectorProps extends SelectProps<Account, false, GroupBase<Account>> {
   ignoreAccounts?: string[],
@@ -46,8 +49,24 @@ export default function AccountSelector(
       id={id}
       getOptionLabel={(option: Account) => option.path}
       getOptionValue={(option: Account) => option.path}
-      options={options}
+      options={options.sort((a, b) => a.path.localeCompare(b.path))}
       placeholder={placeholder || 'Choose account'}
+      classNames={{
+        option: (option) => {
+          if (option.isFocused || option.isSelected) {
+            return accountColorCode(option.data, 'bg-opacity-70 text-white');
+          }
+
+          return classNames('', {
+            'text-green-600': option.data.type === 'INCOME',
+            'text-red-600/80': option.data.type === 'EXPENSE',
+            'text-violet-600': ['INVESTMENT'].includes(option.data.type),
+            'text-cyan-600': isAsset(option.data),
+            'text-orange-600': isLiability(option.data),
+            'text-cyan-700': option.data.type === 'EQUITY',
+          });
+        },
+      }}
     />
   );
 }
