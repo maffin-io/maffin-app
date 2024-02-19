@@ -322,7 +322,7 @@ exports[`AccountForm renders as expected with add 1`] = `
       </div>
     </fieldset>
     <fieldset
-      class="text-sm my-5"
+      class="text-sm my-5 hidden"
     >
       <label
         class="inline-block mb-2"
@@ -772,7 +772,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
       </div>
     </fieldset>
     <fieldset
-      class="text-sm my-5"
+      class="text-sm my-5 hidden"
     >
       <label
         class="inline-block mb-2"
@@ -1219,7 +1219,7 @@ exports[`AccountForm renders as expected with update 1`] = `
       </div>
     </fieldset>
     <fieldset
-      class="text-sm my-5"
+      class="text-sm my-5 hidden"
     >
       <label
         class="inline-block mb-2"

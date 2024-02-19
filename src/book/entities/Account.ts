@@ -109,7 +109,8 @@ export default class Account extends BaseEntity {
 
   @ManyToOne('Commodity', { eager: true, cascade: true })
   @JoinColumn({ name: 'commodity_guid' })
-  @CheckCommodity()
+  @CheckInvestmentCommodity()
+  @CheckIECommodity()
   @v.ValidateIf(o => o.type !== 'ROOT')
   @v.IsNotEmpty({ message: 'commodity is required' })
     fk_commodity!: Commodity | string;
@@ -248,10 +249,10 @@ function CheckAccountType(validationOptions?: v.ValidationOptions) {
 /**
  * Checks that investment accounts commodity is not a currency
  */
-function CheckCommodity(validationOptions?: v.ValidationOptions) {
+function CheckInvestmentCommodity(validationOptions?: v.ValidationOptions) {
   return function f(object: Account, propertyName: string) {
     v.registerDecorator({
-      name: 'checkCommodity',
+      name: 'checkInvestmentCommodity',
       target: object.constructor,
       propertyName,
       options: validationOptions,
@@ -267,6 +268,42 @@ function CheckCommodity(validationOptions?: v.ValidationOptions) {
 
         defaultMessage() {
           return 'investment accounts cant have a currency as their commodity';
+        },
+      },
+    });
+  };
+}
+
+/**
+ * Checks that income/expense commodity is the same as the parent.
+ *
+ * This is a way to check that we always keep the same currency for income/expense
+ * account as we only support them in the main currency.
+ */
+function CheckIECommodity(validationOptions?: v.ValidationOptions) {
+  return function f(object: Account, propertyName: string) {
+    v.registerDecorator({
+      name: 'checkIECommodity',
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(fk_commodity: Commodity, args: v.ValidationArguments) {
+          const account = args.object as Account;
+          if (
+            account.parent
+            && account.parent.type !== 'ROOT'
+            && ['INCOME', 'EXPENSE'].includes(account.type)
+          ) {
+            return fk_commodity.guid === (account.parent.fk_commodity as Commodity).guid;
+          }
+
+          return true;
+        },
+
+        defaultMessage(args: v.ValidationArguments) {
+          const account = args.object as Account;
+          return `Income and Expense accounts must have ${(account.parent.fk_commodity as Commodity).mnemonic} as their commodity`;
         },
       },
     });
