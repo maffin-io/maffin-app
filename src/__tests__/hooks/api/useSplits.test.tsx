@@ -7,7 +7,7 @@ import {
   useSplits,
   useSplitsCount,
   useSplitsPagination,
-  useSplitsTotal,
+  useAccountTotal,
 } from '@/hooks/api';
 import {
   Account,
@@ -144,10 +144,10 @@ describe('useSplits', () => {
     });
   });
 
-  describe('useSplitsTotal', () => {
+  describe('useAccountTotal', () => {
     it('calls query as expected', async () => {
       const { result } = renderHook(
-        () => useSplitsTotal('guid'),
+        () => useAccountTotal('guid'),
         { wrapper },
       );
 

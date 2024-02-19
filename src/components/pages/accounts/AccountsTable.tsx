@@ -8,13 +8,11 @@ import { Tooltip } from 'react-tooltip';
 import Money from '@/book/Money';
 import Table from '@/components/Table';
 import type { AccountsMap } from '@/types/book';
-import { MonthlyTotals } from '@/lib/queries';
 import { Account } from '@/book/entities';
 import {
-  isAsset,
   isLiability,
 } from '@/book/helpers/accountType';
-import { useAccountsTotals, useAccounts } from '@/hooks/api';
+import { useAccounts, useAccountsTotal } from '@/hooks/api';
 import mapAccounts from '@/helpers/mapAccounts';
 import { accountColorCode } from '@/helpers/classNames';
 
@@ -36,54 +34,87 @@ export default function AccountsTable(
   }: AccountsTableProps,
 ): JSX.Element {
   const { data } = useAccounts();
-  const { data: monthlyTotals } = useAccountsTotals();
+  const { data: accountsTotal } = useAccountsTotal(selectedDate);
 
   const accounts = mapAccounts(data);
-  const tree = getTreeTotals(accounts.type_root, accounts, monthlyTotals || {}, selectedDate);
+  const assetsTree = getTreeTotals(
+    accounts.type_asset,
+    accounts,
+    accountsTotal || {},
+    selectedDate,
+  );
+
+  const liabilitiesTree = getTreeTotals(
+    accounts.type_liability,
+    accounts,
+    accountsTotal || {},
+    selectedDate,
+  );
+
+  const incomeTree = getTreeTotals(
+    accounts.type_income,
+    accounts,
+    accountsTotal || {},
+    selectedDate,
+  );
+
+  const expensesTree = getTreeTotals(
+    accounts.type_expense,
+    accounts,
+    accountsTotal || {},
+    selectedDate,
+  );
 
   return (
-    <Table<AccountsTableRow>
-      id="accounts-table"
-      columns={columns}
-      data={tree.leaves}
-      initialState={{
-        sorting: [{ id: 'total', desc: true }],
-      }}
-      showHeader={false}
-      tdClassName="p-2"
-      getSubRows={row => row.leaves}
-      isExpanded={isExpanded}
-    />
+    <div className="divide-y divide-slate-400/25">
+      <div className="pb-2">
+        <Table<AccountsTableRow>
+          id="al-table"
+          columns={columns}
+          data={[assetsTree, liabilitiesTree]}
+          initialState={{
+            sorting: [{ id: 'total', desc: true }],
+          }}
+          showHeader={false}
+          tdClassName="p-2"
+          getSubRows={row => row.leaves}
+          isExpanded={isExpanded}
+        />
+      </div>
+
+      <div className="pt-2">
+        <Table<AccountsTableRow>
+          id="ie-table"
+          columns={columns}
+          data={[incomeTree, expensesTree]}
+          initialState={{
+            sorting: [{ id: 'total', desc: true }],
+          }}
+          showHeader={false}
+          tdClassName="p-2"
+          getSubRows={row => row.leaves}
+          isExpanded={isExpanded}
+        />
+      </div>
+    </div>
   );
 }
 
 function getTreeTotals(
   current: Account,
   accounts: AccountsMap,
-  monthlyTotals: MonthlyTotals,
+  accountsTotal: { [guid: string]: Money },
   selectedDate: DateTime,
 ): AccountsTableRow {
   const leaves: AccountsTableRow[] = [];
   current.childrenIds.forEach(childId => {
     const childAccount = accounts[childId];
     if (!childAccount.hidden && childAccount.parentId === current.guid) {
-      leaves.push(getTreeTotals(childAccount, accounts, monthlyTotals, selectedDate));
+      leaves.push(getTreeTotals(childAccount, accounts, accountsTotal, selectedDate));
     }
   });
 
-  let accountTotal = (monthlyTotals[current.guid] || {})[selectedDate.toFormat('MM/yyyy')]
-    || new Money(0, current.commodity?.mnemonic || '');
-  if (!isAsset(current) && !isLiability(current)) {
-    accountTotal = Object.entries(monthlyTotals[current.guid] || {}).reduce(
-      (total, [monthYear, amount]) => {
-        if (DateTime.fromFormat(monthYear, 'MM/yyyy') <= selectedDate) {
-          return total.add(amount);
-        }
-        return total;
-      },
-      new Money(0, current.commodity?.mnemonic || ''),
-    );
-  }
+  const accountTotal = accountsTotal[current.guid] || new Money(0, current.commodity?.mnemonic || '');
 
   return {
     account: current,

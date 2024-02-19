@@ -7,6 +7,13 @@ import type { FindOptionsWhere } from 'typeorm';
 import { Split } from '@/book/entities';
 import type { Account } from '@/book/entities';
 import fetcher from './fetcher';
+import Money from '@/book/Money';
+import {getAccountsTotals, getMonthlyTotals} from '@/lib/queries';
+import {useAccounts} from './useAccounts';
+import {usePrices} from './usePrices';
+import mapAccounts from '@/helpers/mapAccounts';
+import {PriceDBMap} from '@/book/prices';
+import {DateTime} from 'luxon';
 
 /**
  * This query is a generic way to retrieve splits. It's quite unoptimised because
@@ -108,7 +115,7 @@ export function useSplitsCount(
 /**
  * Calculates total sum of split quantities for a given account
  */
-export function useSplitsTotal(
+export function useAccountTotal(
   account: string,
 ): UseQueryResult<number> {
   const queryKey = [...Split.CACHE_KEY, account, 'total'];
@@ -128,5 +135,28 @@ export function useSplitsTotal(
     ),
   });
 
+  return result;
+}
+
+/**
+ * Calculates the total for each existing account. The total is calculated
+ * by accumulating the splits for each account plus the total of their children
+ *
+ * If a child has different currency (for asset or liability accounts) the price
+ * is converted using the latest available matching exchange rate.
+ */
+export function useAccountsTotal(selectedDate: DateTime): UseQueryResult<{ [guid: string]: Money }> {
+  const { data: accounts } = useAccounts();
+  const { data: prices } = usePrices({});
+
+  const queryKey = [...Split.CACHE_KEY, 'totals'];
+  const result = useQuery({
+    queryKey,
+    queryFn: fetcher(
+      async () => getAccountsTotals(accounts as Account[], prices as PriceDBMap),
+      queryKey,
+    ),
+    enabled: !!accounts && !!prices,
+  });
   return result;
 }

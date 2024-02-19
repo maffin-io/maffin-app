@@ -32,7 +32,7 @@ jest.mock('@/components/StatisticsWidget', () => jest.fn(
 describe('AccountInfo', () => {
   let account: Account;
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useSplitsTotal').mockReturnValue({ data: undefined } as UseQueryResult<number>);
+    jest.spyOn(apiHook, 'useAccountTotal').mockReturnValue({ data: undefined } as UseQueryResult<number>);
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-03-01') as DateTime<true>);
     account = {
       guid: 'guid',
@@ -78,7 +78,7 @@ describe('AccountInfo', () => {
   });
 
   it('renders as expected with splits', () => {
-    jest.spyOn(apiHook, 'useSplitsTotal').mockReturnValue({
+    jest.spyOn(apiHook, 'useAccountTotal').mockReturnValue({
       data: 100,
     } as UseQueryResult<number>);
 
