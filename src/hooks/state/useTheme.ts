@@ -13,5 +13,6 @@ export function useTheme(): UseQueryResult<'dark' | 'light'> {
       return selectedTheme || preferredTheme;
     },
     enabled: typeof window !== 'undefined',
+    gcTime: Infinity,
   });
 }

@@ -31,15 +31,15 @@ export default function InvestmentInfo({
       <div className="col-span-4">
         <div className="card text-lg">
           <span>You currently owe</span>
-          <span className="badge text-xl font-semibold mx-1">{`${investment.quantity.toNumber()} titles`}</span>
+          <span className="badge default text-xl font-semibold mx-1">{`${investment.quantity.toNumber()} titles`}</span>
           <span>at an average price of</span>
-          <span className="badge text-xl font-semibold mx-1">{new Money(investment.avgPrice, investment.currency).format()}</span>
+          <span className="badge default text-xl font-semibold mx-1">{new Money(investment.avgPrice, investment.currency).format()}</span>
         </div>
         <div className="grid grid-cols-12">
           <StatisticsWidget
             className="col-span-6"
             title="Latest known price"
-            statsTextClass="table-caption badge"
+            statsTextClass="table-caption badge default"
             stats={new Money(latestPrice.value, investment.currency).format()}
             description={
               `on ${latestPrice.date.toLocaleString()}`
@@ -71,7 +71,7 @@ export default function InvestmentInfo({
             className="col-span-5"
             title="Total Dividends"
             stats={investment.realizedDividends.format()}
-            statsTextClass="badge"
+            statsTextClass="badge default"
             description=""
           />
         </div>

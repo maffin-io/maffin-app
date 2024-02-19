@@ -15,6 +15,7 @@ import {
   CommoditySelector,
   AccountTypeSelector,
 } from '@/components/selectors';
+import { useMainCurrency } from '@/hooks/api';
 import { getAllowedSubAccounts } from '@/book/helpers/accountType';
 import { toAmountWithScale } from '@/helpers/number';
 import createEquityAccount from '@/lib/createEquityAccount';
@@ -38,10 +39,12 @@ export type SplitFieldData = {
 
 export default function AccountForm({
   action = 'add',
-  defaultValues,
+  defaultValues = {},
   onSave = () => {},
   hideDefaults = false,
 }: AccountFormProps): JSX.Element {
+  const { data: mainCurrency } = useMainCurrency();
+  defaultValues.fk_commodity = defaultValues?.fk_commodity || mainCurrency;
   const form = useForm<FormValues>({
     defaultValues,
     mode: 'onChange',
@@ -123,7 +126,6 @@ export default function AccountForm({
             <>
               <AccountSelector
                 id="parentInput"
-                showRoot
                 isDisabled={disabled}
                 isClearable={false}
                 ignoreAccounts={['INVESTMENT']}

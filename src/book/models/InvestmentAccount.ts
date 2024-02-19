@@ -161,7 +161,7 @@ export default class InvestmentAccount {
     this.realizedProfit = new Money(0, this.currency);
     this.dividends.splice(0, this.dividends.length);
 
-    this.splits.reverse().filter(
+    [...this.splits].reverse().filter(
       split => split.transaction.date <= (date || DateTime.now()),
     ).forEach((split) => {
       const numSplits = split.transaction.splits.length;

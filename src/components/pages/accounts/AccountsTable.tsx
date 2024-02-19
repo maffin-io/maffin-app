@@ -3,7 +3,6 @@ import { DateTime } from 'luxon';
 import { ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
 import { BiCircle, BiSolidRightArrow, BiSolidDownArrow } from 'react-icons/bi';
-import classNames from 'classnames';
 import { Tooltip } from 'react-tooltip';
 
 import Money from '@/book/Money';
@@ -12,12 +11,12 @@ import type { AccountsMap } from '@/types/book';
 import { MonthlyTotals } from '@/lib/queries';
 import { Account } from '@/book/entities';
 import {
-  isInvestment,
   isAsset,
   isLiability,
 } from '@/book/helpers/accountType';
 import { useAccountsTotals, useAccounts } from '@/hooks/api';
 import mapAccounts from '@/helpers/mapAccounts';
+import { accountColorCode } from '@/helpers/classNames';
 
 export type AccountsTableProps = {
   selectedDate?: DateTime,
@@ -128,13 +127,7 @@ const columns: ColumnDef<AccountsTableRow>[] = [
             && (
               <span
                 data-tooltip-id={row.original.account.guid}
-                className={classNames('badge cursor-default', {
-                  success: row.original.account.type === 'INCOME',
-                  danger: row.original.account.type === 'EXPENSE',
-                  info: isAsset(row.original.account),
-                  warning: isLiability(row.original.account),
-                  misc: isInvestment(row.original.account),
-                })}
+                className={accountColorCode(row.original.account, 'badge cursor-default')}
               >
                 {row.original.account.name}
               </span>
@@ -142,13 +135,7 @@ const columns: ColumnDef<AccountsTableRow>[] = [
           ) || (
             <Link
               data-tooltip-id={row.original.account.guid}
-              className={classNames('badge hover:text-slate-300', {
-                success: row.original.account.type === 'INCOME',
-                danger: row.original.account.type === 'EXPENSE',
-                info: isAsset(row.original.account),
-                warning: isLiability(row.original.account),
-                misc: isInvestment(row.original.account),
-              })}
+              className={accountColorCode(row.original.account, 'badge hover:text-slate-300')}
               href={`/dashboard/accounts/${row.original.account.guid}`}
             >
               {row.original.account.name}

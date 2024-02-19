@@ -78,26 +78,30 @@
   }
 
   .badge {
-    @apply text-white bg-cyan-700 dark:bg-cyan-700/70 inline-block py-0.5 px-2 text-xs text-center rounded-md;
+    @apply text-white inline-block py-0.5 px-2 text-xs text-center rounded-md;
   }
 
-  .badge.success {
+  .default {
+    @apply bg-cyan-700 dark:bg-cyan-700/70;
+  }
+
+  .success {
     @apply bg-green-600;
   }
 
-  .badge.warning {
+  .warning {
     @apply bg-orange-600/70;
   }
 
-  .badge.danger {
+  .danger {
     @apply bg-red-600/70;
   }
 
-  .badge.info {
+  .info {
     @apply bg-cyan-600;
   }
 
-  .badge.misc {
+  .misc {
     @apply bg-violet-600;
   }
 
@@ -118,11 +122,7 @@
   }
 
   .selector .selector__option {
-    @apply w-full cursor-default bg-light-100 hover:bg-white/60 dark:bg-dark-800 dark:hover:bg-dark-700 px-4 py-2;
-  }
-
-  .selector .selector__option--is-selected {
-    @apply bg-white dark:bg-dark-700;
+    @apply w-full cursor-default px-4 py-2;
   }
 
   .amount-positive {

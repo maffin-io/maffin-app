@@ -45,7 +45,7 @@ const columns: ColumnDef<InvestmentAccount>[] = [
       <p className="m-0 d-inline-block align-middle font-18">
         <Link
           href={`/dashboard/accounts/${row.original.account.guid}`}
-          className="badge hover:text-slate-300 bg-light"
+          className="badge misc hover:text-slate-300 bg-light"
         >
           {getValue<string>()}
         </Link>
