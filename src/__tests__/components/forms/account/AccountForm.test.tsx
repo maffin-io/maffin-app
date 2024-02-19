@@ -166,6 +166,25 @@ describe('AccountForm', () => {
     await screen.findByText('USD');
   });
 
+  it.each([
+    'INCOME', 'EXPENSE',
+  ])('hides commodity field when %s', async (type) => {
+    jest.spyOn(apiHook, 'useMainCurrency')
+      .mockReturnValue({ data: eur } as UseQueryResult<Commodity>);
+    render(
+      <AccountForm
+        action="add"
+        defaultValues={{
+          type,
+        }}
+        onSave={() => {}}
+      />,
+    );
+
+    const fieldsets = screen.getAllByRole('group');
+    expect(fieldsets[5]).toHaveClass('hidden');
+  });
+
   it('renders with defaults as expected', async () => {
     render(
       <AccountForm

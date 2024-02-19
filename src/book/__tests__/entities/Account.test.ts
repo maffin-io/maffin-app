@@ -175,7 +175,32 @@ describe('Account', () => {
         fk_commodity: eur,
       });
 
-      await expect(account.save()).rejects.toThrow('checkCommodity');
+      await expect(account.save()).rejects.toThrow('checkInvestmentCommodity');
+    });
+
+    it.each([
+      'INCOME',
+      'EXPENSE',
+    ])('fails if different commodity than parent for %s', async (type) => {
+      account2 = await Account.create({
+        name: 'Name',
+        type,
+        parent: root,
+        fk_commodity: eur,
+      }).save();
+
+      const usd = await Commodity.create({
+        namespace: 'CURRENCY',
+        mnemonic: 'USD',
+      }).save();
+      account = Account.create({
+        name: 'name',
+        type,
+        parent: account2,
+        fk_commodity: usd,
+      });
+
+      await expect(account.save()).rejects.toThrow('checkIECommodity');
     });
   });
 });

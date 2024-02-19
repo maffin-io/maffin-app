@@ -245,7 +245,9 @@ export default function AccountForm({
         className={classNames(
           'text-sm my-5',
           {
-            hidden: hideDefaults && defaultValues?.fk_commodity,
+            hidden: (hideDefaults && defaultValues?.fk_commodity)
+                      || type === undefined
+                      || ['INCOME', 'EXPENSE'].includes(type),
           },
         )}
       >
