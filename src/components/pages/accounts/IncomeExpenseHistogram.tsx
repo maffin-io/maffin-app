@@ -1,40 +1,30 @@
 import React from 'react';
 import { DateTime, Interval } from 'luxon';
 import type { ChartDataset } from 'chart.js';
-import { Chart as C } from 'chart.js';
-import zoomPlugin from 'chartjs-plugin-zoom';
 
 import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
-import { useAccountsTotals, useMainCurrency } from '@/hooks/api';
+import { useAccountsMonthlyTotal, useMainCurrency } from '@/hooks/api';
 
 export type IncomeExpenseHistogramProps = {
-  startDate?: DateTime,
   selectedDate?: DateTime,
 };
 
-C.register(
-  zoomPlugin,
-);
-
 export default function IncomeExpenseHistogram({
-  startDate,
-  selectedDate = DateTime.now().minus({ months: 3 }),
+  selectedDate = DateTime.now(),
 }: IncomeExpenseHistogramProps): JSX.Element {
-  const { data: monthlyTotals } = useAccountsTotals();
+  const interval = Interval.fromDateTimes(
+    selectedDate.minus({ months: 6 }).startOf('month'),
+    selectedDate.endOf('month'),
+  );
+  const { data: monthlyTotals } = useAccountsMonthlyTotal(interval);
   const incomeSeries = monthlyTotals?.income;
   const expenseSeries = monthlyTotals?.expense;
 
   const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
 
-  const now = DateTime.now();
-  const interval = Interval.fromDateTimes(
-    startDate?.minus({ month: 1 }) || now,
-    now,
-  );
-  const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).plus({ month: 1 }).startOf('month'));
-  dates.pop();
+  const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).startOf('month'));
 
   const datasets: ChartDataset<'bar'>[] = [
     {
@@ -69,18 +59,10 @@ export default function IncomeExpenseHistogram({
     const expenseAmount = (expenseSeries?.[monthYear]?.toNumber() || 0);
     const netProfit = -incomeAmount - expenseAmount;
 
-    datasets[0].data.push(-incomeAmount);
-    datasets[1].data.push(-expenseAmount);
+    datasets[0].data.push(-incomeAmount || 0);
+    datasets[1].data.push(-expenseAmount || 0);
     datasets[2].data.push(netProfit || 0);
   });
-
-  if (now.diff(selectedDate, ['months']).months < 4) {
-    selectedDate = now.minus({ months: 4 });
-  }
-  const zoomInterval = Interval.fromDateTimes(
-    selectedDate.minus({ months: 4 }).startOf('month'),
-    selectedDate.plus({ months: 4 }).startOf('month'),
-  );
 
   return (
     <>
@@ -102,8 +84,6 @@ export default function IncomeExpenseHistogram({
           },
           scales: {
             x: {
-              min: zoomInterval.start?.toMillis(),
-              max: zoomInterval.end?.toMillis(),
               type: 'time',
               time: {
                 unit: 'month',
@@ -142,26 +122,6 @@ export default function IncomeExpenseHistogram({
               },
               font: {
                 size: 18,
-              },
-            },
-            zoom: {
-              limits: {
-                x: {
-                  min: startDate?.toMillis(),
-                  max: now.toMillis(),
-                  minRange: zoomInterval.toDuration().toMillis(),
-                },
-              },
-              pan: {
-                mode: 'x',
-                enabled: true,
-              },
-              zoom: {
-                mode: 'x',
-                wheel: {
-                  enabled: true,
-                  modifierKey: 'meta',
-                },
               },
             },
             legend: {

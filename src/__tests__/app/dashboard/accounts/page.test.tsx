@@ -163,7 +163,6 @@ describe('AccountsPage', () => {
     expect(IncomeExpenseHistogram).toHaveBeenLastCalledWith(
       {
         selectedDate: DateTime.fromISO('2023-01-02'),
-        startDate: DateTime.fromISO('2022-01-01'),
       },
       {},
     );
@@ -285,7 +284,6 @@ describe('AccountsPage', () => {
     }, {});
     expect(IncomeExpenseHistogram).toHaveBeenLastCalledWith(
       {
-        startDate: date,
         selectedDate: DateTime.fromISO('2023-01-02'),
       },
       {},

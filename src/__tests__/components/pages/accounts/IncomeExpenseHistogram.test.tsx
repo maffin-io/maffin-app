@@ -8,7 +8,7 @@ import Bar from '@/components/charts/Bar';
 import IncomeExpenseHistogram from '@/components/pages/accounts/IncomeExpenseHistogram';
 import * as apiHook from '@/hooks/api';
 import type { Commodity } from '@/book/entities';
-import type { MonthlyTotals } from '@/lib/queries';
+import type { AccountsMonthlyTotals } from '@/types/book';
 
 jest.mock('@/components/charts/Bar', () => jest.fn(
   () => <div data-testid="Bar" />,
@@ -21,8 +21,7 @@ jest.mock('@/hooks/api', () => ({
 
 describe('IncomeExpenseHistogram', () => {
   beforeEach(() => {
-    jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02') as DateTime<true>);
-    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<MonthlyTotals>);
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue({ data: undefined } as UseQueryResult<AccountsMonthlyTotals>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
   });
 
@@ -43,17 +42,17 @@ describe('IncomeExpenseHistogram', () => {
           datasets: [
             {
               backgroundColor: '#22C55E',
-              data: [],
+              data: [0, 0, 0, 0, 0, 0, 0],
               label: 'Income',
             },
             {
               backgroundColor: '#EF4444',
-              data: [],
+              data: [0, 0, 0, 0, 0, 0, 0],
               label: 'Expenses',
             },
             {
               backgroundColor: '#06B6D4',
-              data: [],
+              data: [0, 0, 0, 0, 0, 0, 0],
               label: 'Savings',
               datalabels: {
                 anchor: 'end',
@@ -66,7 +65,15 @@ describe('IncomeExpenseHistogram', () => {
               },
             },
           ],
-          labels: [],
+          labels: [
+            DateTime.now().minus({ month: 6 }),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            DateTime.now(),
+          ],
         },
         options: {
           layout: {
@@ -89,26 +96,6 @@ describe('IncomeExpenseHistogram', () => {
               padding: {
                 bottom: 30,
                 top: 0,
-              },
-            },
-            zoom: {
-              limits: {
-                x: {
-                  min: undefined,
-                  max: 1672617600000,
-                  minRange: 21168000000,
-                },
-              },
-              pan: {
-                mode: 'x',
-                enabled: true,
-              },
-              zoom: {
-                mode: 'x',
-                wheel: {
-                  enabled: true,
-                  modifierKey: 'meta',
-                },
               },
             },
             legend: {
@@ -134,8 +121,6 @@ describe('IncomeExpenseHistogram', () => {
               grid: {
                 display: false,
               },
-              max: DateTime.now().startOf('month').toMillis(),
-              min: DateTime.now().minus({ months: 8 }).startOf('month').toMillis(),
               ticks: {
                 align: 'center',
               },
@@ -167,7 +152,7 @@ describe('IncomeExpenseHistogram', () => {
   });
 
   it('generates datasets as expected', () => {
-    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue(
       {
         data: {
           income: {
@@ -178,13 +163,13 @@ describe('IncomeExpenseHistogram', () => {
             '11/2022': new Money(400, 'EUR'),
             '12/2022': new Money(500, 'EUR'),
           },
-        } as MonthlyTotals,
-      } as UseQueryResult<MonthlyTotals>,
+        } as AccountsMonthlyTotals,
+      } as UseQueryResult<AccountsMonthlyTotals>,
     );
 
     render(
       <IncomeExpenseHistogram
-        startDate={DateTime.fromISO('2022-09-01')}
+        selectedDate={DateTime.fromISO('2022-12-01')}
       />,
     );
 
@@ -193,24 +178,26 @@ describe('IncomeExpenseHistogram', () => {
         data: {
           datasets: [
             expect.objectContaining({
-              data: [-0, -0, 600, 400, -0],
+              data: [0, 0, 0, 0, 0, 600, 400],
               label: 'Income',
             }),
             expect.objectContaining({
-              data: [-0, -0, -400, -500, -0],
+              data: [0, 0, 0, 0, 0, -400, -500],
               label: 'Expenses',
             }),
             expect.objectContaining({
-              data: [0, 0, 200, -100, 0],
+              data: [0, 0, 0, 0, 0, 200, -100],
               label: 'Savings',
             }),
           ],
           labels: [
-            DateTime.fromISO('2022-09-01'),
-            DateTime.fromISO('2022-10-01'),
-            DateTime.fromISO('2022-11-01'),
+            DateTime.fromISO('2022-06-01'),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
             DateTime.fromISO('2022-12-01'),
-            DateTime.fromISO('2023-01-01'),
           ],
         },
       }),

@@ -17,6 +17,7 @@ export {
   useSplitsCount,
   useAccountTotal,
   useAccountsTotal,
+  useAccountsMonthlyTotal,
 } from '@/hooks/api/useSplits';
 export { usePrices } from '@/hooks/api/usePrices';
 export { useMainCurrency } from '@/hooks/api/useMainCurrency';
