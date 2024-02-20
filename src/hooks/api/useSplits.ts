@@ -3,17 +3,16 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 import type { FindOptionsWhere } from 'typeorm';
+import { DateTime } from 'luxon';
 
 import { Split } from '@/book/entities';
 import type { Account } from '@/book/entities';
+import { getAccountsTotals } from '@/lib/queries';
+import type { PriceDBMap } from '@/book/prices';
+import type { AccountsTotals } from '@/lib/queries/getAccountsTotals';
+import { useAccounts } from './useAccounts';
+import { usePrices } from './usePrices';
 import fetcher from './fetcher';
-import Money from '@/book/Money';
-import {getAccountsTotals, getMonthlyTotals} from '@/lib/queries';
-import {useAccounts} from './useAccounts';
-import {usePrices} from './usePrices';
-import mapAccounts from '@/helpers/mapAccounts';
-import {PriceDBMap} from '@/book/prices';
-import {DateTime} from 'luxon';
 
 /**
  * This query is a generic way to retrieve splits. It's quite unoptimised because
@@ -145,18 +144,33 @@ export function useAccountTotal(
  * If a child has different currency (for asset or liability accounts) the price
  * is converted using the latest available matching exchange rate.
  */
-export function useAccountsTotal(selectedDate: DateTime): UseQueryResult<{ [guid: string]: Money }> {
-  const { data: accounts } = useAccounts();
-  const { data: prices } = usePrices({});
+export function useAccountsTotal(
+  selectedDate: DateTime = DateTime.now(),
+): UseQueryResult<AccountsTotals> {
+  const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
+  const { data: prices, dataUpdatedAt: pricesUpdatedAt } = usePrices({});
 
-  const queryKey = [...Split.CACHE_KEY, 'totals'];
+  const queryKey = [
+    ...Split.CACHE_KEY,
+    {
+      aggregation: 'total',
+      date: selectedDate.toISODate(),
+      accountsUpdatedAt,
+      pricesUpdatedAt,
+    },
+  ];
   const result = useQuery({
     queryKey,
     queryFn: fetcher(
-      async () => getAccountsTotals(accounts as Account[], prices as PriceDBMap),
+      async () => getAccountsTotals(
+        accounts as Account[],
+        prices as PriceDBMap,
+        selectedDate,
+      ),
       queryKey,
     ),
     enabled: !!accounts && !!prices,
   });
+
   return result;
 }

@@ -131,6 +131,10 @@ export async function updateCache(
   queryClient.invalidateQueries({
     queryKey: ['api', 'aggregations', 'accounts', 'totals'],
   });
+
+  queryClient.invalidateQueries({
+    queryKey: [...Split.CACHE_KEY, { aggregation: 'total' }],
+  });
 }
 
 // https://github.com/typeorm/typeorm/issues/4714

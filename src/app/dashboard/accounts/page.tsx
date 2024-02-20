@@ -79,11 +79,27 @@ export default function AccountsPage(): JSX.Element {
             <NetWorthPie
               selectedDate={selectedDate}
             />
-            <div className="mt-4">
-              <AccountsTable
-                selectedDate={selectedDate}
-                isExpanded={showOnboarding}
-              />
+            <div id="accounts-table" className="divide-y divide-slate-400/25 mt-4">
+              <div className="pb-2">
+                <AccountsTable
+                  guids={[
+                    accountsMap.type_asset?.guid,
+                    accountsMap.type_liability?.guid,
+                  ]}
+                  selectedDate={selectedDate}
+                  isExpanded={showOnboarding}
+                />
+              </div>
+              <div className="pt-2">
+                <AccountsTable
+                  guids={[
+                    accountsMap.type_income?.guid,
+                    accountsMap.type_expense?.guid,
+                  ]}
+                  selectedDate={selectedDate}
+                  isExpanded={showOnboarding}
+                />
+              </div>
             </div>
           </div>
           <div className="card col-span-12">

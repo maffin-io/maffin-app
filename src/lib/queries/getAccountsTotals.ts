@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon';
+
 import Money from '@/book/Money';
 import { Commodity, Split } from '@/book/entities';
 import type { Account } from '@/book/entities';
@@ -5,10 +7,15 @@ import mapAccounts from '@/helpers/mapAccounts';
 import type { AccountsMap } from '@/types/book';
 import type { PriceDBMap } from '@/book/prices';
 
+export type AccountsTotals = {
+  [guid: string]: Money;
+};
+
 export default async function getAccountsTotals(
   accounts: Account[],
   prices: PriceDBMap,
-): Promise<{ [guid: string]: Money }> {
+  selectedDate: DateTime,
+): Promise<AccountsTotals> {
   const rows: { total: number, accountId: string, mnemonic: string }[] = await Split
     .query(`
       SELECT
@@ -16,6 +23,8 @@ export default async function getAccountsTotals(
         splits.account_guid as accountId
       FROM splits
       JOIN accounts as account ON splits.account_guid = account.guid
+      JOIN transactions as tx ON splits.tx_guid = tx.guid
+      WHERE post_date <= '${selectedDate.toSQLDate()}'
       GROUP BY 
         accountId
       HAVING SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) != 0
@@ -25,7 +34,7 @@ export default async function getAccountsTotals(
   const totals: { [guid: string]: Money } = {};
 
   rows.forEach(row => {
-    totals[row.accountId] = new Money(row.total, accountsMap[row.accountId].mnemonic);
+    totals[row.accountId] = new Money(row.total, accountsMap[row.accountId].commodity.mnemonic);
   });
 
   accountsMap.type_root.childrenIds.forEach((childId: string) => {
@@ -35,9 +44,11 @@ export default async function getAccountsTotals(
       prices,
       totals,
     );
+
+    totals[`type_${accountsMap[childId].type.toLowerCase()}`] = totals[childId];
   });
 
-  return totals;
+  return totals as AccountsTotals;
 }
 
 function aggregateTotals(

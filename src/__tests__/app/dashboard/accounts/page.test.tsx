@@ -119,9 +119,18 @@ describe('AccountsPage', () => {
       {},
     );
 
-    await screen.findByTestId('AccountsTable');
-    expect(AccountsTable).toHaveBeenLastCalledWith(
+    await screen.findAllByTestId('AccountsTable');
+    expect(AccountsTable).toBeCalledWith(
       {
+        guids: [undefined, undefined],
+        selectedDate: DateTime.fromISO('2023-01-02'),
+        isExpanded: true,
+      },
+      {},
+    );
+    expect(AccountsTable).toBeCalledWith(
+      {
+        guids: [undefined, undefined],
         selectedDate: DateTime.fromISO('2023-01-02'),
         isExpanded: true,
       },
@@ -259,9 +268,15 @@ describe('AccountsPage', () => {
       {},
     );
 
-    await screen.findByTestId('AccountsTable');
-    expect(AccountsTable).toBeCalledTimes(1);
-    expect(AccountsTable).toHaveBeenLastCalledWith({
+    await screen.findAllByTestId('AccountsTable');
+    expect(AccountsTable).toBeCalledTimes(2);
+    expect(AccountsTable).toBeCalledWith({
+      guids: [undefined, undefined],
+      isExpanded: false,
+      selectedDate: DateTime.now(),
+    }, {});
+    expect(AccountsTable).toBeCalledWith({
+      guids: ['a5', 'a3'],
       isExpanded: false,
       selectedDate: DateTime.now(),
     }, {});

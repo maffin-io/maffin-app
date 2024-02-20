@@ -17,18 +17,14 @@ import mapAccounts from '@/helpers/mapAccounts';
 import { accountColorCode } from '@/helpers/classNames';
 
 export type AccountsTableProps = {
+  guids: string[],
   selectedDate?: DateTime,
   isExpanded?: boolean,
 };
 
-type AccountsTableRow = {
-  account: Account,
-  total: Money,
-  leaves: AccountsTableRow[],
-};
-
 export default function AccountsTable(
   {
+    guids,
     selectedDate = DateTime.now(),
     isExpanded = false,
   }: AccountsTableProps,
@@ -37,66 +33,31 @@ export default function AccountsTable(
   const { data: accountsTotal } = useAccountsTotal(selectedDate);
 
   const accounts = mapAccounts(data);
-  const assetsTree = getTreeTotals(
-    accounts.type_asset,
-    accounts,
-    accountsTotal || {},
-    selectedDate,
-  );
-
-  const liabilitiesTree = getTreeTotals(
-    accounts.type_liability,
-    accounts,
-    accountsTotal || {},
-    selectedDate,
-  );
-
-  const incomeTree = getTreeTotals(
-    accounts.type_income,
-    accounts,
-    accountsTotal || {},
-    selectedDate,
-  );
-
-  const expensesTree = getTreeTotals(
-    accounts.type_expense,
-    accounts,
-    accountsTotal || {},
-    selectedDate,
-  );
+  const trees: AccountsTableRow[] = [];
+  guids.forEach(guid => {
+    if (accounts[guid] && !accounts[guid].hidden) {
+      trees.push(getTreeTotals(
+        accounts[guid],
+        accounts,
+        accountsTotal || {},
+        selectedDate,
+      ));
+    }
+  });
 
   return (
-    <div className="divide-y divide-slate-400/25">
-      <div className="pb-2">
-        <Table<AccountsTableRow>
-          id="al-table"
-          columns={columns}
-          data={[assetsTree, liabilitiesTree]}
-          initialState={{
-            sorting: [{ id: 'total', desc: true }],
-          }}
-          showHeader={false}
-          tdClassName="p-2"
-          getSubRows={row => row.leaves}
-          isExpanded={isExpanded}
-        />
-      </div>
-
-      <div className="pt-2">
-        <Table<AccountsTableRow>
-          id="ie-table"
-          columns={columns}
-          data={[incomeTree, expensesTree]}
-          initialState={{
-            sorting: [{ id: 'total', desc: true }],
-          }}
-          showHeader={false}
-          tdClassName="p-2"
-          getSubRows={row => row.leaves}
-          isExpanded={isExpanded}
-        />
-      </div>
-    </div>
+    <Table<AccountsTableRow>
+      id={`${guids.join('-')}-table`}
+      columns={columns}
+      data={trees}
+      initialState={{
+        sorting: [{ id: 'total', desc: true }],
+      }}
+      showHeader={false}
+      tdClassName="p-2"
+      getSubRows={row => row.leaves}
+      isExpanded={isExpanded}
+    />
   );
 }
 
@@ -200,3 +161,9 @@ const columns: ColumnDef<AccountsTableRow>[] = [
     ),
   },
 ];
+
+type AccountsTableRow = {
+  account: Account,
+  total: Money,
+  leaves: AccountsTableRow[],
+};

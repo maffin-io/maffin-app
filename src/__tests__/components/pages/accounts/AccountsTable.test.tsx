@@ -8,7 +8,7 @@ import Table from '@/components/Table';
 import { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import * as apiHook from '@/hooks/api';
-import type { MonthlyTotals } from '@/lib/queries';
+import type { AccountsTotals } from '@/lib/queries/getAccountsTotals';
 
 jest.mock('@/components/Table', () => jest.fn(
   () => <div data-testid="Table" />,
@@ -24,7 +24,7 @@ describe('AccountsTable', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-01') as DateTime<true>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
-    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<MonthlyTotals>);
+    jest.spyOn(apiHook, 'useAccountsTotal').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals>);
   });
 
   afterEach(() => {
@@ -32,12 +32,12 @@ describe('AccountsTable', () => {
   });
 
   it('creates empty Table with expected params', async () => {
-    const { container } = render(<AccountsTable />);
+    const { container } = render(<AccountsTable guids={['1', '2']} />);
 
     await screen.findByTestId('Table');
-    expect(Table).toHaveBeenLastCalledWith(
+    expect(Table).toBeCalledWith(
       {
-        id: 'accounts-table',
+        id: '1-2-table',
         columns: [
           {
             header: '',
@@ -64,6 +64,7 @@ describe('AccountsTable', () => {
       },
       {},
     );
+    expect(apiHook.useAccountsTotal).toBeCalledWith(DateTime.now());
     expect(container).toMatchSnapshot();
   });
 
@@ -102,25 +103,20 @@ describe('AccountsTable', () => {
         ] as Account[],
       } as UseQueryResult<Account[]>,
     );
-    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotal').mockReturnValue(
       {
         data: {
-          a1: {
-            '01/2023': new Money(100, 'EUR'),
-            '02/2023': new Money(200, 'EUR'), // Will be ignored
-          },
-          a2: {
-            '01/2023': new Money(-100, 'EUR'),
-          },
-        } as MonthlyTotals,
-      } as UseQueryResult<MonthlyTotals>,
+          a1: new Money(300, 'EUR'),
+          a2: new Money(-100, 'EUR'),
+        } as AccountsTotals,
+      } as UseQueryResult<AccountsTotals>,
     );
 
-    render(<AccountsTable />);
+    render(<AccountsTable guids={['a1', 'a2']} />);
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
-    expect(Table).toHaveBeenLastCalledWith(
+    expect(Table).toBeCalledWith(
       expect.objectContaining({
         data: [
           {
@@ -158,7 +154,7 @@ describe('AccountsTable', () => {
       {},
     );
 
-    expect((Table as jest.Mock).mock.calls[0][0].data[0].total.toString()).toEqual('100.00 EUR');
+    expect((Table as jest.Mock).mock.calls[0][0].data[0].total.toString()).toEqual('300.00 EUR');
     expect((Table as jest.Mock).mock.calls[0][0].data[1].total.toString()).toEqual('100.00 EUR');
   });
 
@@ -187,23 +183,19 @@ describe('AccountsTable', () => {
         ] as Account[],
       } as UseQueryResult<Account[]>,
     );
-    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotal').mockReturnValue(
       {
         data: {
-          a1: {
-            '12/2022': new Money(100, 'EUR'),
-            '01/2023': new Money(100, 'EUR'),
-            '02/2023': new Money(100, 'EUR'), // will be ignored
-          },
-        } as MonthlyTotals,
-      } as UseQueryResult<MonthlyTotals>,
+          a1: new Money(200, 'EUR'),
+        } as AccountsTotals,
+      } as UseQueryResult<AccountsTotals>,
     );
 
-    render(<AccountsTable />);
+    render(<AccountsTable guids={['a1']} />);
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
-    expect(Table).toHaveBeenLastCalledWith(
+    expect(Table).toBeCalledWith(
       expect.objectContaining({
         data: [
           {
@@ -239,6 +231,7 @@ describe('AccountsTable', () => {
             name: 'Root',
             type: 'ROOT',
             childrenIds: ['a1'],
+            hidden: true,
           } as Account,
           {
             guid: 'a1',
@@ -255,7 +248,7 @@ describe('AccountsTable', () => {
       } as UseQueryResult<Account[]>,
     );
 
-    render(<AccountsTable />);
+    render(<AccountsTable guids={['root']} />);
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -268,7 +261,7 @@ describe('AccountsTable', () => {
   });
 
   it('renders Name column as expected when expandable and not expandded', async () => {
-    render(<AccountsTable />);
+    render(<AccountsTable guids={['a1']} />);
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -300,7 +293,7 @@ describe('AccountsTable', () => {
   });
 
   it('renders Name column as expected when expandable and expanded', async () => {
-    render(<AccountsTable />);
+    render(<AccountsTable guids={['a1']} />);
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -319,7 +312,6 @@ describe('AccountsTable', () => {
               childrenIds: ['a1'],
             } as Account,
             total: new Money(100, 'EUR'),
-            monthlyTotals: {},
             children: [],
           },
           getCanExpand: () => true,
@@ -333,7 +325,7 @@ describe('AccountsTable', () => {
   });
 
   it('renders Name column as expected when not expandable', async () => {
-    render(<AccountsTable />);
+    render(<AccountsTable guids={['a1']} />);
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
@@ -353,7 +345,6 @@ describe('AccountsTable', () => {
               placeholder: true,
             } as Account,
             total: new Money(100, 'EUR'),
-            monthlyTotals: {},
             children: [],
           },
           getCanExpand: () => false,
@@ -366,7 +357,7 @@ describe('AccountsTable', () => {
   });
 
   it('renders Total column as expected', async () => {
-    render(<AccountsTable />);
+    render(<AccountsTable guids={['a1']} />);
 
     await screen.findByTestId('Table');
     expect(Table).toBeCalledTimes(1);
