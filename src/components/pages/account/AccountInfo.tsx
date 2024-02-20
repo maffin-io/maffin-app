@@ -3,7 +3,7 @@ import React from 'react';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import type { Account } from '@/book/entities';
 import Money from '@/book/Money';
-import { useSplitsTotal } from '@/hooks/api';
+import { useAccountTotal } from '@/hooks/api';
 import TotalLineChart from './TotalLineChart';
 import SplitsHistogram from './SplitsHistogram';
 
@@ -14,7 +14,7 @@ export type AccountInfoProps = {
 export default function AccountInfo({
   account,
 }: AccountInfoProps): JSX.Element {
-  const { data: t } = useSplitsTotal(account.guid);
+  const { data: t } = useAccountTotal(account.guid);
 
   const total = new Money(t || 0, account.commodity.mnemonic);
 

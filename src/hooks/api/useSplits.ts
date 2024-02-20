@@ -3,9 +3,15 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 import type { FindOptionsWhere } from 'typeorm';
+import { DateTime } from 'luxon';
 
 import { Split } from '@/book/entities';
 import type { Account } from '@/book/entities';
+import { getAccountsTotals } from '@/lib/queries';
+import type { PriceDBMap } from '@/book/prices';
+import type { AccountsTotals } from '@/lib/queries/getAccountsTotals';
+import { useAccounts } from './useAccounts';
+import { usePrices } from './usePrices';
 import fetcher from './fetcher';
 
 /**
@@ -108,7 +114,7 @@ export function useSplitsCount(
 /**
  * Calculates total sum of split quantities for a given account
  */
-export function useSplitsTotal(
+export function useAccountTotal(
   account: string,
 ): UseQueryResult<number> {
   const queryKey = [...Split.CACHE_KEY, account, 'total'];
@@ -126,6 +132,44 @@ export function useSplitsTotal(
       },
       queryKey,
     ),
+  });
+
+  return result;
+}
+
+/**
+ * Calculates the total for each existing account. The total is calculated
+ * by accumulating the splits for each account plus the total of their children
+ *
+ * If a child has different currency (for asset or liability accounts) the price
+ * is converted using the latest available matching exchange rate.
+ */
+export function useAccountsTotal(
+  selectedDate: DateTime = DateTime.now(),
+): UseQueryResult<AccountsTotals> {
+  const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
+  const { data: prices, dataUpdatedAt: pricesUpdatedAt } = usePrices({});
+
+  const queryKey = [
+    ...Split.CACHE_KEY,
+    {
+      aggregation: 'total',
+      date: selectedDate.toISODate(),
+      accountsUpdatedAt,
+      pricesUpdatedAt,
+    },
+  ];
+  const result = useQuery({
+    queryKey,
+    queryFn: fetcher(
+      async () => getAccountsTotals(
+        accounts as Account[],
+        prices as PriceDBMap,
+        selectedDate,
+      ),
+      queryKey,
+    ),
+    enabled: !!accounts && !!prices,
   });
 
   return result;

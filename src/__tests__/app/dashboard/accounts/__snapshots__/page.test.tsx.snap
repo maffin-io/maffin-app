@@ -43,11 +43,23 @@ exports[`AccountsPage renders as expected when no data showing onboarding 1`] = 
           data-testid="NetWorthPie"
         />
         <div
-          class="mt-4"
+          class="divide-y divide-slate-400/25 mt-4"
+          id="accounts-table"
         >
           <div
-            data-testid="AccountsTable"
-          />
+            class="pb-2"
+          >
+            <div
+              data-testid="AccountsTable"
+            />
+          </div>
+          <div
+            class="pt-2"
+          >
+            <div
+              data-testid="AccountsTable"
+            />
+          </div>
         </div>
       </div>
       <div

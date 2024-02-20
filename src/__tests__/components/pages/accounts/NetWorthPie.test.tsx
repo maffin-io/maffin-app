@@ -8,7 +8,7 @@ import Pie from '@/components/charts/Pie';
 import { NetWorthPie } from '@/components/pages/accounts';
 import * as apiHook from '@/hooks/api';
 import type { Commodity } from '@/book/entities';
-import type { MonthlyTotals } from '@/lib/queries';
+import type { AccountsTotals } from '@/lib/queries/getAccountsTotals';
 
 jest.mock('@/components/charts/Pie', () => jest.fn(
   () => <div data-testid="Pie" />,
@@ -22,7 +22,7 @@ jest.mock('@/hooks/api', () => ({
 describe('NetWorthPie', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
-    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<MonthlyTotals>);
+    jest.spyOn(apiHook, 'useAccountsTotal').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals>);
   });
 
   afterEach(() => {
@@ -72,19 +72,13 @@ describe('NetWorthPie', () => {
 
   it('shows net worth as expected', () => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-02-20') as DateTime<true>);
-    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotal').mockReturnValue(
       {
         data: {
-          asset: {
-            '01/2023': new Money(500, 'EUR'),
-            '02/2023': new Money(1000, 'EUR'),
-          },
-          liability: {
-            '01/2023': new Money(-50, 'EUR'),
-            '02/2023': new Money(-100, 'EUR'),
-          },
-        } as MonthlyTotals,
-      } as UseQueryResult<MonthlyTotals>,
+          type_asset: new Money(1500, 'EUR'),
+          type_liability: new Money(-150, 'EUR'),
+        } as AccountsTotals,
+      } as UseQueryResult<AccountsTotals>,
     );
 
     render(<NetWorthPie />);
@@ -95,7 +89,7 @@ describe('NetWorthPie', () => {
           datasets: [
             {
               backgroundColor: ['#06B6D4', '#F97316'],
-              data: [1000, 100],
+              data: [1500, 150],
             },
           ],
           labels: ['Assets', 'Liabilities'],
@@ -106,15 +100,12 @@ describe('NetWorthPie', () => {
   });
 
   it('shows net worth when no liabilities', () => {
-    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotal').mockReturnValue(
       {
         data: {
-          asset: {
-            '01/2023': new Money(500, 'EUR'),
-            '02/2023': new Money(1000, 'EUR'),
-          },
-        } as MonthlyTotals,
-      } as UseQueryResult<MonthlyTotals>,
+          type_asset: new Money(1500, 'EUR'),
+        } as AccountsTotals,
+      } as UseQueryResult<AccountsTotals>,
     );
 
     render(<NetWorthPie />);
@@ -125,7 +116,7 @@ describe('NetWorthPie', () => {
           datasets: [
             {
               backgroundColor: ['#06B6D4', '#F97316'],
-              data: [1000, 0],
+              data: [1500, 0],
             },
           ],
           labels: ['Assets', 'Liabilities'],
@@ -135,41 +126,14 @@ describe('NetWorthPie', () => {
     );
   });
 
-  it('filters by selected date', () => {
-    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
-      {
-        data: {
-          asset: {
-            '01/2023': new Money(500, 'EUR'),
-            '02/2023': new Money(1000, 'EUR'),
-          },
-          liability: {
-            '01/2023': new Money(-50, 'EUR'),
-            '02/2023': new Money(-100, 'EUR'),
-          },
-        } as MonthlyTotals,
-      } as UseQueryResult<MonthlyTotals>,
-    );
-
+  it('passes selectedDate', () => {
+    const date = DateTime.fromISO('2023-01-01');
     render(
       <NetWorthPie
-        selectedDate={DateTime.fromISO('2023-01-01')}
+        selectedDate={date}
       />,
     );
 
-    expect(Pie).toBeCalledWith(
-      expect.objectContaining({
-        data: {
-          datasets: [
-            {
-              backgroundColor: ['#06B6D4', '#F97316'],
-              data: [500, 50],
-            },
-          ],
-          labels: ['Assets', 'Liabilities'],
-        },
-      }),
-      {},
-    );
+    expect(apiHook.useAccountsTotal).toBeCalledWith(date);
   });
 });

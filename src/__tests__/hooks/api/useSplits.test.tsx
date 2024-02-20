@@ -1,13 +1,15 @@
 import React from 'react';
+import { DateTime } from 'luxon';
 import { DataSource } from 'typeorm';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, UseQueryResult } from '@tanstack/react-query';
 
 import {
   useSplits,
   useSplitsCount,
   useSplitsPagination,
-  useSplitsTotal,
+  useAccountTotal,
+  useAccountsTotal,
 } from '@/hooks/api';
 import {
   Account,
@@ -15,8 +17,22 @@ import {
   Split,
   Transaction,
 } from '@/book/entities';
+import * as useAccountsHook from '@/hooks/api/useAccounts';
+import * as usePricesHook from '@/hooks/api/usePrices';
+import * as queries from '@/lib/queries';
+import type { PriceDBMap } from '@/book/prices';
+import Money from '@/book/Money';
+import type { AccountsTotals } from '@/lib/queries/getAccountsTotals';
 
 jest.mock('@/lib/queries');
+jest.mock('@/hooks/api/useAccounts', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/api/useAccounts'),
+}));
+jest.mock('@/hooks/api/usePrices', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/api/usePrices'),
+}));
 
 const queryClient = new QueryClient();
 const wrapper = ({ children }: React.PropsWithChildren) => (
@@ -104,6 +120,10 @@ describe('useSplits', () => {
   });
 
   describe('useSplitsPagination', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
     it('calls query as expected', async () => {
       const { result } = renderHook(
         () => useSplitsPagination('guid', { pageIndex: 0, pageSize: 1 }),
@@ -127,6 +147,10 @@ describe('useSplits', () => {
   });
 
   describe('useSplitsCount', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
     it('calls query as expected', async () => {
       const { result } = renderHook(
         () => useSplitsCount('guid'),
@@ -144,10 +168,14 @@ describe('useSplits', () => {
     });
   });
 
-  describe('useSplitsTotal', () => {
+  describe('useAccountTotal', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
     it('calls query as expected', async () => {
       const { result } = renderHook(
-        () => useSplitsTotal('guid'),
+        () => useAccountTotal('guid'),
         { wrapper },
       );
 
@@ -159,6 +187,70 @@ describe('useSplits', () => {
       expect(queryCache[0].queryKey).toEqual(
         ['api', 'splits', 'guid', 'total'],
       );
+    });
+  });
+
+  describe('useAccountsTotal', () => {
+    beforeEach(() => {
+      jest.spyOn(useAccountsHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
+      jest.spyOn(usePricesHook, 'usePrices').mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
+      jest.spyOn(queries, 'getAccountsTotals').mockResolvedValue({
+        type_asset: new Money(0, 'EUR'),
+      } as AccountsTotals);
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('is pending when no accounts/prices', async () => {
+      const { result } = renderHook(
+        () => useAccountsTotal(DateTime.fromISO('2023-01-01')),
+        { wrapper },
+      );
+
+      await waitFor(() => expect(result.current.status).toEqual('pending'));
+
+      const queryCache = queryClient.getQueryCache().getAll();
+      expect(queryCache).toHaveLength(1);
+      expect(queryCache[0].queryKey).toEqual(
+        ['api', 'splits', { aggregation: 'total', date: '2023-01-01' }],
+      );
+    });
+
+    it('calls query as expected', async () => {
+      jest.spyOn(useAccountsHook, 'useAccounts').mockReturnValue({
+        data: [] as Account[],
+        dataUpdatedAt: 1,
+      } as UseQueryResult<Account[]>);
+      jest.spyOn(usePricesHook, 'usePrices').mockReturnValue({
+        data: {},
+        dataUpdatedAt: 2,
+      } as UseQueryResult<PriceDBMap>);
+
+      const { result } = renderHook(
+        () => useAccountsTotal(DateTime.fromISO('2023-01-01')),
+        { wrapper },
+      );
+
+      await waitFor(() => expect(result.current.status).toEqual('success'));
+      const queryCache = queryClient.getQueryCache().getAll();
+      expect(queryCache[0].queryKey).toEqual(
+        [
+          'api',
+          'splits',
+          {
+            aggregation: 'total',
+            date: '2023-01-01',
+            accountsUpdatedAt: 1,
+            pricesUpdatedAt: 2,
+          }],
+      );
+
+      expect(useAccountsHook.useAccounts).toBeCalledWith();
+      expect(usePricesHook.usePrices).toBeCalledWith({});
+      expect(queries.getAccountsTotals).toBeCalledWith([], {}, DateTime.fromISO('2023-01-01'));
+      expect(result.current.data?.type_asset.toString()).toEqual('0.00 EUR');
     });
   });
 });
