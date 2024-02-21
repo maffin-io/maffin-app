@@ -4,13 +4,14 @@ import Money from '@/book/Money';
 import { Split } from '@/book/entities';
 import type { Account } from '@/book/entities';
 import mapAccounts from '@/helpers/mapAccounts';
-import aggregateChildrenTotals from '@/helpers/aggregateChildrenTotals';
 import type { AccountsTotals } from '@/types/book';
-import type { PriceDBMap } from '@/book/prices';
 
+/**
+ * Returns the sum of splits amounts for each account
+ * up until the selected date
+ */
 export default async function getAccountsTotals(
   accounts: Account[],
-  prices: PriceDBMap,
   selectedDate: DateTime,
 ): Promise<AccountsTotals> {
   const rows: { total: number, accountId: string, mnemonic: string }[] = await Split
@@ -34,11 +35,5 @@ export default async function getAccountsTotals(
     totals[row.accountId] = new Money(row.total, accountsMap[row.accountId].commodity.mnemonic);
   });
 
-  return aggregateChildrenTotals(
-    'type_root',
-    accounts as Account[],
-    prices as PriceDBMap,
-    selectedDate,
-    totals,
-  );
+  return totals;
 }

@@ -11,12 +11,6 @@ import {
 import { getAccountsTotals } from '@/lib/queries';
 import { PriceDBMap } from '@/book/prices';
 import Money from '@/book/Money';
-import * as aggregateChildrenTotals from '@/helpers/aggregateChildrenTotals';
-
-jest.mock('@/helpers/aggregateChildrenTotals', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/helpers/aggregateChildrenTotals'),
-}));
 
 describe('getAccountsTotals', () => {
   let datasource: DataSource;
@@ -26,7 +20,6 @@ describe('getAccountsTotals', () => {
   let expensesAccount: Account;
 
   beforeEach(async () => {
-    jest.spyOn(aggregateChildrenTotals, 'default').mockReturnValue({ totals: new Money(0, 'EUR') });
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
@@ -73,30 +66,17 @@ describe('getAccountsTotals', () => {
     await datasource.destroy();
   });
 
-  it('calls with expected params whe no accounts', async () => {
-    await getAccountsTotals([], {} as PriceDBMap, DateTime.now());
-
-    expect(aggregateChildrenTotals.default).toBeCalledWith('type_root', [], {}, DateTime.now(), {});
+  it('returns empty when no accounts', async () => {
+    const totals = await getAccountsTotals([], DateTime.now());
+    expect(totals).toEqual({});
   });
 
-  it('calls with expected params when accounts without splits', async () => {
-    await getAccountsTotals(
+  it('returns empty when accounts with no splits', async () => {
+    const totals = await getAccountsTotals(
       [root, assetAccount, expensesAccount],
-      {} as PriceDBMap,
       DateTime.now(),
     );
-
-    expect(aggregateChildrenTotals.default).toBeCalledWith(
-      'type_root',
-      [
-        root,
-        assetAccount,
-        expensesAccount,
-      ],
-      {},
-      DateTime.now(),
-      {},
-    );
+    expect(totals).toEqual({});
   });
 
   it('sums splits and calls as expected', async () => {
@@ -143,28 +123,13 @@ describe('getAccountsTotals', () => {
       ],
     }).save();
 
-    await getAccountsTotals(
+    const totals = await getAccountsTotals(
       [root, assetAccount, expensesAccount],
-      {} as PriceDBMap,
       DateTime.now(),
     );
 
-    expect(aggregateChildrenTotals.default).toBeCalledWith(
-      'type_root',
-      [root, assetAccount, expensesAccount],
-      {},
-      DateTime.now(),
-      {
-        abcdef: expect.any(Money),
-        ghijk: expect.any(Money),
-      },
-    );
-    expect(
-      (aggregateChildrenTotals.default as jest.Mock).mock.calls[0][4].abcdef.toString(),
-    ).toEqual('300.00 EUR');
-    expect(
-      (aggregateChildrenTotals.default as jest.Mock).mock.calls[0][4].ghijk.toString(),
-    ).toEqual('300.00 EUR');
+    expect(totals.abcdef.toString()).toEqual('300.00 EUR');
+    expect(totals.ghijk.toString()).toEqual('300.00 EUR');
   });
 
   it('filters by date', async () => {
@@ -211,17 +176,12 @@ describe('getAccountsTotals', () => {
       ],
     }).save();
 
-    await getAccountsTotals(
+    const totals = await getAccountsTotals(
       [root, assetAccount, expensesAccount],
-      {} as PriceDBMap,
       DateTime.fromISO('2023-01-10'),
     );
 
-    expect(
-      (aggregateChildrenTotals.default as jest.Mock).mock.calls[0][4].abcdef.toString(),
-    ).toEqual('100.00 EUR');
-    expect(
-      (aggregateChildrenTotals.default as jest.Mock).mock.calls[0][4].ghijk.toString(),
-    ).toEqual('100.00 EUR');
+    expect(totals.abcdef.toString()).toEqual('100.00 EUR');
+    expect(totals.ghijk.toString()).toEqual('100.00 EUR');
   });
 });

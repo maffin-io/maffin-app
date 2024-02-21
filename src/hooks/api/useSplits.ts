@@ -1,5 +1,5 @@
+import React from 'react';
 import {
-  useQueries,
   useQuery,
   UseQueryResult,
 } from '@tanstack/react-query';
@@ -10,7 +10,8 @@ import { Split } from '@/book/entities';
 import type { Account } from '@/book/entities';
 import { getAccountsTotals, getMonthlyTotals } from '@/lib/queries';
 import type { PriceDBMap } from '@/book/prices';
-import type { AccountsMonthlyTotals, AccountsTotals } from '@/types/book';
+import type { AccountsTotals } from '@/types/book';
+import aggregateChildrenTotals from '@/helpers/aggregateChildrenTotals';
 import { useAccounts } from './useAccounts';
 import { usePrices } from './usePrices';
 import fetcher from './fetcher';
@@ -125,7 +126,7 @@ export function useAccountTotal(
       async () => {
         const r = await Split.query(`
           SELECT
-            SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) as total
+            ABS(SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom)) as total
           FROM splits
           WHERE splits.account_guid = :guid
         `, [account]);
@@ -140,16 +141,29 @@ export function useAccountTotal(
 
 /**
  * Calculates the total for each existing account. The total is calculated
- * by accumulating the splits for each account plus the total of their children
+ * by accumulating the splits for each account.
  *
- * If a child has different currency (for asset or liability accounts) the price
- * is converted using the exchange rate for the selected date (or the closest one found).
+ * By default, it aggregates the splits of the children into their parent but an
+ * optional select parameter can be passed to change that behavior.
  */
 export function useAccountsTotal(
   selectedDate: DateTime = DateTime.now(),
+  select?: (data: AccountsTotals) => AccountsTotals,
 ): UseQueryResult<AccountsTotals> {
   const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
   const { data: prices, dataUpdatedAt: pricesUpdatedAt } = usePrices({});
+
+  const aggregate = React.useCallback(
+    ((data: AccountsTotals) => aggregateChildrenTotals(
+      'type_root',
+      accounts as Account[],
+      prices as PriceDBMap,
+      selectedDate,
+      data,
+    )),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [accountsUpdatedAt, pricesUpdatedAt, selectedDate.toISODate()],
+  );
 
   const queryKey = [
     ...Split.CACHE_KEY,
@@ -165,12 +179,12 @@ export function useAccountsTotal(
     queryFn: fetcher(
       async () => getAccountsTotals(
         accounts as Account[],
-        prices as PriceDBMap,
         selectedDate,
       ),
       queryKey,
     ),
     enabled: !!accounts && !!prices,
+    select: select || aggregate,
   });
 
   return result;
@@ -184,13 +198,29 @@ export function useAccountsTotal(
  */
 export function useAccountsMonthlyTotal(
   interval?: Interval,
-): UseQueryResult<AccountsMonthlyTotals> {
+  select?: (data: AccountsTotals[]) => AccountsTotals[],
+): UseQueryResult<AccountsTotals[]> {
   interval = interval || Interval.fromDateTimes(
     DateTime.now().minus({ month: 6 }).startOf('month'),
     DateTime.now(),
   );
   const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
   const { data: prices, dataUpdatedAt: pricesUpdatedAt } = usePrices({});
+
+  const aggregate = React.useCallback(
+    ((data: AccountsTotals[]) => {
+      const dates = (interval as Interval).splitBy({ month: 1 }).map(d => (d.start as DateTime));
+      return data.map((d, i) => aggregateChildrenTotals(
+        'type_root',
+        accounts as Account[],
+        prices as PriceDBMap,
+        dates[i],
+        d,
+      ));
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [accountsUpdatedAt, pricesUpdatedAt, interval.toISODate()],
+  );
 
   const queryKey = [
     ...Split.CACHE_KEY,
@@ -206,12 +236,12 @@ export function useAccountsMonthlyTotal(
     queryFn: fetcher(
       () => getMonthlyTotals(
         accounts as Account[],
-        prices as PriceDBMap,
         interval,
       ),
       queryKey,
     ),
     enabled: !!accounts && !!prices,
+    select: select || aggregate,
   });
 
   return result;

@@ -23,6 +23,7 @@ import * as usePricesHook from '@/hooks/api/usePrices';
 import * as queries from '@/lib/queries';
 import type { PriceDBMap } from '@/book/prices';
 import Money from '@/book/Money';
+import * as aggregateChildrenTotals from '@/helpers/aggregateChildrenTotals';
 import type { AccountsMonthlyTotals, AccountsTotals } from '@/types/book';
 
 jest.mock('@/lib/queries');
@@ -33,6 +34,10 @@ jest.mock('@/hooks/api/useAccounts', () => ({
 jest.mock('@/hooks/api/usePrices', () => ({
   __esModule: true,
   ...jest.requireActual('@/hooks/api/usePrices'),
+}));
+jest.mock('@/helpers/aggregateChildrenTotals', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/helpers/aggregateChildrenTotals'),
 }));
 
 const queryClient = new QueryClient();
@@ -198,6 +203,9 @@ describe('useSplits', () => {
       jest.spyOn(queries, 'getAccountsTotals').mockResolvedValue({
         type_asset: new Money(0, 'EUR'),
       } as AccountsTotals);
+      jest.spyOn(aggregateChildrenTotals, 'default').mockReturnValue({
+        type_asset: new Money(0, 'EUR'),
+      } as AccountsTotals);
     });
 
     afterEach(() => {
@@ -217,6 +225,7 @@ describe('useSplits', () => {
       expect(queryCache[0].queryKey).toEqual(
         ['api', 'splits', { aggregation: 'total', date: '2023-01-01' }],
       );
+      expect(aggregateChildrenTotals.default).not.toBeCalled();
     });
 
     it('calls query as expected', async () => {
@@ -250,8 +259,15 @@ describe('useSplits', () => {
 
       expect(useAccountsHook.useAccounts).toBeCalledWith();
       expect(usePricesHook.usePrices).toBeCalledWith({});
-      expect(queries.getAccountsTotals).toBeCalledWith([], {}, DateTime.fromISO('2023-01-01'));
+      expect(queries.getAccountsTotals).toBeCalledWith([], DateTime.fromISO('2023-01-01'));
       expect(result.current.data?.type_asset.toString()).toEqual('0.00 EUR');
+      expect(aggregateChildrenTotals.default).toBeCalledWith(
+        'type_root',
+        [],
+        {},
+        DateTime.now(),
+        { type_asset: expect.any(Money) },
+      );
     });
   });
 

@@ -9,7 +9,7 @@ import {
 
 import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
-import { useAccountsTotals, useMainCurrency } from '@/hooks/api';
+import { useAccountsMonthlyTotal, useAccountsTotal, useMainCurrency } from '@/hooks/api';
 
 // We are using Bar chart here but one of the axis uses Line so
 // we have to register here or otherwise we get an error.
@@ -30,9 +30,15 @@ export default function NetWorthHistogram({
     selectedDate.minus({ months: 6 }).startOf('month'),
     selectedDate,
   );
-  const { data: monthlyTotals } = useAccountsTotals();
-  const assetSeries = monthlyTotals?.asset;
-  const liabilitiesSeries = monthlyTotals?.liability;
+  // TODO: pass this as an initial total to be added
+  const { data: totals } = useAccountsTotal(
+    interval.start as DateTime<true>,
+    (data) => data,
+  );
+  // TODO: This should be accumulating previous ones somehow :/
+  const { data: monthlyTotals } = useAccountsMonthlyTotal(interval);
+  const assetSeries = monthlyTotals?.map(m => m.type_asset.toNumber());
+  const liabilitySeries = monthlyTotals?.map(m => m.type_liability.toNumber());
 
   const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
@@ -42,17 +48,17 @@ export default function NetWorthHistogram({
   const datasets: ChartDataset<'bar'>[] = [
     {
       label: 'Assets',
-      data: [],
+      data: assetSeries || [],
       backgroundColor: '#06B6D4',
       order: 1,
       barPercentage: 0.6,
     },
   ];
 
-  if (liabilitiesSeries) {
+  if (liabilitySeries) {
     datasets.push({
       label: 'Liabilities',
-      data: [],
+      data: liabilitySeries?.map(n => -n) || [],
       backgroundColor: '#FF6600',
       order: 2,
       barPercentage: 0.6,
@@ -61,7 +67,7 @@ export default function NetWorthHistogram({
       label: 'Net worth',
       // @ts-ignore
       type: 'line',
-      data: [],
+      data: assetSeries?.map((n, i) => n - (liabilitySeries?.[i] || 0)) || [],
       backgroundColor: '#0E7490',
       borderColor: '#0E7490',
       showLine: false,
@@ -86,18 +92,6 @@ export default function NetWorthHistogram({
       },
     });
   }
-
-  dates.forEach(date => {
-    const monthYear = (date as DateTime).toFormat('MM/yyyy');
-    const assetTotal = assetSeries?.[monthYear]?.toNumber() || 0;
-    datasets[0].data.push(assetTotal);
-
-    if (liabilitiesSeries) {
-      const liabilityTotal = liabilitiesSeries?.[monthYear]?.toNumber() || 0;
-      datasets[1].data.push(liabilityTotal);
-      datasets[2].data.push(assetTotal + liabilityTotal);
-    }
-  });
 
   return (
     <>
