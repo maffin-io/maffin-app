@@ -6,7 +6,6 @@ import {
   LineElement,
   LineController,
 } from 'chart.js';
-import zoomPlugin from 'chartjs-plugin-zoom';
 
 import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
@@ -18,18 +17,19 @@ import { useAccountsTotals, useMainCurrency } from '@/hooks/api';
 C.register(
   LineElement,
   LineController,
-  zoomPlugin,
 );
 
 export type NetWorthHistogramProps = {
-  startDate?: DateTime,
   selectedDate?: DateTime,
 };
 
 export default function NetWorthHistogram({
-  startDate,
-  selectedDate = DateTime.now().minus({ months: 3 }),
+  selectedDate = DateTime.now(),
 }: NetWorthHistogramProps): JSX.Element {
+  const interval = Interval.fromDateTimes(
+    selectedDate.minus({ months: 6 }).startOf('month'),
+    selectedDate,
+  );
   const { data: monthlyTotals } = useAccountsTotals();
   const assetSeries = monthlyTotals?.asset;
   const liabilitiesSeries = monthlyTotals?.liability;
@@ -37,13 +37,7 @@ export default function NetWorthHistogram({
   const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
 
-  const now = DateTime.now();
-  const interval = Interval.fromDateTimes(
-    startDate?.minus({ month: 1 }) || now,
-    now,
-  );
-  const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).plus({ month: 1 }).startOf('month'));
-  dates.pop();
+  const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).startOf('month'));
 
   const datasets: ChartDataset<'bar'>[] = [
     {
@@ -105,14 +99,6 @@ export default function NetWorthHistogram({
     }
   });
 
-  if (now.diff(selectedDate, ['months']).months < 4) {
-    selectedDate = now.minus({ months: 4 });
-  }
-  const zoomInterval = Interval.fromDateTimes(
-    selectedDate.minus({ months: 4 }).startOf('month').minus({ days: 5 }),
-    selectedDate.plus({ months: 4 }).startOf('month').plus({ days: 5 }),
-  );
-
   return (
     <>
       <Bar
@@ -134,8 +120,6 @@ export default function NetWorthHistogram({
           scales: {
             x: {
               stacked: true,
-              min: zoomInterval.start?.toMillis(),
-              max: zoomInterval.end?.toMillis(),
               type: 'time',
               time: {
                 unit: 'month',
@@ -174,26 +158,6 @@ export default function NetWorthHistogram({
               },
               font: {
                 size: 18,
-              },
-            },
-            zoom: {
-              limits: {
-                x: {
-                  min: startDate?.toMillis(),
-                  max: now.toMillis(),
-                  minRange: zoomInterval.toDuration().toMillis(),
-                },
-              },
-              pan: {
-                mode: 'x',
-                enabled: true,
-              },
-              zoom: {
-                mode: 'x',
-                wheel: {
-                  enabled: true,
-                  modifierKey: 'meta',
-                },
               },
             },
             legend: {

@@ -20,7 +20,7 @@ export default function MonthlyTotalHistogram({
 }: MonthlyTotalHistogramProps): JSX.Element {
   const interval = Interval.fromDateTimes(
     selectedDate.minus({ months: 6 }).startOf('month'),
-    selectedDate.endOf('month'),
+    selectedDate,
   );
   const { data: monthlyTotals } = useAccountsMonthlyTotal(interval);
 
@@ -28,7 +28,6 @@ export default function MonthlyTotalHistogram({
   const unit = currency?.mnemonic || '';
 
   const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).startOf('month'));
-
   const datasets: ChartDataset<'bar'>[] = [];
 
   if (accounts.length && monthlyTotals) {

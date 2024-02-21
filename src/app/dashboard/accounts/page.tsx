@@ -16,15 +16,14 @@ import {
 import Loading from '@/components/Loading';
 import DateRangeInput from '@/components/DateRangeInput';
 import Onboarding from '@/components/onboarding/Onboarding';
-import * as API from '@/hooks/api';
+import { useAccounts } from '@/hooks/api';
 import mapAccounts from '@/helpers/mapAccounts';
 
 const NetWorthHistogram = dynamic(() => import('@/components/pages/accounts/NetWorthHistogram'), { ssr: false });
 const IncomeExpenseHistogram = dynamic(() => import('@/components/pages/accounts/IncomeExpenseHistogram'), { ssr: false });
 
 export default function AccountsPage(): JSX.Element {
-  const { data: earliestDate } = API.useStartDate();
-  const { data, isLoading } = API.useAccounts();
+  const { data, isLoading } = useAccounts();
   const [selectedDate, setSelectedDate] = React.useState(DateTime.now());
 
   if (isLoading) {
@@ -49,7 +48,6 @@ export default function AccountsPage(): JSX.Element {
         </span>
         <span className="ml-auto mr-3">
           <DateRangeInput
-            earliestDate={earliestDate}
             dateRange={{
               start: selectedDate,
               end: selectedDate,
@@ -109,7 +107,6 @@ export default function AccountsPage(): JSX.Element {
         <div className="grid grid-cols-12 col-span-9">
           <div className="card col-span-8">
             <NetWorthHistogram
-              startDate={earliestDate}
               selectedDate={selectedDate}
             />
           </div>

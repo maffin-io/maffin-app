@@ -21,7 +21,6 @@ jest.mock('@/hooks/api', () => ({
 
 describe('NetWorthHistogram', () => {
   beforeEach(() => {
-    jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02') as DateTime<true>);
     jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<MonthlyTotals>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
   });
@@ -43,13 +42,20 @@ describe('NetWorthHistogram', () => {
           datasets: [
             {
               backgroundColor: '#06B6D4',
-              data: [],
+              data: [0, 0, 0, 0, 0, 0],
               label: 'Assets',
               order: 1,
               barPercentage: 0.6,
             },
           ],
-          labels: [],
+          labels: [
+            DateTime.now().minus({ months: 6 }),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            DateTime.fromISO('2022-12-01'),
+          ],
         },
         options: {
           layout: {
@@ -72,26 +78,6 @@ describe('NetWorthHistogram', () => {
               padding: {
                 bottom: 30,
                 top: 0,
-              },
-            },
-            zoom: {
-              limits: {
-                x: {
-                  min: undefined,
-                  max: 1672617600000,
-                  minRange: 22032000000,
-                },
-              },
-              pan: {
-                mode: 'x',
-                enabled: true,
-              },
-              zoom: {
-                mode: 'x',
-                wheel: {
-                  enabled: true,
-                  modifierKey: 'meta',
-                },
               },
             },
             legend: {
@@ -118,10 +104,6 @@ describe('NetWorthHistogram', () => {
               grid: {
                 display: false,
               },
-              min: DateTime.now().minus({ months: 8 })
-                .startOf('month').minus({ days: 5 })
-                .toMillis(),
-              max: DateTime.now().startOf('month').plus({ days: 5 }).toMillis(),
               ticks: {
                 align: 'center',
               },
@@ -171,9 +153,7 @@ describe('NetWorthHistogram', () => {
     );
 
     render(
-      <NetWorthHistogram
-        startDate={DateTime.fromISO('2022-09-01')}
-      />,
+      <NetWorthHistogram selectedDate={DateTime.fromISO('2023-01-30')} />,
     );
 
     expect(Bar).toBeCalledWith(
@@ -181,19 +161,21 @@ describe('NetWorthHistogram', () => {
         data: {
           datasets: [
             expect.objectContaining({
-              data: [0, 0, 800, 1200, 1200],
+              data: [0, 0, 0, 0, 800, 1200, 1200],
               label: 'Assets',
             }),
             expect.objectContaining({
-              data: [0, 0, -200, -200, -200],
+              data: [0, 0, 0, 0, -200, -200, -200],
               label: 'Liabilities',
             }),
             expect.objectContaining({
-              data: [0, 0, 600, 1000, 1000],
+              data: [0, 0, 0, 0, 600, 1000, 1000],
               label: 'Net worth',
             }),
           ],
           labels: [
+            DateTime.fromISO('2022-07-01'),
+            DateTime.fromISO('2022-08-01'),
             DateTime.fromISO('2022-09-01'),
             DateTime.fromISO('2022-10-01'),
             DateTime.fromISO('2022-11-01'),

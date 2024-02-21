@@ -52,7 +52,6 @@ describe('MonthlyTotalHistogram', () => {
             DateTime.fromISO('2022-10-01').startOf('day'),
             DateTime.fromISO('2022-11-01').startOf('day'),
             DateTime.fromISO('2022-12-01').startOf('day'),
-            DateTime.fromISO('2023-01-01').startOf('day'),
           ],
         },
         options: {
@@ -133,7 +132,7 @@ describe('MonthlyTotalHistogram', () => {
     render(
       <MonthlyTotalHistogram
         title="Title"
-        selectedDate={DateTime.now().minus({ months: 3 })}
+        selectedDate={DateTime.now().plus({ days: 40 })}
         accounts={[
           {
             guid: 'salary',
@@ -149,13 +148,13 @@ describe('MonthlyTotalHistogram', () => {
         data: {
           datasets: expect.any(Array),
           labels: [
-            DateTime.now().minus({ months: 9 }).startOf('month'),
+            DateTime.now().minus({ months: 5 }).startOf('month'),
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
-            DateTime.now().minus({ months: 3 }).startOf('month'),
+            DateTime.now().plus({ month: 1 }).startOf('month'),
           ],
         },
       }),
@@ -202,11 +201,11 @@ describe('MonthlyTotalHistogram', () => {
         data: {
           datasets: [
             {
-              data: [-0, -0, -0, -0, 1000, 1000, -0],
+              data: [-0, -0, -0, -0, 1000, 1000],
               label: 'Salary',
             },
             {
-              data: [-0, -0, -0, -0, 150, 50, -0],
+              data: [-0, -0, -0, -0, 150, 50],
               label: 'Dividends',
             },
           ],
