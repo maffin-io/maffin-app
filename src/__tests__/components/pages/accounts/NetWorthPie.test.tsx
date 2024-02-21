@@ -76,7 +76,7 @@ describe('NetWorthPie', () => {
       {
         data: {
           type_asset: new Money(1500, 'EUR'),
-          type_liability: new Money(-150, 'EUR'),
+          type_liability: new Money(150, 'EUR'),
         } as AccountsTotals,
       } as UseQueryResult<AccountsTotals>,
     );

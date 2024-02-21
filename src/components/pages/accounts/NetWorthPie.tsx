@@ -29,7 +29,7 @@ export default function NetWorthPie({
           datasets: [
             {
               backgroundColor: ['#06B6D4', '#F97316'],
-              data: [assetsTotal.toNumber(), Math.abs(liabilitiesTotal.toNumber())],
+              data: [assetsTotal.toNumber(), liabilitiesTotal.toNumber()],
             },
           ],
         }}
@@ -63,7 +63,7 @@ export default function NetWorthPie({
       <div className="-mt-12">
         <p className="flex justify-center">Net worth</p>
         <p className="flex justify-center text-xl">
-          {moneyToString(assetsTotal.toNumber() + liabilitiesTotal.toNumber(), unit)}
+          {moneyToString(assetsTotal.toNumber() - liabilitiesTotal.toNumber(), unit)}
         </p>
       </div>
     </>

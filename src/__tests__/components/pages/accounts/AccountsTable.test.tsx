@@ -107,7 +107,7 @@ describe('AccountsTable', () => {
       {
         data: {
           a1: new Money(300, 'EUR'),
-          a2: new Money(-100, 'EUR'),
+          a2: new Money(100, 'EUR'),
         } as AccountsTotals,
       } as UseQueryResult<AccountsTotals>,
     );
