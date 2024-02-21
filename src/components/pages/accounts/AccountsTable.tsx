@@ -9,9 +9,6 @@ import Money from '@/book/Money';
 import Table from '@/components/Table';
 import type { AccountsMap } from '@/types/book';
 import { Account } from '@/book/entities';
-import {
-  isLiability,
-} from '@/book/helpers/accountType';
 import { useAccounts, useAccountsTotal } from '@/hooks/api';
 import mapAccounts from '@/helpers/mapAccounts';
 import { accountColorCode } from '@/helpers/classNames';
@@ -79,7 +76,7 @@ function getTreeTotals(
 
   return {
     account: current,
-    total: current.type === 'INCOME' || isLiability(current) ? accountTotal.multiply(-1) : accountTotal,
+    total: accountTotal,
     leaves,
   };
 }

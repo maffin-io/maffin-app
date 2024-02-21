@@ -1,4 +1,5 @@
 import {
+  useQueries,
   useQuery,
   UseQueryResult,
 } from '@tanstack/react-query';
@@ -142,7 +143,7 @@ export function useAccountTotal(
  * by accumulating the splits for each account plus the total of their children
  *
  * If a child has different currency (for asset or liability accounts) the price
- * is converted using the latest available matching exchange rate.
+ * is converted using the exchange rate for the selected date (or the closest one found).
  */
 export function useAccountsTotal(
   selectedDate: DateTime = DateTime.now(),
@@ -175,6 +176,12 @@ export function useAccountsTotal(
   return result;
 }
 
+/**
+ * Aggregates monthly splits for each account to produce
+ * monthly histograms of transactions. For accounts where their children
+ * have different commodity, the monthly aggregation is converted using an
+ * exchange rate for that month
+ */
 export function useAccountsMonthlyTotal(
   interval?: Interval,
 ): UseQueryResult<AccountsMonthlyTotals> {
