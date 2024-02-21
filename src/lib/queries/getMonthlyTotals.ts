@@ -37,11 +37,8 @@ export default async function getMonthlyTotals(
   prices: PriceDBMap,
   interval?: Interval,
 ): Promise<MonthlyTotals> {
-  const startDate = await getEarliestDate();
   interval = interval
-    // For end we set `endOf('month')` because we are doing monthly aggregation
-    // so we want to take into account the whole month
-    || Interval.fromDateTimes(startDate, DateTime.now().endOf('month'));
+    || Interval.fromDateTimes(await getEarliestDate(), DateTime.now());
 
   const rows: { date: string, total: number, accountId: string }[] = await Split
     .query(`

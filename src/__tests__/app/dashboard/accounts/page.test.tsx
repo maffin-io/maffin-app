@@ -78,7 +78,6 @@ jest.mock('@/components/Loading', () => jest.fn(
 describe('AccountsPage', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02') as DateTime<true>);
-    jest.spyOn(apiHook, 'useStartDate').mockReturnValue({ data: undefined } as UseQueryResult<DateTime>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
   });
 
@@ -94,8 +93,6 @@ describe('AccountsPage', () => {
   });
 
   it('renders as expected when no data showing onboarding', async () => {
-    const date = DateTime.fromISO('2022-01-01');
-    jest.spyOn(apiHook, 'useStartDate').mockReturnValueOnce({ data: date } as UseQueryResult<DateTime>);
     const { container } = render(<AccountsPage />);
 
     await screen.findByTestId('FormButton');
@@ -145,7 +142,6 @@ describe('AccountsPage', () => {
           start: DateTime.fromISO('2023-01-02'),
           end: DateTime.fromISO('2023-01-02'),
         },
-        earliestDate: DateTime.fromISO('2022-01-01'),
         onChange: expect.any(Function),
       },
       {},
@@ -171,7 +167,6 @@ describe('AccountsPage', () => {
     expect(NetWorthHistogram).toHaveBeenLastCalledWith(
       {
         selectedDate: DateTime.fromISO('2023-01-02'),
-        startDate: DateTime.fromISO('2022-01-01'),
       },
       {},
     );
@@ -253,8 +248,6 @@ describe('AccountsPage', () => {
       } as Account,
     ];
 
-    const date = DateTime.fromISO('2022-01-01');
-    jest.spyOn(apiHook, 'useStartDate').mockReturnValueOnce({ data: date } as UseQueryResult<DateTime>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValueOnce({ data: accounts } as UseQueryResult<Account[]>);
 
     render(<AccountsPage />);
@@ -290,7 +283,6 @@ describe('AccountsPage', () => {
     );
     expect(NetWorthHistogram).toHaveBeenLastCalledWith(
       {
-        startDate: date,
         selectedDate: DateTime.fromISO('2023-01-02'),
       },
       {},

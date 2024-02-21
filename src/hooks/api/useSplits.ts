@@ -179,7 +179,7 @@ export function useAccountsMonthlyTotal(
   interval?: Interval,
 ): UseQueryResult<AccountsMonthlyTotals> {
   interval = interval || Interval.fromDateTimes(
-    DateTime.now().minus({ month: 6 }),
+    DateTime.now().minus({ month: 6 }).startOf('month'),
     DateTime.now(),
   );
   const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();

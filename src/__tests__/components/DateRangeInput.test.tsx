@@ -2,16 +2,24 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import Datepicker from 'react-tailwindcss-datepicker';
 import { DateTime } from 'luxon';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import DateRangeInput from '@/components/DateRangeInput';
+import * as apiHook from '@/hooks/api';
 
 jest.mock('react-tailwindcss-datepicker', () => jest.fn(
   () => <div data-testid="DatePicker" />,
 ));
 
+jest.mock('@/hooks/api', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/api'),
+}));
+
 describe('DateRangeInput', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-30') as DateTime<true>);
+    jest.spyOn(apiHook, 'useStartDate').mockReturnValue({ data: undefined } as UseQueryResult<DateTime>);
   });
 
   afterEach(() => {
@@ -60,6 +68,10 @@ describe('DateRangeInput', () => {
   });
 
   it('sets dateRange and earliestDate', () => {
+    jest.spyOn(apiHook, 'useStartDate').mockReturnValue({
+      data: DateTime.fromISO('2022-01-01'),
+    } as UseQueryResult<DateTime>);
+
     render(
       <DateRangeInput
         asSingle
@@ -70,7 +82,6 @@ describe('DateRangeInput', () => {
             end: DateTime.fromISO('2023-05-01'),
           }
         }
-        earliestDate={DateTime.fromISO('2022-01-01')}
       />,
     );
 

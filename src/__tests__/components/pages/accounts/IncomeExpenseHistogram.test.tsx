@@ -42,17 +42,17 @@ describe('IncomeExpenseHistogram', () => {
           datasets: [
             {
               backgroundColor: '#22C55E',
-              data: [0, 0, 0, 0, 0, 0, 0],
+              data: [0, 0, 0, 0, 0, 0],
               label: 'Income',
             },
             {
               backgroundColor: '#EF4444',
-              data: [0, 0, 0, 0, 0, 0, 0],
+              data: [0, 0, 0, 0, 0, 0],
               label: 'Expenses',
             },
             {
               backgroundColor: '#06B6D4',
-              data: [0, 0, 0, 0, 0, 0, 0],
+              data: [0, 0, 0, 0, 0, 0],
               label: 'Savings',
               datalabels: {
                 anchor: 'end',
@@ -71,8 +71,8 @@ describe('IncomeExpenseHistogram', () => {
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
-            expect.any(DateTime),
-            DateTime.now(),
+            // When it's the 1st of the month, we only show 6 labels instead
+            DateTime.fromISO('2022-12-01'),
           ],
         },
         options: {
@@ -169,7 +169,7 @@ describe('IncomeExpenseHistogram', () => {
 
     render(
       <IncomeExpenseHistogram
-        selectedDate={DateTime.fromISO('2022-12-01')}
+        selectedDate={DateTime.fromISO('2022-12-30')}
       />,
     );
 
@@ -197,6 +197,8 @@ describe('IncomeExpenseHistogram', () => {
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
+            // Note this is not filtering data but just a label to display
+            // in the X axes
             DateTime.fromISO('2022-12-01'),
           ],
         },

@@ -74,7 +74,7 @@ describe('getMonthlyTotals', () => {
   it('aggregates as expected', async () => {
     await Transaction.create({
       description: 'description',
-      date: DateTime.fromISO('2023-01-01'),
+      date: DateTime.fromISO('2022-12-30'),
       fk_currency: eur,
       splits: [
         Split.create({
@@ -120,15 +120,15 @@ describe('getMonthlyTotals', () => {
     );
 
     // For asset and liabilities, we accumulate the total
-    expect(monthlyTotals.asset['01/2023'].toString()).toEqual('-600.00 EUR');
+    expect(monthlyTotals.asset['12/2022'].toString()).toEqual('-600.00 EUR');
     expect(monthlyTotals.asset['02/2022'].toString()).toEqual('-400.00 EUR');
-    expect(monthlyTotals.abcdef['01/2023'].toString()).toEqual('-600.00 EUR');
+    expect(monthlyTotals.abcdef['12/2022'].toString()).toEqual('-600.00 EUR');
     expect(monthlyTotals.abcdef['02/2022'].toString()).toEqual('-400.00 EUR');
 
     // For expense/income we store the monthly splits
-    expect(monthlyTotals.expense['01/2023'].toString()).toEqual('200.00 EUR');
+    expect(monthlyTotals.expense['12/2022'].toString()).toEqual('200.00 EUR');
     expect(monthlyTotals.expense['02/2022'].toString()).toEqual('400.00 EUR');
-    expect(monthlyTotals.ghijk['01/2023'].toString()).toEqual('200.00 EUR');
+    expect(monthlyTotals.ghijk['12/2022'].toString()).toEqual('200.00 EUR');
     expect(monthlyTotals.ghijk['02/2022'].toString()).toEqual('400.00 EUR');
   });
 

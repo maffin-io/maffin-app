@@ -38,6 +38,7 @@ export default async function getAccountsTotals(
       childId,
       accountsMap,
       prices,
+      selectedDate,
       totals,
     );
 
@@ -51,6 +52,7 @@ function aggregateTotals(
   guid: string,
   accounts: AccountsMap,
   prices: PriceDBMap,
+  selectedDate: DateTime,
   totals: { [guid: string]: Money },
 ) {
   const current = accounts[guid];
@@ -60,10 +62,11 @@ function aggregateTotals(
       || new Money(0, current.commodity.mnemonic)
     ).add(
       convertToParentCommodity(
-        aggregateTotals(childId, accounts, prices, totals),
+        aggregateTotals(childId, accounts, prices, selectedDate, totals),
         accounts[childId].commodity,
         current.commodity,
         prices,
+        selectedDate,
       ),
     );
   });
@@ -86,6 +89,7 @@ function convertToParentCommodity(
   from: Commodity,
   to: Commodity,
   prices: PriceDBMap,
+  selectedDate: DateTime,
 ): Money {
   let rate = 1;
   let currency = from;
@@ -93,6 +97,7 @@ function convertToParentCommodity(
   if (currency.namespace !== 'CURRENCY') {
     const stockPrice = prices.getInvestmentPrice(
       currency.mnemonic,
+      selectedDate,
     );
     rate = stockPrice.value;
     currency = stockPrice.currency;
@@ -101,6 +106,7 @@ function convertToParentCommodity(
     rate *= prices.getPrice(
       currency.mnemonic,
       to.mnemonic,
+      selectedDate,
     ).value;
   }
 

@@ -2,9 +2,10 @@ import React from 'react';
 import Datepicker from 'react-tailwindcss-datepicker';
 import { DateTime } from 'luxon';
 
+import { useStartDate } from '@/hooks/api';
+
 export type DateRangeInputProps = {
   asSingle?: boolean,
-  earliestDate?: DateTime,
   dateRange?: {
     start?: DateTime,
     end?: DateTime,
@@ -13,11 +14,11 @@ export type DateRangeInputProps = {
 };
 
 export default function DateRangeInput({
-  earliestDate,
   dateRange = {},
   onChange,
   asSingle = false,
 }: DateRangeInputProps): JSX.Element {
+  const { data: earliestDate } = useStartDate();
   const now = DateTime.now();
   const shortcuts: { [key: string]: { text: string, period: { start: Date, end: Date } } } = {
     t: {
