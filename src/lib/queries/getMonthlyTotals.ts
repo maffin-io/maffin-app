@@ -35,7 +35,14 @@ export type MonthlyTotals = {
 export default async function getMonthlyTotals(
   accounts: Account[],
   prices: PriceDBMap,
+  interval?: Interval,
 ): Promise<MonthlyTotals> {
+  const startDate = await getEarliestDate();
+  interval = interval
+    // For end we set `endOf('month')` because we are doing monthly aggregation
+    // so we want to take into account the whole month
+    || Interval.fromDateTimes(startDate, DateTime.now().endOf('month'));
+
   const rows: { date: string, total: number, accountId: string }[] = await Split
     .query(`
       SELECT
@@ -45,6 +52,8 @@ export default async function getMonthlyTotals(
       FROM splits
       JOIN transactions as tx ON splits.tx_guid = tx.guid
       JOIN accounts as account ON splits.account_guid = account.guid
+      WHERE tx.post_date >= '${interval.start?.toSQLDate()}'
+        AND tx.post_date <= '${interval.end?.toSQLDate()}'
       GROUP BY 
         accountId, date
       HAVING SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) != 0
@@ -65,10 +74,7 @@ export default async function getMonthlyTotals(
     );
   });
 
-  const startDate = await getEarliestDate();
-  const interval = Interval.fromDateTimes(startDate, DateTime.now());
   const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).endOf('month'));
-
   accountsMap.type_root?.childrenIds.forEach(
     (childId: string) => {
       const account = accountsMap[childId];

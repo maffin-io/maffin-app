@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon';
+import { DateTime, Interval } from 'luxon';
 import { DataSource } from 'typeorm';
 
 import {
@@ -132,6 +132,71 @@ describe('getMonthlyTotals', () => {
     expect(monthlyTotals.ghijk['02/2022'].toString()).toEqual('400.00 EUR');
   });
 
+  it('filters by date', async () => {
+    await Transaction.create({
+      description: 'description',
+      date: DateTime.fromISO('2023-01-01'),
+      fk_currency: eur,
+      splits: [
+        Split.create({
+          valueNum: 100,
+          valueDenom: 1,
+          quantityNum: 200,
+          quantityDenom: 1,
+          fk_account: expensesAccount,
+        }),
+        Split.create({
+          valueNum: -100,
+          valueDenom: 1,
+          quantityNum: -200,
+          quantityDenom: 1,
+          fk_account: assetAccount,
+        }),
+      ],
+    }).save();
+    await Transaction.create({
+      description: 'description',
+      date: DateTime.fromISO('2022-02-05'),
+      fk_currency: eur,
+      splits: [
+        Split.create({
+          valueNum: 200,
+          valueDenom: 1,
+          quantityNum: 400,
+          quantityDenom: 1,
+          fk_account: expensesAccount,
+        }),
+        Split.create({
+          valueNum: -200,
+          valueDenom: 1,
+          quantityNum: -400,
+          quantityDenom: 1,
+          fk_account: assetAccount,
+        }),
+      ],
+    }).save();
+    const monthlyTotals = await getMonthlyTotals(
+      [root, assetAccount, expensesAccount],
+      {} as PriceDBMap,
+      Interval.fromDateTimes(
+        DateTime.fromISO('2023-01-01'),
+        DateTime.now(),
+      ),
+    );
+
+    // For asset and liabilities, we accumulate the total
+    expect(monthlyTotals.asset['01/2023'].toString()).toEqual('-200.00 EUR');
+    expect(monthlyTotals.asset['02/2022']).toBe(undefined);
+    expect(monthlyTotals.abcdef['01/2023'].toString()).toEqual('-200.00 EUR');
+    expect(monthlyTotals.abcdef['02/2022']).toBe(undefined);
+
+    // For expense/income we store the monthly splits
+    expect(monthlyTotals.expense['01/2023'].toString()).toEqual('200.00 EUR');
+    expect(monthlyTotals.expense['02/2022']).toBe(undefined);
+    expect(monthlyTotals.ghijk['01/2023'].toString()).toEqual('200.00 EUR');
+    expect(monthlyTotals.ghijk['02/2022']).toBe(undefined);
+  });
+
   it('aggregates children totals into parent', async () => {
     const childAccount = await Account.create({
       guid: 'bank',
@@ -222,7 +287,7 @@ describe('getMonthlyTotals', () => {
 
     await Transaction.create({
       description: 'description',
-      date: DateTime.fromISO('2023-01-01'),
+      date: DateTime.fromISO('2022-11-30'),
       fk_currency: eur,
       splits: [
         Split.create({
@@ -243,7 +308,7 @@ describe('getMonthlyTotals', () => {
     }).save();
     await Transaction.create({
       description: 'description',
-      date: DateTime.fromISO('2023-02-01'),
+      date: DateTime.fromISO('2022-12-30'),
       fk_currency: eur,
       splits: [
         Split.create({
@@ -267,14 +332,14 @@ describe('getMonthlyTotals', () => {
       [root, assetAccount, expensesAccount, childAccount],
       new PriceDBMap([
         Price.create({
-          date: DateTime.fromISO('2023-01-30'),
+          date: DateTime.fromISO('2022-11-30'),
           fk_commodity: usd,
           fk_currency: eur,
           valueNum: 80,
           valueDenom: 100,
         }),
         Price.create({
-          date: DateTime.fromISO('2023-02-28'),
+          date: DateTime.fromISO('2022-12-30'),
           fk_commodity: usd,
           fk_currency: eur,
           valueNum: 90,
@@ -283,15 +348,15 @@ describe('getMonthlyTotals', () => {
       ]),
     );
 
-    expect(monthlyTotals.bank['01/2023'].toString()).toEqual('-100.00 USD');
-    // 100USD * 0.8 (which is the exchange rate on Jan)
-    expect(monthlyTotals.asset['01/2023'].toString()).toEqual('-80.00 EUR');
-    expect(monthlyTotals.expense['01/2023'].toString()).toEqual('80.00 EUR');
+    expect(monthlyTotals.bank['11/2022'].toString()).toEqual('-100.00 USD');
+    // 100USD * 0.8 (which is the exchange rate on Nov)
+    expect(monthlyTotals.asset['11/2022'].toString()).toEqual('-80.00 EUR');
+    expect(monthlyTotals.expense['11/2022'].toString()).toEqual('80.00 EUR');
 
-    expect(monthlyTotals.bank['02/2023'].toString()).toEqual('-200.00 USD');
-    // 200USD * 0.9 (which is the exchange rate on Feb)
-    expect(monthlyTotals.asset['02/2023'].toString()).toEqual('-180.00 EUR');
-    expect(monthlyTotals.expense['02/2023'].toString()).toEqual('90.00 EUR');
+    expect(monthlyTotals.bank['12/2022'].toString()).toEqual('-200.00 USD');
+    // 200USD * 0.9 (which is the exchange rate on Dec)
+    expect(monthlyTotals.asset['12/2022'].toString()).toEqual('-180.00 EUR');
+    expect(monthlyTotals.expense['12/2022'].toString()).toEqual('90.00 EUR');
   });
 
   /**

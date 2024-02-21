@@ -135,6 +135,10 @@ export async function updateCache(
   queryClient.invalidateQueries({
     queryKey: [...Split.CACHE_KEY, { aggregation: 'total' }],
   });
+
+  queryClient.invalidateQueries({
+    queryKey: [...Split.CACHE_KEY, { aggregation: 'monthlyTotal' }],
+  });
 }
 
 // https://github.com/typeorm/typeorm/issues/4714

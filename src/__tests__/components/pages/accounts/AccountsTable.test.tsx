@@ -8,7 +8,7 @@ import Table from '@/components/Table';
 import { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import * as apiHook from '@/hooks/api';
-import type { AccountsTotals } from '@/lib/queries/getAccountsTotals';
+import type { AccountsTotals } from '@/types/book';
 
 jest.mock('@/components/Table', () => jest.fn(
   () => <div data-testid="Table" />,

@@ -12,7 +12,7 @@ import { getAccountsTotals } from '@/lib/queries';
 import { PriceDBMap } from '@/book/prices';
 import Money from '@/book/Money';
 
-describe('getMonthlyTotals', () => {
+describe('getAccountsTotals', () => {
   let datasource: DataSource;
   let eur: Commodity;
   let root: Account;
@@ -88,7 +88,7 @@ describe('getMonthlyTotals', () => {
   it('aggregates with same currency', async () => {
     await Transaction.create({
       description: 'description',
-      date: DateTime.fromISO('2023-01-01'),
+      date: DateTime.fromISO('2022-01-01'),
       fk_currency: eur,
       splits: [
         Split.create({
@@ -109,7 +109,7 @@ describe('getMonthlyTotals', () => {
     }).save();
     await Transaction.create({
       description: 'description',
-      date: DateTime.fromISO('2023-02-01'),
+      date: DateTime.fromISO('2022-02-01'),
       fk_currency: eur,
       splits: [
         Split.create({
@@ -219,7 +219,7 @@ describe('getMonthlyTotals', () => {
 
     await Transaction.create({
       description: 'description',
-      date: DateTime.fromISO('2023-01-01'),
+      date: DateTime.fromISO('2022-01-01'),
       fk_currency: eur,
       splits: [
         Split.create({
@@ -240,7 +240,7 @@ describe('getMonthlyTotals', () => {
     }).save();
     await Transaction.create({
       description: 'description',
-      date: DateTime.fromISO('2023-02-01'),
+      date: DateTime.fromISO('2022-02-01'),
       fk_currency: eur,
       splits: [
         Split.create({

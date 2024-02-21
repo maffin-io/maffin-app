@@ -3,13 +3,13 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 import type { FindOptionsWhere } from 'typeorm';
-import { DateTime } from 'luxon';
+import { DateTime, Interval } from 'luxon';
 
 import { Split } from '@/book/entities';
 import type { Account } from '@/book/entities';
-import { getAccountsTotals } from '@/lib/queries';
+import { getAccountsTotals, getMonthlyTotals } from '@/lib/queries';
 import type { PriceDBMap } from '@/book/prices';
-import type { AccountsTotals } from '@/lib/queries/getAccountsTotals';
+import type { AccountsMonthlyTotals, AccountsTotals } from '@/types/book';
 import { useAccounts } from './useAccounts';
 import { usePrices } from './usePrices';
 import fetcher from './fetcher';
@@ -166,6 +166,41 @@ export function useAccountsTotal(
         accounts as Account[],
         prices as PriceDBMap,
         selectedDate,
+      ),
+      queryKey,
+    ),
+    enabled: !!accounts && !!prices,
+  });
+
+  return result;
+}
+
+export function useAccountsMonthlyTotal(
+  interval?: Interval,
+): UseQueryResult<AccountsMonthlyTotals> {
+  interval = interval || Interval.fromDateTimes(
+    DateTime.now().minus({ month: 6 }),
+    DateTime.now(),
+  );
+  const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
+  const { data: prices, dataUpdatedAt: pricesUpdatedAt } = usePrices({});
+
+  const queryKey = [
+    ...Split.CACHE_KEY,
+    {
+      aggregation: 'monthly-total',
+      dates: interval.toISODate(),
+      accountsUpdatedAt,
+      pricesUpdatedAt,
+    },
+  ];
+  const result = useQuery({
+    queryKey,
+    queryFn: fetcher(
+      () => getMonthlyTotals(
+        accounts as Account[],
+        prices as PriceDBMap,
+        interval,
       ),
       queryKey,
     ),

@@ -8,7 +8,7 @@ import Pie from '@/components/charts/Pie';
 import { NetWorthPie } from '@/components/pages/accounts';
 import * as apiHook from '@/hooks/api';
 import type { Commodity } from '@/book/entities';
-import type { AccountsTotals } from '@/lib/queries/getAccountsTotals';
+import type { AccountsTotals } from '@/types/book';
 
 jest.mock('@/components/charts/Pie', () => jest.fn(
   () => <div data-testid="Pie" />,

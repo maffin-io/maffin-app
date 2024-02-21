@@ -293,7 +293,7 @@ describe('InvestmentAccount', () => {
       await Transaction.create({
         description: 'description',
         fk_currency: stockCurrency,
-        date: DateTime.fromISO('2023-01-01'),
+        date: DateTime.fromISO('2022-01-01'),
         splits: [
           // Purchase 122.85 stocks for 1000EUR
           {
@@ -316,7 +316,7 @@ describe('InvestmentAccount', () => {
       currencyPrice = await Price.create({
         fk_commodity: stockCurrency,
         fk_currency: mainCommodity,
-        date: DateTime.fromISO('2023-01-01'),
+        date: DateTime.fromISO('2022-01-01'),
         source: `maffin::{"price":${txExchangeRate},"changePct":-1,"changeAbs":-1,"currency":"${currency}"}`,
         valueNum: txExchangeRate * 10000,
         valueDenom: 10000,
@@ -381,7 +381,7 @@ describe('InvestmentAccount', () => {
         await Transaction.create({
           description: 'description',
           fk_currency: stockCurrency,
-          date: DateTime.fromISO('2023-01-10'),
+          date: DateTime.fromISO('2022-01-10'),
           splits: [
             {
               valueNum: 1700,
@@ -403,7 +403,7 @@ describe('InvestmentAccount', () => {
         const currencyPrice2 = await Price.create({
           fk_commodity: stockCurrency,
           fk_currency: mainCommodity,
-          date: DateTime.fromISO('2023-01-10'),
+          date: DateTime.fromISO('2022-01-10'),
           source: `maffin::{"price":0.9056,"changePct":-1,"changeAbs":-1,"currency":"${currency}"}`,
           valueNum: currency === mainCurrency ? 10000 : 9056,
           valueDenom: 10000,
@@ -454,7 +454,7 @@ describe('InvestmentAccount', () => {
         await Transaction.create({
           description: 'description',
           fk_currency: stockCurrency,
-          date: DateTime.fromISO('2023-01-02'),
+          date: DateTime.fromISO('2022-01-02'),
           splits: [
             {
               valueNum: -1000,
@@ -511,7 +511,7 @@ describe('InvestmentAccount', () => {
         await Transaction.create({
           description: 'description',
           fk_currency: stockCurrency,
-          date: DateTime.fromISO('2023-01-02'),
+          date: DateTime.fromISO('2022-01-02'),
           splits: [
             {
               guid: 'split_guid_3',
@@ -575,7 +575,7 @@ describe('InvestmentAccount', () => {
         await Transaction.create({
           description: 'description',
           fk_currency: stockCurrency,
-          date: DateTime.fromISO('2023-01-02'),
+          date: DateTime.fromISO('2022-01-02'),
           splits: [
             {
               valueNum: -500,
@@ -638,7 +638,7 @@ describe('InvestmentAccount', () => {
         await Transaction.create({
           description: 'description',
           fk_currency: stockCurrency,
-          date: DateTime.fromISO('2023-01-02'),
+          date: DateTime.fromISO('2022-01-02'),
           splits: [
             {
               valueNum: -1000,
@@ -700,7 +700,7 @@ describe('InvestmentAccount', () => {
         await Transaction.create({
           description: 'description',
           fk_currency: stockCurrency,
-          date: DateTime.fromISO('2023-01-02'),
+          date: DateTime.fromISO('2022-01-02'),
           splits: [
             {
               valueNum: -250,
@@ -767,7 +767,7 @@ describe('InvestmentAccount', () => {
         await Transaction.create({
           description: 'description',
           fk_currency: stockCurrency,
-          date: DateTime.fromISO('2023-01-02'),
+          date: DateTime.fromISO('2022-01-02'),
           splits: [
             {
               valueNum: 0,
@@ -820,7 +820,7 @@ describe('InvestmentAccount', () => {
         await Transaction.create({
           description: 'description',
           fk_currency: stockCurrency,
-          date: DateTime.fromISO('2023-01-02'),
+          date: DateTime.fromISO('2022-01-02'),
           splits: [
             {
               valueNum: 0,
@@ -890,7 +890,7 @@ describe('InvestmentAccount', () => {
         tx = await Transaction.create({
           description: 'description',
           fk_currency: stockCurrency,
-          date: DateTime.fromISO('2023-01-02'),
+          date: DateTime.fromISO('2022-01-02'),
           splits: [
             // This split is used to associate the STOCK it comes from
             {
@@ -955,7 +955,7 @@ describe('InvestmentAccount', () => {
 
         expect(instance.dividends[0].amount.toString()).toEqual(`89.67 ${currency}`);
         expect(instance.dividends[0].amountInCurrency.toString()).toEqual(expected.toString());
-        expect(instance.dividends[0].when.toISODate()).toEqual('2023-01-02');
+        expect(instance.dividends[0].when.toISODate()).toEqual('2022-01-02');
       });
 
       /**
@@ -990,7 +990,7 @@ describe('InvestmentAccount', () => {
         await Transaction.create({
           description: 'description',
           fk_currency: eur,
-          date: DateTime.fromISO('2023-01-02'),
+          date: DateTime.fromISO('2022-01-02'),
           splits: [
             {
               valueNum: 0,
@@ -1139,7 +1139,7 @@ describe('InvestmentAccount', () => {
       await Transaction.create({
         description: 'description',
         fk_currency: stockCommodity,
-        date: DateTime.fromISO('2023-01-02'),
+        date: DateTime.fromISO('2022-01-02'),
         splits: [
           {
             valueNum: 10,

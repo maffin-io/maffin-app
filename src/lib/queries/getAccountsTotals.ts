@@ -4,12 +4,8 @@ import Money from '@/book/Money';
 import { Commodity, Split } from '@/book/entities';
 import type { Account } from '@/book/entities';
 import mapAccounts from '@/helpers/mapAccounts';
-import type { AccountsMap } from '@/types/book';
+import type { AccountsMap, AccountsTotals } from '@/types/book';
 import type { PriceDBMap } from '@/book/prices';
-
-export type AccountsTotals = {
-  [guid: string]: Money;
-};
 
 export default async function getAccountsTotals(
   accounts: Account[],

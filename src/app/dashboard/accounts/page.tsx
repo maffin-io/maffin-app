@@ -124,7 +124,6 @@ export default function AccountsPage(): JSX.Element {
           </div>
           <div className="card col-span-8">
             <IncomeExpenseHistogram
-              startDate={earliestDate}
               selectedDate={selectedDate}
             />
           </div>
