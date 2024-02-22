@@ -116,4 +116,25 @@ describe('DateRangeInput', () => {
       {},
     );
   });
+
+  /**
+   * We want this to happen so Interval.spliBy generates proper intervals
+   * for displaying amount of columns we want. If we pass an interval with
+   * end date as 1st of the month without setting end of day, that month
+   * will not be included
+   */
+  it('sets end of day for start date when changing', () => {
+    const mockOnChange = jest.fn();
+    render(<DateRangeInput onChange={mockOnChange} />);
+
+    const datePickerOnChange = (Datepicker as jest.Mock).mock.calls[0][0].onChange;
+    datePickerOnChange({
+      startDate: DateTime.fromISO('2023-01-01'),
+      endDate: DateTime.fromISO('2023-01-01'),
+    });
+    expect(mockOnChange).toBeCalledWith({
+      start: DateTime.fromISO('2023-01-01').endOf('day'),
+      end: DateTime.fromISO('2023-01-01'),
+    });
+  });
 });

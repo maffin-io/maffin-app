@@ -12,6 +12,7 @@ import { getAccountsTotals, getMonthlyTotals } from '@/lib/queries';
 import type { PriceDBMap } from '@/book/prices';
 import type { AccountsTotals } from '@/types/book';
 import { aggregateChildrenTotals, aggregateMonthlyWorth } from '@/helpers/accountsTotalAggregations';
+import monthlyDates from '@/helpers/monthlyDates';
 import { useAccounts } from './useAccounts';
 import { usePrices } from './usePrices';
 import fetcher from './fetcher';
@@ -207,7 +208,7 @@ export function useAccountsMonthlyTotal(
 
   const aggregate = React.useCallback(
     ((data: AccountsTotals[]) => {
-      const dates = (interval as Interval).splitBy({ month: 1 }).map(d => (d.start as DateTime).endOf('month'));
+      const dates = monthlyDates(interval as Interval).map(d => d.endOf('month'));
       dates[dates.length - 1] = (interval as Interval).end as DateTime;
       return data.map((d, i) => aggregateChildrenTotals(
         'type_root',
@@ -270,7 +271,7 @@ export function useAccountsMonthlyWorth(
 
   const aggregate = React.useCallback(
     ((data: AccountsTotals[]) => {
-      const dates = (interval as Interval).splitBy({ month: 1 }).map(d => (d.start as DateTime).endOf('month'));
+      const dates = monthlyDates(interval as Interval).map(d => d.endOf('month'));
       dates[dates.length - 1] = (interval as Interval).end as DateTime;
       const aggregated = aggregateMonthlyWorth(
         'type_root',

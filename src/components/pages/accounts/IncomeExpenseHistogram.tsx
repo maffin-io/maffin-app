@@ -5,6 +5,7 @@ import type { ChartDataset } from 'chart.js';
 import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
 import { useAccountsMonthlyTotal, useMainCurrency } from '@/hooks/api';
+import monthlyDates from '@/helpers/monthlyDates';
 
 export type IncomeExpenseHistogramProps = {
   selectedDate?: DateTime,
@@ -24,7 +25,6 @@ export default function IncomeExpenseHistogram({
   const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
 
-  const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).startOf('month'));
   const datasets: ChartDataset<'bar'>[] = [
     {
       label: 'Income',
@@ -57,7 +57,7 @@ export default function IncomeExpenseHistogram({
       <Bar
         height="400"
         data={{
-          labels: dates,
+          labels: monthlyDates(interval),
           datasets,
         }}
         options={{

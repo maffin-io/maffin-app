@@ -10,6 +10,7 @@ import {
 import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
 import { useAccountsMonthlyWorth, useMainCurrency } from '@/hooks/api';
+import monthlyDates from '@/helpers/monthlyDates';
 
 // We are using Bar chart here but one of the axis uses Line so
 // we have to register here or otherwise we get an error.
@@ -37,8 +38,6 @@ export default function NetWorthHistogram({
 
   const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
-
-  const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).startOf('month'));
 
   const datasets: ChartDataset<'bar'>[] = [
     {
@@ -92,7 +91,7 @@ export default function NetWorthHistogram({
       <Bar
         height="400"
         data={{
-          labels: dates,
+          labels: monthlyDates(interval),
           datasets,
         }}
         options={{
