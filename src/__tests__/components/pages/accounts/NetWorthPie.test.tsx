@@ -22,7 +22,7 @@ jest.mock('@/hooks/api', () => ({
 describe('NetWorthPie', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
-    jest.spyOn(apiHook, 'useAccountsTotal').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals>);
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals>);
   });
 
   afterEach(() => {
@@ -72,11 +72,11 @@ describe('NetWorthPie', () => {
 
   it('shows net worth as expected', () => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-02-20') as DateTime<true>);
-    jest.spyOn(apiHook, 'useAccountsTotal').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
       {
         data: {
           type_asset: new Money(1500, 'EUR'),
-          type_liability: new Money(150, 'EUR'),
+          type_liability: new Money(-150, 'EUR'),
         } as AccountsTotals,
       } as UseQueryResult<AccountsTotals>,
     );
@@ -100,7 +100,7 @@ describe('NetWorthPie', () => {
   });
 
   it('shows net worth when no liabilities', () => {
-    jest.spyOn(apiHook, 'useAccountsTotal').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
       {
         data: {
           type_asset: new Money(1500, 'EUR'),
@@ -134,6 +134,6 @@ describe('NetWorthPie', () => {
       />,
     );
 
-    expect(apiHook.useAccountsTotal).toBeCalledWith(date);
+    expect(apiHook.useAccountsTotals).toBeCalledWith(date);
   });
 });

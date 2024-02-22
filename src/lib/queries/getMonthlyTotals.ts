@@ -7,12 +7,6 @@ import type { Account } from '@/book/entities';
 import type { AccountsTotals } from '@/types/book';
 import getEarliestDate from './getEarliestDate';
 
-export type MonthlyTotals = {
-  [guid: string]: {
-    [yearMonth: string]: Money,
-  },
-};
-
 /**
  * Given an interval it aggregates monthly splits for each account
  */
@@ -27,7 +21,7 @@ export default async function getMonthlyTotals(
     .query(`
       SELECT
         strftime('%Y-%m', tx.post_date) AS date,
-        ABS(SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom)) as total,
+        SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) as total,
         splits.account_guid as accountId
       FROM splits
       JOIN transactions as tx ON splits.tx_guid = tx.guid
@@ -37,7 +31,6 @@ export default async function getMonthlyTotals(
       GROUP BY 
         accountId, date
       HAVING SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) != 0
-      ORDER BY tx.post_date
     `);
 
   const accountsMap = mapAccounts(accounts);
@@ -48,7 +41,11 @@ export default async function getMonthlyTotals(
   dates.forEach(date => {
     const totals: { [guid: string]: Money } = {};
     rows.filter(r => r.date === date.toFormat('yyyy-MM')).forEach(row => {
-      totals[row.accountId] = new Money(row.total, accountsMap[row.accountId].commodity.mnemonic);
+      const account = accountsMap[row.accountId];
+      totals[row.accountId] = new Money(
+        account.type !== 'INCOME' ? row.total : -row.total,
+        account.commodity.mnemonic,
+      );
     });
     monthlyTotals.push(totals);
   });

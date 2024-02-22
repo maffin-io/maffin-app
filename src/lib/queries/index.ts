@@ -5,5 +5,3 @@ export { default as getMainCurrency } from './getMainCurrency';
 export { default as getEarliestDate } from './getEarliestDate';
 export { default as getLatestTxs } from './getLatestTxs';
 export { default as getAccountsTotals } from './getAccountsTotals';
-
-export type { MonthlyTotals } from './getMonthlyTotals';

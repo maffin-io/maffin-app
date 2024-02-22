@@ -11,7 +11,7 @@ import type { Account } from '@/book/entities';
 import { getAccountsTotals, getMonthlyTotals } from '@/lib/queries';
 import type { PriceDBMap } from '@/book/prices';
 import type { AccountsTotals } from '@/types/book';
-import aggregateChildrenTotals from '@/helpers/aggregateChildrenTotals';
+import { aggregateChildrenTotals, aggregateMonthlyWorth } from '@/helpers/accountsTotalAggregations';
 import { useAccounts } from './useAccounts';
 import { usePrices } from './usePrices';
 import fetcher from './fetcher';
@@ -126,7 +126,7 @@ export function useAccountTotal(
       async () => {
         const r = await Split.query(`
           SELECT
-            ABS(SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom)) as total
+            SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) as total
           FROM splits
           WHERE splits.account_guid = :guid
         `, [account]);
@@ -146,7 +146,7 @@ export function useAccountTotal(
  * By default, it aggregates the splits of the children into their parent but an
  * optional select parameter can be passed to change that behavior.
  */
-export function useAccountsTotal(
+export function useAccountsTotals(
   selectedDate: DateTime = DateTime.now(),
   select?: (data: AccountsTotals) => AccountsTotals,
 ): UseQueryResult<AccountsTotals> {
@@ -171,7 +171,6 @@ export function useAccountsTotal(
       aggregation: 'total',
       date: selectedDate.toISODate(),
       accountsUpdatedAt,
-      pricesUpdatedAt,
     },
   ];
   const result = useQuery({
@@ -183,7 +182,7 @@ export function useAccountsTotal(
       ),
       queryKey,
     ),
-    enabled: !!accounts && !!prices,
+    enabled: !!accounts,
     select: select || aggregate,
   });
 
@@ -198,7 +197,6 @@ export function useAccountsTotal(
  */
 export function useAccountsMonthlyTotal(
   interval?: Interval,
-  select?: (data: AccountsTotals[]) => AccountsTotals[],
 ): UseQueryResult<AccountsTotals[]> {
   interval = interval || Interval.fromDateTimes(
     DateTime.now().minus({ month: 6 }).startOf('month'),
@@ -209,7 +207,8 @@ export function useAccountsMonthlyTotal(
 
   const aggregate = React.useCallback(
     ((data: AccountsTotals[]) => {
-      const dates = (interval as Interval).splitBy({ month: 1 }).map(d => (d.start as DateTime));
+      const dates = (interval as Interval).splitBy({ month: 1 }).map(d => (d.start as DateTime).endOf('month'));
+      dates[dates.length - 1] = (interval as Interval).end as DateTime;
       return data.map((d, i) => aggregateChildrenTotals(
         'type_root',
         accounts as Account[],
@@ -228,7 +227,6 @@ export function useAccountsMonthlyTotal(
       aggregation: 'monthly-total',
       dates: interval.toISODate(),
       accountsUpdatedAt,
-      pricesUpdatedAt,
     },
   ];
   const result = useQuery({
@@ -240,8 +238,84 @@ export function useAccountsMonthlyTotal(
       ),
       queryKey,
     ),
-    enabled: !!accounts && !!prices,
-    select: select || aggregate,
+    enabled: !!accounts,
+    select: aggregate,
+  });
+
+  return result;
+}
+
+/**
+ * Aggregates monthly splits for each account accumulating the value for each month.
+ * This is useful to produce monthly worth histograms.
+ *
+ * For accounts where their children
+ * have different commodity, the monthly aggregation is converted using an
+ * exchange rate for each respective month
+ */
+export function useAccountsMonthlyWorth(
+  interval?: Interval,
+): UseQueryResult<AccountsTotals[]> {
+  interval = interval
+    || Interval.fromDateTimes(
+      DateTime.now().minus({ month: 6 }).startOf('month'),
+      DateTime.now(),
+    );
+  const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
+  const { data: prices, dataUpdatedAt: pricesUpdatedAt } = usePrices({});
+  const { data: totals, dataUpdatedAt: totalsUpdatedAt } = useAccountsTotals(
+    (interval.start as DateTime).endOf('month') as DateTime,
+    (data) => data,
+  );
+
+  const aggregate = React.useCallback(
+    ((data: AccountsTotals[]) => {
+      const dates = (interval as Interval).splitBy({ month: 1 }).map(d => (d.start as DateTime).endOf('month'));
+      dates[dates.length - 1] = (interval as Interval).end as DateTime;
+      const aggregated = aggregateMonthlyWorth(
+        'type_root',
+        accounts as Account[],
+        [
+          totals as AccountsTotals,
+          ...data,
+        ],
+        dates,
+      );
+      return aggregated.map((d, i) => aggregateChildrenTotals(
+        'type_root',
+        accounts as Account[],
+        prices as PriceDBMap,
+        dates[i],
+        d,
+      ));
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [accountsUpdatedAt, pricesUpdatedAt, totalsUpdatedAt, interval.toISODate()],
+  );
+
+  const queryKey = [
+    ...Split.CACHE_KEY,
+    {
+      aggregation: 'monthly-worth',
+      dates: interval.toISODate(),
+      totalsUpdatedAt,
+      accountsUpdatedAt,
+    },
+  ];
+  const result = useQuery({
+    queryKey,
+    queryFn: fetcher(
+      () => getMonthlyTotals(
+        accounts as Account[],
+        Interval.fromDateTimes(
+          ((interval as Interval).start as DateTime).plus({ month: 1 }),
+          (interval as Interval).end as DateTime,
+        ),
+      ),
+      queryKey,
+    ),
+    enabled: !!accounts && !!totalsUpdatedAt,
+    select: aggregate,
   });
 
   return result;

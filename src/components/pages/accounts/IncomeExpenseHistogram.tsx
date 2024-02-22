@@ -33,7 +33,7 @@ export default function IncomeExpenseHistogram({
     },
     {
       label: 'Expenses',
-      data: expenseSeries?.map(n => -n) || [],
+      data: expenseSeries?.map(n => -n || 0) || [],
       backgroundColor: '#EF4444',
     },
     {

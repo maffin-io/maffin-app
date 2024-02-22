@@ -172,4 +172,16 @@ describe('Money', () => {
       expect(money.convert('EUR', 0.94).toString()).toEqual('94.00 EUR');
     });
   });
+
+  describe('abs', () => {
+    it('returns abs for positive', () => {
+      money = new Money(100, 'EUR');
+      expect(money.abs().toString()).toEqual('100.00 EUR');
+    });
+
+    it('returns abs for negative', () => {
+      money = new Money(-100, 'EUR');
+      expect(money.abs().toString()).toEqual('100.00 EUR');
+    });
+  });
 });

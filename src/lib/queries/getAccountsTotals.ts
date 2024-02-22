@@ -17,11 +17,11 @@ export default async function getAccountsTotals(
   const rows: { total: number, accountId: string, mnemonic: string }[] = await Split
     .query(`
       SELECT
-        ABS(SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom)) as total,
+        SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) as total,
         splits.account_guid as accountId
       FROM splits
-      JOIN accounts as account ON splits.account_guid = account.guid
       JOIN transactions as tx ON splits.tx_guid = tx.guid
+      JOIN accounts as account ON splits.account_guid = account.guid
       WHERE post_date <= '${selectedDate.toSQLDate()}'
       GROUP BY 
         accountId

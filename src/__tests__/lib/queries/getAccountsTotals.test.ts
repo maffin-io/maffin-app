@@ -9,8 +9,6 @@ import {
   Transaction,
 } from '@/book/entities';
 import { getAccountsTotals } from '@/lib/queries';
-import { PriceDBMap } from '@/book/prices';
-import Money from '@/book/Money';
 
 describe('getAccountsTotals', () => {
   let datasource: DataSource;
@@ -128,7 +126,7 @@ describe('getAccountsTotals', () => {
       DateTime.now(),
     );
 
-    expect(totals.abcdef.toString()).toEqual('300.00 EUR');
+    expect(totals.abcdef.toString()).toEqual('-300.00 EUR');
     expect(totals.ghijk.toString()).toEqual('300.00 EUR');
   });
 
@@ -181,7 +179,7 @@ describe('getAccountsTotals', () => {
       DateTime.fromISO('2023-01-10'),
     );
 
-    expect(totals.abcdef.toString()).toEqual('100.00 EUR');
+    expect(totals.abcdef.toString()).toEqual('-100.00 EUR');
     expect(totals.ghijk.toString()).toEqual('100.00 EUR');
   });
 });

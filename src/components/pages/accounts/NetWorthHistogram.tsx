@@ -9,7 +9,7 @@ import {
 
 import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
-import { useAccountsMonthlyTotal, useAccountsTotal, useMainCurrency } from '@/hooks/api';
+import { useAccountsMonthlyWorth, useMainCurrency } from '@/hooks/api';
 
 // We are using Bar chart here but one of the axis uses Line so
 // we have to register here or otherwise we get an error.
@@ -30,15 +30,10 @@ export default function NetWorthHistogram({
     selectedDate.minus({ months: 6 }).startOf('month'),
     selectedDate,
   );
-  // TODO: pass this as an initial total to be added
-  const { data: totals } = useAccountsTotal(
-    interval.start as DateTime<true>,
-    (data) => data,
-  );
-  // TODO: This should be accumulating previous ones somehow :/
-  const { data: monthlyTotals } = useAccountsMonthlyTotal(interval);
-  const assetSeries = monthlyTotals?.map(m => m.type_asset.toNumber());
-  const liabilitySeries = monthlyTotals?.map(m => m.type_liability.toNumber());
+
+  const { data: monthlyWorth } = useAccountsMonthlyWorth(interval);
+  const assetSeries = monthlyWorth?.map(m => m.type_asset.toNumber());
+  const liabilitySeries = monthlyWorth?.map(m => m.type_liability.toNumber());
 
   const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
@@ -58,7 +53,7 @@ export default function NetWorthHistogram({
   if (liabilitySeries) {
     datasets.push({
       label: 'Liabilities',
-      data: liabilitySeries?.map(n => -n) || [],
+      data: liabilitySeries || [],
       backgroundColor: '#FF6600',
       order: 2,
       barPercentage: 0.6,
@@ -67,7 +62,7 @@ export default function NetWorthHistogram({
       label: 'Net worth',
       // @ts-ignore
       type: 'line',
-      data: assetSeries?.map((n, i) => n - (liabilitySeries?.[i] || 0)) || [],
+      data: assetSeries?.map((n, i) => n + (liabilitySeries?.[i] || 0)) || [],
       backgroundColor: '#0E7490',
       borderColor: '#0E7490',
       showLine: false,
@@ -76,7 +71,6 @@ export default function NetWorthHistogram({
       pointHoverRadius: 10,
       order: 0,
       datalabels: {
-        clip: true,
         display: (ctx) => {
           if (ctx.dataIndex % 2) {
             return true;

@@ -9,7 +9,7 @@ import Money from '@/book/Money';
 import Table from '@/components/Table';
 import type { AccountsMap } from '@/types/book';
 import { Account } from '@/book/entities';
-import { useAccounts, useAccountsTotal } from '@/hooks/api';
+import { useAccounts, useAccountsTotals } from '@/hooks/api';
 import mapAccounts from '@/helpers/mapAccounts';
 import { accountColorCode } from '@/helpers/classNames';
 
@@ -27,13 +27,13 @@ export default function AccountsTable(
   }: AccountsTableProps,
 ): JSX.Element {
   const { data } = useAccounts();
-  const { data: accountsTotal } = useAccountsTotal(selectedDate);
+  const { data: accountsTotal } = useAccountsTotals(selectedDate);
 
   const accounts = mapAccounts(data);
   const trees: AccountsTableRow[] = [];
   guids.forEach(guid => {
     if (accounts[guid] && !accounts[guid].hidden) {
-      trees.push(getTreeTotals(
+      trees.push(getTree(
         accounts[guid],
         accounts,
         accountsTotal || {},
@@ -58,7 +58,7 @@ export default function AccountsTable(
   );
 }
 
-function getTreeTotals(
+function getTree(
   current: Account,
   accounts: AccountsMap,
   accountsTotal: { [guid: string]: Money },
@@ -68,7 +68,7 @@ function getTreeTotals(
   current.childrenIds.forEach(childId => {
     const childAccount = accounts[childId];
     if (!childAccount.hidden && childAccount.parentId === current.guid) {
-      leaves.push(getTreeTotals(childAccount, accounts, accountsTotal, selectedDate));
+      leaves.push(getTree(childAccount, accounts, accountsTotal, selectedDate));
     }
   });
 
@@ -148,12 +148,12 @@ const columns: ColumnDef<AccountsTableRow>[] = [
     ),
   },
   {
-    accessorFn: (row: AccountsTableRow) => row.total.toNumber(),
+    accessorFn: (row: AccountsTableRow) => row.total.abs().toNumber(),
     id: 'total',
     header: '',
     cell: ({ row }) => (
       <span>
-        {row.original.total.format()}
+        {row.original.total.abs().format()}
       </span>
     ),
   },

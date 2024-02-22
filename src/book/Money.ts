@@ -156,6 +156,14 @@ export default class Money {
       throw new Error(`Error converting ${this.format()} to ${to} with rates ${JSON.stringify(rates)}: ${e}`);
     }
   }
+
+  /**
+   * Returns a Money with absolute amount
+   */
+  abs(): Money {
+    const snapshot = djs.toSnapshot(this.raw);
+    return new Money(Math.abs(snapshot.amount), this.currency, snapshot.scale);
+  }
 }
 
 function toCurrency(currency: string): DineroCurrency<number> {

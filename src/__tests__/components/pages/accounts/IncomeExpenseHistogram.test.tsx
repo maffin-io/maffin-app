@@ -8,7 +8,7 @@ import Bar from '@/components/charts/Bar';
 import IncomeExpenseHistogram from '@/components/pages/accounts/IncomeExpenseHistogram';
 import * as apiHook from '@/hooks/api';
 import type { Commodity } from '@/book/entities';
-import type { AccountsMonthlyTotals } from '@/types/book';
+import type { AccountsTotals } from '@/types/book';
 
 jest.mock('@/components/charts/Bar', () => jest.fn(
   () => <div data-testid="Bar" />,
@@ -21,7 +21,7 @@ jest.mock('@/hooks/api', () => ({
 
 describe('IncomeExpenseHistogram', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue({ data: undefined } as UseQueryResult<AccountsMonthlyTotals>);
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals[]>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
   });
 
@@ -42,17 +42,17 @@ describe('IncomeExpenseHistogram', () => {
           datasets: [
             {
               backgroundColor: '#22C55E',
-              data: [0, 0, 0, 0, 0, 0],
+              data: [],
               label: 'Income',
             },
             {
               backgroundColor: '#EF4444',
-              data: [0, 0, 0, 0, 0, 0],
+              data: [],
               label: 'Expenses',
             },
             {
               backgroundColor: '#06B6D4',
-              data: [0, 0, 0, 0, 0, 0],
+              data: [],
               label: 'Savings',
               datalabels: {
                 anchor: 'end',
@@ -154,17 +154,37 @@ describe('IncomeExpenseHistogram', () => {
   it('generates datasets as expected', () => {
     jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue(
       {
-        data: {
-          income: {
-            '11/2022': new Money(-600, 'EUR'),
-            '12/2022': new Money(-400, 'EUR'),
-          },
-          expense: {
-            '11/2022': new Money(400, 'EUR'),
-            '12/2022': new Money(500, 'EUR'),
-          },
-        } as AccountsMonthlyTotals,
-      } as UseQueryResult<AccountsMonthlyTotals>,
+        data: [
+          {
+            type_income: new Money(0, 'EUR'),
+            type_expense: new Money(0, 'EUR'),
+          } as AccountsTotals,
+          {
+            type_income: new Money(0, 'EUR'),
+            type_expense: new Money(0, 'EUR'),
+          } as AccountsTotals,
+          {
+            type_income: new Money(0, 'EUR'),
+            type_expense: new Money(0, 'EUR'),
+          } as AccountsTotals,
+          {
+            type_income: new Money(0, 'EUR'),
+            type_expense: new Money(0, 'EUR'),
+          } as AccountsTotals,
+          {
+            type_income: new Money(0, 'EUR'),
+            type_expense: new Money(0, 'EUR'),
+          } as AccountsTotals,
+          {
+            type_income: new Money(600, 'EUR'),
+            type_expense: new Money(400, 'EUR'),
+          } as AccountsTotals,
+          {
+            type_income: new Money(400, 'EUR'),
+            type_expense: new Money(500, 'EUR'),
+          } as AccountsTotals,
+        ],
+      } as UseQueryResult<AccountsTotals[]>,
     );
 
     render(
