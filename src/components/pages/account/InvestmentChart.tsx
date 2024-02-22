@@ -8,6 +8,7 @@ import { moneyToString } from '@/helpers/number';
 import type { Account } from '@/book/entities';
 import { useInvestment, usePrices } from '@/hooks/api';
 import Loading from '@/components/Loading';
+import monthlyDates from '@/helpers/monthlyDates';
 
 Chart.register(Filler);
 
@@ -49,7 +50,7 @@ export default function InvestmentChart({
   const valueData: { x: number, y: number }[] = [];
   const interval = Interval.fromDateTimes(startDate, DateTime.now());
   const monthly = interval.toDuration('months').months >= 3
-    ? interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).startOf('month'))
+    ? monthlyDates(interval)
     : interval.splitBy({ day: 1 }).map(d => (d.start as DateTime));
   monthly.forEach(x => {
     investment.processSplits(x);

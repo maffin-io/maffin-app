@@ -6,6 +6,7 @@ import Bar from '@/components/charts/Bar';
 import type { Account } from '@/book/entities';
 import { useAccountsMonthlyTotal, useMainCurrency } from '@/hooks/api';
 import { moneyToString } from '@/helpers/number';
+import monthlyDates from '@/helpers/monthlyDates';
 
 export type MonthlyTotalHistogramProps = {
   title: string,
@@ -27,7 +28,7 @@ export default function MonthlyTotalHistogram({
   const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
 
-  const dates = interval.splitBy({ month: 1 }).map(d => (d.start as DateTime).startOf('month'));
+  const dates = monthlyDates(interval);
   const datasets: ChartDataset<'bar'>[] = [];
 
   if (accounts.length && monthlyTotals) {

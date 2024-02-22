@@ -61,7 +61,7 @@ export default function DateRangeInput({
       onChange={(newValue) => {
         if (newValue) {
           onChange({
-            start: DateTime.fromISO(newValue.startDate as string),
+            start: DateTime.fromISO(newValue.startDate as string).endOf('day'),
             end: DateTime.fromISO(newValue.endDate as string),
           });
         }
