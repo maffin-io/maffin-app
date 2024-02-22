@@ -16,12 +16,12 @@ export {
   useSplitsPagination,
   useSplitsCount,
   useAccountTotal,
-  useAccountsTotal,
+  useAccountsTotals,
   useAccountsMonthlyTotal,
+  useAccountsMonthlyWorth,
 } from '@/hooks/api/useSplits';
 export { usePrices } from '@/hooks/api/usePrices';
 export { useMainCurrency } from '@/hooks/api/useMainCurrency';
-export { useAccountsTotals } from '@/hooks/api/useAccountsTotals';
 
 export function useStartDate(): UseQueryResult<DateTime> {
   return useQuery({

@@ -8,7 +8,7 @@ import { Account, Commodity } from '@/book/entities';
 import Bar from '@/components/charts/Bar';
 import { MonthlyTotalHistogram } from '@/components/pages/accounts';
 import * as apiHook from '@/hooks/api';
-import type { AccountsMonthlyTotals } from '@/types/book';
+import type { AccountsTotals } from '@/types/book';
 
 jest.mock('@/components/charts/Bar', () => jest.fn(
   () => <div data-testid="Bar" />,
@@ -23,7 +23,7 @@ describe('MonthlyTotalHistogram', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-01') as DateTime<true>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue({ data: undefined } as UseQueryResult<AccountsMonthlyTotals>);
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals[]>);
   });
 
   afterEach(() => {
@@ -125,8 +125,30 @@ describe('MonthlyTotalHistogram', () => {
   it('selects default date now - 7 months', () => {
     jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue(
       {
-        data: {} as AccountsMonthlyTotals,
-      } as UseQueryResult<AccountsMonthlyTotals>,
+        data: [
+          {
+            salary: new Money(0, 'EUR'),
+          },
+          {
+            salary: new Money(0, 'EUR'),
+          },
+          {
+            salary: new Money(0, 'EUR'),
+          },
+          {
+            salary: new Money(0, 'EUR'),
+          },
+          {
+            salary: new Money(0, 'EUR'),
+          },
+          {
+            salary: new Money(0, 'EUR'),
+          },
+          {
+            salary: new Money(0, 'EUR'),
+          },
+        ] as AccountsTotals[],
+      } as UseQueryResult<AccountsTotals[]>,
     );
 
     render(
@@ -165,17 +187,33 @@ describe('MonthlyTotalHistogram', () => {
   it('generates data as expected', () => {
     jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue(
       {
-        data: {
-          salary: {
-            '11/2022': new Money(-1000, 'EUR'),
-            '12/2022': new Money(-1000, 'EUR'),
-          },
-          dividends: {
-            '11/2022': new Money(-150, 'EUR'),
-            '12/2022': new Money(-50, 'EUR'),
-          },
-        } as AccountsMonthlyTotals,
-      } as UseQueryResult<AccountsMonthlyTotals>,
+        data: [
+          {
+            salary: new Money(0, 'EUR'),
+            dividends: new Money(0, 'EUR'),
+          } as AccountsTotals,
+          {
+            salary: new Money(0, 'EUR'),
+            dividends: new Money(0, 'EUR'),
+          } as AccountsTotals,
+          {
+            salary: new Money(0, 'EUR'),
+            dividends: new Money(0, 'EUR'),
+          } as AccountsTotals,
+          {
+            salary: new Money(0, 'EUR'),
+            dividends: new Money(0, 'EUR'),
+          } as AccountsTotals,
+          {
+            salary: new Money(1000, 'EUR'),
+            dividends: new Money(150, 'EUR'),
+          } as AccountsTotals,
+          {
+            salary: new Money(1000, 'EUR'),
+            dividends: new Money(50, 'EUR'),
+          } as AccountsTotals,
+        ],
+      } as UseQueryResult<AccountsTotals[]>,
     );
 
     render(
@@ -201,11 +239,11 @@ describe('MonthlyTotalHistogram', () => {
         data: {
           datasets: [
             {
-              data: [-0, -0, -0, -0, 1000, 1000],
+              data: [0, 0, 0, 0, 1000, 1000],
               label: 'Salary',
             },
             {
-              data: [-0, -0, -0, -0, 150, 50],
+              data: [0, 0, 0, 0, 150, 50],
               label: 'Dividends',
             },
           ],

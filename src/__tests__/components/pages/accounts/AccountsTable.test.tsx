@@ -24,7 +24,7 @@ describe('AccountsTable', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-01') as DateTime<true>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
-    jest.spyOn(apiHook, 'useAccountsTotal').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals>);
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals>);
   });
 
   afterEach(() => {
@@ -64,7 +64,7 @@ describe('AccountsTable', () => {
       },
       {},
     );
-    expect(apiHook.useAccountsTotal).toBeCalledWith(DateTime.now());
+    expect(apiHook.useAccountsTotals).toBeCalledWith(DateTime.now());
     expect(container).toMatchSnapshot();
   });
 
@@ -103,7 +103,7 @@ describe('AccountsTable', () => {
         ] as Account[],
       } as UseQueryResult<Account[]>,
     );
-    jest.spyOn(apiHook, 'useAccountsTotal').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
       {
         data: {
           a1: new Money(300, 'EUR'),
@@ -183,7 +183,7 @@ describe('AccountsTable', () => {
         ] as Account[],
       } as UseQueryResult<Account[]>,
     );
-    jest.spyOn(apiHook, 'useAccountsTotal').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
       {
         data: {
           a1: new Money(200, 'EUR'),

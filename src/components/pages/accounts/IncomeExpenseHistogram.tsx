@@ -18,8 +18,8 @@ export default function IncomeExpenseHistogram({
     selectedDate,
   );
   const { data: monthlyTotals } = useAccountsMonthlyTotal(interval);
-  const incomeSeries = monthlyTotals?.income;
-  const expenseSeries = monthlyTotals?.expense;
+  const incomeSeries = monthlyTotals?.map(m => m.type_income.toNumber());
+  const expenseSeries = monthlyTotals?.map(m => m.type_expense.toNumber());
 
   const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
@@ -28,17 +28,17 @@ export default function IncomeExpenseHistogram({
   const datasets: ChartDataset<'bar'>[] = [
     {
       label: 'Income',
-      data: [],
+      data: incomeSeries || [],
       backgroundColor: '#22C55E',
     },
     {
       label: 'Expenses',
-      data: [],
+      data: expenseSeries?.map(n => -n || 0) || [],
       backgroundColor: '#EF4444',
     },
     {
       label: 'Savings',
-      data: [],
+      data: incomeSeries?.map((n, i) => n - (expenseSeries?.[i] || 0)) || [],
       backgroundColor: '#06B6D4',
       datalabels: {
         anchor: 'end',
@@ -51,17 +51,6 @@ export default function IncomeExpenseHistogram({
       },
     },
   ];
-
-  dates.forEach(date => {
-    const monthYear = (date as DateTime).toFormat('MM/yyyy');
-    const incomeAmount = (incomeSeries?.[monthYear]?.toNumber() || 0);
-    const expenseAmount = (expenseSeries?.[monthYear]?.toNumber() || 0);
-    const netProfit = -incomeAmount - expenseAmount;
-
-    datasets[0].data.push(-incomeAmount || 0);
-    datasets[1].data.push(-expenseAmount || 0);
-    datasets[2].data.push(netProfit || 0);
-  });
 
   return (
     <>

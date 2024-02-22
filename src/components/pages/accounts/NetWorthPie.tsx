@@ -4,7 +4,7 @@ import { DateTime } from 'luxon';
 import Money from '@/book/Money';
 import Pie from '@/components/charts/Pie';
 import { moneyToString } from '@/helpers/number';
-import { useAccountsTotal, useMainCurrency } from '@/hooks/api';
+import { useAccountsTotals, useMainCurrency } from '@/hooks/api';
 
 export type NetWorthPieProps = {
   selectedDate?: DateTime,
@@ -13,7 +13,7 @@ export type NetWorthPieProps = {
 export default function NetWorthPie({
   selectedDate,
 }: NetWorthPieProps): JSX.Element {
-  const { data: totals } = useAccountsTotal(selectedDate);
+  const { data: totals } = useAccountsTotals(selectedDate);
 
   const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
@@ -29,7 +29,7 @@ export default function NetWorthPie({
           datasets: [
             {
               backgroundColor: ['#06B6D4', '#F97316'],
-              data: [assetsTotal.toNumber(), liabilitiesTotal.toNumber()],
+              data: [assetsTotal.toNumber(), -liabilitiesTotal.toNumber() || 0],
             },
           ],
         }}
@@ -63,7 +63,7 @@ export default function NetWorthPie({
       <div className="-mt-12">
         <p className="flex justify-center">Net worth</p>
         <p className="flex justify-center text-xl">
-          {moneyToString(assetsTotal.toNumber() - liabilitiesTotal.toNumber(), unit)}
+          {moneyToString(assetsTotal.toNumber() + liabilitiesTotal.toNumber(), unit)}
         </p>
       </div>
     </>

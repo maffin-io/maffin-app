@@ -10,6 +10,10 @@ import '@/css/globals.css';
 import { Auth0Provider } from '@/lib/auth0-provider';
 import { isProd, isStaging } from '@/helpers/env';
 
+if (process.env.NODE_ENV === 'development') {
+  Settings.throwOnInvalid = true;
+}
+
 if (isStaging()) {
   Settings.now = () => 1704067200000; // 2023-01-01
 }

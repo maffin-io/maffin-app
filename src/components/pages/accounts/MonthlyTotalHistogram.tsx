@@ -32,10 +32,8 @@ export default function MonthlyTotalHistogram({
 
   if (accounts.length && monthlyTotals) {
     accounts.forEach(account => {
-      const data = dates.map(date => (
-        account.type === 'INCOME'
-          ? (monthlyTotals[account.guid]?.[date.toFormat('MM/yyyy')]?.toNumber() || 0) * -1
-          : monthlyTotals[account.guid]?.[date.toFormat('MM/yyyy')]?.toNumber() || 0
+      const data = dates.map((_, i) => (
+        monthlyTotals[i][account.guid]?.toNumber() || 0
       ));
       if (!data.every(v => v === 0)) {
         datasets.push({

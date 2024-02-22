@@ -8,7 +8,7 @@ import Bar from '@/components/charts/Bar';
 import NetWorthHistogram from '@/components/pages/accounts/NetWorthHistogram';
 import * as apiHook from '@/hooks/api';
 import type { Commodity } from '@/book/entities';
-import type { MonthlyTotals } from '@/lib/queries';
+import type { AccountsTotals } from '@/types/book';
 
 jest.mock('@/components/charts/Bar', () => jest.fn(
   () => <div data-testid="Bar" />,
@@ -21,7 +21,7 @@ jest.mock('@/hooks/api', () => ({
 
 describe('NetWorthHistogram', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<MonthlyTotals>);
+    jest.spyOn(apiHook, 'useAccountsMonthlyWorth').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals[]>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
   });
 
@@ -42,7 +42,7 @@ describe('NetWorthHistogram', () => {
           datasets: [
             {
               backgroundColor: '#06B6D4',
-              data: [0, 0, 0, 0, 0, 0],
+              data: [],
               label: 'Assets',
               order: 1,
               barPercentage: 0.6,
@@ -135,21 +135,39 @@ describe('NetWorthHistogram', () => {
   });
 
   it('generates datasets as expected', () => {
-    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
+    jest.spyOn(apiHook, 'useAccountsMonthlyWorth').mockReturnValue(
       {
-        data: {
-          asset: {
-            '11/2022': new Money(800, 'EUR'),
-            '12/2022': new Money(1200, 'EUR'),
-            '01/2023': new Money(1200, 'EUR'),
+        data: [
+          {
+            type_asset: new Money(0, 'EUR'),
+            type_liability: new Money(0, 'EUR'),
           },
-          liability: {
-            '11/2022': new Money(-200, 'EUR'),
-            '12/2022': new Money(-200, 'EUR'),
-            '01/2023': new Money(-200, 'EUR'),
+          {
+            type_asset: new Money(0, 'EUR'),
+            type_liability: new Money(0, 'EUR'),
           },
-        } as MonthlyTotals,
-      } as UseQueryResult<MonthlyTotals>,
+          {
+            type_asset: new Money(0, 'EUR'),
+            type_liability: new Money(0, 'EUR'),
+          },
+          {
+            type_asset: new Money(0, 'EUR'),
+            type_liability: new Money(0, 'EUR'),
+          },
+          {
+            type_asset: new Money(800, 'EUR'),
+            type_liability: new Money(-200, 'EUR'),
+          },
+          {
+            type_asset: new Money(1200, 'EUR'),
+            type_liability: new Money(-200, 'EUR'),
+          },
+          {
+            type_asset: new Money(1200, 'EUR'),
+            type_liability: new Money(-200, 'EUR'),
+          },
+        ] as AccountsTotals[],
+      } as UseQueryResult<AccountsTotals[]>,
     );
 
     render(
