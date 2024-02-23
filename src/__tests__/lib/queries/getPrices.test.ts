@@ -8,14 +8,14 @@ describe('getPrices', () => {
   beforeEach(() => {
     price1 = new Price();
     price1.guid = '1';
-    price1.fk_commodity = { mnemonic: 'EUR' } as Commodity;
-    price1.fk_currency = { mnemonic: 'USD' } as Commodity;
+    price1.fk_commodity = { mnemonic: 'EUR', namespace: 'CURRENCY' } as Commodity;
+    price1.fk_currency = { mnemonic: 'USD', namespace: 'CURRENCY' } as Commodity;
     price1.value = 1;
 
     price2 = new Price();
     price2.guid = '2';
-    price2.fk_commodity = { mnemonic: 'USD' } as Commodity;
-    price2.fk_currency = { mnemonic: 'EUR' } as Commodity;
+    price2.fk_commodity = { mnemonic: 'USD', namespace: 'CURRENCY' } as Commodity;
+    price2.fk_currency = { mnemonic: 'EUR', namespace: 'CURRENCY' } as Commodity;
     price2.value = 2;
 
     jest.spyOn(Price, 'find')
@@ -65,30 +65,77 @@ describe('getPrices', () => {
     expect(Price.find).toHaveBeenNthCalledWith(
       1,
       {
-        where: {
-          fk_commodity: {
-            guid: 'guid',
+        where: [
+          {
+            fk_commodity: {
+              guid: 'guid',
+            },
+            fk_currency: {
+              guid: undefined,
+            },
           },
-          fk_currency: {
-            guid: undefined,
+          {
+            fk_commodity: {
+              guid: 'guid',
+            },
+            fk_currency: {
+              guid: undefined,
+            },
           },
-        },
+        ],
       },
     );
     expect(Price.find).toHaveBeenNthCalledWith(
       2,
       {
-        where: {
-          fk_commodity: {
-            guid: undefined,
-            namespace: 'CURRENCY',
+        where: [
+          {
+            fk_commodity: {
+              guid: undefined,
+              namespace: 'CURRENCY',
+            },
+            fk_currency: {
+              guid: 'guid',
+            },
           },
-          fk_currency: {
-            guid: 'guid',
+          {
+            fk_commodity: {
+              guid: undefined,
+              namespace: 'CURRENCY',
+            },
+            fk_currency: {
+              guid: 'guid',
+            },
           },
-        },
+        ],
       },
     );
+  });
+
+  it('retrieves reverse prices when no parameters', async () => {
+    jest.spyOn(Price, 'create').mockReturnValue({
+      guid: 'reverse_price',
+      commodity: price2.currency,
+      currency: price2.commodity,
+    } as Price);
+    jest.spyOn(Price, 'find')
+      .mockResolvedValueOnce([price2]);
+
+    const prices = await getPrices({});
+
+    expect(prices.prices[0]).toEqual(price2);
+    expect(prices.prices[1]).toEqual({
+      guid: 'reverse_price',
+      commodity: price2.currency,
+      currency: price2.commodity,
+      value: 0.5,
+    });
+    expect(Price.create).toBeCalledWith({
+      guid: price2.guid,
+      fk_commodity: price2.currency,
+      fk_currency: price2.commodity,
+      date: price2.date,
+    });
   });
 
   it('calls Price.find with currency', async () => {

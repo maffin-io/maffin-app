@@ -64,7 +64,6 @@ export default function NetWorthHistogram({
       data: assetSeries?.map((n, i) => n + (liabilitySeries?.[i] || 0)) || [],
       backgroundColor: '#0E7490',
       borderColor: '#0E7490',
-      showLine: false,
       pointStyle: 'rectRounded',
       pointRadius: 5,
       pointHoverRadius: 10,

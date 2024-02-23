@@ -68,7 +68,7 @@ export default class PriceDBMap {
     const prices = this.map[key];
 
     if (!prices) {
-      console.warn(`Missing price for ${key}`);
+      console.log(`Missing price for ${key}`);
       return missingPrice;
     }
 
