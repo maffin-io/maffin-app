@@ -68,7 +68,7 @@ describe('AccountInfo', () => {
       1,
       {
         className: 'mr-2',
-        title: 'This account has a total of',
+        title: 'Total',
         description: '',
         stats: '€0.00',
       },
@@ -90,7 +90,7 @@ describe('AccountInfo', () => {
       1,
       {
         className: 'mr-2',
-        title: 'This account has a total of',
+        title: 'Total',
         description: '',
         stats: '€100.00',
       },
