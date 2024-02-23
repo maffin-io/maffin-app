@@ -105,6 +105,10 @@
     @apply bg-violet-600;
   }
 
+  .disabled {
+    @apply bg-gray-400 dark:bg-gray-600/70;
+  }
+
   .invalid-feedback {
     @apply text-xs mt-1 text-red-600 dark:text-red-400/70
   }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Chart, Filler } from 'chart.js';
 import { DateTime, Interval } from 'luxon';
+import zoomPlugin from 'chartjs-plugin-zoom';
 
 import { Price } from '@/book/entities';
 import Line from '@/components/charts/Line';
@@ -10,7 +11,7 @@ import { useInvestment, usePrices } from '@/hooks/api';
 import Loading from '@/components/Loading';
 import monthlyDates from '@/helpers/monthlyDates';
 
-Chart.register(Filler);
+Chart.register(Filler, zoomPlugin);
 
 export type InvestmentChartProps = {
   account: Account,
@@ -136,6 +137,18 @@ export default function InvestmentChart({
               },
             },
           },
+          zoom: {
+            limits: {
+              x: {
+                min: startDate?.toMillis(),
+                max: DateTime.now().toMillis(),
+              },
+            },
+            pan: {
+              mode: 'x',
+              enabled: true,
+            },
+          },
         },
         scales: {
           x: {
@@ -153,7 +166,7 @@ export default function InvestmentChart({
             border: {
               display: false,
             },
-            min: startDate.startOf('month').toISODate() as string,
+            min: DateTime.now().minus({ year: 1 }).toISODate(),
           },
           yStocks: {
             offset: true,
@@ -176,6 +189,7 @@ export default function InvestmentChart({
           },
           yPrice: {
             offset: true,
+            beginAtZero: true,
             stackWeight: 4,
             stack: 'investment',
             border: {
@@ -189,6 +203,7 @@ export default function InvestmentChart({
           },
           yValue: {
             offset: true,
+            beginAtZero: true,
             stackWeight: 4,
             stack: 'investment',
             border: {

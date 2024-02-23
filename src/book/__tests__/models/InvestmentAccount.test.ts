@@ -107,6 +107,7 @@ describe('InvestmentAccount', () => {
       expect(investment.realizedProfitInCurrency.toString()).toEqual('0.00 EUR');
       expect(investment.realizedDividends.toString()).toEqual('0.00 EUR');
       expect(investment.realizedDividendsInCurrency.toString()).toEqual('0.00 EUR');
+      expect(investment.isClosed).toBe(true);
 
       expect(investment.dividends).toHaveLength(0);
 

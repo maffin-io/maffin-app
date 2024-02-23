@@ -63,7 +63,7 @@ describe('InvestmentsTable', () => {
           {
             accessorFn: expect.any(Function),
             header: 'Unrealized profit (in )',
-            id: 'profitInCurrency',
+            id: 'unrealizedProfitInCurrency',
             cell: expect.any(Function),
           },
           {
@@ -89,11 +89,7 @@ describe('InvestmentsTable', () => {
         data: [
           {
             account: { name: 'Investment' },
-            quantity: new Money(0, 'TICKER'),
-            valueInCurrency: new Money(0, 'EUR'),
-            costInCurrency: new Money(0, 'EUR'),
-            realizedProfitInCurrency: new Money(10, 'EUR'),
-            realizedDividendsInCurrency: new Money(5, 'EUR'),
+            isClosed: true,
           } as InvestmentAccount,
         ],
       } as UseQueryResult<InvestmentAccount[]>,

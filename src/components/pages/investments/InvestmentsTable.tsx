@@ -12,7 +12,7 @@ import * as API from '@/hooks/api';
 export default function InvestmentsTable(): JSX.Element {
   let { data: investments } = API.useInvestments();
   investments = (investments || []).filter(
-    investment => investment.quantity.toNumber() > 0,
+    investment => !investment.isClosed,
   );
 
   let currency = '';
@@ -94,17 +94,17 @@ const columns: ColumnDef<InvestmentAccount>[] = [
     ),
   },
   {
-    accessorFn: (row: InvestmentAccount) => row.profitPct,
+    accessorFn: (row: InvestmentAccount) => row.unrealizedProfitPct,
     id: 'unrealizedProfit',
     header: 'Unrealized Profit',
     cell: ({ row, getValue }) => (
       <p className="m-0 d-inline-block align-middle font-16">
-        {row.original.profitAbs.format()}
+        {row.original.unrealizedProfitAbs.format()}
         <br />
         <span
           className={classNames('badge', {
-            success: row.original.profitAbs.toNumber() >= 0,
-            danger: row.original.profitAbs.toNumber() < 0,
+            success: row.original.unrealizedProfitAbs.toNumber() >= 0,
+            danger: row.original.unrealizedProfitAbs.toNumber() < 0,
           })}
         >
           {toFixed(getValue<number>())}
@@ -128,17 +128,17 @@ const columns: ColumnDef<InvestmentAccount>[] = [
     ),
   },
   {
-    accessorFn: (row: InvestmentAccount) => row.profitPctInCurrency,
-    id: 'profitInCurrency',
+    accessorFn: (row: InvestmentAccount) => row.unrealizedProfitPctInCurrency,
+    id: 'unrealizedProfitInCurrency',
     header: '',
     cell: ({ row, getValue }) => (
       <p className="m-0 d-inline-block align-middle font-16">
-        {row.original.profitAbsInCurrency.format()}
+        {row.original.unrealizedProfitAbsInCurrency.format()}
         <br />
         <span
           className={classNames('badge', {
-            success: row.original.profitAbsInCurrency.toNumber() >= 0,
-            danger: row.original.profitAbsInCurrency.toNumber() < 0,
+            success: row.original.unrealizedProfitAbsInCurrency.toNumber() >= 0,
+            danger: row.original.unrealizedProfitAbsInCurrency.toNumber() < 0,
           })}
         >
           {toFixed(getValue<number>())}

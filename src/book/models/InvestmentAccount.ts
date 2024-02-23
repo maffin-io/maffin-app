@@ -12,6 +12,7 @@ export default class InvestmentAccount {
   readonly account: Account;
   readonly splits: Split[];
   quantity: Money;
+  totalBought: Money;
   realizedProfit: Money;
   realizedProfitInCurrency: Money;
   readonly dividends: {
@@ -53,10 +54,6 @@ export default class InvestmentAccount {
         currency: this.currency,
       },
     );
-
-    this.quantity = new Money(0, this.account.commodity.mnemonic);
-    this.realizedProfit = new Money(0, this.currency);
-    this.realizedProfitInCurrency = new Money(0, this.mainCurrency);
 
     this.processSplits();
   }
@@ -111,26 +108,35 @@ export default class InvestmentAccount {
     );
   }
 
-  get profitAbs(): Money {
+  get unrealizedProfitAbs(): Money {
     return this.value.subtract(this.cost);
   }
 
-  get profitAbsInCurrency(): Money {
+  get unrealizedProfitAbsInCurrency(): Money {
     return this.valueInCurrency.subtract(this.costInCurrency);
   }
 
-  get profitPct(): number {
+  get unrealizedProfitPct(): number {
     const n = Math.round(
-      (((this.profitAbs.toNumber() / this.cost.toNumber()) * 100) + Number.EPSILON) * 100,
+      (((this.unrealizedProfitAbs.toNumber() / this.cost.toNumber()) * 100) + Number.EPSILON) * 100,
     ) / 100;
     return n;
   }
 
-  get profitPctInCurrency(): number {
+  get unrealizedProfitPctInCurrency(): number {
     const n = Math.round(
       ((
-        (this.profitAbsInCurrency.toNumber() / this.costInCurrency.toNumber()) * 100
+        (this.unrealizedProfitAbsInCurrency.toNumber() / this.costInCurrency.toNumber()) * 100
       ) + Number.EPSILON) * 100,
+    ) / 100;
+    return n;
+  }
+
+  get realizedProfitPct(): number {
+    const n = Math.round(
+      (
+        ((this.realizedProfit.toNumber() / this.totalBought.toNumber()) * 100) + Number.EPSILON
+      ) * 100,
     ) / 100;
     return n;
   }
@@ -154,11 +160,17 @@ export default class InvestmentAccount {
     );
   }
 
+  get isClosed(): boolean {
+    return this.quantity.toNumber() === 0;
+  }
+
   processSplits(date?: DateTime): void {
     this._avgPrice = 0;
     this._avgPriceInCurrency = 0;
     this.quantity = new Money(0, this.account.commodity.mnemonic);
+    this.totalBought = new Money(0, this.currency);
     this.realizedProfit = new Money(0, this.currency);
+    this.realizedProfitInCurrency = new Money(0, this.mainCurrency);
     this.dividends.splice(0, this.dividends.length);
 
     [...this.splits].reverse().filter(
@@ -219,8 +231,10 @@ export default class InvestmentAccount {
    * - sets average price as the division of value / quantity
    */
   _buy(split: Split): void {
+    const cost = new Money(split.value, split.transaction.currency.mnemonic);
+    this.totalBought = this.totalBought.add(cost);
     this._avgPrice = (
-      this.cost.add(new Money(split.value, split.transaction.currency.mnemonic)).toNumber()
+      this.cost.add(cost).toNumber()
     ) / (
       this.quantity.add(new Money(split.quantity, this.account.commodity.mnemonic)).toNumber()
     );
