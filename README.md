@@ -13,7 +13,7 @@
 Maffin is an **accounting software** focused on particulars or small businesses. It allows you to track income, expenses, investments and other types of assets while showing your financials in nice dashboards and reports.
 
 <div align="center">
-  <img width="450" alt="Screenshot 2024-02-23 at 2 37 08 PM" src="https://github.com/maffin-io/maffin-blog/assets/3578154/3b842c43-3ed0-4f80-bab3-5d5cbb65a5a5"> <img width="450" alt="Screenshot 2024-02-23 at 2 37 26 PM" src="https://github.com/maffin-io/maffin-blog/assets/3578154/77dff933-7dca-4f38-bd6f-49694f890167">
+  <img width="400" alt="Screenshot 2024-02-23 at 2 37 08 PM" src="https://github.com/maffin-io/maffin-blog/assets/3578154/3b842c43-3ed0-4f80-bab3-5d5cbb65a5a5"> <img width="400" alt="Screenshot 2024-02-23 at 2 37 26 PM" src="https://github.com/maffin-io/maffin-blog/assets/3578154/77dff933-7dca-4f38-bd6f-49694f890167">
 </div>
 
 ## 🍒 Features
