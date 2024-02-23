@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon';
-import { DataSource, BaseEntity } from 'typeorm';
+import { DataSource, BaseEntity as BE } from 'typeorm';
 
 import {
+  BaseEntity,
   Commodity,
   Price,
 } from '../../entities';
@@ -18,6 +19,9 @@ describe('Price', () => {
       logging: false,
     });
     await datasource.initialize();
+
+    // @ts-ignore
+    jest.spyOn(BaseEntity.prototype, 'remove').mockImplementation(BE.prototype.remove);
   });
 
   afterEach(async () => {
@@ -143,8 +147,6 @@ describe('caching', () => {
 
     // @ts-ignore
     jest.spyOn(Price, 'upsert').mockImplementation();
-    // @ts-ignore
-    jest.spyOn(BaseEntity.prototype, 'remove').mockImplementation();
   });
 
   it('invalidates keys when saving', async () => {

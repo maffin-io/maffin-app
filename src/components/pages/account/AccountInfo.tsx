@@ -25,8 +25,8 @@ export default function AccountInfo({
           <div className="col-span-4">
             <StatisticsWidget
               className="mr-2"
-              title="This account has a total of"
-              stats={total.format()}
+              title="Total"
+              stats={total.abs().format()}
               description=""
             />
           </div>

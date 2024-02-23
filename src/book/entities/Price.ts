@@ -115,12 +115,13 @@ export default class Price extends BaseEntity {
   }
 
   async remove(options?: SaveOptions): Promise<this> {
+    const entity = await super.remove(options);
+
     if (this.queryClient) {
-      updateCache({ queryClient: this.queryClient, entity: this, isDelete: true });
+      updateCache({ queryClient: this.queryClient, entity, isDelete: true });
     }
 
-    const price = await super.remove(options);
-    return price;
+    return entity;
   }
 }
 

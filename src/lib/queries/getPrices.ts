@@ -20,9 +20,6 @@ export default async function getPrices({
         guid: to?.guid,
       },
     },
-    order: {
-      date: 'ASC',
-    },
   });
 
   let reversePrices: Price[] = [];
@@ -36,9 +33,6 @@ export default async function getPrices({
         fk_currency: {
           guid: from?.guid,
         },
-      },
-      order: {
-        date: 'ASC',
       },
     });
     reversePrices.forEach((price, i) => {

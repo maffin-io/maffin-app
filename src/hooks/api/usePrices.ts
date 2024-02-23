@@ -14,11 +14,12 @@ export function usePrices(params: {
   from?: Commodity,
   to?: Commodity,
 }): UseQueryResult<PriceDBMap> {
+  const queryKey = [...Price.CACHE_KEY, { from: params.from?.guid, to: params.to?.guid }];
   return useQuery({
-    queryKey: [...Price.CACHE_KEY, { from: params.from?.guid, to: params.to?.guid }],
+    queryKey,
     queryFn: fetcher(
       () => getPrices(params),
-      `/${Price.CACHE_KEY.join('/')}/${params.from?.guid}.${params.to?.guid}`,
+      queryKey,
     ),
     enabled: (
       !!('from' in params && params.from)

@@ -41,9 +41,6 @@ describe('getPrices', () => {
             guid: undefined,
           },
         },
-        order: {
-          date: 'ASC',
-        },
       },
     );
   });
@@ -76,9 +73,6 @@ describe('getPrices', () => {
             guid: undefined,
           },
         },
-        order: {
-          date: 'ASC',
-        },
       },
     );
     expect(Price.find).toHaveBeenNthCalledWith(
@@ -92,9 +86,6 @@ describe('getPrices', () => {
           fk_currency: {
             guid: 'guid',
           },
-        },
-        order: {
-          date: 'ASC',
         },
       },
     );
@@ -112,9 +103,6 @@ describe('getPrices', () => {
         fk_currency: {
           guid: 'guid',
         },
-      },
-      order: {
-        date: 'ASC',
       },
     });
   });
@@ -150,9 +138,6 @@ describe('getPrices', () => {
             guid: 'guid2',
           },
         },
-        order: {
-          date: 'ASC',
-        },
       },
     );
     expect(Price.find).toHaveBeenNthCalledWith(
@@ -166,9 +151,6 @@ describe('getPrices', () => {
           fk_currency: {
             guid: 'guid1',
           },
-        },
-        order: {
-          date: 'ASC',
         },
       },
     );
