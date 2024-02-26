@@ -31,15 +31,43 @@ export default function InvestmentInfo({
       <div className="col-span-4">
         <div className="card text-lg">
           <span>You currently owe</span>
-          <span className="badge default text-xl font-semibold mx-1">{`${investment.quantity.toNumber()} titles`}</span>
+          <span
+            className={
+              classNames(
+                'badge default text-xl font-semibold mx-1',
+                { disabled: investment.isClosed },
+              )
+            }
+          >
+            {`${investment.quantity.toNumber()} titles`}
+          </span>
           <span>at an average price of</span>
-          <span className="badge default text-xl font-semibold mx-1">{new Money(investment.avgPrice, investment.currency).format()}</span>
+          <span
+            className={
+              classNames(
+                'badge default text-xl font-semibold mx-1',
+                { disabled: investment.isClosed },
+              )
+            }
+          >
+            {
+              new Money(
+                investment.isClosed ? 0 : investment.avgPrice,
+                investment.currency,
+              ).format()
+            }
+          </span>
         </div>
         <div className="grid grid-cols-12">
           <StatisticsWidget
             className="col-span-6"
             title="Latest known price"
-            statsTextClass="table-caption badge default"
+            statsTextClass={
+              classNames(
+                'table-caption badge default',
+                { disabled: investment.isClosed },
+              )
+            }
             stats={new Money(latestPrice.value, investment.currency).format()}
             description={
               `on ${latestPrice.date.toLocaleString()}`
@@ -50,8 +78,8 @@ export default function InvestmentInfo({
             title="Current value is"
             stats={`${investment.value.format()}`}
             statsTextClass={classNames({
-              'amount-positive': investment.profitPct >= 0,
-              'amount-negative': investment.profitPct < 0,
+              'amount-positive': investment.unrealizedProfitPct >= 0,
+              'amount-negative': investment.unrealizedProfitPct < 0,
             })}
             description={
               `from ${investment.cost.format()} invested`
@@ -60,18 +88,30 @@ export default function InvestmentInfo({
           <StatisticsWidget
             className="col-span-7"
             statsTextClass={classNames({
-              'amount-positive': investment.profitPct >= 0,
-              'amount-negative': investment.profitPct < 0,
+              'amount-positive': investment.isClosed
+                ? investment.realizedProfitPct >= 0
+                : investment.unrealizedProfitPct >= 0,
+              'amount-negative': investment.isClosed
+                ? investment.realizedProfitPct < 0
+                : investment.unrealizedProfitPct < 0,
             })}
-            title="Unrealized Profit"
-            stats={`${investment.profitAbs.format()} (${toFixed(investment.profitPct)}%)`}
-            description=""
+            title={investment.isClosed ? 'Realized Profit' : 'Unrealized Profit'}
+            stats={
+              investment.isClosed
+                ? `${investment.realizedProfit.format()} (${toFixed(investment.realizedProfitPct)}%)`
+                : `${investment.unrealizedProfitAbs.format()} (${toFixed(investment.unrealizedProfitPct)}%)`
+            }
+            description={
+              investment.isClosed
+                ? `Bought a total of ${investment.totalBought.format()}`
+                : ''
+            }
           />
           <StatisticsWidget
             className="col-span-5"
             title="Total Dividends"
             stats={investment.realizedDividends.format()}
-            statsTextClass="badge default"
+            statsTextClass={classNames('badge default', { disabled: investment.isClosed })}
             description=""
           />
         </div>

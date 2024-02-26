@@ -294,6 +294,18 @@ describe('InvestmentChart', () => {
                 label: expect.any(Function),
               },
             },
+            zoom: {
+              limits: {
+                x: {
+                  min: account.splits[0].transaction.date.toMillis(),
+                  max: DateTime.now().toMillis(),
+                },
+              },
+              pan: {
+                mode: 'x',
+                enabled: true,
+              },
+            },
           },
           scales: {
             x: {
@@ -311,7 +323,7 @@ describe('InvestmentChart', () => {
               border: {
                 display: false,
               },
-              min: '2023-01-01',
+              min: DateTime.now().minus({ year: 1 }).toISODate(),
             },
             yStocks: {
               offset: true,
@@ -331,6 +343,7 @@ describe('InvestmentChart', () => {
             },
             yPrice: {
               offset: true,
+              beginAtZero: true,
               stackWeight: 4,
               stack: 'investment',
               border: {
@@ -344,6 +357,7 @@ describe('InvestmentChart', () => {
             },
             yValue: {
               offset: true,
+              beginAtZero: true,
               stackWeight: 4,
               stack: 'investment',
               border: {
@@ -539,6 +553,18 @@ describe('InvestmentChart', () => {
                 label: expect.any(Function),
               },
             },
+            zoom: {
+              limits: {
+                x: {
+                  min: account.splits[0].transaction.date.toMillis(),
+                  max: DateTime.now().toMillis(),
+                },
+              },
+              pan: {
+                mode: 'x',
+                enabled: true,
+              },
+            },
           },
           scales: {
             x: {
@@ -556,7 +582,7 @@ describe('InvestmentChart', () => {
               border: {
                 display: false,
               },
-              min: '2023-01-01',
+              min: DateTime.now().minus({ year: 1 }).toISODate(),
             },
             yStocks: {
               offset: true,
@@ -576,6 +602,7 @@ describe('InvestmentChart', () => {
             },
             yPrice: {
               offset: true,
+              beginAtZero: true,
               stackWeight: 4,
               stack: 'investment',
               border: {
@@ -589,6 +616,7 @@ describe('InvestmentChart', () => {
             },
             yValue: {
               offset: true,
+              beginAtZero: true,
               stackWeight: 4,
               stack: 'investment',
               border: {

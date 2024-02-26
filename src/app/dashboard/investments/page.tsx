@@ -48,8 +48,8 @@ export default function InvestmentsPage(): JSX.Element {
     new Money(0, mainCurrency),
   );
 
-  const profitAbs = totalValue.subtract(totalCost);
-  const profitPct = (profitAbs.toNumber() / totalCost.toNumber()) * 100;
+  const unrealizedProfitAbs = totalValue.subtract(totalCost);
+  const unrealizedProfitPct = (unrealizedProfitAbs.toNumber() / totalCost.toNumber()) * 100;
 
   const totalDividends = investments.reduce(
     (total, investment) => total.add(investment.realizedDividendsInCurrency),
@@ -60,9 +60,9 @@ export default function InvestmentsPage(): JSX.Element {
     new Money(0, mainCurrency),
   );
 
-  const profitAbsWithDividends = profitAbs.add(totalDividends);
-  const profitPctWithDividends = (
-    profitAbsWithDividends.toNumber() / totalCost.toNumber()
+  const unrealizedProfitAbsWithDividends = unrealizedProfitAbs.add(totalDividends);
+  const unrealizedProfitPctWithDividends = (
+    unrealizedProfitAbsWithDividends.toNumber() / totalCost.toNumber()
   ) * 100;
 
   return (
@@ -95,13 +95,13 @@ export default function InvestmentsPage(): JSX.Element {
               <StatisticsWidget
                 className="mr-2"
                 statsTextClass={classNames({
-                  'amount-positive': profitPct >= 0,
-                  'amount-negative': profitPct < 0,
+                  'amount-positive': unrealizedProfitPct >= 0,
+                  'amount-negative': unrealizedProfitPct < 0,
                 })}
                 title="Unrealized Profit"
-                stats={`${profitAbs.format()} (${toFixed(profitPct)}%)`}
+                stats={`${unrealizedProfitAbs.format()} (${toFixed(unrealizedProfitPct)}%)`}
                 description={
-                  `${profitAbsWithDividends.format()} (${toFixed(profitPctWithDividends)}%) with dividends`
+                  `${unrealizedProfitAbsWithDividends.format()} (${toFixed(unrealizedProfitPctWithDividends)}%) with dividends`
                 }
               />
             </div>

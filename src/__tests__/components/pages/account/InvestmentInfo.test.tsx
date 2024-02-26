@@ -96,15 +96,15 @@ describe('InvestmentInfo', () => {
       data: {
         cost: new Money(100, 'EUR'),
         value: new Money(150, 'EUR'),
-        profitAbs: new Money(50, 'EUR'),
-        profitPct: 50,
+        unrealizedProfitAbs: new Money(50, 'EUR'),
+        unrealizedProfitPct: 50,
         avgPrice: 10,
         quantity: new Money(10, 'TICKER'),
         account,
         currency: 'EUR',
         realizedDividends: new Money(20, 'EUR'),
       },
-    } as SWRResponse);
+    } as UseQueryResult<InvestmentAccount>);
 
     const { container } = render(
       <InvestmentInfo account={account} />,
@@ -167,6 +167,104 @@ describe('InvestmentInfo', () => {
     expect(container).toMatchSnapshot();
   });
 
+  it('renders as expected with closed position', async () => {
+    const account = {
+      guid: 'guid',
+      commodity: ticker,
+    } as Account;
+    jest.spyOn(apiHook, 'usePrices').mockReturnValue({
+      data: new PriceDBMap([
+        {
+          date: DateTime.fromISO('2023-01-01'),
+          value: 10,
+          currency: eur,
+          commodity: ticker,
+        } as Price,
+        {
+          date: DateTime.fromISO('2023-02-01'),
+          value: 15,
+          currency: eur,
+          commodity: ticker,
+        } as Price,
+      ]),
+    } as UseQueryResult<PriceDBMap>);
+    jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
+      data: {
+        cost: new Money(0, 'EUR'),
+        value: new Money(0, 'EUR'),
+        totalBought: new Money(150, 'EUR'),
+        unrealizedProfitAbs: new Money(0, 'EUR'),
+        unrealizedProfitPct: 0,
+        realizedProfitPct: 50,
+        realizedProfit: new Money(50, 'EUR'),
+        avgPrice: 10,
+        quantity: new Money(0, 'TICKER'),
+        isClosed: true,
+        account,
+        currency: 'EUR',
+        realizedDividends: new Money(20, 'EUR'),
+      },
+    } as UseQueryResult<InvestmentAccount>);
+
+    render(
+      <InvestmentInfo account={account} />,
+    );
+
+    await screen.findByText('0 titles');
+    await screen.findByText('€0.00');
+
+    expect(InvestmentChart).toBeCalledWith(
+      {
+        account,
+      },
+      {},
+    );
+    expect(StatisticsWidget).toHaveBeenNthCalledWith(
+      1,
+      {
+        className: 'col-span-6',
+        title: 'Latest known price',
+        statsTextClass: 'table-caption badge default disabled',
+        stats: '€15.00',
+        description: 'on 2/1/2023',
+      },
+      {},
+    );
+    expect(StatisticsWidget).toHaveBeenNthCalledWith(
+      2,
+      {
+        className: 'col-span-6',
+        title: 'Current value is',
+        statsTextClass: 'amount-positive',
+        stats: '€0.00',
+        description: 'from €0.00 invested',
+      },
+      {},
+    );
+    expect(StatisticsWidget).toHaveBeenNthCalledWith(
+      3,
+      {
+        className: 'col-span-7',
+        title: 'Realized Profit',
+        statsTextClass: 'amount-positive',
+        stats: '€50.00 (50%)',
+        description: 'Bought a total of €150.00',
+      },
+      {},
+    );
+    expect(StatisticsWidget).toHaveBeenNthCalledWith(
+      4,
+      {
+        className: 'col-span-5',
+        title: 'Total Dividends',
+        statsTextClass: 'badge default disabled',
+        stats: '€20.00',
+        description: '',
+      },
+      {},
+    );
+  });
+
   it('renders as expected when dividend with different currency', async () => {
     const account = {
       guid: 'guid',
@@ -192,8 +290,8 @@ describe('InvestmentInfo', () => {
       data: {
         cost: new Money(100, 'EUR'),
         value: new Money(150, 'EUR'),
-        profitAbs: new Money(50, 'EUR'),
-        profitPct: 50,
+        unrealizedProfitAbs: new Money(50, 'EUR'),
+        unrealizedProfitPct: 50,
         avgPrice: 10,
         quantity: new Money(10, 'TICKER'),
         account,
