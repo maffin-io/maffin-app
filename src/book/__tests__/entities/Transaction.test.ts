@@ -286,7 +286,10 @@ describe('caching', () => {
 
     await tx.save();
 
-    expect(mockInvalidateQueries).toBeCalledTimes(7);
+    expect(mockInvalidateQueries).toBeCalledTimes(8);
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['api', 'txs', tx.guid],
+    });
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['api', 'txs', { name: 'latest' }],
     });
@@ -323,7 +326,10 @@ describe('caching', () => {
 
     await tx.remove();
 
-    expect(mockInvalidateQueries).toBeCalledTimes(7);
+    expect(mockInvalidateQueries).toBeCalledTimes(8);
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['api', 'txs', tx.guid],
+    });
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['api', 'txs', { name: 'latest' }],
     });

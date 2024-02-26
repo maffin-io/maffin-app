@@ -116,6 +116,9 @@ export async function updateCache(
   },
 ) {
   queryClient.invalidateQueries({
+    queryKey: [...Transaction.CACHE_KEY, entity.guid],
+  });
+  queryClient.invalidateQueries({
     queryKey: [...Transaction.CACHE_KEY, { name: 'latest' }],
   });
   queryClient.invalidateQueries({

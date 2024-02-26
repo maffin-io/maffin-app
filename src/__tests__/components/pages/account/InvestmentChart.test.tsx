@@ -323,7 +323,7 @@ describe('InvestmentChart', () => {
               border: {
                 display: false,
               },
-              min: DateTime.now().minus({ year: 1 }).toISODate(),
+              min: account.splits[0].transaction.date.toISODate(),
             },
             yStocks: {
               offset: true,
@@ -582,7 +582,7 @@ describe('InvestmentChart', () => {
               border: {
                 display: false,
               },
-              min: DateTime.now().minus({ year: 1 }).toISODate(),
+              min: account.splits[0].transaction.date.toISODate(),
             },
             yStocks: {
               offset: true,

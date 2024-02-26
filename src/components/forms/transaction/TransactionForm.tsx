@@ -85,6 +85,7 @@ export default function TransactionForm({
 
       <fieldset className="text-sm my-5">
         <SplitsField
+          action={action}
           disabled={disabled}
           form={form}
         />

@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import type { UseQueryResult } from '@tanstack/react-query';
 
-import Money from '@/book/Money';
 import { InvestmentAccount } from '@/book/models';
 import Table from '@/components/Table';
 import { InvestmentsTable } from '@/components/pages/investments';
