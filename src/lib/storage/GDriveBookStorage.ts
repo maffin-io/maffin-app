@@ -101,7 +101,7 @@ export default class GDriveBookStorage implements BookStorage {
           Authorization: `Bearer ${this.gapiClient.getToken().access_token}`,
           'Content-Type': 'application/vnd.sqlite3',
         }),
-        body: new Blob([pako.gzip(rawBook)], { type: 'application/vnd.sqlite3' }),
+        body: new Blob([pako.gzip(rawBook, { level: 9 })], { type: 'application/vnd.sqlite3' }),
       },
     );
     const end = performance.now();

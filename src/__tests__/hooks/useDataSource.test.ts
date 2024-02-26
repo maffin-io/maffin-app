@@ -46,6 +46,7 @@ jest.mock('typeorm', () => ({
       runMigrations: jest.fn(),
       initialize: mockInitialize,
       setOptions: jest.fn(),
+      query: jest.fn(),
       sqljsManager: {
         loadDatabase: jest.fn(),
         exportDatabase: jest.fn().mockReturnValue(new Uint8Array([22, 33])),
@@ -239,13 +240,14 @@ describe('useDataSource', () => {
     });
 
     describe('save', () => {
-      it('updates datasource, saves storage and updates state', async () => {
+      it('updates datasource, vacuums, saves storage and updates state', async () => {
         const { result } = renderHook(() => useDataSource());
 
         await waitFor(() => expect(result.current.isLoaded).toBe(true));
         const datasource = result.current.datasource as DataSource;
 
         await result.current.save();
+        expect(datasource.query).toBeCalledWith('VACUUM');
         expect(datasource.options.extra.queryClient.setQueryData).toHaveBeenNthCalledWith(
           1,
           ['state', 'isSaving'],
