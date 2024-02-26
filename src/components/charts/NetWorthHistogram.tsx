@@ -9,7 +9,7 @@ import {
 
 import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
-import { useAccountsMonthlyWorth, useMainCurrency } from '@/hooks/api';
+import { useAccountsMonthlyWorth } from '@/hooks/api';
 import monthlyDates from '@/helpers/monthlyDates';
 
 // We are using Bar chart here but one of the axis uses Line so
@@ -21,11 +21,25 @@ C.register(
 );
 
 export type NetWorthHistogramProps = {
+  assetsGuid: string,
+  assetsLabel?: string,
+  hideAssets?: boolean,
+  liabilitiesGuid: string,
+  liabilitiesLabel?: string,
+  hideLiabilities?: boolean,
   selectedDate?: DateTime,
+  showLegend?: boolean,
 };
 
 export default function NetWorthHistogram({
+  assetsGuid,
+  assetsLabel = 'Assets',
+  hideAssets = false,
+  liabilitiesGuid,
+  liabilitiesLabel = 'Liabilities',
+  hideLiabilities = false,
   selectedDate = DateTime.now(),
+  showLegend = true,
 }: NetWorthHistogramProps): JSX.Element {
   const interval = Interval.fromDateTimes(
     selectedDate.minus({ months: 6 }).startOf('month'),
@@ -33,58 +47,59 @@ export default function NetWorthHistogram({
   );
 
   const { data: monthlyWorth } = useAccountsMonthlyWorth(interval);
-  const assetSeries = monthlyWorth?.map(m => m.type_asset.toNumber());
-  const liabilitySeries = monthlyWorth?.map(m => m.type_liability.toNumber());
+  const assetSeries = monthlyWorth?.map(m => m[assetsGuid].toNumber());
+  const liabilitySeries = monthlyWorth?.map(m => m[liabilitiesGuid]?.toNumber() || 0);
 
-  const { data: currency } = useMainCurrency();
-  const unit = currency?.mnemonic || '';
+  const unit = monthlyWorth?.[0][assetsGuid].currency || '';
 
-  const datasets: ChartDataset<'bar'>[] = [
-    {
-      label: 'Assets',
+  const datasets: ChartDataset<'bar'>[] = [];
+
+  if (!hideAssets) {
+    datasets.push({
+      label: assetsLabel,
       data: assetSeries || [],
       backgroundColor: '#06B6D4',
       order: 1,
       barPercentage: 0.6,
-    },
-  ];
+    });
+  }
 
-  if (liabilitySeries) {
+  if (liabilitySeries?.some(n => n !== 0) && !hideLiabilities) {
     datasets.push({
-      label: 'Liabilities',
+      label: liabilitiesLabel,
       data: liabilitySeries || [],
       backgroundColor: '#FF6600',
       order: 2,
       barPercentage: 0.6,
     });
-    datasets.push({
-      label: 'Net worth',
-      // @ts-ignore
-      type: 'line',
-      data: assetSeries?.map((n, i) => n + (liabilitySeries?.[i] || 0)) || [],
-      backgroundColor: '#0E7490',
-      borderColor: '#0E7490',
-      showLine: true,
-      pointStyle: 'rectRounded',
-      pointRadius: 5,
-      pointHoverRadius: 10,
-      order: 0,
-      datalabels: {
-        display: (ctx) => {
-          if (ctx.dataIndex % 2) {
-            return true;
-          }
-
-          return false;
-        },
-        formatter: (value) => moneyToString(value, unit),
-        align: 'end',
-        backgroundColor: '#0E7490FF',
-        borderRadius: 5,
-        color: '#FFF',
-      },
-    });
   }
+
+  datasets.push({
+    label: 'Net worth',
+    // @ts-ignore
+    type: 'line',
+    data: assetSeries?.map((n, i) => n + (liabilitySeries?.[i] || 0)) || [],
+    backgroundColor: '#0E7490',
+    borderColor: '#0E7490',
+    pointStyle: 'rectRounded',
+    pointRadius: 5,
+    pointHoverRadius: 10,
+    order: 0,
+    datalabels: {
+      display: (ctx) => {
+        if (ctx.dataIndex % 2) {
+          return true;
+        }
+
+        return false;
+      },
+      formatter: (value) => moneyToString(value, unit),
+      align: 'end',
+      backgroundColor: '#0E7490FF',
+      borderRadius: 5,
+      color: '#FFF',
+    },
+  });
 
   return (
     <>
@@ -124,6 +139,7 @@ export default function NetWorthHistogram({
             },
             y: {
               grace: 1,
+              beginAtZero: false,
               position: 'left',
               border: {
                 display: false,
@@ -148,6 +164,7 @@ export default function NetWorthHistogram({
               },
             },
             legend: {
+              display: showLegend,
               position: 'bottom',
               onClick: () => {},
               labels: {

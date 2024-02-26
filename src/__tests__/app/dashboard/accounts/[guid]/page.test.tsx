@@ -1,5 +1,4 @@
 import React from 'react';
-import { DateTime } from 'luxon';
 import {
   render,
   screen,
@@ -7,14 +6,14 @@ import {
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import AccountPage from '@/app/dashboard/accounts/[guid]/page';
-import FormButton from '@/components/buttons/FormButton';
-import AccountForm from '@/components/forms/account/AccountForm';
-import TransactionForm from '@/components/forms/transaction/TransactionForm';
-import { Account, Split } from '@/book/entities';
+import { Account } from '@/book/entities';
 import * as apiHook from '@/hooks/api';
 import {
+  Header,
   AccountInfo,
+  AssetInfo,
   TransactionsTable,
+  InvestmentInfo,
 } from '@/components/pages/account';
 
 jest.mock('@/hooks/api', () => ({
@@ -22,20 +21,8 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
-jest.mock('@/components/buttons/FormButton', () => jest.fn(
-  (props: React.PropsWithChildren) => (
-    <div data-testid="FormButton">
-      {props.children}
-    </div>
-  ),
-));
-
-jest.mock('@/components/forms/account/AccountForm', () => jest.fn(
-  () => <div data-testid="AccountForm" />,
-));
-
-jest.mock('@/components/forms/transaction/TransactionForm', () => jest.fn(
-  () => <div data-testid="TransactionForm" />,
+jest.mock('@/components/pages/account/Header', () => jest.fn(
+  () => <div data-testid="Header" />,
 ));
 
 jest.mock('@/components/pages/account/TransactionsTable', () => jest.fn(
@@ -50,15 +37,17 @@ jest.mock('@/components/pages/account/InvestmentInfo', () => jest.fn(
   () => <div data-testid="InvestmentInfo" />,
 ));
 
+jest.mock('@/components/pages/account/AssetInfo', () => jest.fn(
+  () => <div data-testid="AssetInfo" />,
+));
+
 jest.mock('@/components/Loading', () => jest.fn(
   () => <div data-testid="Loading" />,
 ));
 
 describe('AccountPage', () => {
   beforeEach(() => {
-    jest.spyOn(Split, 'create').mockReturnValue({ guid: 'createdSplit' } as Split);
     jest.spyOn(apiHook, 'useAccount').mockReturnValue({ data: undefined } as UseQueryResult<Account>);
-    jest.spyOn(apiHook, 'useSplits').mockReturnValue({ data: undefined } as UseQueryResult<Split[]>);
   });
 
   afterEach(() => {
@@ -70,8 +59,7 @@ describe('AccountPage', () => {
     const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
 
     await screen.findByTestId('Loading');
-    expect(FormButton).toHaveBeenCalledTimes(0);
-    expect(FormButton).toHaveBeenCalledTimes(0);
+    expect(Header).toHaveBeenCalledTimes(0);
     expect(TransactionsTable).toHaveBeenCalledTimes(0);
     expect(container).toMatchSnapshot();
   });
@@ -80,8 +68,7 @@ describe('AccountPage', () => {
     render(<AccountPage params={{ guid: 'guid' }} />);
 
     screen.getByText('does not exist', { exact: false });
-    expect(FormButton).toHaveBeenCalledTimes(0);
-    expect(FormButton).toHaveBeenCalledTimes(0);
+    expect(Header).toHaveBeenCalledTimes(0);
     expect(TransactionsTable).toHaveBeenCalledTimes(0);
   });
 
@@ -95,97 +82,13 @@ describe('AccountPage', () => {
         mnemonic: 'EUR',
       },
     } as Account;
-    const splits = [
-      {
-        guid: 'split_guid',
-        transaction: {
-          date: DateTime.fromISO('2023-01-01'),
-          splits: [
-            { guid: 'split_guid' },
-            { guid: 'split_guid_2' },
-          ],
-        },
-        account: {
-          guid: 'guid',
-          type: 'TYPE',
-        },
-        quantity: 100,
-      } as Split,
-    ];
 
     jest.spyOn(apiHook, 'useAccount').mockReturnValueOnce({ data: account } as UseQueryResult<Account>);
-    jest.spyOn(apiHook, 'useSplits').mockReturnValueOnce({ data: splits } as UseQueryResult<Split[]>);
 
     const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
 
     await screen.findByTestId('TransactionsTable');
-    expect(FormButton).toHaveBeenNthCalledWith(
-      1,
-      expect.objectContaining({
-        id: 'add-tx',
-        modalTitle: 'Add transaction to undefined',
-      }),
-      {},
-    );
-    expect(TransactionForm).toBeCalledWith(
-      {
-        defaultValues: {
-          date: '2023-01-01',
-          description: '',
-          fk_currency: {
-            mnemonic: 'EUR',
-          },
-          splits: [
-            { guid: 'createdSplit' },
-            {
-              action: '',
-              guid: expect.any(String),
-            },
-          ],
-        },
-      },
-      {},
-    );
-    expect(FormButton).toHaveBeenNthCalledWith(
-      2,
-      expect.objectContaining({
-        id: 'edit-account',
-        modalTitle: 'Edit account',
-      }),
-      {},
-    );
-    expect(AccountForm).toHaveBeenNthCalledWith(
-      1,
-      {
-        action: 'update',
-        defaultValues: {
-          ...account,
-        },
-      },
-      {},
-    );
-    expect(FormButton).toHaveBeenNthCalledWith(
-      3,
-      expect.objectContaining({
-        className: 'btn btn-danger',
-        'data-tooltip-id': 'delete-help',
-        disabled: true,
-        id: 'delete-account',
-        modalTitle: 'Confirm you want to remove this account',
-      }),
-      {},
-    );
-    expect(AccountForm).toHaveBeenNthCalledWith(
-      2,
-      {
-        action: 'delete',
-        defaultValues: {
-          ...account,
-        },
-        onSave: expect.any(Function),
-      },
-      {},
-    );
+    expect(Header).toBeCalledWith({ account }, {});
     expect(TransactionsTable).toHaveBeenLastCalledWith(
       {
         account,
@@ -213,10 +116,39 @@ describe('AccountPage', () => {
     } as Account;
 
     jest.spyOn(apiHook, 'useAccount').mockReturnValueOnce({ data: account } as UseQueryResult<Account>);
-    jest.spyOn(apiHook, 'useSplits').mockReturnValueOnce({ data: [] as Split[] } as UseQueryResult<Split[]>);
 
     render(<AccountPage params={{ guid: 'guid' }} />);
 
     await screen.findByTestId('InvestmentInfo');
+    expect(InvestmentInfo).toHaveBeenLastCalledWith(
+      {
+        account,
+      },
+      {},
+    );
+  });
+
+  it('shows asset info when account is asset', async () => {
+    const account = {
+      guid: 'guid',
+      path: 'path',
+      type: 'ASSET',
+      commodity: {
+        mnemonic: 'EUR',
+      },
+      parentId: 'parent',
+    } as Account;
+
+    jest.spyOn(apiHook, 'useAccount').mockReturnValueOnce({ data: account } as UseQueryResult<Account>);
+
+    render(<AccountPage params={{ guid: 'guid' }} />);
+
+    await screen.findByTestId('AssetInfo');
+    expect(AssetInfo).toHaveBeenLastCalledWith(
+      {
+        account,
+      },
+      {},
+    );
   });
 });

@@ -1,0 +1,50 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Header renders as expected with account 1`] = `
+<div>
+  <div
+    class="header"
+  >
+    <span
+      class="title"
+    >
+      <span
+        class="text-xl font-medium badge"
+      >
+        path
+         
+        account
+      </span>
+    </span>
+    <div
+      class="ml-auto"
+    >
+      <div
+        class="flex gap-1"
+      >
+        <div
+          data-testid="FormButton"
+        >
+          <div
+            data-testid="TransactionForm"
+          />
+        </div>
+        <div
+          data-testid="FormButton"
+        >
+          <div
+            data-testid="AccountForm"
+          />
+        </div>
+        <div
+          data-testid="FormButton"
+        >
+          <div
+            data-testid="AccountForm"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

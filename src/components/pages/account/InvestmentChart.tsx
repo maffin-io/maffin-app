@@ -191,7 +191,6 @@ export default function InvestmentChart({
           },
           yPrice: {
             offset: true,
-            beginAtZero: true,
             stackWeight: 4,
             stack: 'investment',
             border: {
@@ -205,7 +204,6 @@ export default function InvestmentChart({
           },
           yValue: {
             offset: true,
-            beginAtZero: true,
             stackWeight: 4,
             stack: 'investment',
             border: {

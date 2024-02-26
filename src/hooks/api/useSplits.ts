@@ -68,7 +68,7 @@ export function useSplits(
  */
 export function useSplitsPagination(
   account: string,
-  pagination: { pageSize: number, pageIndex: number },
+  pagination: { pageSize: number, pageIndex: number } = { pageSize: 10, pageIndex: 0 },
 ): UseQueryResult<Split[]> {
   const queryKey = [...Split.CACHE_KEY, account, 'page', pagination];
   const result = useQuery({
