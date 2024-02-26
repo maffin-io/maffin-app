@@ -10,59 +10,22 @@ exports[`SplitsField renders with default values 1`] = `
       name="date"
       type="date"
     />
-    <label
-      class="inline-block mb-2"
-    >
-      Amount
-    </label>
-    <div
-      class="flex w-1/2"
-    >
-      <div
-        class="flex items-center rounded-md bg-light-100 dark:bg-dark-800"
+    <div>
+      <label
+        class="inline-block mb-2"
       >
-        <input
-          aria-label="splits.0.quantity"
-          class="w-full text-right m-0"
-          name="splits.0.quantity"
-          step="0.001"
-          type="number"
-        />
-        <span
-          class="pr-2"
-        >
-          €
-        </span>
-      </div>
+        Amount
+      </label>
       <div
-        class="flex items-center rounded-md hidden"
+        class="flex w-1/2"
       >
-        <span
-          class="badge mx-3"
-          data-tooltip-id="value-help"
-        >
-          <svg
-            fill="currentColor"
-            height="1em"
-            stroke="currentColor"
-            stroke-width="0"
-            viewBox="0 0 24 24"
-            width="1em"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
-            />
-          </svg>
-        </span>
         <div
-          class="flex items-center rounded-md  bg-light-100 dark:bg-dark-800"
+          class="flex items-center rounded-md bg-light-100 dark:bg-dark-800"
         >
           <input
-            aria-label="splits.0.value"
+            aria-label="splits.0.quantity"
             class="w-full text-right m-0"
-            hidden=""
-            name="splits.0.value"
+            name="splits.0.quantity"
             step="0.001"
             type="number"
           />
@@ -71,6 +34,45 @@ exports[`SplitsField renders with default values 1`] = `
           >
             €
           </span>
+        </div>
+        <div
+          class="flex items-center rounded-md hidden"
+        >
+          <span
+            class="badge mx-3"
+            data-tooltip-id="value-help"
+          >
+            <svg
+              fill="currentColor"
+              height="1em"
+              stroke="currentColor"
+              stroke-width="0"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
+              />
+            </svg>
+          </span>
+          <div
+            class="flex items-center rounded-md  bg-light-100 dark:bg-dark-800"
+          >
+            <input
+              aria-label="splits.0.value"
+              class="w-full text-right m-0"
+              hidden=""
+              name="splits.0.value"
+              step="0.001"
+              type="number"
+            />
+            <span
+              class="pr-2"
+            >
+              €
+            </span>
+          </div>
         </div>
       </div>
     </div>

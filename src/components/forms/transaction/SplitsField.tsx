@@ -9,11 +9,13 @@ import SplitField from './SplitField';
 import MainSplit from './MainSplit';
 
 export type SplitsFieldProps = {
+  action?: 'add' | 'update' | 'delete',
   form: UseFormReturn<FormValues>,
   disabled?: boolean,
 };
 
 export default function SplitsField({
+  action,
   form,
   disabled = false,
 }: SplitsFieldProps): JSX.Element {
@@ -24,6 +26,10 @@ export default function SplitsField({
 
   const splits = form.watch('splits');
   const mainSplit = splits[0];
+  let firstSplitIndex = 1;
+  if (action === 'update') {
+    firstSplitIndex = 0;
+  }
 
   React.useEffect(() => {
     if (
@@ -44,12 +50,19 @@ export default function SplitsField({
 
   return (
     <>
-      <label className="inline-block mb-2">Amount</label>
-      <MainSplit form={form} disabled={disabled} />
+      {
+        action !== 'update'
+        && (
+          <div>
+            <label className="inline-block mb-2">Amount</label>
+            <MainSplit form={form} disabled={disabled} />
+          </div>
+        )
+      }
       <label className="inline-block mt-5 mb-2">Records</label>
       {
-        fields.slice(1).map((item, index) => {
-          index += 1;
+        fields.slice(firstSplitIndex).map((item, index) => {
+          index += firstSplitIndex;
           return (
             <fieldset className="grid grid-cols-12" key={item.id}>
               <div className="col-span-11">

@@ -166,7 +166,9 @@ export default function InvestmentChart({
             border: {
               display: false,
             },
-            min: DateTime.now().minus({ year: 1 }).toISODate(),
+            min: (startDate.toMillis() > DateTime.now().minus({ year: 1 }).toMillis())
+              ? startDate.toISODate() || undefined
+              : DateTime.now().minus({ year: 1 }).toISODate() || undefined,
           },
           yStocks: {
             offset: true,

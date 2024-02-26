@@ -3,7 +3,6 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 import { BiPlusCircle } from 'react-icons/bi';
-import dynamic from 'next/dynamic';
 
 import FormButton from '@/components/buttons/FormButton';
 import AccountForm from '@/components/forms/account/AccountForm';
@@ -11,6 +10,8 @@ import {
   AccountsTable,
   NetWorthPie,
   MonthlyTotalHistogram,
+  NetWorthHistogram,
+  IncomeExpenseHistogram,
   LatestTransactions,
 } from '@/components/pages/accounts';
 import Loading from '@/components/Loading';
@@ -18,9 +19,6 @@ import DateRangeInput from '@/components/DateRangeInput';
 import Onboarding from '@/components/onboarding/Onboarding';
 import { useAccounts } from '@/hooks/api';
 import mapAccounts from '@/helpers/mapAccounts';
-
-const NetWorthHistogram = dynamic(() => import('@/components/pages/accounts/NetWorthHistogram'), { ssr: false });
-const IncomeExpenseHistogram = dynamic(() => import('@/components/pages/accounts/IncomeExpenseHistogram'), { ssr: false });
 
 export default function AccountsPage(): JSX.Element {
   const { data, isLoading } = useAccounts();

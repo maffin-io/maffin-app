@@ -1,5 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
+import dynamic from 'next/dynamic';
 
 import type { Account } from '@/book/entities';
 import { useInvestment, usePrices } from '@/hooks/api';
@@ -7,7 +8,8 @@ import Loading from '@/components/Loading';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import { toFixed } from '@/helpers/number';
 import Money from '@/book/Money';
-import InvestmentChart from './InvestmentChart';
+
+const InvestmentChart = dynamic(() => import('./InvestmentChart'), { ssr: false });
 
 export type InvestmentInfoProps = {
   account: Account,
