@@ -7,10 +7,11 @@ import {
   Header,
   AccountInfo,
   InvestmentInfo,
+  AssetInfo,
 } from '@/components/pages/account';
 import { useAccount } from '@/hooks/api';
 import Loading from '@/components/Loading';
-import { isInvestment } from '@/book/helpers';
+import { isAsset, isInvestment } from '@/book/helpers';
 
 export type AccountPageProps = {
   params: {
@@ -47,7 +48,15 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
         )
       }
       {
+        isAsset(account)
+        && !isInvestment(account)
+        && (
+          <AssetInfo account={account} />
+        )
+      }
+      {
         !isInvestment(account)
+        && !isAsset(account)
         && (
           <AccountInfo account={account} />
         )

@@ -13,49 +13,8 @@ exports[`AccountPage displays loading while accounts is empty 1`] = `
 exports[`AccountPage renders as expected with account 1`] = `
 <div>
   <div
-    class="header"
-  >
-    <span
-      class="title"
-    >
-      <span
-        class="text-xl font-medium badge"
-      >
-        path
-         
-        account
-      </span>
-    </span>
-    <div
-      class="ml-auto"
-    >
-      <div
-        class="flex gap-1"
-      >
-        <div
-          data-testid="FormButton"
-        >
-          <div
-            data-testid="TransactionForm"
-          />
-        </div>
-        <div
-          data-testid="FormButton"
-        >
-          <div
-            data-testid="AccountForm"
-          />
-        </div>
-        <div
-          data-testid="FormButton"
-        >
-          <div
-            data-testid="AccountForm"
-          />
-        </div>
-      </div>
-    </div>
-  </div>
+    data-testid="Header"
+  />
   <div
     data-testid="AccountInfo"
   />

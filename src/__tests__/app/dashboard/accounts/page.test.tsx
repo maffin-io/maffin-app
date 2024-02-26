@@ -18,7 +18,7 @@ import {
   MonthlyTotalHistogram,
   LatestTransactions,
 } from '@/components/pages/accounts';
-import NetWorthHistogram from '@/components/pages/accounts/NetWorthHistogram';
+import { NetWorthHistogram } from '@/components/charts';
 import IncomeExpenseHistogram from '@/components/pages/accounts/IncomeExpenseHistogram';
 import * as apiHook from '@/hooks/api';
 
@@ -55,7 +55,7 @@ jest.mock('@/components/pages/accounts/IncomeExpenseHistogram', () => jest.fn(
   () => <div data-testid="IncomeExpenseHistogram" />,
 ));
 
-jest.mock('@/components/pages/accounts/NetWorthHistogram', () => jest.fn(
+jest.mock('@/components/charts/NetWorthHistogram', () => jest.fn(
   () => <div data-testid="NetWorthHistogram" />,
 ));
 
@@ -166,6 +166,8 @@ describe('AccountsPage', () => {
     await screen.findByTestId('NetWorthHistogram');
     expect(NetWorthHistogram).toHaveBeenLastCalledWith(
       {
+        assetsGuid: 'type_asset',
+        liabilitiesGuid: 'type_liability',
         selectedDate: DateTime.fromISO('2023-01-02'),
       },
       {},
@@ -283,6 +285,8 @@ describe('AccountsPage', () => {
     );
     expect(NetWorthHistogram).toHaveBeenLastCalledWith(
       {
+        assetsGuid: 'type_asset',
+        liabilitiesGuid: 'type_liability',
         selectedDate: DateTime.fromISO('2023-01-02'),
       },
       {},

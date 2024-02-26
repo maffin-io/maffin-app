@@ -37,7 +37,7 @@ export default function TransactionsTable({
     pageSize: 10,
   });
   const { data: splitsCount } = useSplitsCount(account.guid);
-  const { data: splits } = useSplitsPagination(account.guid, { pageIndex, pageSize });
+  const { data: splits } = useSplitsPagination(account.guid);
 
   columns[3].cell = AmountPartial(account);
   columns[4].cell = TotalPartial(account);

@@ -10,10 +10,10 @@ import {
   AccountsTable,
   NetWorthPie,
   MonthlyTotalHistogram,
-  NetWorthHistogram,
   IncomeExpenseHistogram,
   LatestTransactions,
 } from '@/components/pages/accounts';
+import { NetWorthHistogram } from '@/components/charts';
 import Loading from '@/components/Loading';
 import DateRangeInput from '@/components/DateRangeInput';
 import Onboarding from '@/components/onboarding/Onboarding';
@@ -105,6 +105,8 @@ export default function AccountsPage(): JSX.Element {
         <div className="grid grid-cols-12 col-span-9">
           <div className="card col-span-8">
             <NetWorthHistogram
+              assetsGuid="type_asset"
+              liabilitiesGuid="type_liability"
               selectedDate={selectedDate}
             />
           </div>

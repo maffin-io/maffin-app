@@ -343,7 +343,6 @@ describe('InvestmentChart', () => {
             },
             yPrice: {
               offset: true,
-              beginAtZero: true,
               stackWeight: 4,
               stack: 'investment',
               border: {
@@ -357,7 +356,6 @@ describe('InvestmentChart', () => {
             },
             yValue: {
               offset: true,
-              beginAtZero: true,
               stackWeight: 4,
               stack: 'investment',
               border: {
@@ -602,7 +600,6 @@ describe('InvestmentChart', () => {
             },
             yPrice: {
               offset: true,
-              beginAtZero: true,
               stackWeight: 4,
               stack: 'investment',
               border: {
@@ -616,7 +613,6 @@ describe('InvestmentChart', () => {
             },
             yValue: {
               offset: true,
-              beginAtZero: true,
               stackWeight: 4,
               stack: 'investment',
               border: {

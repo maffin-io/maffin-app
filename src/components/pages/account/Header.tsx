@@ -14,7 +14,7 @@ import {
   isLiability,
 } from '@/book/helpers/accountType';
 import { Account, Split } from '@/book/entities';
-import { useAccount, useSplits } from '@/hooks/api';
+import { useAccount, useSplitsPagination } from '@/hooks/api';
 
 export type HeaderProps = {
   account: Account,
@@ -24,7 +24,7 @@ export default function Header({
   account,
 }: HeaderProps): JSX.Element {
   const { data: parent } = useAccount(account.parentId);
-  const { data: splits } = useSplits({ guid: account.guid });
+  const { data: splits } = useSplitsPagination(account.guid);
   const router = useRouter();
 
   const latestDate = splits?.[0]?.transaction?.date;

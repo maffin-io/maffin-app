@@ -5,7 +5,7 @@ import type { UseQueryResult } from '@tanstack/react-query';
 
 import Money from '@/book/Money';
 import Bar from '@/components/charts/Bar';
-import NetWorthHistogram from '@/components/pages/accounts/NetWorthHistogram';
+import { NetWorthHistogram } from '@/components/charts';
 import * as apiHook from '@/hooks/api';
 import type { Commodity } from '@/book/entities';
 import type { AccountsTotals } from '@/types/book';
@@ -32,7 +32,10 @@ describe('NetWorthHistogram', () => {
 
   it('renders with no data', () => {
     render(
-      <NetWorthHistogram />,
+      <NetWorthHistogram
+        assetsGuid=""
+        liabilitiesGuid=""
+      />,
     );
 
     expect(Bar).toBeCalledWith(
@@ -46,6 +49,25 @@ describe('NetWorthHistogram', () => {
               label: 'Assets',
               order: 1,
               barPercentage: 0.6,
+            },
+            {
+              backgroundColor: '#0E7490',
+              borderColor: '#0E7490',
+              data: [],
+              label: 'Net worth',
+              order: 0,
+              pointHoverRadius: 10,
+              pointRadius: 5,
+              pointStyle: 'rectRounded',
+              type: 'line',
+              datalabels: {
+                align: 'end',
+                backgroundColor: '#0E7490FF',
+                borderRadius: 5,
+                color: '#FFF',
+                display: expect.any(Function),
+                formatter: expect.any(Function),
+              },
             },
           ],
           labels: [
@@ -81,6 +103,7 @@ describe('NetWorthHistogram', () => {
               },
             },
             legend: {
+              display: true,
               onClick: expect.any(Function),
               labels: {
                 boxHeight: 8,
@@ -117,6 +140,7 @@ describe('NetWorthHistogram', () => {
               type: 'time',
             },
             y: {
+              beginAtZero: false,
               grace: 1,
               border: {
                 display: false,
@@ -130,6 +154,30 @@ describe('NetWorthHistogram', () => {
           },
         },
       },
+      {},
+    );
+  });
+
+  it('hides assets and liabilities', () => {
+    render(
+      <NetWorthHistogram
+        assetsGuid=""
+        hideAssets
+        liabilitiesGuid=""
+        hideLiabilities
+      />,
+    );
+
+    expect(Bar).toBeCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          datasets: [
+            expect.objectContaining({
+              label: 'Net worth',
+            }),
+          ],
+        }),
+      }),
       {},
     );
   });
@@ -171,7 +219,11 @@ describe('NetWorthHistogram', () => {
     );
 
     render(
-      <NetWorthHistogram selectedDate={DateTime.fromISO('2023-01-30')} />,
+      <NetWorthHistogram
+        assetsGuid="type_asset"
+        liabilitiesGuid="type_liability"
+        selectedDate={DateTime.fromISO('2023-01-30')}
+      />,
     );
 
     expect(Bar).toBeCalledWith(
