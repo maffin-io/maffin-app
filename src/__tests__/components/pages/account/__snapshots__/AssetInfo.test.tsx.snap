@@ -22,17 +22,24 @@ exports[`AssetInfo renders as expected when no splits 1`] = `
           class="col-span-8"
         />
         <div
-          class="card col-span-12"
-        >
-          <div
-            data-testid="NetWorthHistogram"
-          />
-        </div>
+          class="col-span-4"
+        />
       </div>
     </div>
     <div
-      class="card col-span-6"
-    />
+      class="grid grid-cols-12 col-span-6"
+    >
+      <div
+        class="card col-span-12"
+      >
+        <div
+          data-testid="NetWorthHistogram"
+        />
+      </div>
+      <div
+        class="col-span-12"
+      />
+    </div>
   </div>
 </div>
 `;

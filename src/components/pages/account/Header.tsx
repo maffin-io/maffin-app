@@ -15,6 +15,7 @@ import {
 } from '@/book/helpers/accountType';
 import { Account, Split } from '@/book/entities';
 import { useAccount, useSplitsPagination } from '@/hooks/api';
+import Link from 'next/link';
 
 export type HeaderProps = {
   account: Account,
@@ -30,6 +31,23 @@ export default function Header({
   const latestDate = splits?.[0]?.transaction?.date;
   const deletable = splits?.length === 0;
 
+  let title: string | JSX.Element = account.path;
+  if (account.path.lastIndexOf(':') > 0) {
+    const parentPath = account.path.slice(0, account.path.lastIndexOf(':'));
+    title = (
+      <span>
+        <Link
+          href={`/dashboard/accounts/${account.parentId}`}
+          className={classNames('text-white text-opacity-50 hover:text-current')}
+        >
+          {parentPath}
+        </Link>
+        :
+        {account.name}
+      </span>
+    );
+  }
+
   return (
     <div className="header">
       <span className="title">
@@ -42,7 +60,7 @@ export default function Header({
             misc: isInvestment(account),
           })}
         >
-          {account.path}
+          {title}
         </span>
       </span>
       <div className="ml-auto">

@@ -2,7 +2,7 @@ import React from 'react';
 
 export type StatisticsWidgetProps = {
   title: string,
-  stats: string,
+  stats: JSX.Element | string,
   description: JSX.Element | string,
   className?: string,
   statsTextClass?: string,
@@ -20,7 +20,7 @@ export default function StatisticsWidget({
       <p>
         {title}
       </p>
-      <p className={`${statsTextClass} text-2xl font-semibold my-3`}>{stats}</p>
+      <p className={`text-2xl font-semibold my-3 ${statsTextClass}`}>{stats}</p>
 
       <span className="text-sm">
         {description}
