@@ -49,6 +49,7 @@ const wrapper = ({ children }: React.PropsWithChildren) => (
 describe('useSplits', () => {
   let datasource: DataSource;
   let split1: Split;
+  let account1: Account;
 
   beforeEach(async () => {
     datasource = new DataSource({
@@ -60,14 +61,14 @@ describe('useSplits', () => {
     });
     await datasource.initialize();
 
-    const account = await Account.create({
+    account1 = await Account.create({
       guid: 'guid',
       name: 'hi',
       type: 'ROOT',
     }).save();
 
     split1 = await Split.create({
-      fk_account: account.guid,
+      fk_account: account1,
       valueNum: 50,
       valueDenom: 1,
       quantityNum: 100,
@@ -75,7 +76,7 @@ describe('useSplits', () => {
     }).save();
 
     await Split.create({
-      fk_account: account.guid,
+      fk_account: account1,
       valueNum: 100,
       valueDenom: 1,
       quantityNum: 200,
@@ -176,6 +177,36 @@ describe('useSplits', () => {
   });
 
   describe('useAccountTotal', () => {
+    beforeEach(async () => {
+      const commodity = await Commodity.create({
+        mnemonic: 'EUR',
+        namespace: 'CURRENCY',
+      }).save();
+
+      const account2 = await Account.create({
+        name: 'Bank',
+        fk_commodity: commodity,
+        parent: account1,
+        type: 'ASSET',
+      }).save();
+
+      await Transaction.create({
+        fk_currency: commodity,
+        description: 'description',
+        date: DateTime.now().minus({ day: 1 }),
+        splits: [
+          split1,
+          Split.create({
+            fk_account: account2,
+            valueNum: -50,
+            valueDenom: 1,
+            quantityNum: -100,
+            quantityDenom: 1,
+          }),
+        ],
+      }).save();
+    });
+
     afterEach(() => {
       jest.clearAllMocks();
     });
@@ -187,12 +218,12 @@ describe('useSplits', () => {
       );
 
       await waitFor(() => expect(result.current.status).toEqual('success'));
-      expect(result.current.data).toEqual(300);
+      expect(result.current.data).toEqual(100);
 
       const queryCache = queryClient.getQueryCache().getAll();
       expect(queryCache).toHaveLength(1);
       expect(queryCache[0].queryKey).toEqual(
-        ['api', 'splits', 'guid', 'total'],
+        ['api', 'splits', 'guid', 'total', '2023-01-01'],
       );
     });
   });

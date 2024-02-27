@@ -76,40 +76,6 @@ exports[`AccountsTable renders Name column as expected when expandable and not e
 </div>
 `;
 
-exports[`AccountsTable renders Name column as expected when not expandable 1`] = `
-<div>
-  <div
-    class="flex pl-NaN"
-  >
-    <button
-      class="cursor-default"
-      type="button"
-    >
-      <svg
-        class="mr-1 text-xs opacity-50"
-        fill="currentColor"
-        height="1em"
-        stroke="currentColor"
-        stroke-width="0"
-        viewBox="0 0 24 24"
-        width="1em"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M12 2C6.486 2 2 6.486 2 12c.001 5.515 4.487 10.001 10 10.001 5.514 0 10-4.486 10.001-10.001 0-5.514-4.486-10-10.001-10zm0 18.001c-4.41 0-7.999-3.589-8-8.001 0-4.411 3.589-8 8-8 4.412 0 8.001 3.589 8.001 8-.001 4.412-3.59 8.001-8.001 8.001z"
-        />
-      </svg>
-    </button>
-    <span
-      class="badge cursor-default info"
-      data-tooltip-id="assets"
-    >
-      Assets
-    </span>
-  </div>
-</div>
-`;
-
 exports[`AccountsTable renders Total column as expected 1`] = `
 <div>
   <span>

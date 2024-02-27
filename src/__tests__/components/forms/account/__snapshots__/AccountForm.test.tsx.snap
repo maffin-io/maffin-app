@@ -47,7 +47,32 @@ exports[`AccountForm renders as expected with add 1`] = `
           type="checkbox"
         />
       </fieldset>
+      <fieldset
+        class="col-start-10 col-span-2"
+      >
+        <label
+          class="inline-block mb-2"
+          for="placeholderInput"
+        >
+          Parent
+        </label>
+        <span
+          class="badge ml-0.5"
+          data-tooltip-id="placeholder-help"
+        >
+          ?
+        </span>
+        <input
+          class="block m-0"
+          id="placeholderInput"
+          name="placeholder"
+          type="checkbox"
+        />
+      </fieldset>
     </div>
+    <p
+      class="invalid-feedback"
+    />
     <fieldset
       class="text-sm my-5"
     >
@@ -499,7 +524,33 @@ exports[`AccountForm renders as expected with delete 1`] = `
           type="checkbox"
         />
       </fieldset>
+      <fieldset
+        class="col-start-10 col-span-2"
+      >
+        <label
+          class="inline-block mb-2"
+          for="placeholderInput"
+        >
+          Parent
+        </label>
+        <span
+          class="badge ml-0.5"
+          data-tooltip-id="placeholder-help"
+        >
+          ?
+        </span>
+        <input
+          class="block m-0"
+          disabled=""
+          id="placeholderInput"
+          name="placeholder"
+          type="checkbox"
+        />
+      </fieldset>
     </div>
+    <p
+      class="invalid-feedback"
+    />
     <fieldset
       class="text-sm my-5"
     >
@@ -944,7 +995,32 @@ exports[`AccountForm renders as expected with update 1`] = `
           type="checkbox"
         />
       </fieldset>
+      <fieldset
+        class="col-start-10 col-span-2"
+      >
+        <label
+          class="inline-block mb-2"
+          for="placeholderInput"
+        >
+          Parent
+        </label>
+        <span
+          class="badge ml-0.5"
+          data-tooltip-id="placeholder-help"
+        >
+          ?
+        </span>
+        <input
+          class="block m-0"
+          id="placeholderInput"
+          name="placeholder"
+          type="checkbox"
+        />
+      </fieldset>
     </div>
+    <p
+      class="invalid-feedback"
+    />
     <fieldset
       class="text-sm my-5"
     >

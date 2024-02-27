@@ -21,7 +21,6 @@ export default async function getAccountsTotals(
         splits.account_guid as accountId
       FROM splits
       JOIN transactions as tx ON splits.tx_guid = tx.guid
-      JOIN accounts as account ON splits.account_guid = account.guid
       WHERE post_date <= '${selectedDate.toSQLDate()}'
       GROUP BY 
         accountId

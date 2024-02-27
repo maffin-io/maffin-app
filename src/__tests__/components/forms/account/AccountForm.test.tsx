@@ -54,6 +54,7 @@ describe('AccountForm', () => {
     root = await Account.create({
       name: 'Root',
       type: 'ROOT',
+      placeholder: true,
     }).save();
 
     assetAccount = await Account.create({
@@ -61,6 +62,7 @@ describe('AccountForm', () => {
       type: 'ASSET',
       fk_commodity: eur,
       parent: root,
+      placeholder: true,
     }).save();
 
     expenseAccount = await Account.create({
@@ -68,6 +70,7 @@ describe('AccountForm', () => {
       type: 'EXPENSE',
       fk_commodity: eur,
       parent: root,
+      placeholder: true,
     }).save();
 
     root.path = 'Root';
@@ -222,9 +225,9 @@ describe('AccountForm', () => {
 
     const fieldsets = screen.getAllByRole('group');
     // Can't check with toBeVisible due tailwindcss not being understood by jest
-    expect(fieldsets[2]).toHaveClass('hidden');
     expect(fieldsets[3]).toHaveClass('hidden');
-    expect(fieldsets[5]).toHaveClass('hidden');
+    expect(fieldsets[4]).toHaveClass('hidden');
+    expect(fieldsets[6]).toHaveClass('hidden');
   });
 
   it('button is disabled when form not valid', async () => {
@@ -242,25 +245,18 @@ describe('AccountForm', () => {
     expect(button).toBeDisabled();
   });
 
-  /**
-   * INVESTMENT accounts can't have children
-   */
-  it('filters stock/mutual accounts as parents', async () => {
+  it('filters non placeholders as parents', async () => {
     const user = userEvent.setup();
-    const commodity = await Commodity.create({
-      mnemonic: 'TICKER',
-      namespace: 'STOCK',
-    }).save();
 
     const stockAccount = await Account.create({
-      guid: 'stock_guid_1',
-      name: 'Stock',
-      type: 'INVESTMENT',
-      fk_commodity: commodity,
+      guid: 'guid_1',
+      name: 'A',
+      type: 'ASSET',
+      fk_commodity: eur,
       parent: assetAccount,
     }).save();
 
-    stockAccount.path = 'Assets:Stock';
+    stockAccount.path = 'Assets:A';
 
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({
       data: [
@@ -280,8 +276,7 @@ describe('AccountForm', () => {
     await user.click(screen.getByRole('combobox', { name: 'parentInput' }));
     screen.getByText('Assets');
     screen.getByText('Expenses');
-    expect(screen.queryByText('Stock')).toBeNull();
-    expect(screen.queryByText('Mutual')).toBeNull();
+    expect(screen.queryByText('Assets:A')).toBeNull();
   });
 
   it('creates account with expected params and saves', async () => {
@@ -483,6 +478,7 @@ describe('AccountForm', () => {
       type: 'INCOME',
       fk_commodity: eur,
       parent: root,
+      placeholder: true,
     }).save();
     incomeAccount.path = 'Income';
 
@@ -492,6 +488,7 @@ describe('AccountForm', () => {
       type: 'BANK',
       fk_commodity: eur,
       parent: assetAccount,
+      placeholder: true,
     }).save();
     bankAccount.path = 'Assets:Bank';
 

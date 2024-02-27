@@ -40,7 +40,7 @@ describe('NetWorthHistogram', () => {
 
     expect(Bar).toBeCalledWith(
       {
-        height: '400',
+        height: 400,
         data: {
           datasets: [
             {

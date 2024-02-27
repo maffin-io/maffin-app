@@ -324,38 +324,6 @@ describe('AccountsTable', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('renders Name column as expected when not expandable', async () => {
-    render(<AccountsTable guids={['a1']} />);
-
-    await screen.findByTestId('Table');
-    expect(Table).toBeCalledTimes(1);
-    const nameCol = TableMock.mock.calls[0][0].columns[0];
-
-    expect(nameCol.cell).not.toBeUndefined();
-    const { container } = render(
-      // @ts-ignore
-      nameCol.cell({
-        row: {
-          original: {
-            account: {
-              guid: 'assets',
-              name: 'Assets',
-              type: 'ASSET',
-              childrenIds: ['a1'],
-              placeholder: true,
-            } as Account,
-            total: new Money(100, 'EUR'),
-            children: [],
-          },
-          getCanExpand: () => false,
-        },
-      }),
-    );
-
-    await screen.findByText('Assets');
-    expect(container).toMatchSnapshot();
-  });
-
   it('renders Total column as expected', async () => {
     render(<AccountsTable guids={['a1']} />);
 

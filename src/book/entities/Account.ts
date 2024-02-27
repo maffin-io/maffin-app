@@ -21,7 +21,7 @@ import {
   LIABILITY_ACCOUNTS,
 } from '@/book/helpers/accountType';
 import type Commodity from './Commodity';
-import type Split from './Split';
+import Split from './Split';
 import BaseEntity from './BaseEntity';
 
 /**
@@ -136,6 +136,7 @@ export default class Account extends BaseEntity {
   })
     hidden!: boolean;
 
+  @CheckPlaceholder()
   @Column({
     default: false,
   })
@@ -304,6 +305,41 @@ function CheckIECommodity(validationOptions?: v.ValidationOptions) {
         defaultMessage(args: v.ValidationArguments) {
           const account = args.object as Account;
           return `Income and Expense accounts must have ${(account.parent.fk_commodity as Commodity).mnemonic} as their commodity`;
+        },
+      },
+    });
+  };
+}
+
+/**
+ * Checks if an account can be a placeholder. Accounts can be Placeholders
+ * if they don't have any transactions associated.
+ */
+function CheckPlaceholder(validationOptions?: v.ValidationOptions) {
+  return function f(object: Account, propertyName: string) {
+    v.registerDecorator({
+      name: 'checkPlaceholder',
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        async validate(_: string, args: v.ValidationArguments) {
+          const account = args.object as Account;
+          if (account.guid) {
+            const [, numSplits] = await Split.findAndCount({
+              where: { fk_account: { guid: account.guid } },
+            });
+
+            if (numSplits > 0 && account.placeholder) {
+              return false;
+            }
+          }
+
+          return true;
+        },
+
+        defaultMessage() {
+          return 'Placeholder accounts cannot have transactions';
         },
       },
     });

@@ -43,37 +43,51 @@ export default function Header({
           })}
         >
           {account.path}
-          {' '}
-          account
         </span>
       </span>
       <div className="ml-auto">
-        <div className="flex gap-1">
-          <FormButton
-            id="add-tx"
-            modalTitle={`Add transaction to ${account?.name}`}
-            buttonContent={(
-              <>
-                <BiPlusCircle className="mr-1" />
-                Add transaction
-              </>
+        <div
+          className={classNames(
+            'flex gap-1',
+            {
+              hidden: account.parentId === 'rootAccount',
+            },
+          )}
+        >
+          <div
+            className={classNames(
+              '',
+              {
+                hidden: account.placeholder,
+              },
             )}
           >
-            <TransactionForm
-              defaultValues={
-                {
-                  date: (latestDate || DateTime.now()).toISODate() as string,
-                  description: '',
-                  splits: [Split.create({ fk_account: account }), new Split()],
-                  fk_currency: account.commodity,
+            <FormButton
+              id="add-tx"
+              modalTitle={`Add transaction to ${account?.name}`}
+              buttonContent={(
+                <>
+                  <BiPlusCircle className="mr-1" />
+                  Add transaction
+                </>
+              )}
+            >
+              <TransactionForm
+                defaultValues={
+                  {
+                    date: (latestDate || DateTime.now()).toISODate() as string,
+                    description: '',
+                    splits: [Split.create({ fk_account: account }), new Split()],
+                    fk_currency: account.commodity,
+                  }
                 }
-              }
-            />
-          </FormButton>
+              />
+            </FormButton>
+          </div>
           <FormButton
             id="edit-account"
             modalTitle="Edit account"
-            buttonContent={<BiEdit />}
+            buttonContent={<BiEdit className="text-sm" />}
           >
             <AccountForm
               action="update"
@@ -86,7 +100,7 @@ export default function Header({
           <FormButton
             id="delete-account"
             modalTitle="Confirm you want to remove this account"
-            buttonContent={<BiXCircle />}
+            buttonContent={<BiXCircle className="text-sm" />}
             className="btn btn-danger"
             disabled={!deletable}
             data-tooltip-id="delete-help"

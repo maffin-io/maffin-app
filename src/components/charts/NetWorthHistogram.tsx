@@ -29,6 +29,7 @@ export type NetWorthHistogramProps = {
   hideLiabilities?: boolean,
   selectedDate?: DateTime,
   showLegend?: boolean,
+  height?: number,
 };
 
 export default function NetWorthHistogram({
@@ -40,6 +41,7 @@ export default function NetWorthHistogram({
   hideLiabilities = false,
   selectedDate = DateTime.now(),
   showLegend = true,
+  height = 400,
 }: NetWorthHistogramProps): JSX.Element {
   const interval = Interval.fromDateTimes(
     selectedDate.minus({ months: 6 }).startOf('month'),
@@ -104,7 +106,7 @@ export default function NetWorthHistogram({
   return (
     <>
       <Bar
-        height="400"
+        height={height}
         data={{
           labels: monthlyDates(interval),
           datasets,

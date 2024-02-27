@@ -3,7 +3,7 @@ import React from 'react';
 export type StatisticsWidgetProps = {
   title: string,
   stats: string,
-  description: string,
+  description: JSX.Element | string,
   className?: string,
   statsTextClass?: string,
 };

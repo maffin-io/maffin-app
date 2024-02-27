@@ -110,27 +110,13 @@ const columns: ColumnDef<AccountsTableRow>[] = [
             <BiCircle className="mr-1 text-xs opacity-50" />
           </button>
         )}
-        {
-          (
-            row.original.account.placeholder
-            && (
-              <span
-                data-tooltip-id={row.original.account.guid}
-                className={accountColorCode(row.original.account, 'badge cursor-default')}
-              >
-                {row.original.account.name}
-              </span>
-            )
-          ) || (
-            <Link
-              data-tooltip-id={row.original.account.guid}
-              className={accountColorCode(row.original.account, 'badge hover:text-slate-300')}
-              href={`/dashboard/accounts/${row.original.account.guid}`}
-            >
-              {row.original.account.name}
-            </Link>
-          )
-        }
+        <Link
+          data-tooltip-id={row.original.account.guid}
+          className={accountColorCode(row.original.account, 'badge hover:text-slate-300')}
+          href={`/dashboard/accounts/${row.original.account.guid}`}
+        >
+          {row.original.account.name}
+        </Link>
 
         {
           row.original.account.description
