@@ -108,7 +108,35 @@ export default function AccountForm({
             type="checkbox"
           />
         </fieldset>
+
+        <fieldset className="col-start-10 col-span-2">
+          <label htmlFor="placeholderInput" className="inline-block mb-2">Parent</label>
+          <span
+            className="badge ml-0.5"
+            data-tooltip-id="placeholder-help"
+          >
+            ?
+          </span>
+          <Tooltip
+            id="placeholder-help"
+            className="tooltip"
+            disableStyleInjection
+          >
+            <p>
+              For accounts that are parent categories. These accounts cannot have
+              transactions.
+            </p>
+          </Tooltip>
+          <input
+            id="placeholderInput"
+            disabled={disabled}
+            className="block m-0"
+            {...form.register('placeholder')}
+            type="checkbox"
+          />
+        </fieldset>
       </div>
+      <p className="invalid-feedback">{errors.placeholder?.message}</p>
 
       <fieldset
         className={classNames(
@@ -128,8 +156,7 @@ export default function AccountForm({
                 id="parentInput"
                 isDisabled={disabled}
                 isClearable={false}
-                ignoreAccounts={['INVESTMENT']}
-                ignorePlaceholders={false}
+                onlyPlaceholders
                 placeholder="<parent account>"
                 onChange={field.onChange}
                 defaultValue={defaultValues?.parent}

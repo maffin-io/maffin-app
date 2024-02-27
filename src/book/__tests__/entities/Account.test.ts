@@ -202,6 +202,20 @@ describe('Account', () => {
 
       await expect(account.save()).rejects.toThrow('checkIECommodity');
     });
+
+    it('fails if placeholder with splits', async () => {
+      await Split.create({
+        fk_account: account,
+        valueNum: 1,
+        valueDenom: 1,
+        quantityNum: 1,
+        quantityDenom: 1,
+      }).save();
+
+      account.placeholder = true;
+
+      await expect(account.save()).rejects.toThrow('checkPlaceholder');
+    });
   });
 });
 

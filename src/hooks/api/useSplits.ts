@@ -119,8 +119,9 @@ export function useSplitsCount(
  */
 export function useAccountTotal(
   account: string,
+  selectedDate: DateTime = DateTime.now(),
 ): UseQueryResult<number> {
-  const queryKey = [...Split.CACHE_KEY, account, 'total'];
+  const queryKey = [...Split.CACHE_KEY, account, 'total', selectedDate.toISODate()];
   const result = useQuery({
     queryKey,
     queryFn: fetcher(
@@ -129,7 +130,9 @@ export function useAccountTotal(
           SELECT
             SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) as total
           FROM splits
+          JOIN transactions as tx ON splits.tx_guid = tx.guid
           WHERE splits.account_guid = :guid
+            AND post_date <= '${selectedDate.toSQLDate()}'
         `, [account]);
         return r[0].total;
       },

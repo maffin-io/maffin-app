@@ -237,13 +237,55 @@ describe('AccountSelector', () => {
     );
 
     render(
-      <AccountSelector />,
+      <AccountSelector ignorePlaceholders />,
     );
 
     await screen.findByTestId('Selector');
     expect(Selector).toHaveBeenCalledWith(
       expect.objectContaining({
         options: [options[0]],
+      }),
+      {},
+    );
+  });
+
+  it('selects placeholders only', async () => {
+    const options = [
+      {
+        guid: 'guid1',
+        path: 'path1',
+        type: 'ASSET',
+        commodity: {
+          mnemonic: 'USD',
+        } as Commodity,
+      } as Account,
+      {
+        guid: 'guid2',
+        path: 'path2',
+        type: 'ASSET',
+        commodity: {
+          mnemonic: 'USD',
+        } as Commodity,
+        placeholder: true,
+      } as Account,
+    ];
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+      {
+        data: [
+          options[0],
+          options[1],
+        ],
+      } as UseQueryResult<Account[]>,
+    );
+
+    render(
+      <AccountSelector onlyPlaceholders />,
+    );
+
+    await screen.findByTestId('Selector');
+    expect(Selector).toHaveBeenCalledWith(
+      expect.objectContaining({
+        options: [options[1]],
       }),
       {},
     );

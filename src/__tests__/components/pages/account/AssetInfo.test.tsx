@@ -7,7 +7,9 @@ import { AssetInfo } from '@/components/pages/account';
 import { NetWorthHistogram } from '@/components/charts';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import * as apiHook from '@/hooks/api';
+import Money from '@/book/Money';
 import type { Account } from '@/book/entities';
+import type { AccountsTotals } from '@/types/book';
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
@@ -25,7 +27,7 @@ jest.mock('@/components/StatisticsWidget', () => jest.fn(
 describe('AssetInfo', () => {
   let account: Account;
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useAccountTotal').mockReturnValue({ data: undefined } as UseQueryResult<number>);
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals>);
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-03-01') as DateTime<true>);
     account = {
       guid: 'guid',
@@ -48,6 +50,7 @@ describe('AssetInfo', () => {
 
     expect(NetWorthHistogram).toBeCalledWith(
       {
+        height: 300,
         assetsGuid: 'guid',
         assetsLabel: 'Assets',
         hideAssets: true,
@@ -62,8 +65,8 @@ describe('AssetInfo', () => {
       {
         className: 'mr-2',
         title: 'Total',
-        description: '',
         stats: '€0.00',
+        description: expect.anything(),
       },
       {},
     );
@@ -71,9 +74,9 @@ describe('AssetInfo', () => {
   });
 
   it('renders as expected with splits', () => {
-    jest.spyOn(apiHook, 'useAccountTotal').mockReturnValue({
-      data: 100,
-    } as UseQueryResult<number>);
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({
+      data: { guid: new Money(100, 'EUR') } as AccountsTotals,
+    } as UseQueryResult<AccountsTotals>);
 
     render(
       <AssetInfo account={account} />,
@@ -84,7 +87,7 @@ describe('AssetInfo', () => {
       {
         className: 'mr-2',
         title: 'Total',
-        description: '',
+        description: expect.anything(),
         stats: '€100.00',
       },
       {},

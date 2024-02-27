@@ -79,6 +79,7 @@ export default function SplitField({
                 isClearable={false}
                 isDisabled={disabled}
                 placeholder="<account>"
+                ignorePlaceholders
                 onChange={async (a: SingleValue<Account>) => {
                   field.onChange(a);
                   const mainCurrency = await getMainCurrency();

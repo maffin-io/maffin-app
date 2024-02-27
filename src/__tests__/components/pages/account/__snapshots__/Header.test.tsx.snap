@@ -12,8 +12,6 @@ exports[`Header renders as expected with account 1`] = `
         class="text-xl font-medium badge"
       >
         path
-         
-        account
       </span>
     </span>
     <div
@@ -23,11 +21,15 @@ exports[`Header renders as expected with account 1`] = `
         class="flex gap-1"
       >
         <div
-          data-testid="FormButton"
+          class=""
         >
           <div
-            data-testid="TransactionForm"
-          />
+            data-testid="FormButton"
+          >
+            <div
+              data-testid="TransactionForm"
+            />
+          </div>
         </div>
         <div
           data-testid="FormButton"

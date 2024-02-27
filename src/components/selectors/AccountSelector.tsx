@@ -11,6 +11,7 @@ import { accountColorCode } from '@/helpers/classNames';
 export interface AccountSelectorProps extends SelectProps<Account, false, GroupBase<Account>> {
   ignoreAccounts?: string[],
   ignorePlaceholders?: boolean,
+  onlyPlaceholders?: boolean,
   ignoreHidden?: boolean,
   showRoot?: boolean,
 }
@@ -18,7 +19,8 @@ export interface AccountSelectorProps extends SelectProps<Account, false, GroupB
 export default function AccountSelector(
   {
     ignoreAccounts = [],
-    ignorePlaceholders = true,
+    ignorePlaceholders = false,
+    onlyPlaceholders = false,
     ignoreHidden = true,
     showRoot = false,
     id = 'accountSelector',
@@ -37,6 +39,8 @@ export default function AccountSelector(
 
   if (ignorePlaceholders) {
     options = options.filter(account => !account.placeholder);
+  } else if (onlyPlaceholders) {
+    options = options.filter(account => account.placeholder);
   }
 
   if (ignoreHidden) {
