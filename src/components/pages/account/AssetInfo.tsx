@@ -7,6 +7,7 @@ import type { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import { useAccountsTotals } from '@/hooks/api';
 import { NetWorthHistogram } from '@/components/charts';
+import { AccountsTable } from '@/components/pages/accounts';
 
 export type AssetInfoProps = {
   account: Account,
@@ -49,20 +50,38 @@ export default function AssetInfo({
             />
           </div>
           <div className="col-span-8" />
-          <div className="card col-span-12">
-            <NetWorthHistogram
-              height={300}
-              assetsGuid={account.guid}
-              assetsLabel={account.name}
-              hideAssets
-              liabilitiesGuid=""
-              hideLiabilities
-              showLegend={false}
-            />
+          <div className="col-span-4">
+            {
+              account.placeholder
+              && (
+                <div className="col-span-6">
+                  <StatisticsWidget
+                    className="mr-2"
+                    statsTextClass="font-normal"
+                    title="Subaccounts"
+                    stats={<AccountsTable guids={account.childrenIds} />}
+                    description=""
+                  />
+                </div>
+              )
+            }
           </div>
         </div>
       </div>
-      <div className="card col-span-6" />
+      <div className="grid grid-cols-12 col-span-6">
+        <div className="card col-span-12">
+          <NetWorthHistogram
+            height={300}
+            assetsGuid={account.guid}
+            assetsLabel={account.name}
+            hideAssets
+            liabilitiesGuid=""
+            hideLiabilities
+            showLegend={false}
+          />
+        </div>
+        <div className="col-span-12" />
+      </div>
     </div>
   );
 }

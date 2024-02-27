@@ -24,6 +24,10 @@ jest.mock('@/components/StatisticsWidget', () => jest.fn(
   () => <div data-testid="StatisticsWidget" />,
 ));
 
+jest.mock('@/components/pages/accounts/AccountsTable', () => jest.fn(
+  () => <div data-testid="AccountsTable" />,
+));
+
 describe('AssetInfo', () => {
   let account: Account;
   beforeEach(() => {
@@ -82,13 +86,39 @@ describe('AssetInfo', () => {
       <AssetInfo account={account} />,
     );
 
-    expect(StatisticsWidget).toHaveBeenNthCalledWith(
-      1,
+    expect(StatisticsWidget).toBeCalledTimes(1);
+    expect(StatisticsWidget).toBeCalledWith(
       {
         className: 'mr-2',
         title: 'Total',
+        // Don't know how to check for JSX element here
         description: expect.anything(),
         stats: '€100.00',
+      },
+      {},
+    );
+  });
+
+  it('shows account table when placeholder', () => {
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({
+      data: { guid: new Money(100, 'EUR') } as AccountsTotals,
+    } as UseQueryResult<AccountsTotals>);
+
+    account.placeholder = true;
+    render(
+      <AssetInfo account={account} />,
+    );
+
+    expect(StatisticsWidget).toBeCalledTimes(2);
+    expect(StatisticsWidget).toHaveBeenNthCalledWith(
+      2,
+      {
+        className: 'mr-2',
+        title: 'Subaccounts',
+        description: '',
+        statsTextClass: 'font-normal',
+        // Don't know how to check for AccountsTable here
+        stats: expect.anything(),
       },
       {},
     );

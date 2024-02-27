@@ -156,4 +156,25 @@ describe('Header', () => {
     );
     expect(container).toMatchSnapshot();
   });
+
+  it('shows parent link', async () => {
+    const account = {
+      guid: 'guid',
+      path: 'Assets:account',
+      name: 'account',
+      type: 'TYPE',
+      parentId: 'parent',
+      commodity: {
+        mnemonic: 'EUR',
+      },
+    } as Account;
+
+    jest.spyOn(apiHook, 'useAccount').mockReturnValueOnce({
+      data: { guid: 'parent' } as Account,
+    } as UseQueryResult<Account>);
+    jest.spyOn(apiHook, 'useSplits').mockReturnValueOnce({ data: undefined } as UseQueryResult<Split[]>);
+
+    const { container } = render(<Header account={account} />);
+    expect(container).toMatchSnapshot();
+  });
 });
