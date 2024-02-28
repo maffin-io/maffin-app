@@ -17,16 +17,28 @@ describe('isInvestment', () => {
 describe('isAsset', () => {
   it.each(
     ASSET_ACCOUNTS,
-  )('returns true for %s', (type) => {
+  )('returns true for %s account', (type) => {
     expect(isAsset({ type } as Account)).toBe(true);
+  });
+
+  it.each(
+    ASSET_ACCOUNTS,
+  )('returns true for %s string', (type) => {
+    expect(isAsset(type)).toBe(true);
   });
 });
 
 describe('isLiability', () => {
   it.each(
     LIABILITY_ACCOUNTS,
-  )('returns true for %s', (type) => {
+  )('returns true for %s account', (type) => {
     expect(isLiability({ type } as Account)).toBe(true);
+  });
+
+  it.each(
+    LIABILITY_ACCOUNTS,
+  )('returns true for %s string', (type) => {
+    expect(isLiability(type)).toBe(true);
   });
 });
 

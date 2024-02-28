@@ -15,7 +15,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 if (isStaging()) {
-  Settings.now = () => 1704067200000; // 2023-01-01
+  Settings.now = () => 1703980800000; // 2023-12-31
 }
 
 const queryClient = new QueryClient({
