@@ -1,6 +1,5 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import * as query from '@tanstack/react-query';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import { AssetSankey } from '@/components/charts';
@@ -8,7 +7,6 @@ import Sankey from '@/components/charts/Sankey';
 import * as apiHooks from '@/hooks/api';
 import type { Commodity } from '@/book/entities';
 
-jest.mock('@tanstack/react-query');
 jest.mock('@/hooks/api');
 
 jest.mock('@/components/charts/Sankey', () => jest.fn(
@@ -17,7 +15,7 @@ jest.mock('@/components/charts/Sankey', () => jest.fn(
 
 describe('AssetSankey', () => {
   beforeEach(() => {
-    jest.spyOn(query, 'useQuery').mockReturnValue({ data: undefined } as UseQueryResult);
+    jest.spyOn(apiHooks, 'useCashFlow').mockReturnValue({ data: undefined } as UseQueryResult<{ guid: string, total: number, type: string, name: string }[]>);
     jest.spyOn(apiHooks, 'useMainCurrency').mockReturnValue(
       { data: { mnemonic: 'EUR' } as Commodity } as UseQueryResult<Commodity>,
     );
@@ -34,7 +32,7 @@ describe('AssetSankey', () => {
   });
 
   it('generates data as expected', () => {
-    jest.spyOn(query, 'useQuery').mockReturnValue(
+    jest.spyOn(apiHooks, 'useCashFlow').mockReturnValue(
       {
         data: [
           {
@@ -73,9 +71,8 @@ describe('AssetSankey', () => {
             type: 'ASSET',
             total: 30,
           },
-
         ],
-      } as UseQueryResult,
+      } as UseQueryResult<{ guid: string, total: number, type: string, name: string }[]>,
     );
 
     render(<AssetSankey guid="guid1" />);
@@ -174,7 +171,7 @@ describe('AssetSankey', () => {
 
     const { label } = (Sankey as jest.Mock).mock.calls[0][0].options.plugins.tooltip.callbacks;
 
-    expect(label({ raw: { flow: 10, toType: 'EXPENSE' } })).toEqual('€10.00 (16.67 %)');
+    expect(label({ raw: { flow: 10, toType: 'EXPENSE' } })).toEqual('-€10.00 (16.67 %)');
     expect(label({ raw: { flow: 10, toType: 'ASSET' } })).toEqual('€10.00 (33.33 %)');
   });
 });
