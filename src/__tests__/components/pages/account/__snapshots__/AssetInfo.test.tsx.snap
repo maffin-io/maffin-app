@@ -19,8 +19,12 @@ exports[`AssetInfo renders as expected when no splits 1`] = `
           />
         </div>
         <div
-          class="col-span-8"
-        />
+          class="card col-span-8"
+        >
+          <div
+            data-testid="AssetSankey"
+          />
+        </div>
         <div
           class="col-span-4"
         />

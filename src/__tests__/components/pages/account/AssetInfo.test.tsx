@@ -4,7 +4,7 @@ import { DateTime } from 'luxon';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import { AssetInfo } from '@/components/pages/account';
-import { NetWorthHistogram } from '@/components/charts';
+import { NetWorthHistogram, AssetSankey } from '@/components/charts';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import * as apiHook from '@/hooks/api';
 import Money from '@/book/Money';
@@ -18,6 +18,10 @@ jest.mock('@/hooks/api', () => ({
 
 jest.mock('@/components/charts/NetWorthHistogram', () => jest.fn(
   () => <div data-testid="NetWorthHistogram" />,
+));
+
+jest.mock('@/components/charts/AssetSankey', () => jest.fn(
+  () => <div data-testid="AssetSankey" />,
 ));
 
 jest.mock('@/components/StatisticsWidget', () => jest.fn(
@@ -64,6 +68,7 @@ describe('AssetInfo', () => {
       },
       {},
     );
+    expect(AssetSankey).toBeCalledWith({ guid: 'guid' }, {});
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       1,
       {

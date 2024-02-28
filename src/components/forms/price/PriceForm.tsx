@@ -145,11 +145,15 @@ async function onSubmit(
   const price = Price.create({
     ...data,
     date: DateTime.fromISO(data.date),
-    guid: data.guid || undefined,
+    guid: action !== 'update' ? data.guid || undefined : undefined,
   });
 
-  if (action === 'add' || action === 'update') {
+  if (action === 'add') {
     await price.save();
+  } else if (action === 'update') {
+    await price.save();
+    price.guid = data.guid;
+    await price.remove();
   } else if (action === 'delete') {
     await price.remove();
   }

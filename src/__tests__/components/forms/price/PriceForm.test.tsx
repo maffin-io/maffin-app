@@ -257,9 +257,13 @@ describe('PriceForm', () => {
     );
 
     const priceInput = screen.getByLabelText('Price');
+    const dateInput = screen.getByLabelText('Date');
 
     await user.clear(priceInput);
     await user.type(priceInput, '120');
+
+    await user.clear(dateInput);
+    await user.type(dateInput, '2023-10-01');
 
     expect(screen.getByText('update')).not.toBeDisabled();
     await user.click(screen.getByText('update'));
@@ -268,7 +272,7 @@ describe('PriceForm', () => {
     expect(prices).toEqual([
       {
         guid: expect.any(String),
-        date: DateTime.fromISO('2023-01-01'),
+        date: DateTime.fromISO('2023-10-01'),
         fk_commodity: eur,
         fk_currency: usd,
         valueDenom: 1,
@@ -277,8 +281,8 @@ describe('PriceForm', () => {
       },
     ]);
     expect(mockSave).toBeCalledWith({
-      guid: expect.any(String),
-      date: DateTime.fromISO('2023-01-01'),
+      guid: undefined,
+      date: DateTime.fromISO('2023-10-01'),
       fk_commodity: eur,
       fk_currency: usd,
       valueDenom: 1,

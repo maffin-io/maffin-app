@@ -6,7 +6,7 @@ import StatisticsWidget from '@/components/StatisticsWidget';
 import type { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import { useAccountsTotals } from '@/hooks/api';
-import { NetWorthHistogram } from '@/components/charts';
+import { AssetSankey, NetWorthHistogram } from '@/components/charts';
 import { AccountsTable } from '@/components/pages/accounts';
 
 export type AssetInfoProps = {
@@ -49,7 +49,16 @@ export default function AssetInfo({
               )}
             />
           </div>
-          <div className="col-span-8" />
+          <div className="card col-span-8">
+            {
+              !account.placeholder
+              && (
+                <AssetSankey
+                  guid={account.guid}
+                />
+              )
+            }
+          </div>
           <div className="col-span-4">
             {
               account.placeholder

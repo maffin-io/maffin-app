@@ -18,16 +18,22 @@ export function isInvestment(account: Account): boolean {
   return false;
 }
 
-export function isAsset(account: Account): boolean {
-  if (ASSET_ACCOUNTS.includes(account.type)) {
+export function isAsset(account: Account | string): boolean {
+  if (
+    ASSET_ACCOUNTS.includes(account as string)
+      || ASSET_ACCOUNTS.includes((account as Account).type)
+  ) {
     return true;
   }
 
   return false;
 }
 
-export function isLiability(account: Account): boolean {
-  if (LIABILITY_ACCOUNTS.includes(account.type)) {
+export function isLiability(account: Account | string): boolean {
+  if (
+    LIABILITY_ACCOUNTS.includes(account as string)
+      || LIABILITY_ACCOUNTS.includes((account as Account).type)
+  ) {
     return true;
   }
 
