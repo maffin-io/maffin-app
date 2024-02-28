@@ -15,7 +15,10 @@ exports[`AssetInfo renders as expected when no splits 1`] = `
           class="col-span-4"
         >
           <div
-            data-testid="StatisticsWidget"
+            data-testid="TotalWidget"
+          />
+          <div
+            data-testid="SpendWidget"
           />
         </div>
         <div

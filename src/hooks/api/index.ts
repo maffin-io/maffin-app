@@ -17,6 +17,7 @@ export {
   useSplitsCount,
   useAccountTotal,
   useAccountsTotals,
+  useCashFlow,
   useAccountsMonthlyTotal,
   useAccountsMonthlyWorth,
 } from '@/hooks/api/useSplits';

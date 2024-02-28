@@ -1,10 +1,7 @@
 import React from 'react';
-import { DateTime } from 'luxon';
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import type { ChartDataset } from 'chart.js';
 
-import { Split, Transaction } from '@/book/entities';
-import { useMainCurrency } from '@/hooks/api';
+import { useCashFlow, useMainCurrency } from '@/hooks/api';
 import { isAsset, isLiability } from '@/book/helpers/accountType';
 import { moneyToString, toFixed } from '@/helpers/number';
 import Sankey from './Sankey';
@@ -16,29 +13,7 @@ export type AssetSankeyProps = {
 export default function AssetSankey({
   guid,
 }: AssetSankeyProps): JSX.Element {
-  const selectedDate = DateTime.now();
-
-  const { data: byAccount, isPending } = useQuery({
-    queryKey: [...Split.CACHE_KEY, guid, 'total-by-account', selectedDate.toISODate()],
-    queryFn: () => Transaction.query(`
-      SELECT
-        splits.account_guid as guid,
-        accounts.name,
-        accounts.account_type as type,
-        SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) as total
-      FROM transactions AS tx
-      JOIN splits ON splits.tx_guid = tx.guid
-      JOIN accounts ON splits.account_guid = accounts.guid
-      WHERE tx.guid IN (
-        SELECT DISTINCT tx_guid
-        FROM splits
-        WHERE account_guid = '${guid}'
-      )
-      AND tx.post_date >= '${selectedDate.startOf('month').toSQLDate()}'
-      GROUP BY splits.account_guid
-      HAVING SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) != 0
-    `),
-  }) as UseQueryResult<{ guid: string, total: number, type: string, name: string }[]>;
+  const { data: byAccount, isPending } = useCashFlow(guid);
   const { data: currency } = useMainCurrency();
 
   const assetName = byAccount?.find(r => r.guid === guid)?.name || '';
@@ -59,13 +34,13 @@ export default function AssetSankey({
       };
     }
 
-    totalOut += Math.abs(r.total);
+    totalOut += r.total;
     return {
       from: assetName,
       fromType: 'ASSET',
       to: r.name,
       toType: r.type,
-      flow: Math.abs(r.total),
+      flow: r.total,
     };
   });
 
@@ -126,10 +101,11 @@ export default function AssetSankey({
             callbacks: {
               label: (ctx) => {
                 const raw = ctx.raw as { flow: number, toType: string };
-                const absolute = moneyToString(raw.flow, currency?.mnemonic || '');
+                let absolute = moneyToString(-raw.flow, currency?.mnemonic || '');
                 let percentage = toFixed((raw.flow / totalOut) * 100);
                 if (isAsset(raw.toType)) {
                   percentage = toFixed((raw.flow / totalIn) * 100);
+                  absolute = moneyToString(raw.flow, currency?.mnemonic || '');
                 }
                 return `${absolute} (${percentage} %)`;
               },
