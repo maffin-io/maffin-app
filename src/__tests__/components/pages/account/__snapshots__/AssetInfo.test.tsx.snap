@@ -20,6 +20,9 @@ exports[`AssetInfo renders as expected when no splits 1`] = `
           <div
             data-testid="SpendWidget"
           />
+          <div
+            data-testid="EarnWidget"
+          />
         </div>
         <div
           class="card col-span-8"
@@ -28,9 +31,6 @@ exports[`AssetInfo renders as expected when no splits 1`] = `
             data-testid="AssetSankey"
           />
         </div>
-        <div
-          class="col-span-4"
-        />
       </div>
     </div>
     <div

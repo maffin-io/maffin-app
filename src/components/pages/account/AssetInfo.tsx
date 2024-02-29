@@ -6,6 +6,7 @@ import { AssetSankey, NetWorthHistogram } from '@/components/charts';
 import { AccountsTable } from '@/components/pages/accounts';
 import TotalWidget from './TotalWidget';
 import SpendWidget from './SpendWidget';
+import EarnWidget from './EarnWidget';
 
 export type AssetInfoProps = {
   account: Account,
@@ -20,7 +21,29 @@ export default function AssetInfo({
         <div className="grid grid-cols-12">
           <div className="col-span-4">
             <TotalWidget account={account} />
-            <SpendWidget account={account} />
+            {
+              (
+                !account.placeholder
+                && (
+                  <>
+                    <SpendWidget account={account} />
+                    <EarnWidget account={account} />
+                  </>
+                )
+              ) || (
+                <StatisticsWidget
+                  className="mr-2"
+                  statsTextClass="!font-normal"
+                  title="Subaccounts"
+                  stats={(
+                    <AccountsTable
+                      guids={account.childrenIds}
+                    />
+                  )}
+                  description=""
+                />
+              )
+            }
           </div>
           <div className="card col-span-8">
             {
@@ -29,22 +52,6 @@ export default function AssetInfo({
                 <AssetSankey
                   guid={account.guid}
                 />
-              )
-            }
-          </div>
-          <div className="col-span-4">
-            {
-              account.placeholder
-              && (
-                <div className="col-span-6">
-                  <StatisticsWidget
-                    className="mr-2"
-                    statsTextClass="font-normal"
-                    title="Subaccounts"
-                    stats={<AccountsTable guids={account.childrenIds} />}
-                    description=""
-                  />
-                </div>
               )
             }
           </div>

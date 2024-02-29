@@ -1,19 +1,18 @@
 import React from 'react';
 import { DateTime, Interval } from 'luxon';
-import { BiHappy, BiSad } from 'react-icons/bi';
 
 import { useMainCurrency, useCashFlow } from '@/hooks/api';
 import type { Account } from '@/book/entities';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import { moneyToString } from '@/helpers/number';
 
-export type SpendWidgetProps = {
+export type EarnWidgetProps = {
   account: Account,
 };
 
-export default function SpendWidget({
+export default function EarnWidget({
   account,
-}: SpendWidgetProps): JSX.Element {
+}: EarnWidgetProps): JSX.Element {
   const { data: currency } = useMainCurrency();
   const { data: cashflow0 } = useCashFlow(account.guid);
   const { data: cashflow1 } = useCashFlow(
@@ -23,31 +22,23 @@ export default function SpendWidget({
       DateTime.now().minus({ month: 1 }).endOf('month'),
     ),
   );
-  const totalSpend0 = cashflow0?.filter(c => c.type === 'EXPENSE').reduce(
+  const totalEarn0 = Math.abs(cashflow0?.filter(c => c.type === 'INCOME').reduce(
     (total, c) => c.total + total,
     0,
-  ) || 0;
-  const totalSpend1 = cashflow1?.filter(c => c.type === 'EXPENSE').reduce(
+  ) || 0);
+  const totalEarn1 = Math.abs(cashflow1?.filter(c => c.type === 'INCOME').reduce(
     (total, c) => c.total + total,
     0,
-  ) || 0;
-  const cashflowDifference = totalSpend0 - totalSpend1;
+  ) || 0);
+  const cashflowDifference = totalEarn0 - totalEarn1;
 
   return (
     <StatisticsWidget
       className="mr-2"
-      title="This month expenses"
-      stats={moneyToString(totalSpend0, currency?.mnemonic || '')}
+      title="This month income"
+      stats={moneyToString(totalEarn0, currency?.mnemonic || '')}
       description={(
-        <div className="flex items-center">
-          {
-            cashflowDifference > 0
-            && <BiSad className="mr-1 amount-negative" />
-          }
-          {
-            cashflowDifference <= 0
-            && <BiHappy className="mr-1 amount-positive" />
-          }
+        <div>
           {(cashflowDifference < 0 ? '' : '+')}
           {moneyToString(cashflowDifference, currency?.mnemonic || '')}
           {' '}
