@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import dynamic from 'next/dynamic';
+import { BiTrendingDown, BiTrendingUp } from 'react-icons/bi';
 
 import type { Account } from '@/book/entities';
 import { useInvestment, usePrices } from '@/hooks/api';
@@ -88,33 +89,38 @@ export default function InvestmentInfo({
             }
           />
           <StatisticsWidget
-            className="col-span-7"
+            className="col-span-6"
             statsTextClass={classNames({
-              'amount-positive': investment.isClosed
-                ? investment.realizedProfitPct >= 0
-                : investment.unrealizedProfitPct >= 0,
-              'amount-negative': investment.isClosed
-                ? investment.realizedProfitPct < 0
-                : investment.unrealizedProfitPct < 0,
+              'amount-positive': investment.unrealizedProfitPct >= 0,
+              'amount-negative': investment.unrealizedProfitPct < 0,
             })}
-            title={investment.isClosed ? 'Realized Profit' : 'Unrealized Profit'}
+            title="Unrealized Profit"
             stats={
-              investment.isClosed
-                ? `${investment.realizedProfit.format()} (${toFixed(investment.realizedProfitPct)}%)`
-                : `${investment.unrealizedProfitAbs.format()} (${toFixed(investment.unrealizedProfitPct)}%)`
+              `${toFixed(investment.unrealizedProfitPct)} %`
             }
-            description={
-              investment.isClosed
-                ? `Bought a total of ${investment.totalBought.format()}`
-                : ''
-            }
+            description={(
+              <div className="flex items-center">
+                {
+                  investment.unrealizedProfitPct >= 0
+                  && <BiTrendingUp className="mr-1 amount-positive" />
+                }
+                {
+                  investment.unrealizedProfitPct < 0
+                  && <BiTrendingDown className="mr-1 amount-negative" />
+                }
+                {investment.unrealizedProfitAbs.format()}
+              </div>
+            )}
           />
           <StatisticsWidget
-            className="col-span-5"
-            title="Total Dividends"
-            stats={investment.realizedDividends.format()}
-            statsTextClass={classNames('badge default', { disabled: investment.isClosed })}
-            description=""
+            className="col-span-6"
+            title="Realized Profit"
+            stats={investment.realizedProfit.format()}
+            statsTextClass={classNames({
+              'amount-positive': investment.realizedProfitPct >= 0,
+              'amount-negative': investment.realizedProfitPct < 0,
+            })}
+            description={`+ ${investment.realizedDividends.format()} from dividends`}
           />
         </div>
       </div>
