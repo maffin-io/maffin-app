@@ -20,7 +20,7 @@ describe('SpendWidgetTest', () => {
   let account: Account;
 
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
     jest.spyOn(apiHook, 'useCashFlow').mockReturnValue({ data: undefined } as UseQueryResult<{ guid: string, total: number, type: string, name: string }[]>);
     account = {
       guid: 'guid',
@@ -49,6 +49,7 @@ describe('SpendWidgetTest', () => {
   });
 
   it('renders as expected', () => {
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
     jest.spyOn(apiHook, 'useCashFlow')
       .mockReturnValueOnce({
         data: [
