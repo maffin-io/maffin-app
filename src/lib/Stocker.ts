@@ -23,7 +23,7 @@ export async function insertTodayPrices(): Promise<void> {
     Commodity.find({
       where: [
         { namespace: 'STOCK' },
-        { namespace: 'MUTUAL' },
+        { namespace: 'FUND' },
       ],
     }),
   ]);
