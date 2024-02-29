@@ -7,6 +7,7 @@ import { NetWorthHistogram, AssetSankey } from '@/components/charts';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import TotalWidget from '@/components/pages/account/TotalWidget';
 import SpendWidget from '@/components/pages/account/SpendWidget';
+import EarnWidget from '@/components/pages/account/EarnWidget';
 import type { Account } from '@/book/entities';
 
 jest.mock('@/components/charts/NetWorthHistogram', () => jest.fn(
@@ -27,6 +28,10 @@ jest.mock('@/components/pages/account/TotalWidget', () => jest.fn(
 
 jest.mock('@/components/pages/account/SpendWidget', () => jest.fn(
   () => <div data-testid="SpendWidget" />,
+));
+
+jest.mock('@/components/pages/account/EarnWidget', () => jest.fn(
+  () => <div data-testid="EarnWidget" />,
 ));
 
 jest.mock('@/components/pages/accounts/AccountsTable', () => jest.fn(
@@ -77,6 +82,10 @@ describe('AssetInfo', () => {
       { account },
       {},
     );
+    expect(EarnWidget).toBeCalledWith(
+      { account },
+      {},
+    );
     expect(container).toMatchSnapshot();
   });
 
@@ -93,7 +102,7 @@ describe('AssetInfo', () => {
         className: 'mr-2',
         title: 'Subaccounts',
         description: '',
-        statsTextClass: 'font-normal',
+        statsTextClass: '!font-normal',
         // Don't know how to check for AccountsTable here
         stats: expect.anything(),
       },

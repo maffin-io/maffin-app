@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import type { UseQueryResult } from '@tanstack/react-query';
 
-import SpendWidget from '@/components/pages/account/SpendWidget';
+import EarnWidget from '@/components/pages/account/EarnWidget';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import * as apiHook from '@/hooks/api';
 import type { Account, Commodity } from '@/book/entities';
@@ -16,7 +16,7 @@ jest.mock('@/components/StatisticsWidget', () => jest.fn(
   () => <div data-testid="StatisticsWidget" />,
 ));
 
-describe('SpendWidgetTest', () => {
+describe('EarnWidgetTest', () => {
   let account: Account;
 
   beforeEach(() => {
@@ -35,14 +35,14 @@ describe('SpendWidgetTest', () => {
   });
 
   it('renders with no data', () => {
-    render(<SpendWidget account={account} />);
+    render(<EarnWidget account={account} />);
 
     expect(StatisticsWidget).toBeCalledWith(
       {
         className: 'mr-2',
         description: expect.anything(),
         stats: '€0.00',
-        title: 'This month expenses',
+        title: 'This month income',
       },
       {},
     );
@@ -57,7 +57,7 @@ describe('SpendWidgetTest', () => {
             guid: 'guid3',
             name: '3',
             type: 'INCOME',
-            total: -20,
+            total: -30,
           },
           {
             guid: 'guid4',
@@ -108,14 +108,14 @@ describe('SpendWidgetTest', () => {
         ],
       } as UseQueryResult<{ guid: string, total: number, type: string, name: string }[]>);
 
-    render(<SpendWidget account={account} />);
+    render(<EarnWidget account={account} />);
 
     expect(StatisticsWidget).toBeCalledWith(
       {
         className: 'mr-2',
         description: expect.anything(),
-        stats: '€20.00',
-        title: 'This month expenses',
+        stats: '€30.00',
+        title: 'This month income',
       },
       {},
     );

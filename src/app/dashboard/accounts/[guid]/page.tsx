@@ -11,7 +11,7 @@ import {
 } from '@/components/pages/account';
 import { useAccount } from '@/hooks/api';
 import Loading from '@/components/Loading';
-import { isAsset, isInvestment } from '@/book/helpers';
+import { isAsset, isLiability, isInvestment } from '@/book/helpers';
 
 export type AccountPageProps = {
   params: {
@@ -38,29 +38,19 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
     );
   }
 
+  let infoComponent: JSX.Element;
+  if (isInvestment(account)) {
+    infoComponent = <InvestmentInfo account={account} />;
+  } else if (isAsset(account) || isLiability(account)) {
+    infoComponent = <AssetInfo account={account} />;
+  } else {
+    infoComponent = <AccountInfo account={account} />;
+  }
+
   return (
     <>
       <Header account={account} />
-      {
-        isInvestment(account)
-        && (
-          <InvestmentInfo account={account} />
-        )
-      }
-      {
-        isAsset(account)
-        && !isInvestment(account)
-        && (
-          <AssetInfo account={account} />
-        )
-      }
-      {
-        !isInvestment(account)
-        && !isAsset(account)
-        && (
-          <AccountInfo account={account} />
-        )
-      }
+      {infoComponent}
       {
         !account.placeholder
         && (

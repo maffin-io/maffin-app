@@ -1,2 +1,2 @@
 export { currencyToSymbol } from './currencyToSymbol';
-export { isInvestment, isAsset } from './accountType';
+export { isInvestment, isLiability, isAsset } from './accountType';
