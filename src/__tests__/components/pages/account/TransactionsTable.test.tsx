@@ -154,6 +154,7 @@ describe('TransactionsTable', () => {
       },
       {},
     );
+    expect(apiHook.useSplitsPagination).toBeCalledWith('account_guid_1', { pageIndex: 0, pageSize: 10 });
   });
 
   it('creates Table with expected params', async () => {
