@@ -96,11 +96,11 @@ describe('SplitField', () => {
     expect(screen.getByRole('spinbutton', { name: 'splits.1.value' })).toBeVisible();
   });
 
-  // When we load data with defaults, we want to keep it as
-  // we are loading the split for deleting or updating
-  it('loads with default and doesnt reset value', async () => {
+  // When we load data for updating/deleting, we want to keep it as it is
+  it('loads with default and doesnt reset value when update', async () => {
     render(
       <FormWrapper
+        action="update"
         defaults={{
           fk_currency: { mnemonic: 'SGD' } as Commodity,
           splits: [
@@ -757,10 +757,12 @@ describe('SplitField', () => {
 
 function FormWrapper(
   {
+    action = 'add',
     disabled = false,
     defaults = {} as FormValues,
     submit,
   }: {
+    action?: 'add' | 'update' | 'delete',
     disabled?: boolean,
     defaults?: Partial<FormValues>,
     submit?: Function,
@@ -815,7 +817,7 @@ function FormWrapper(
         {...form.register('date')}
         type="date"
       />
-      <SplitField index={1} form={form} disabled={disabled} />
+      <SplitField index={1} form={form} action={action} disabled={disabled} />
       <button type="submit">
         submit
       </button>

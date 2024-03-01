@@ -17,11 +17,13 @@ export type SplitFieldProps = {
   index: number;
   form: UseFormReturn<FormValues>,
   disabled?: boolean,
+  action?: 'add' | 'update' | 'delete',
 };
 
 export default function SplitField({
   index,
   form,
+  action = 'add',
   disabled = false,
 }: SplitFieldProps): JSX.Element {
   const account = form.watch(`splits.${index}.fk_account`) as Account;
@@ -39,7 +41,7 @@ export default function SplitField({
     if (
       account
       && date
-      && form.formState.isDirty
+      && action === 'add'
       && prices
     ) {
       let rate = null;
@@ -54,17 +56,17 @@ export default function SplitField({
         setExchangeRate(Price.create({ valueNum: 1, valueDenom: 1 }));
       }
     }
-  }, [account, txCurrency, date, disabled, form.formState.isDirty, index, prices]);
+  }, [account, txCurrency, date, disabled, action, index, prices]);
 
   React.useEffect(() => {
-    if (value && form.formState.isDirty) {
+    if (value && action === 'add') {
       form.setValue(
         `splits.${index}.quantity`,
         toFixed(value / exchangeRate.value, 3),
       );
     }
     form.trigger('splits');
-  }, [value, exchangeRate, form, form.formState.isDirty, index]);
+  }, [value, exchangeRate, form, action, index]);
 
   return (
     <fieldset className="grid grid-cols-13" key={`splits.${index}`}>
