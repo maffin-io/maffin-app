@@ -15,7 +15,7 @@ export type SplitsFieldProps = {
 };
 
 export default function SplitsField({
-  action,
+  action = 'add',
   form,
   disabled = false,
 }: SplitsFieldProps): JSX.Element {
@@ -34,7 +34,7 @@ export default function SplitsField({
   React.useEffect(() => {
     if (
       splits.length === 2
-      && form.formState.isDirty
+      && action === 'add'
     ) {
       if (
         splits[0].account?.commodity?.guid === splits[1].account?.commodity?.guid
@@ -67,6 +67,7 @@ export default function SplitsField({
             <fieldset className="grid grid-cols-12" key={item.id}>
               <div className="col-span-11">
                 <SplitField
+                  action={action}
                   index={index}
                   form={form}
                   disabled={disabled}
