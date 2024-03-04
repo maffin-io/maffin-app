@@ -385,6 +385,7 @@ describe('TransactionsTable', () => {
             quantity: s.quantity,
           })),
         },
+        onSave: expect.any(Function),
       },
       {},
     );
@@ -413,6 +414,19 @@ describe('TransactionsTable', () => {
       },
       {},
     );
+
+    const updateOnSave = (TransactionForm as jest.Mock).mock.calls[0][0].onSave;
+    // @ts-ignore
+    tx.queryClient = {
+      invalidateQueries: jest.fn(),
+    };
+    updateOnSave();
+    // Make sure we update the split related to the account we are displaying on update.
+    // This is because sometimes the user may change the main split to be from
+    // another account so we want to make sure the split disappears from the
+    // transactions table and the total aggregations
+    // @ts-ignore
+    expect(tx.queryClient.invalidateQueries).toBeCalledWith({ queryKey: ['api', 'splits', 'account_guid_1'] });
 
     expect(container).toMatchSnapshot();
   });

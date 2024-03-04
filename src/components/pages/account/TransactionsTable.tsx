@@ -242,6 +242,9 @@ function ActionsCell({ row }: CellContext<Split, unknown>): JSX.Element {
         <TransactionForm
           action="update"
           defaultValues={defaultValues}
+          onSave={() => tx.queryClient?.invalidateQueries({
+            queryKey: [...Split.CACHE_KEY, row.original.accountId],
+          })}
         />
       </FormButton>
       <FormButton
