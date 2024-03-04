@@ -286,7 +286,7 @@ describe('caching', () => {
 
     await tx.save();
 
-    expect(mockInvalidateQueries).toBeCalledTimes(8);
+    expect(mockInvalidateQueries).toBeCalledTimes(7);
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['api', 'txs', tx.guid],
     });
@@ -301,9 +301,6 @@ describe('caching', () => {
     });
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['api', 'splits', '2'],
-    });
-    expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['api', 'aggregations', 'accounts', 'totals'],
     });
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['api', 'splits', { aggregation: 'total' }],
@@ -326,7 +323,7 @@ describe('caching', () => {
 
     await tx.remove();
 
-    expect(mockInvalidateQueries).toBeCalledTimes(8);
+    expect(mockInvalidateQueries).toBeCalledTimes(7);
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['api', 'txs', tx.guid],
     });
@@ -341,9 +338,6 @@ describe('caching', () => {
     });
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['api', 'splits', '2'],
-    });
-    expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['api', 'aggregations', 'accounts', 'totals'],
     });
     expect(mockInvalidateQueries).toBeCalledWith({
       queryKey: ['api', 'splits', { aggregation: 'total' }],

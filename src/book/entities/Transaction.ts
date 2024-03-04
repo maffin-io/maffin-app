@@ -100,10 +100,6 @@ export default class Transaction extends BaseEntity {
 
 /**
  * Update some detail keys for consistency
- *
- * - /api/txs/latest -> Latest 5 transactions that happened
- * - /api/txs/start -> The transaction date that happened the earliest
- * - /api/splits/<account> -> For each split in the transaction, we invalidate this key
  */
 export async function updateCache(
   {
@@ -129,10 +125,6 @@ export async function updateCache(
     queryClient.invalidateQueries({
       queryKey: [...Split.CACHE_KEY, split.accountId],
     });
-  });
-
-  queryClient.invalidateQueries({
-    queryKey: ['api', 'aggregations', 'accounts', 'totals'],
   });
 
   queryClient.invalidateQueries({
