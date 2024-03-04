@@ -69,7 +69,14 @@ export default class Account extends BaseEntity {
   @v.IsIn(Account.TYPES)
     type!: string;
 
-  path!: string;
+  @Column({
+    type: 'text',
+    insert: false,
+    select: false,
+    update: false,
+    nullable: true,
+  })
+    path!: string;
 
   @TreeParent()
   @JoinColumn({ name: 'parent_guid' })

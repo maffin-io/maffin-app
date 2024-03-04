@@ -80,3 +80,57 @@ describe('Commodity', () => {
     });
   });
 });
+
+describe('caching', () => {
+  let datasource: DataSource;
+  let mockInvalidateQueries: jest.Mock;
+
+  beforeEach(async () => {
+    mockInvalidateQueries = jest.fn();
+
+    datasource = new DataSource({
+      type: 'sqljs',
+      dropSchema: true,
+      entities: [Commodity],
+      synchronize: true,
+      logging: false,
+      extra: {
+        queryClient: {
+          invalidateQueries: mockInvalidateQueries,
+        },
+      },
+    });
+    await datasource.initialize();
+
+    jest.spyOn(BaseEntity.prototype, 'save').mockImplementation();
+    jest.spyOn(BaseEntity.prototype, 'remove').mockImplementation();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('invalidates keys when saving', async () => {
+    const c = new Commodity();
+    c.fullname = 'name';
+
+    await c.save();
+
+    expect(mockInvalidateQueries).toBeCalledTimes(1);
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['api', 'commodities'],
+    });
+  });
+
+  it('invalidates keys when deleting', async () => {
+    const c = new Commodity();
+    c.fullname = 'name';
+
+    await c.remove();
+
+    expect(mockInvalidateQueries).toBeCalledTimes(1);
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['api', 'commodities'],
+    });
+  });
+});

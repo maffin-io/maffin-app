@@ -55,6 +55,7 @@ export default function AccountSelector(
       getOptionValue={(option: Account) => option.path}
       options={options.sort((a, b) => a.path.localeCompare(b.path))}
       placeholder={placeholder || 'Choose account'}
+      defaultValue={accounts?.find(a => a.guid === (props.defaultValue as Account)?.guid)}
       classNames={{
         option: (option) => {
           if (option.isFocused || option.isSelected) {
