@@ -49,10 +49,10 @@ export default function NetWorthHistogram({
   );
 
   const { data: monthlyWorth } = useAccountsMonthlyWorth(interval);
-  const assetSeries = monthlyWorth?.map(m => m[assetsGuid].toNumber());
+  const assetSeries = monthlyWorth?.map(m => m[assetsGuid]?.toNumber() || 0);
   const liabilitySeries = monthlyWorth?.map(m => m[liabilitiesGuid]?.toNumber() || 0);
 
-  const unit = monthlyWorth?.[0][assetsGuid].currency || '';
+  const unit = monthlyWorth?.[0][assetsGuid]?.currency || '';
 
   const datasets: ChartDataset<'bar'>[] = [];
 

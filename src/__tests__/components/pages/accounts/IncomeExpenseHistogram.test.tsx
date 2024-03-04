@@ -30,7 +30,7 @@ describe('IncomeExpenseHistogram', () => {
     jest.resetAllMocks();
   });
 
-  it('renders with no data', () => {
+  it('renders with no loaded data', () => {
     render(
       <IncomeExpenseHistogram />,
     );
@@ -53,6 +53,129 @@ describe('IncomeExpenseHistogram', () => {
             {
               backgroundColor: '#06B6D4',
               data: [],
+              label: 'Savings',
+              datalabels: {
+                anchor: 'end',
+                display: true,
+                formatter: expect.any(Function),
+                align: 'end',
+                backgroundColor: '#06B6D4FF',
+                borderRadius: 5,
+                color: '#FFF',
+              },
+            },
+          ],
+          labels: [
+            DateTime.now().minus({ month: 6 }),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            // When it's the 1st of the month, we only show 6 labels instead
+            DateTime.fromISO('2022-12-01'),
+          ],
+        },
+        options: {
+          layout: {
+            padding: {
+              right: 15,
+            },
+          },
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+          },
+          plugins: {
+            title: {
+              align: 'start',
+              display: true,
+              text: 'Monthly Savings',
+              font: {
+                size: 18,
+              },
+              padding: {
+                bottom: 30,
+                top: 0,
+              },
+            },
+            legend: {
+              onClick: expect.any(Function),
+              labels: {
+                boxHeight: 8,
+                boxWidth: 8,
+                pointStyle: 'circle',
+                usePointStyle: true,
+              },
+              position: 'bottom',
+            },
+            tooltip: {
+              backgroundColor: '#323b44',
+              callbacks: {
+                label: expect.any(Function),
+                labelColor: expect.any(Function),
+              },
+            },
+          },
+          scales: {
+            x: {
+              grid: {
+                display: false,
+              },
+              ticks: {
+                align: 'center',
+              },
+              time: {
+                displayFormats: {
+                  month: 'MMM-yy',
+                },
+                tooltipFormat: 'MMMM yyyy',
+                unit: 'month',
+              },
+              type: 'time',
+            },
+            y: {
+              grace: 1,
+              border: {
+                display: false,
+              },
+              position: 'left',
+              ticks: {
+                callback: expect.any(Function),
+                maxTicksLimit: 10,
+              },
+            },
+          },
+        },
+      },
+      {},
+    );
+  });
+
+  it('renders with no data', () => {
+    jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue({ data: [{}, {}] } as UseQueryResult<AccountsTotals[]>);
+
+    render(
+      <IncomeExpenseHistogram />,
+    );
+
+    expect(Bar).toBeCalledWith(
+      {
+        height: '400',
+        data: {
+          datasets: [
+            {
+              backgroundColor: '#22C55E',
+              data: [0, 0],
+              label: 'Income',
+            },
+            {
+              backgroundColor: '#EF4444',
+              data: [0, 0],
+              label: 'Expenses',
+            },
+            {
+              backgroundColor: '#06B6D4',
+              data: [0, 0],
               label: 'Savings',
               datalabels: {
                 anchor: 'end',

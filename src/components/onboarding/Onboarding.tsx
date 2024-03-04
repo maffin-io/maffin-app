@@ -127,6 +127,7 @@ export default function Onboarding({
                   parent: accounts.type_asset as Account,
                   type: 'BANK',
                   fk_commodity: useMainCurrency().data as Commodity,
+                  placeholder: false,
                   balance: 0,
                 }}
               />

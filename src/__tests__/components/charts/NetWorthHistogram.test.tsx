@@ -30,7 +30,7 @@ describe('NetWorthHistogram', () => {
     jest.resetAllMocks();
   });
 
-  it('renders with no data', () => {
+  it('renders with no loaded data', () => {
     render(
       <NetWorthHistogram
         assetsGuid=""
@@ -54,6 +54,136 @@ describe('NetWorthHistogram', () => {
               backgroundColor: '#0E7490',
               borderColor: '#0E7490',
               data: [],
+              label: 'Net worth',
+              order: 0,
+              pointHoverRadius: 10,
+              pointRadius: 5,
+              pointStyle: 'rectRounded',
+              type: 'line',
+              datalabels: {
+                align: 'end',
+                backgroundColor: '#0E7490FF',
+                borderRadius: 5,
+                color: '#FFF',
+                display: expect.any(Function),
+                formatter: expect.any(Function),
+              },
+            },
+          ],
+          labels: [
+            DateTime.now().minus({ months: 6 }),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            expect.any(DateTime),
+            DateTime.fromISO('2022-12-01'),
+          ],
+        },
+        options: {
+          layout: {
+            padding: {
+              right: 15,
+            },
+          },
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+          },
+          plugins: {
+            title: {
+              align: 'start',
+              display: true,
+              text: 'Net Worth',
+              font: {
+                size: 18,
+              },
+              padding: {
+                bottom: 30,
+                top: 0,
+              },
+            },
+            legend: {
+              display: true,
+              onClick: expect.any(Function),
+              labels: {
+                boxHeight: 8,
+                boxWidth: 8,
+                pointStyle: 'circle',
+                usePointStyle: true,
+              },
+              position: 'bottom',
+            },
+            tooltip: {
+              backgroundColor: '#323b44',
+              callbacks: {
+                label: expect.any(Function),
+                labelColor: expect.any(Function),
+              },
+            },
+          },
+          scales: {
+            x: {
+              stacked: true,
+              grid: {
+                display: false,
+              },
+              ticks: {
+                align: 'center',
+              },
+              time: {
+                displayFormats: {
+                  month: 'MMM-yy',
+                },
+                tooltipFormat: 'MMMM yyyy',
+                unit: 'month',
+              },
+              type: 'time',
+            },
+            y: {
+              beginAtZero: false,
+              grace: 1,
+              border: {
+                display: false,
+              },
+              position: 'left',
+              ticks: {
+                callback: expect.any(Function),
+                maxTicksLimit: 10,
+              },
+            },
+          },
+        },
+      },
+      {},
+    );
+  });
+
+  it('renders with no data', () => {
+    jest.spyOn(apiHook, 'useAccountsMonthlyWorth').mockReturnValue({ data: [{}, {}] } as UseQueryResult<AccountsTotals[]>);
+
+    render(
+      <NetWorthHistogram
+        assetsGuid=""
+        liabilitiesGuid=""
+      />,
+    );
+
+    expect(Bar).toBeCalledWith(
+      {
+        height: 400,
+        data: {
+          datasets: [
+            {
+              backgroundColor: '#06B6D4',
+              data: [0, 0],
+              label: 'Assets',
+              order: 1,
+              barPercentage: 0.6,
+            },
+            {
+              backgroundColor: '#0E7490',
+              borderColor: '#0E7490',
+              data: [0, 0],
               label: 'Net worth',
               order: 0,
               pointHoverRadius: 10,
