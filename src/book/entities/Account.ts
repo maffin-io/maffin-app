@@ -5,8 +5,6 @@ import {
   ManyToOne,
   OneToMany,
   RelationId,
-  BeforeInsert,
-  BeforeUpdate,
   Tree,
   TreeParent,
   TreeChildren,
@@ -71,24 +69,7 @@ export default class Account extends BaseEntity {
   @v.IsIn(Account.TYPES)
     type!: string;
 
-  @BeforeInsert()
-  @BeforeUpdate()
-  async setPath() {
-    if (this.type === 'ROOT' || this.parent?.type === 'ROOT') {
-      this.path = this.name;
-    } else {
-      // havent found a way to control BeforeInsert order.
-      // The validation one executes after this so we have to protect
-      // against parent not existing (which is mandatory).
-      this.path = `${this.parent?.path}:${this.name}`;
-    }
-  }
-
-  @Column({
-    type: 'text',
-    default: '',
-  })
-    path!: string;
+  path!: string;
 
   @TreeParent()
   @JoinColumn({ name: 'parent_guid' })
@@ -148,7 +129,7 @@ export default class Account extends BaseEntity {
     const account = await super.save(options);
 
     if (this.queryClient) {
-      updateCache({ queryClient: this.queryClient, entity: this });
+      updateCache({ queryClient: this.queryClient });
     }
 
     return account;
@@ -156,7 +137,7 @@ export default class Account extends BaseEntity {
 
   async remove(options?: SaveOptions): Promise<this> {
     if (this.queryClient) {
-      updateCache({ queryClient: this.queryClient, entity: this, isDelete: true });
+      updateCache({ queryClient: this.queryClient });
     }
 
     const account = await super.remove(options);
@@ -164,53 +145,10 @@ export default class Account extends BaseEntity {
   }
 }
 
-/**
- * Because accounts have parent/children relations,
- * whenever an account is updated or deleted we need to update
- * those relations
- */
-export async function updateCache(
-  {
-    queryClient,
-    entity,
-    isDelete = false,
-  }: {
-    queryClient: QueryClient,
-    entity: Account,
-    isDelete?: boolean,
-  },
-) {
-  // We need this to reload childrenIds... haven't explored much
-  // maybe there is a better way.
-  await entity.reload();
-
-  queryClient.setQueryData(
-    [...Account.CACHE_KEY],
-    (entities: Account[] | undefined) => {
-      if (!entities) {
-        return undefined;
-      }
-
-      const newEntities = [...entities];
-
-      if (entity.type !== 'ROOT') {
-        const parentIndex = entities.findIndex(e => e.guid === entity.parentId) as number;
-        const parentAccount = entities[parentIndex];
-        const childIndex = parentAccount.childrenIds.findIndex(
-          (guid: string) => guid === entity.guid,
-        );
-        if (childIndex < 0) {
-          parentAccount.childrenIds.push(entity.guid);
-        } else if (isDelete) {
-          parentAccount.childrenIds.splice(childIndex, 1);
-        }
-
-        newEntities[parentIndex] = parentAccount;
-      }
-
-      return newEntities;
-    },
-  );
+export async function updateCache({ queryClient }: { queryClient: QueryClient }) {
+  queryClient.invalidateQueries({
+    queryKey: [...Account.CACHE_KEY],
+  });
 }
 
 // https://github.com/typeorm/typeorm/issues/4714

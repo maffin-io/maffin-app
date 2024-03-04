@@ -18,13 +18,6 @@ export default async function importBook(rawData: Uint8Array): Promise<Uint8Arra
   });
   await tempDataSource.initialize();
 
-  const accounts = await Account.find();
-  setAccountPaths(accounts.find(a => a.type === 'ROOT') as Account, accounts);
-  await Promise.all(accounts.map(account => Account.update(
-    { guid: account.guid },
-    { path: account.path },
-  )));
-
   await Promise.all([
     Account.delete({
       type: 'ROOT',
@@ -41,18 +34,4 @@ export default async function importBook(rawData: Uint8Array): Promise<Uint8Arra
   ]);
 
   return tempDataSource.sqljsManager.exportDatabase();
-}
-
-function setAccountPaths(current: Account, accounts: Account[]) {
-  const parent = accounts.find(a => a.guid === current.parentId);
-  if (!parent || parent.type === 'ROOT') {
-    current.path = current.name;
-  } else {
-    current.path = `${parent.path}:${current.name}`;
-  }
-
-  current.childrenIds.forEach(childId => {
-    const account = accounts.find(a => a.guid === childId) as Account;
-    setAccountPaths(account, accounts);
-  });
 }

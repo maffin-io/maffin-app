@@ -32,7 +32,7 @@ export default function AccountSelector(
 
   let options = accounts || [];
 
-  options = options.filter(account => account && !(ignoreAccounts).includes(account.type));
+  options = options.filter(account => account && !(ignoreAccounts).includes(account.guid));
   if (!showRoot) {
     options = options.filter(account => account.type !== 'ROOT');
   }

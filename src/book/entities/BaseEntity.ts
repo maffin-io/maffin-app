@@ -34,7 +34,7 @@ export default class BaseEntity extends BE {
   async save(options?: SaveOptions): Promise<this> {
     const entity = await super.save(options);
 
-    if (this.queryClient && ['Account', 'Commodity'].includes(this.constructor.name)) {
+    if (this.queryClient && ['Commodity'].includes(this.constructor.name)) {
       updateCache({ queryClient: this.queryClient, entity });
     }
 
@@ -44,7 +44,7 @@ export default class BaseEntity extends BE {
   async remove(options?: SaveOptions): Promise<this> {
     const entity = await super.remove(options);
 
-    if (this.queryClient && ['Account', 'Commodity'].includes(this.constructor.name)) {
+    if (this.queryClient && ['Commodity'].includes(this.constructor.name)) {
       updateCache({ queryClient: this.queryClient, entity, isDelete: true });
     }
 
