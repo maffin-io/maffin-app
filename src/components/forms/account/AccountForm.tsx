@@ -109,7 +109,14 @@ export default function AccountForm({
           />
         </fieldset>
 
-        <fieldset className="col-start-10 col-span-2">
+        <fieldset
+          className={classNames(
+            'col-start-10 col-span-2',
+            {
+              hidden: hideDefaults && 'placeholder' in defaultValues,
+            },
+          )}
+        >
           <label htmlFor="placeholderInput" className="inline-block mb-2">Parent</label>
           <span
             className="badge ml-0.5"

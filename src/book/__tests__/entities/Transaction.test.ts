@@ -306,7 +306,7 @@ describe('caching', () => {
       queryKey: ['api', 'splits', { aggregation: 'total' }],
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['api', 'splits', { aggregation: 'monthlyTotal' }],
+      queryKey: ['api', 'splits', { aggregation: 'monthly-total' }],
     });
   });
 
@@ -343,7 +343,7 @@ describe('caching', () => {
       queryKey: ['api', 'splits', { aggregation: 'total' }],
     });
     expect(mockInvalidateQueries).toBeCalledWith({
-      queryKey: ['api', 'splits', { aggregation: 'monthlyTotal' }],
+      queryKey: ['api', 'splits', { aggregation: 'monthly-total' }],
     });
   });
 });
