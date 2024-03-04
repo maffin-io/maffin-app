@@ -3311,10 +3311,10 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.1.tgz#16308cea045f0fc777b6ff20a9f25474dd8293d2"
   integrity sha512-9TANp6GPoMtYzQdt54kfAyMmz1+osLlXdg2ENroU7zzrtflTLrrC/lgrIfaSe+Wu0b89GKccT7vxXA0MoAIO+Q==
 
-"@fontsource/inter@^5.0.16":
-  version "5.0.16"
-  resolved "https://registry.yarnpkg.com/@fontsource/inter/-/inter-5.0.16.tgz#b858508cdb56dcbbf3166903122851e2fbd16b50"
-  integrity sha512-qF0aH5UiZvCmneX5orJbVRoc2VTyLTV3X/7laMp03Qt28L+B9tFlZODOGUL64wDWc69YVdi1LeJB0cIgd51lvw==
+"@fontsource/inter@^5.0.17":
+  version "5.0.17"
+  resolved "https://registry.yarnpkg.com/@fontsource/inter/-/inter-5.0.17.tgz#43fb1bc6bcfbfbfc3a9d19a59a4a7ab99fc1c645"
+  integrity sha512-2meBGx1kt7u5LwzGc5Sz5rka6ZDrydg6nT3x6Wkt310vHXUchIywrO8pooWMzZdHYcyFY/cv4lEpJZgMD94bCg==
 
 "@gilbarbara/deep-equal@^0.1.1":
   version "0.1.2"
