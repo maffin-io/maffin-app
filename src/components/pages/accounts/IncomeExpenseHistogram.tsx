@@ -19,8 +19,8 @@ export default function IncomeExpenseHistogram({
     selectedDate,
   );
   const { data: monthlyTotals } = useAccountsMonthlyTotal(interval);
-  const incomeSeries = monthlyTotals?.map(m => m.type_income.toNumber());
-  const expenseSeries = monthlyTotals?.map(m => m.type_expense.toNumber());
+  const incomeSeries = monthlyTotals?.map(m => m.type_income?.toNumber() || 0);
+  const expenseSeries = monthlyTotals?.map(m => m.type_expense?.toNumber() || 0);
 
   const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';

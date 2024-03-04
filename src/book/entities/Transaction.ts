@@ -132,7 +132,7 @@ export async function updateCache(
   });
 
   queryClient.invalidateQueries({
-    queryKey: [...Split.CACHE_KEY, { aggregation: 'monthlyTotal' }],
+    queryKey: [...Split.CACHE_KEY, { aggregation: 'monthly-total' }],
   });
 }
 
