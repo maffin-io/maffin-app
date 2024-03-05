@@ -23,7 +23,7 @@
     "@dinero.js/currencies": "^2.0.0-alpha.14",
     "@fontsource/inter": "^5.0.17",
     "@hookform/resolvers": "^3.3.4",
-    "@tanstack/react-query": "^5.24.1",
+    "@tanstack/react-query": "^5.24.8",
     "@tanstack/react-query-devtools": "^5.21.0",
     "@tanstack/react-table": "^8.13.0",
     "@testing-library/jest-dom": "^6.4.2",
