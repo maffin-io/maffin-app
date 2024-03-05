@@ -10,7 +10,7 @@ import { Account } from '@/book/entities';
 import * as apiHook from '@/hooks/api';
 import {
   Header,
-  AccountInfo,
+  IEInfo,
   AssetInfo,
   TransactionsTable,
   InvestmentInfo,
@@ -29,8 +29,8 @@ jest.mock('@/components/pages/account/TransactionsTable', () => jest.fn(
   () => <div data-testid="TransactionsTable" />,
 ));
 
-jest.mock('@/components/pages/account/AccountInfo', () => jest.fn(
-  () => <div data-testid="AccountInfo" />,
+jest.mock('@/components/pages/account/IEInfo', () => jest.fn(
+  () => <div data-testid="IEInfo" />,
 ));
 
 jest.mock('@/components/pages/account/InvestmentInfo', () => jest.fn(
@@ -95,7 +95,7 @@ describe('AccountPage', () => {
       },
       {},
     );
-    expect(AccountInfo).toHaveBeenLastCalledWith(
+    expect(IEInfo).toHaveBeenLastCalledWith(
       {
         account,
       },

@@ -16,7 +16,7 @@ exports[`AccountPage renders as expected with account 1`] = `
     data-testid="Header"
   />
   <div
-    data-testid="AccountInfo"
+    data-testid="IEInfo"
   />
   <div
     class="card p-0 mt-4 bg-light-100 dark:bg-dark-800"

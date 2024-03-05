@@ -5,9 +5,9 @@ import React from 'react';
 import {
   TransactionsTable,
   Header,
-  AccountInfo,
   InvestmentInfo,
   AssetInfo,
+  IEInfo,
 } from '@/components/pages/account';
 import { useAccount } from '@/hooks/api';
 import Loading from '@/components/Loading';
@@ -44,7 +44,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
   } else if (isAsset(account) || isLiability(account)) {
     infoComponent = <AssetInfo account={account} />;
   } else {
-    infoComponent = <AccountInfo account={account} />;
+    infoComponent = <IEInfo account={account} />;
   }
 
   return (

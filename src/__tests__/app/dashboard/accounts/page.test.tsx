@@ -3,7 +3,7 @@ import {
   screen,
   render,
 } from '@testing-library/react';
-import { DateTime } from 'luxon';
+import { DateTime, Interval } from 'luxon';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import type { Account } from '@/book/entities';
@@ -180,7 +180,10 @@ describe('AccountsPage', () => {
       {
         title: 'Income',
         accounts: undefined,
-        selectedDate: DateTime.fromISO('2023-01-02'),
+        interval: Interval.fromDateTimes(
+          DateTime.now().minus({ month: 6 }).startOf('month'),
+          DateTime.now(),
+        ),
       },
       {},
     );
@@ -189,7 +192,10 @@ describe('AccountsPage', () => {
       {
         title: 'Expenses',
         accounts: undefined,
-        selectedDate: DateTime.fromISO('2023-01-02'),
+        interval: Interval.fromDateTimes(
+          DateTime.now().minus({ month: 6 }).startOf('month'),
+          DateTime.now(),
+        ),
       },
       {},
     );
@@ -295,7 +301,10 @@ describe('AccountsPage', () => {
       1,
       {
         title: 'Income',
-        selectedDate: DateTime.fromISO('2023-01-02'),
+        interval: Interval.fromDateTimes(
+          DateTime.now().minus({ month: 6 }).startOf('month'),
+          DateTime.now(),
+        ),
         accounts: [accounts[4]],
       },
       {},
@@ -304,7 +313,10 @@ describe('AccountsPage', () => {
       2,
       {
         title: 'Expenses',
-        selectedDate: DateTime.fromISO('2023-01-02'),
+        interval: Interval.fromDateTimes(
+          DateTime.now().minus({ month: 6 }).startOf('month'),
+          DateTime.now(),
+        ),
         accounts: [accounts[2]],
       },
       {},
