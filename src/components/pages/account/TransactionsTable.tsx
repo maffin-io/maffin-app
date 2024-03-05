@@ -20,7 +20,7 @@ import {
   Split,
   Transaction,
 } from '@/book/entities';
-import { useSplitsCount, useSplitsPagination } from '@/hooks/api';
+import { useAccounts, useSplitsCount, useSplitsPagination } from '@/hooks/api';
 import type { Commodity } from '@/book/entities';
 import { accountColorCode } from '@/helpers/classNames';
 import fetcher from '@/hooks/api/fetcher';
@@ -118,9 +118,7 @@ function useTransaction(guid: string): UseQueryResult<Transaction> {
       () => Transaction.findOne({
         where: { guid },
         relations: {
-          splits: {
-            fk_account: true,
-          },
+          splits: true,
         },
       }),
       queryKey,
@@ -139,6 +137,7 @@ function DescriptionCell({ row }: CellContext<Split, unknown>): JSX.Element {
 
 function FromToAccountCell({ row }: CellContext<Split, unknown>): JSX.Element {
   const { data: tx } = useTransaction(row.original.txId);
+  const { data: accounts } = useAccounts();
 
   const otherSplits = tx?.splits.filter(
     split => split.accountId !== row.original.accountId,
@@ -147,7 +146,7 @@ function FromToAccountCell({ row }: CellContext<Split, unknown>): JSX.Element {
   return (
     <ul>
       { otherSplits.map(split => {
-        const { account } = split;
+        const account = accounts?.find(a => a.guid === split.accountId) as Account;
 
         return (
           <li key={split.guid}>
@@ -204,6 +203,7 @@ function TotalPartial(
 
 function ActionsCell({ row }: CellContext<Split, unknown>): JSX.Element {
   const { data: tx } = useTransaction(row.original.txId);
+  const { data: accounts } = useAccounts();
 
   if (!tx || tx.guid !== row.original.txId) {
     return <span />;
@@ -223,11 +223,13 @@ function ActionsCell({ row }: CellContext<Split, unknown>): JSX.Element {
         ...originalSplit,
         value: originalSplit.value,
         quantity: originalSplit.quantity,
+        fk_account: accounts?.find(a => a.guid === originalSplit.accountId) as Account,
       },
       ...tx.splits.filter(split => split.guid !== originalSplit.guid).map(split => ({
         ...split,
         value: split.value,
         quantity: split.quantity,
+        fk_account: accounts?.find(a => a.guid === split.accountId) as Account,
       } as Split)),
     ] as Split[],
   };

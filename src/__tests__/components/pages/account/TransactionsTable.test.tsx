@@ -226,25 +226,27 @@ describe('TransactionsTable', () => {
   });
 
   it('renders FromTo column as expected', async () => {
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({
+      data: [
+        {
+          guid: 'account_guid_2',
+          type: 'EXPENSE',
+          path: 'Expenses:expense',
+        },
+        {
+          guid: 'account_guid_3',
+          type: 'INVESTMENT',
+          path: 'account_guid_3.path',
+        },
+      ],
+    } as UseQueryResult<Account[]>);
     jest.spyOn(query, 'useQuery').mockReturnValue({
       data: {
         guid: 'tx_guid',
         splits: [
           split,
-          {
-            accountId: 'account_guid_2',
-            account: {
-              type: 'EXPENSE',
-              path: 'Expenses:expense',
-            },
-          },
-          {
-            accountId: 'account_guid_3',
-            account: {
-              type: 'INVESTMENT',
-              path: 'account_guid_3.path',
-            },
-          },
+          { accountId: 'account_guid_2' },
+          { accountId: 'account_guid_3' },
         ],
       },
     } as UseQueryResult<Transaction>);
@@ -323,6 +325,13 @@ describe('TransactionsTable', () => {
   });
 
   it('renders Actions column as expected', async () => {
+    const accounts = [
+      { guid: 'account_guid_1' },
+      { guid: 'account_guid_3' },
+    ];
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({
+      data: accounts,
+    } as UseQueryResult<Account[]>);
     const tx = {
       guid: 'tx_guid',
       date: DateTime.fromISO('2023-01-01'),
@@ -332,10 +341,6 @@ describe('TransactionsTable', () => {
           accountId: 'account_guid_2',
           value: 100,
           quantity: 100,
-          account: {
-            type: 'EXPENSE',
-            path: 'Expenses:expense',
-          },
         },
       ],
     };
@@ -383,6 +388,7 @@ describe('TransactionsTable', () => {
             ...s,
             value: s.value,
             quantity: s.quantity,
+            fk_account: accounts.find(a => a.guid === s.accountId),
           })),
         },
         onSave: expect.any(Function),
@@ -409,6 +415,7 @@ describe('TransactionsTable', () => {
             ...s,
             value: s.value,
             quantity: s.quantity,
+            fk_account: accounts.find(a => a.guid === s.accountId),
           })),
         },
       },

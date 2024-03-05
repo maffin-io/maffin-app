@@ -1,5 +1,4 @@
-import { waitFor } from '@testing-library/react';
-import { DataSource, BaseEntity as BE } from 'typeorm';
+import { DataSource } from 'typeorm';
 
 import {
   Account,

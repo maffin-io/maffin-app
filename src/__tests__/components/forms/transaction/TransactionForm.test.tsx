@@ -88,7 +88,6 @@ describe('TransactionForm', () => {
     }).save();
 
     assetAccount.path = 'Assets:asset1';
-    console.log(assetAccount);
     expenseAccount.path = 'Expenses:random';
 
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
@@ -110,7 +109,6 @@ describe('TransactionForm', () => {
     'add', 'update', 'delete',
   ])('renders as expected with action %s', async (action) => {
     const now = DateTime.now().toISODate();
-    console.log(assetAccount);
     const { container } = render(
       <TransactionForm
         onSave={() => {}}
@@ -552,6 +550,7 @@ describe('TransactionForm', () => {
         fk_commodity: ticker,
         parent: root,
       }).save();
+      tickerAccount.path = 'Assets:Asset3';
 
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
@@ -845,6 +844,7 @@ describe('TransactionForm', () => {
         fk_commodity: ticker,
         parent: root,
       }).save();
+      tickerAccount.path = 'Assets:Asset3';
 
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
@@ -1280,6 +1280,7 @@ describe('TransactionForm', () => {
         fk_commodity: eur,
         parent: root,
       }).save();
+      extraExpenseAccount.path = 'Expenses:Extra';
 
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {

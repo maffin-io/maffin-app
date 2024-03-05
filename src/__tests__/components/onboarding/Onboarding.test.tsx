@@ -1,5 +1,10 @@
 import React from 'react';
-import { screen, render } from '@testing-library/react';
+import {
+  screen,
+  render,
+  waitFor,
+  renderHook,
+} from '@testing-library/react';
 import { DataSource } from 'typeorm';
 import { DateTime } from 'luxon';
 import userEvent from '@testing-library/user-event';
@@ -21,6 +26,11 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
+const queryClient = new QueryClient();
+const wrapper = ({ children }: React.PropsWithChildren) => (
+  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+);
+
 describe('Onboarding', () => {
   let datasource: DataSource;
 
@@ -40,14 +50,13 @@ describe('Onboarding', () => {
       type: 'ROOT',
     }).save();
 
-    jest.spyOn(API, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
     jest.spyOn(API, 'useMainCurrency').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
   });
 
   // This test is huge but doing it like this because the onboarding
   // steps are linked one after the other
   it('full onboarding', async () => {
-    const queryClient = new QueryClient();
+    queryClient.removeQueries();
     const user = userEvent.setup();
     render(
       <QueryClientProvider client={queryClient}>
@@ -73,39 +82,10 @@ describe('Onboarding', () => {
     jest.spyOn(API, 'useMainCurrency').mockReturnValue({ data: eur } as UseQueryResult<Commodity>);
 
     const accounts = await Account.find();
-    expect(accounts).toContainEqual(
+    expect(accounts).toEqual([
       expect.objectContaining({
-        name: 'Root',
+        guid: 'root_account_guid',
       }),
-    );
-    expect(accounts).toContainEqual(
-      expect.objectContaining({
-        fk_commodity: eur,
-        parentId: 'root_account_guid',
-        placeholder: true,
-        type: 'EXPENSE',
-        name: 'Expenses',
-      }),
-    );
-    expect(accounts).toContainEqual(
-      expect.objectContaining({
-        fk_commodity: eur,
-        parentId: 'root_account_guid',
-        placeholder: true,
-        type: 'ASSET',
-        name: 'Assets',
-      }),
-    );
-    expect(accounts).toContainEqual(
-      expect.objectContaining({
-        fk_commodity: eur,
-        parentId: accounts[1].guid,
-        placeholder: false,
-        type: 'EXPENSE',
-        name: 'Groceries',
-      }),
-    );
-    expect(accounts).toContainEqual(
       expect.objectContaining({
         fk_commodity: eur,
         parentId: 'root_account_guid',
@@ -113,8 +93,6 @@ describe('Onboarding', () => {
         type: 'LIABILITY',
         name: 'Liabilities',
       }),
-    );
-    expect(accounts).toContainEqual(
       expect.objectContaining({
         fk_commodity: eur,
         parentId: 'root_account_guid',
@@ -122,8 +100,20 @@ describe('Onboarding', () => {
         type: 'INCOME',
         name: 'Income',
       }),
-    );
-    expect(accounts).toContainEqual(
+      expect.objectContaining({
+        fk_commodity: eur,
+        parentId: 'root_account_guid',
+        placeholder: true,
+        type: 'EXPENSE',
+        name: 'Expenses',
+      }),
+      expect.objectContaining({
+        fk_commodity: eur,
+        parentId: 'root_account_guid',
+        placeholder: true,
+        type: 'ASSET',
+        name: 'Assets',
+      }),
       expect.objectContaining({
         fk_commodity: eur,
         parentId: 'root_account_guid',
@@ -132,39 +122,46 @@ describe('Onboarding', () => {
         name: 'Equity',
         hidden: true,
       }),
-    );
-    expect(accounts).toContainEqual(
       expect.objectContaining({
         fk_commodity: eur,
         placeholder: false,
-        type: 'EQUITY',
-        name: 'Opening balances - EUR',
-      }),
-    );
-    expect(accounts).toContainEqual(
-      expect.objectContaining({
-        fk_commodity: eur,
-        placeholder: false,
+        parentId: accounts[2].guid,
         type: 'INCOME',
         name: 'Salary',
       }),
-    );
-    expect(accounts).toContainEqual(
+      expect.objectContaining({
+        fk_commodity: eur,
+        parentId: accounts[3].guid,
+        placeholder: false,
+        type: 'EXPENSE',
+        name: 'Groceries',
+      }),
       expect.objectContaining({
         fk_commodity: eur,
         placeholder: false,
+        parentId: accounts[3].guid,
         type: 'EXPENSE',
         name: 'Electricity',
       }),
-    );
-    expect(accounts).toContainEqual(
       expect.objectContaining({
         fk_commodity: eur,
         placeholder: false,
+        parentId: accounts[3].guid,
         type: 'EXPENSE',
         name: 'Water',
       }),
-    );
+      expect.objectContaining({
+        fk_commodity: eur,
+        placeholder: false,
+        parentId: accounts[5].guid,
+        type: 'EQUITY',
+        name: 'Opening balances - EUR',
+      }),
+    ]);
+
+    let { result } = renderHook(() => API.useAccounts(), { wrapper });
+    // Make sure the useAccounts hook is returning all the accounts we created
+    await waitFor(() => expect(result.current.data).toHaveLength(11));
 
     // Show accounts tree
     await screen.findByText('This represents your accounts tree', { exact: false });
@@ -183,8 +180,12 @@ describe('Onboarding', () => {
       placeholder: false,
       type: 'BANK',
       name: 'My bank',
-      parentId: accounts[2].guid,
+      parentId: accounts[4].guid,
     }));
+
+    // Make sure the useAccounts hook is returning the new account we just created
+    ({ result } = renderHook(() => API.useAccounts(), { wrapper }));
+    await waitFor(() => expect(result.current.data).toHaveLength(12));
 
     // Show accounts tree again
     await screen.findByText('See that now your bank account', { exact: false });
