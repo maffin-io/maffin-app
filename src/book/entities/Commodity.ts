@@ -3,7 +3,9 @@ import {
   Column,
   Entity,
   Index,
+  SaveOptions,
 } from 'typeorm';
+import type { QueryClient } from '@tanstack/react-query';
 
 import BaseEntity from './BaseEntity';
 
@@ -71,6 +73,31 @@ export default class Commodity extends BaseEntity {
   get stockerId(): string {
     return this.cusip || this.mnemonic;
   }
+
+  async save(options?: SaveOptions): Promise<this> {
+    const account = await super.save(options);
+
+    if (this.queryClient) {
+      updateCache({ queryClient: this.queryClient });
+    }
+
+    return account;
+  }
+
+  async remove(options?: SaveOptions): Promise<this> {
+    if (this.queryClient) {
+      updateCache({ queryClient: this.queryClient });
+    }
+
+    const account = await super.remove(options);
+    return account;
+  }
+}
+
+export async function updateCache({ queryClient }: { queryClient: QueryClient }) {
+  queryClient.invalidateQueries({
+    queryKey: [...Commodity.CACHE_KEY],
+  });
 }
 
 // https://github.com/typeorm/typeorm/issues/4714

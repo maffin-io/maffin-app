@@ -2,7 +2,7 @@ import React from 'react';
 import Joyride from 'react-joyride';
 import Image from 'next/image';
 
-import { useMainCurrency } from '@/hooks/api';
+import { useAccounts, useMainCurrency } from '@/hooks/api';
 import { Account, Commodity, Split } from '@/book/entities';
 import AccountForm from '@/components/forms/account/AccountForm';
 import CurrencyForm from '@/components/forms/currency/CurrencyForm';
@@ -22,7 +22,7 @@ export default function Onboarding({
   const { save, datasource } = React.useContext(DataSourceContext);
   const [run] = React.useState(show);
   const [stepIndex, setStepIndex] = React.useState(0);
-  const [accounts, setAccounts] = React.useState<{ [key: string]: Account }>({});
+  const { data: accounts } = useAccounts();
   const { data: theme } = useTheme();
 
   return (
@@ -63,7 +63,7 @@ export default function Onboarding({
                       [...Commodity.CACHE_KEY, { guid: 'main' }],
                       currency,
                     );
-                    await createInitialAccounts(setAccounts, currency);
+                    await createInitialAccounts(currency);
                     save();
                     setStepIndex(stepIndex + 1);
                   }}
@@ -114,17 +114,13 @@ export default function Onboarding({
                 set it to the amount you had in the bank at that time (you can change this later).
               </span>
               <AccountForm
-                onSave={(account: Account) => {
-                  setAccounts({
-                    ...accounts,
-                    bank: account,
-                  });
+                onSave={() => {
                   setStepIndex(stepIndex + 1);
                 }}
                 hideDefaults
                 defaultValues={{
                   name: 'My bank',
-                  parent: accounts.type_asset as Account,
+                  parent: accounts?.find(a => a.type === 'ASSET') as Account,
                   type: 'BANK',
                   fk_commodity: useMainCurrency().data as Commodity,
                   placeholder: false,
@@ -186,14 +182,14 @@ export default function Onboarding({
                   description: 'Grocery shopping',
                   splits: [
                     Split.create({
-                      fk_account: accounts.bank as Account,
+                      fk_account: accounts?.find(a => a.type === 'BANK') as Account,
                       quantityNum: -30,
                       quantityDenom: 1,
                       valueNum: -30,
                       valueDenom: 1,
                     }),
                     Split.create({
-                      fk_account: accounts.groceries as Account,
+                      fk_account: accounts?.find(a => a.name === 'Groceries') as Account,
                       quantityNum: 30,
                       quantityDenom: 1,
                       valueNum: 30,
@@ -277,25 +273,13 @@ export default function Onboarding({
   );
 }
 
-async function createInitialAccounts(setAccounts: Function, currency: Commodity) {
+async function createInitialAccounts(currency: Commodity) {
   const root = await Account.findOneByOrFail({
     type: 'ROOT',
   });
 
-  const expensesAccount = await Account.create({
-    name: 'Expenses',
-    type: 'EXPENSE',
-    description: 'Any expense such as food, clothing, taxes, etc.',
-    placeholder: true,
-    fk_commodity: currency,
-    parent: root,
-    children: [],
-  }).save();
-  await expensesAccount.reload();
-
-  // Preload needed accounts for tutorial
-  setAccounts({
-    type_asset: await Account.create({
+  const [, , incomeAccount, expensesAccount, equityAccount] = await Promise.all([
+    Account.create({
       name: 'Assets',
       type: 'ASSET',
       description: 'Asset accounts are used for tracking things that are of value and can be used or sold to pay debts.',
@@ -303,17 +287,6 @@ async function createInitialAccounts(setAccounts: Function, currency: Commodity)
       fk_commodity: currency,
       parent: root,
     }).save(),
-    type_expense: expensesAccount,
-    groceries: await Account.create({
-      name: 'Groceries',
-      type: 'EXPENSE',
-      placeholder: false,
-      fk_commodity: currency,
-      parent: expensesAccount,
-    }).save(),
-  });
-
-  await Promise.all([
     Account.create({
       name: 'Liabilities',
       type: 'LIABILITY',
@@ -329,6 +302,15 @@ async function createInitialAccounts(setAccounts: Function, currency: Commodity)
       placeholder: true,
       fk_commodity: currency,
       parent: root,
+    }).save(),
+    await Account.create({
+      name: 'Expenses',
+      type: 'EXPENSE',
+      description: 'Any expense such as food, clothing, taxes, etc.',
+      placeholder: true,
+      fk_commodity: currency,
+      parent: root,
+      children: [],
     }).save(),
     Account.create({
       name: 'Equity',
@@ -348,14 +330,21 @@ async function createInitialAccounts(setAccounts: Function, currency: Commodity)
       description: `Opening balances for ${currency.mnemonic} accounts`,
       placeholder: false,
       fk_commodity: currency,
-      parent: await Account.findOneByOrFail({ type: 'EQUITY' }),
+      parent: equityAccount,
     }).save(),
     Account.create({
       name: 'Salary',
       type: 'INCOME',
       placeholder: false,
       fk_commodity: currency,
-      parent: await Account.findOneByOrFail({ type: 'INCOME' }),
+      parent: incomeAccount,
+    }).save(),
+    Account.create({
+      name: 'Groceries',
+      type: 'EXPENSE',
+      placeholder: false,
+      fk_commodity: currency,
+      parent: expensesAccount,
     }).save(),
     Account.create({
       name: 'Electricity',

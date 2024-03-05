@@ -62,7 +62,6 @@ describe('TransactionForm', () => {
     }).save();
 
     jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
     jest.spyOn(apiHook, 'usePrices')
       .mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
 
@@ -90,6 +89,15 @@ describe('TransactionForm', () => {
 
     assetAccount.path = 'Assets:asset1';
     expenseAccount.path = 'Expenses:random';
+
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+      {
+        data: [
+          assetAccount,
+          expenseAccount,
+        ],
+      } as UseQueryResult<Account[]>,
+    );
   });
 
   afterEach(async () => {
@@ -184,14 +192,6 @@ describe('TransactionForm', () => {
   describe('same commodity', () => {
     it('creates transaction, mutates and saves with expected params when both same currency', async () => {
       const user = userEvent.setup();
-      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-        {
-          data: [
-            assetAccount,
-            expenseAccount,
-          ],
-        } as UseQueryResult<Account[]>,
-      );
       const mockSave = jest.fn();
 
       render(
@@ -310,14 +310,6 @@ describe('TransactionForm', () => {
       const user = userEvent.setup();
       assetAccount.fk_commodity = sgd;
       await assetAccount.save();
-      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-        {
-          data: [
-            assetAccount,
-            expenseAccount,
-          ],
-        } as UseQueryResult<Account[]>,
-      );
       const mockSave = jest.fn();
 
       render(
@@ -420,14 +412,6 @@ describe('TransactionForm', () => {
       const user = userEvent.setup();
       expenseAccount.fk_commodity = sgd;
       await expenseAccount.save();
-      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-        {
-          data: [
-            assetAccount,
-            expenseAccount,
-          ],
-        } as UseQueryResult<Account[]>,
-      );
       const mockSave = jest.fn();
 
       render(
@@ -463,9 +447,7 @@ describe('TransactionForm', () => {
       await waitFor(() => expect(q1).toHaveValue(100));
 
       await user.click(screen.getByRole('combobox', { name: 'splits.1.account' }));
-      // after saving we are setting the right account path so we need to use "Random"
-      // coz parent is root
-      await user.click(screen.getByText('Random'));
+      await user.click(screen.getByText('Expenses:random'));
 
       // At this point v1 becomes available because txCurrency is EUR
       const v1 = screen.getByRole('spinbutton', { name: 'splits.1.value' });
@@ -568,6 +550,7 @@ describe('TransactionForm', () => {
         fk_commodity: ticker,
         parent: root,
       }).save();
+      tickerAccount.path = 'Assets:Asset3';
 
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
@@ -861,6 +844,7 @@ describe('TransactionForm', () => {
         fk_commodity: ticker,
         parent: root,
       }).save();
+      tickerAccount.path = 'Assets:Asset3';
 
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
@@ -1172,16 +1156,8 @@ describe('TransactionForm', () => {
     });
   });
 
-  it('refreshes investment SWR cache when commodity is not CURRENCY', async () => {
+  it('refreshes investment cache when commodity is not CURRENCY', async () => {
     const user = userEvent.setup();
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [
-          assetAccount,
-          expenseAccount,
-        ],
-      } as UseQueryResult<Account[]>,
-    );
     const mockSave = jest.fn();
 
     const stockCommodity = await Commodity.create({
@@ -1236,14 +1212,6 @@ describe('TransactionForm', () => {
   describe('actions', () => {
     it('updates transaction', async () => {
       const user = userEvent.setup();
-      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-        {
-          data: [
-            assetAccount,
-            expenseAccount,
-          ],
-        } as UseQueryResult<Account[]>,
-      );
       const mockSave = jest.fn();
 
       await Transaction.create({
@@ -1312,6 +1280,7 @@ describe('TransactionForm', () => {
         fk_commodity: eur,
         parent: root,
       }).save();
+      extraExpenseAccount.path = 'Expenses:Extra';
 
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
@@ -1409,14 +1378,6 @@ describe('TransactionForm', () => {
 
     it('deletes transaction and splits', async () => {
       const user = userEvent.setup();
-      jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-        {
-          data: [
-            assetAccount,
-            expenseAccount,
-          ],
-        } as UseQueryResult<Account[]>,
-      );
       const mockSave = jest.fn();
 
       const { rerender } = render(

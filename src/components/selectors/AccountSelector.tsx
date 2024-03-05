@@ -32,7 +32,7 @@ export default function AccountSelector(
 
   let options = accounts || [];
 
-  options = options.filter(account => account && !(ignoreAccounts).includes(account.type));
+  options = options.filter(account => account && !(ignoreAccounts).includes(account.guid));
   if (!showRoot) {
     options = options.filter(account => account.type !== 'ROOT');
   }
@@ -55,6 +55,7 @@ export default function AccountSelector(
       getOptionValue={(option: Account) => option.path}
       options={options.sort((a, b) => a.path.localeCompare(b.path))}
       placeholder={placeholder || 'Choose account'}
+      defaultValue={accounts?.find(a => a.guid === (props.defaultValue as Account)?.guid)}
       classNames={{
         option: (option) => {
           if (option.isFocused || option.isSelected) {

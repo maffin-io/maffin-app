@@ -49,26 +49,6 @@ describe('importBook', () => {
     }).save();
   });
 
-  it('sets accounts paths', async () => {
-    const rawBook = await importBook(datasource.sqljsManager.exportDatabase());
-
-    const ds = new DataSource({
-      type: 'sqljs',
-      dropSchema: true,
-      entities: [Account, Commodity, Split, Transaction],
-      synchronize: true,
-      logging: false,
-    });
-    await ds.initialize();
-    await ds.sqljsManager.loadDatabase(rawBook);
-
-    const accounts = await ds.getRepository(Account).find();
-    expect(accounts).toHaveLength(3);
-    expect(accounts[0].path).toEqual('Root');
-    expect(accounts[1].path).toEqual('Assets');
-    expect(accounts[2].path).toEqual('Assets:Bank');
-  });
-
   /**
    * The Root Template account gets created by gnucash automatically
    * but we don't use it and makes it complicated to retrieve the root

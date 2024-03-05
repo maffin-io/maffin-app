@@ -312,7 +312,6 @@ describe('AccountForm', () => {
       childrenIds: [],
       description: null,
       parentId: assetAccount.guid,
-      path: 'Assets:TestAccount',
       placeholder: false,
       hidden: false,
     });
@@ -349,7 +348,6 @@ describe('AccountForm', () => {
     expect(accounts[1]).toMatchObject({
       guid: assetAccount.guid,
       name: 'New name',
-      path: 'New name',
     });
   });
 
@@ -424,7 +422,6 @@ describe('AccountForm', () => {
       childrenIds: [],
       description: null,
       parentId: assetAccount.guid,
-      path: 'Assets:TestAccount',
       placeholder: false,
       hidden: false,
     });

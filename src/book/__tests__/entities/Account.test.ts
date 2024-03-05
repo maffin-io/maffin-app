@@ -1,5 +1,4 @@
-import { waitFor } from '@testing-library/react';
-import { DataSource, BaseEntity as BE } from 'typeorm';
+import { DataSource } from 'typeorm';
 
 import {
   Account,
@@ -96,20 +95,6 @@ describe('Account', () => {
     it('loads commodity eagerly', async () => {
       const instance = await Account.findOneByOrFail({ name: 'name' });
       expect(instance.commodity.mnemonic).toEqual('EUR');
-    });
-
-    it('sets path on save', async () => {
-      const account3 = await Account.create({
-        name: 'Groceries',
-        type: 'EXPENSE',
-        parent: account2,
-        fk_commodity: eur,
-      }).save();
-
-      expect(root.path).toEqual('Root');
-      expect(account.path).toEqual('name');
-      expect(account2.path).toEqual('Expenses');
-      expect(account3.path).toEqual('Expenses:Groceries');
     });
   });
 
@@ -220,21 +205,11 @@ describe('Account', () => {
 });
 
 describe('caching', () => {
-  let mockSetQueryData: jest.Mock;
   let datasource: DataSource;
-  let root: Account;
-  let eur: Commodity;
+  let mockInvalidateQueries: jest.Mock;
 
   beforeEach(async () => {
-    mockSetQueryData = jest.fn()
-      .mockImplementation((_: string, callback: Account | Function): Account[] | Account => {
-        if (callback instanceof Function) {
-          return callback(undefined);
-        }
-
-        return root;
-      })
-      .mockName('setQueryData');
+    mockInvalidateQueries = jest.fn();
 
     datasource = new DataSource({
       type: 'sqljs',
@@ -244,86 +219,41 @@ describe('caching', () => {
       logging: false,
       extra: {
         queryClient: {
-          setQueryData: mockSetQueryData,
+          invalidateQueries: mockInvalidateQueries,
         },
       },
     });
     await datasource.initialize();
 
-    eur = await Commodity.create({
-      namespace: 'CURRENCY',
-      mnemonic: 'EUR',
-    }).save();
-
-    // @ts-ignore
-    jest.spyOn(BaseEntity.prototype, 'save').mockImplementation(BE.prototype.save);
-    // @ts-ignore
-    jest.spyOn(BaseEntity.prototype, 'remove').mockImplementation(BE.prototype.remove);
-
-    root = await Account.create({
-      name: 'Root',
-      type: 'ROOT',
-    }).save();
+    jest.spyOn(BaseEntity.prototype, 'save').mockImplementation();
+    jest.spyOn(BaseEntity.prototype, 'remove').mockImplementation();
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('returns empty accounts map when /api/accounts is undefined', async () => {
-    await waitFor(() => expect(mockSetQueryData.mock.results[0].value).toBeUndefined());
+  it('invalidates keys when saving', async () => {
+    const acc = new Account();
+    acc.name = 'name';
+
+    await acc.save();
+
+    expect(mockInvalidateQueries).toBeCalledTimes(1);
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['api', 'accounts'],
+    });
   });
 
-  it('adds account to parent childrenIds /api/accounts', async () => {
-    mockSetQueryData
-      .mockImplementation((_: string, callback: Account | Function): Account[] | Account => {
-        if (callback instanceof Function) {
-          return callback([root]);
-        }
+  it('invalidates keys when deleting', async () => {
+    const acc = new Account();
+    acc.name = 'name';
 
-        return root;
-      })
-      .mockName('setQueryData');
+    await acc.remove();
 
-    // Wait for the first updateCache to execute so we don't have race conditions
-    await waitFor(() => expect(mockSetQueryData.mock.results).toHaveLength(1));
-
-    const account = await Account.create({
-      name: 'name',
-      type: 'ASSET',
-      parent: root,
-      fk_commodity: eur,
-    }).save();
-
-    await waitFor(() => expect(mockSetQueryData.mock.results).toHaveLength(2));
-    const result = mockSetQueryData.mock.results[1].value;
-    expect(result[0].childrenIds).toContain(account.guid);
-  });
-
-  it('deletes account in /api/accounts', async () => {
-    mockSetQueryData
-      .mockImplementation((_: string, callback: Account | Function): Account[] | Account => {
-        if (callback instanceof Function) {
-          return callback([root]);
-        }
-
-        return root;
-      })
-      .mockName('setQueryData');
-
-    const account = await Account.create({
-      name: 'name',
-      type: 'ASSET',
-      parent: root,
-      fk_commodity: eur,
-    }).save();
-
-    await waitFor(() => expect(mockSetQueryData.mock.results).toHaveLength(2));
-
-    await account.remove();
-
-    await waitFor(() => expect(mockSetQueryData.mock.results).toHaveLength(3));
-    const result = mockSetQueryData.mock.results[2].value;
-    expect(result[0].childrenIds).toHaveLength(0);
+    expect(mockInvalidateQueries).toBeCalledTimes(1);
+    expect(mockInvalidateQueries).toBeCalledWith({
+      queryKey: ['api', 'accounts'],
+    });
   });
 });

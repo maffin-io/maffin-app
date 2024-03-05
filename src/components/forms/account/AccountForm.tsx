@@ -165,6 +165,7 @@ export default function AccountForm({
                 isClearable={false}
                 onlyPlaceholders
                 placeholder="<parent account>"
+                ignoreAccounts={[form.getValues('guid')]}
                 onChange={field.onChange}
                 defaultValue={defaultValues?.parent}
               />

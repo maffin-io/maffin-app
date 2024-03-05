@@ -116,7 +116,7 @@ describe('AccountSelector', () => {
 
     render(
       <AccountSelector
-        ignoreAccounts={['TYPE2']}
+        ignoreAccounts={['guid2']}
       />,
     );
 
