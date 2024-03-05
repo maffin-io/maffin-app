@@ -9,19 +9,19 @@ import { moneyToString } from '@/helpers/number';
 import monthlyDates from '@/helpers/monthlyDates';
 
 export type MonthlyTotalHistogramProps = {
-  title: string,
-  selectedDate?: DateTime,
+  title?: string,
+  interval?: Interval,
   accounts: Account[],
 };
 
 export default function MonthlyTotalHistogram({
+  interval,
   title,
-  selectedDate = DateTime.now(),
   accounts = [],
 }: MonthlyTotalHistogramProps): JSX.Element {
-  const interval = Interval.fromDateTimes(
-    selectedDate.minus({ months: 6 }).startOf('month'),
-    selectedDate,
+  interval = interval || Interval.fromDateTimes(
+    DateTime.now().minus({ months: 6 }).startOf('month'),
+    DateTime.now(),
   );
   const { data: monthlyTotals } = useAccountsMonthlyTotal(interval);
 
@@ -88,7 +88,7 @@ export default function MonthlyTotalHistogram({
         },
         plugins: {
           title: {
-            display: true,
+            display: !!title,
             text: title,
             align: 'start',
             padding: {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { DateTime } from 'luxon';
+import { DateTime, Interval } from 'luxon';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import Money from '@/book/Money';
@@ -122,7 +122,7 @@ describe('MonthlyTotalHistogram', () => {
     );
   });
 
-  it('selects default date now - 7 months', () => {
+  it('uses custom interval', () => {
     jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue(
       {
         data: [
@@ -154,7 +154,10 @@ describe('MonthlyTotalHistogram', () => {
     render(
       <MonthlyTotalHistogram
         title="Title"
-        selectedDate={DateTime.now().plus({ days: 40 })}
+        interval={Interval.fromDateTimes(
+          DateTime.now().minus({ month: 2 }).startOf('month'),
+          DateTime.now(),
+        )}
         accounts={[
           {
             guid: 'salary',
@@ -170,13 +173,8 @@ describe('MonthlyTotalHistogram', () => {
         data: {
           datasets: expect.any(Array),
           labels: [
-            DateTime.now().minus({ months: 5 }).startOf('month'),
-            expect.any(DateTime),
-            expect.any(DateTime),
-            expect.any(DateTime),
-            expect.any(DateTime),
-            expect.any(DateTime),
-            DateTime.now().plus({ month: 1 }).startOf('month'),
+            DateTime.now().minus({ months: 2 }).startOf('month'),
+            DateTime.now().minus({ months: 1 }).startOf('month'),
           ],
         },
       }),

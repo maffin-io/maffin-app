@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { DateTime } from 'luxon';
+import { DateTime, Interval } from 'luxon';
 import { BiPlusCircle } from 'react-icons/bi';
 
 import FormButton from '@/components/buttons/FormButton';
@@ -116,7 +116,12 @@ export default function AccountsPage(): JSX.Element {
                 accountsMap?.type_income?.childrenIds.map((guid: string) => accountsMap?.[guid])
               }
               title="Income"
-              selectedDate={selectedDate}
+              interval={
+                Interval.fromDateTimes(
+                  selectedDate.minus({ months: 6 }).startOf('month'),
+                  selectedDate,
+                )
+              }
             />
           </div>
           <div className="card col-span-8">
@@ -130,7 +135,12 @@ export default function AccountsPage(): JSX.Element {
                 accountsMap?.type_expense?.childrenIds.map((guid: string) => accountsMap?.[guid])
               }
               title="Expenses"
-              selectedDate={selectedDate}
+              interval={
+                Interval.fromDateTimes(
+                  selectedDate.minus({ months: 6 }).startOf('month'),
+                  selectedDate,
+                )
+              }
             />
           </div>
         </div>
