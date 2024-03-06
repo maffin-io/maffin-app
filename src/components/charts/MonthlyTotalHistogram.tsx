@@ -4,26 +4,27 @@ import type { ChartDataset } from 'chart.js';
 
 import Bar from '@/components/charts/Bar';
 import type { Account } from '@/book/entities';
-import { useAccountsMonthlyTotal, useMainCurrency } from '@/hooks/api';
+import { useAccounts, useAccountsMonthlyTotal, useMainCurrency } from '@/hooks/api';
 import { moneyToString } from '@/helpers/number';
 import monthlyDates from '@/helpers/monthlyDates';
 
 export type MonthlyTotalHistogramProps = {
   title?: string,
   interval?: Interval,
-  accounts: Account[],
+  guids: string[],
 };
 
 export default function MonthlyTotalHistogram({
   interval,
   title,
-  accounts = [],
+  guids = [],
 }: MonthlyTotalHistogramProps): JSX.Element {
   interval = interval || Interval.fromDateTimes(
     DateTime.now().minus({ months: 6 }).startOf('month'),
     DateTime.now(),
   );
   const { data: monthlyTotals } = useAccountsMonthlyTotal(interval);
+  const { data: accounts } = useAccounts();
 
   const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
@@ -31,14 +32,14 @@ export default function MonthlyTotalHistogram({
   const dates = monthlyDates(interval);
   const datasets: ChartDataset<'bar'>[] = [];
 
-  if (accounts.length && monthlyTotals) {
-    accounts.forEach(account => {
+  if (accounts && monthlyTotals) {
+    guids.forEach(guid => {
       const data = dates.map((_, i) => (
-        monthlyTotals[i][account.guid]?.toNumber() || 0
+        monthlyTotals[i][guid]?.toNumber() || 0
       ));
       if (!data.every(v => v === 0)) {
         datasets.push({
-          label: account.name,
+          label: (accounts.find(a => a.guid === guid) as Account).name,
           data,
         });
       }

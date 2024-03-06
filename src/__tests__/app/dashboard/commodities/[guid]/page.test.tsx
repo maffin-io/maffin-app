@@ -7,7 +7,8 @@ import type { UseQueryResult } from '@tanstack/react-query';
 
 import { Commodity, Price } from '@/book/entities';
 import CommodityPage from '@/app/dashboard/commodities/[guid]/page';
-import { PricesTable, PricesChart } from '@/components/pages/commodity';
+import { PricesChart } from '@/components/pages/commodity';
+import { PricesTable } from '@/components/tables';
 import FormButton from '@/components/buttons/FormButton';
 import * as apiHook from '@/hooks/api';
 import PriceForm from '@/components/forms/price/PriceForm';
@@ -19,7 +20,7 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
-jest.mock('@/components/pages/commodity/PricesTable', () => jest.fn(
+jest.mock('@/components/tables/PricesTable', () => jest.fn(
   () => <div data-testid="PricesTable" />,
 ));
 

@@ -6,7 +6,7 @@ import type { UseQueryResult } from '@tanstack/react-query';
 import Money from '@/book/Money';
 import { Account, Commodity } from '@/book/entities';
 import Bar from '@/components/charts/Bar';
-import { MonthlyTotalHistogram } from '@/components/pages/accounts';
+import { MonthlyTotalHistogram } from '@/components/charts';
 import * as apiHook from '@/hooks/api';
 import type { AccountsTotals } from '@/types/book';
 
@@ -24,6 +24,7 @@ describe('MonthlyTotalHistogram', () => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-01') as DateTime<true>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
     jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals[]>);
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
   });
 
   afterEach(() => {
@@ -36,7 +37,7 @@ describe('MonthlyTotalHistogram', () => {
     render(
       <MonthlyTotalHistogram
         title="Title"
-        accounts={[]}
+        guids={[]}
       />,
     );
 
@@ -120,6 +121,11 @@ describe('MonthlyTotalHistogram', () => {
       },
       {},
     );
+
+    const { plugins } = (Bar as jest.Mock).mock.calls[0][0].options;
+    expect(plugins.tooltip.backgroundColor({ tooltip: { labelColors: [{ backgroundColor: '#111' }] } })).toEqual('#111');
+    expect(plugins.tooltip.callbacks.title()).toEqual('');
+    expect(plugins.tooltip.callbacks.label({ dataset: { label: 'label' }, raw: 100 })).toEqual('label: €100.00');
   });
 
   it('uses custom interval', () => {
@@ -150,6 +156,11 @@ describe('MonthlyTotalHistogram', () => {
         ] as AccountsTotals[],
       } as UseQueryResult<AccountsTotals[]>,
     );
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+      {
+        data: [{ guid: 'salary', name: 'Salary' } as Account],
+      } as UseQueryResult<Account[]>,
+    );
 
     render(
       <MonthlyTotalHistogram
@@ -158,13 +169,7 @@ describe('MonthlyTotalHistogram', () => {
           DateTime.now().minus({ month: 2 }).startOf('month'),
           DateTime.now(),
         )}
-        accounts={[
-          {
-            guid: 'salary',
-            name: 'Salary',
-            type: 'INCOME',
-          } as Account,
-        ]}
+        guids={['salary']}
       />,
     );
 
@@ -183,6 +188,22 @@ describe('MonthlyTotalHistogram', () => {
   });
 
   it('generates data as expected', () => {
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+      {
+        data: [
+          {
+            guid: 'salary',
+            name: 'Salary',
+            type: 'INCOME',
+          } as Account,
+          {
+            guid: 'dividends',
+            name: 'Dividends',
+            type: 'INCOME',
+          } as Account,
+        ],
+      } as UseQueryResult<Account[]>,
+    );
     jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue(
       {
         data: [
@@ -217,18 +238,7 @@ describe('MonthlyTotalHistogram', () => {
     render(
       <MonthlyTotalHistogram
         title="Title"
-        accounts={[
-          {
-            guid: 'salary',
-            name: 'Salary',
-            type: 'INCOME',
-          } as Account,
-          {
-            guid: 'dividends',
-            name: 'Dividends',
-            type: 'INCOME',
-          } as Account,
-        ]}
+        guids={['salary', 'dividends']}
       />,
     );
 

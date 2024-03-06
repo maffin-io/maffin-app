@@ -13,7 +13,7 @@ import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
 import FormButton from '@/components/buttons/FormButton';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
-import Table from '@/components/Table';
+import Table from '@/components/tables/Table';
 import Money from '@/book/Money';
 import {
   Account,

@@ -1,15 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`IEInfo renders as expected when no splits 1`] = `
+exports[`IEInfo renders as expected when not placeholder 1`] = `
 <div>
   <div
-    class="grid grid-cols-12"
+    class="grid grid-cols-12 items-start"
   >
     <div
       class="col-span-6"
     >
       <div
-        class="grid grid-cols-12"
+        class="grid grid-cols-12 items-start"
       >
         <div
           class="col-span-4"
@@ -20,6 +20,54 @@ exports[`IEInfo renders as expected when no splits 1`] = `
         </div>
         <div
           class="card col-span-8"
+        />
+      </div>
+    </div>
+    <div
+      class="grid grid-cols-12 col-span-6"
+    >
+      <div
+        class="card col-span-12"
+      >
+        <div
+          data-testid="MonthlyTotalHistogram"
+        />
+      </div>
+      <div
+        class="col-span-12"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`IEInfo renders as expected when placeholder 1`] = `
+<div>
+  <div
+    class="grid grid-cols-12 items-start"
+  >
+    <div
+      class="col-span-6"
+    >
+      <div
+        class="grid grid-cols-12 items-start"
+      >
+        <div
+          class="card col-span-6"
+        >
+          <div
+            data-testid="TotalsPie"
+          />
+          <div
+            class="mt-4"
+          >
+            <div
+              data-testid="AccountsTable"
+            />
+          </div>
+        </div>
+        <div
+          class="card col-span-6"
         />
       </div>
     </div>

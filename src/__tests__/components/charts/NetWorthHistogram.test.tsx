@@ -156,6 +156,17 @@ describe('NetWorthHistogram', () => {
       },
       {},
     );
+
+    const { plugins } = (Bar as jest.Mock).mock.calls[0][0].options;
+    expect(plugins.tooltip.callbacks.label({ dataset: { label: 'label' }, raw: 100 })).toEqual('label: €100.00');
+    expect(plugins.tooltip.callbacks.labelColor(
+      { dataset: { backgroundColor: '#111' } },
+    )).toEqual({
+      borderColor: '#323b44',
+      backgroundColor: '#111',
+      borderWidth: 3,
+      borderRadius: 2,
+    });
   });
 
   it('renders with no data', () => {

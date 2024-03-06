@@ -13,12 +13,10 @@ import AccountForm from '@/components/forms/account/AccountForm';
 import DateRangeInput from '@/components/DateRangeInput';
 import Onboarding from '@/components/onboarding/Onboarding';
 import {
-  AccountsTable,
-  NetWorthPie,
-  MonthlyTotalHistogram,
   LatestTransactions,
 } from '@/components/pages/accounts';
-import { NetWorthHistogram } from '@/components/charts';
+import { AccountsTable } from '@/components/tables';
+import { TotalsPie, MonthlyTotalHistogram, NetWorthHistogram } from '@/components/charts';
 import IncomeExpenseHistogram from '@/components/pages/accounts/IncomeExpenseHistogram';
 import * as apiHook from '@/hooks/api';
 
@@ -39,7 +37,7 @@ jest.mock('@/components/forms/account/AccountForm', () => jest.fn(
   () => <div data-testid="AccountForm" />,
 ));
 
-jest.mock('@/components/pages/accounts/AccountsTable', () => jest.fn(
+jest.mock('@/components/tables/AccountsTable', () => jest.fn(
   () => <div data-testid="AccountsTable" />,
 ));
 
@@ -47,8 +45,8 @@ jest.mock('@/components/DateRangeInput', () => jest.fn(
   () => <div data-testid="DateRangeInput" />,
 ));
 
-jest.mock('@/components/pages/accounts/NetWorthPie', () => jest.fn(
-  () => <div data-testid="NetWorthPie" />,
+jest.mock('@/components/charts/TotalsPie', () => jest.fn(
+  () => <div data-testid="TotalsPie" />,
 ));
 
 jest.mock('@/components/pages/accounts/IncomeExpenseHistogram', () => jest.fn(
@@ -59,7 +57,7 @@ jest.mock('@/components/charts/NetWorthHistogram', () => jest.fn(
   () => <div data-testid="NetWorthHistogram" />,
 ));
 
-jest.mock('@/components/pages/accounts/MonthlyTotalHistogram', () => jest.fn(
+jest.mock('@/components/charts/MonthlyTotalHistogram', () => jest.fn(
   () => <div data-testid="MonthlyTotalHistogram" />,
 ));
 
@@ -147,9 +145,12 @@ describe('AccountsPage', () => {
       {},
     );
 
-    await screen.findByTestId('NetWorthPie');
-    expect(NetWorthPie).toHaveBeenLastCalledWith(
+    await screen.findByTestId('TotalsPie');
+    expect(TotalsPie).toHaveBeenLastCalledWith(
       {
+        backgroundColor: ['#06B6D4', '#FF6600'],
+        guids: [undefined, undefined],
+        title: 'Net worth',
         selectedDate: DateTime.fromISO('2023-01-02'),
       },
       {},
@@ -254,6 +255,26 @@ describe('AccountsPage', () => {
         type: 'INCOME',
         childrenIds: [] as string[],
       } as Account,
+      {
+        guid: 'a7',
+        name: 'Assets',
+        commodity: {
+          mnemonic: 'EUR',
+        },
+        type: 'ASSET',
+        parentId: 'root',
+        childrenIds: [] as string[],
+      } as Account,
+      {
+        guid: 'a8',
+        name: 'Liabilities',
+        commodity: {
+          mnemonic: 'EUR',
+        },
+        type: 'LIABILITY',
+        parentId: 'root',
+        childrenIds: [] as string[],
+      } as Account,
     ];
 
     jest.spyOn(apiHook, 'useAccounts').mockReturnValueOnce({ data: accounts } as UseQueryResult<Account[]>);
@@ -271,7 +292,7 @@ describe('AccountsPage', () => {
     await screen.findAllByTestId('AccountsTable');
     expect(AccountsTable).toBeCalledTimes(2);
     expect(AccountsTable).toBeCalledWith({
-      guids: [undefined, undefined],
+      guids: ['a7', 'a8'],
       isExpanded: false,
       selectedDate: DateTime.now(),
     }, {});
@@ -280,7 +301,10 @@ describe('AccountsPage', () => {
       isExpanded: false,
       selectedDate: DateTime.now(),
     }, {});
-    expect(NetWorthPie).toHaveBeenLastCalledWith({
+    expect(TotalsPie).toHaveBeenLastCalledWith({
+      backgroundColor: ['#06B6D4', '#FF6600'],
+      guids: ['a7', 'a8'],
+      title: 'Net worth',
       selectedDate: DateTime.now(),
     }, {});
     expect(IncomeExpenseHistogram).toHaveBeenLastCalledWith(
@@ -305,7 +329,7 @@ describe('AccountsPage', () => {
           DateTime.now().minus({ month: 6 }).startOf('month'),
           DateTime.now(),
         ),
-        accounts: [accounts[4]],
+        guids: [accounts[4].guid],
       },
       {},
     );
@@ -317,7 +341,7 @@ describe('AccountsPage', () => {
           DateTime.now().minus({ month: 6 }).startOf('month'),
           DateTime.now(),
         ),
-        accounts: [accounts[2]],
+        guids: [accounts[2].guid],
       },
       {},
     );

@@ -14,8 +14,8 @@ import {
   Split,
   Transaction,
 } from '@/book/entities';
-import Table from '@/components/Table';
-import { TransactionsTable } from '@/components/pages/account';
+import Table from '@/components/tables/Table';
+import { TransactionsTable } from '@/components/tables';
 import FormButton from '@/components/buttons/FormButton';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import * as apiHook from '@/hooks/api';
@@ -29,7 +29,7 @@ jest.mock('next/link', () => jest.fn(
   ),
 ));
 
-jest.mock('@/components/Table', () => jest.fn(
+jest.mock('@/components/tables/Table', () => jest.fn(
   () => <div data-testid="Table" />,
 ));
 const TableMock = Table as jest.MockedFunction<typeof Table>;

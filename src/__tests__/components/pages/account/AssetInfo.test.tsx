@@ -34,7 +34,7 @@ jest.mock('@/components/pages/account/EarnWidget', () => jest.fn(
   () => <div data-testid="EarnWidget" />,
 ));
 
-jest.mock('@/components/pages/accounts/AccountsTable', () => jest.fn(
+jest.mock('@/components/tables/AccountsTable', () => jest.fn(
   () => <div data-testid="AccountsTable" />,
 ));
 

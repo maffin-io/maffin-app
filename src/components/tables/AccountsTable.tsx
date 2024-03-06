@@ -6,7 +6,7 @@ import { BiCircle, BiSolidRightArrow, BiSolidDownArrow } from 'react-icons/bi';
 import { Tooltip } from 'react-tooltip';
 
 import Money from '@/book/Money';
-import Table from '@/components/Table';
+import Table from '@/components/tables/Table';
 import type { AccountsMap } from '@/types/book';
 import { Account } from '@/book/entities';
 import { useAccounts, useAccountsTotals } from '@/hooks/api';

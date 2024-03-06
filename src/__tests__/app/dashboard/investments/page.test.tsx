@@ -8,8 +8,8 @@ import StatisticsWidget from '@/components/StatisticsWidget';
 import {
   WeightsChart,
   DividendChart,
-  InvestmentsTable,
 } from '@/components/pages/investments';
+import { InvestmentsTable } from '@/components/tables';
 import Money from '@/book/Money';
 import { InvestmentAccount } from '@/book/models';
 import * as apiHook from '@/hooks/api';
@@ -32,7 +32,7 @@ jest.mock('@/components/pages/investments/DividendChart', () => jest.fn(
   () => <div data-testid="DividendChart" />,
 ));
 
-jest.mock('@/components/pages/investments/InvestmentsTable', () => jest.fn(
+jest.mock('@/components/tables/InvestmentsTable', () => jest.fn(
   () => <div data-testid="InvestmentsTable" />,
 ));
 
