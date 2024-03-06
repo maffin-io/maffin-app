@@ -3,14 +3,14 @@ import { DateTime } from 'luxon';
 import { render, screen } from '@testing-library/react';
 import { UseQueryResult } from '@tanstack/react-query';
 
-import { AccountsTable } from '@/components/pages/accounts';
-import Table from '@/components/Table';
+import { AccountsTable } from '@/components/tables';
+import Table from '@/components/tables/Table';
 import { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import * as apiHook from '@/hooks/api';
 import type { AccountsTotals } from '@/types/book';
 
-jest.mock('@/components/Table', () => jest.fn(
+jest.mock('@/components/tables/Table', () => jest.fn(
   () => <div data-testid="Table" />,
 ));
 const TableMock = Table as jest.MockedFunction<typeof Table>;

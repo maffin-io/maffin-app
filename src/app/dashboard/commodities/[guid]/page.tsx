@@ -9,7 +9,8 @@ import FormButton from '@/components/buttons/FormButton';
 import CommodityForm from '@/components/forms/commodity/CommodityForm';
 import PriceForm from '@/components/forms/price/PriceForm';
 import Loading from '@/components/Loading';
-import { PricesTable, PricesChart } from '@/components/pages/commodity';
+import { PricesChart } from '@/components/pages/commodity';
+import { PricesTable } from '@/components/tables';
 import { Price } from '@/book/entities';
 
 export type CommodityPageProps = {

@@ -3,11 +3,11 @@ import { render, screen } from '@testing-library/react';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import { InvestmentAccount } from '@/book/models';
-import Table from '@/components/Table';
-import { InvestmentsTable } from '@/components/pages/investments';
+import Table from '@/components/tables/Table';
+import { InvestmentsTable } from '@/components/tables';
 import * as apiHook from '@/hooks/api';
 
-jest.mock('@/components/Table', () => jest.fn(
+jest.mock('@/components/tables/Table', () => jest.fn(
   () => <div data-testid="Table" />,
 ));
 

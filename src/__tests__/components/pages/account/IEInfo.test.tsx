@@ -3,24 +3,29 @@ import { render } from '@testing-library/react';
 import { DateTime, Interval } from 'luxon';
 
 import { IEInfo } from '@/components/pages/account';
-import StatisticsWidget from '@/components/StatisticsWidget';
 import TotalWidget from '@/components/pages/account/TotalWidget';
 import type { Account } from '@/book/entities';
-import { MonthlyTotalHistogram } from '@/components/pages/accounts';
+import { TotalsPie, MonthlyTotalHistogram } from '@/components/charts';
+import { AccountsTable } from '@/components/tables';
+import { EXPENSE_COLORS } from '@/constants/colors';
 
-jest.mock('@/components/pages/accounts/MonthlyTotalHistogram', () => jest.fn(
+jest.mock('@/components/charts/MonthlyTotalHistogram', () => jest.fn(
   () => <div data-testid="MonthlyTotalHistogram" />,
 ));
 
-jest.mock('@/components/StatisticsWidget', () => jest.fn(
-  () => <div data-testid="StatisticsWidget" />,
+jest.mock('@/components/charts/TotalsPie', () => jest.fn(
+  () => <div data-testid="TotalsPie" />,
+));
+
+jest.mock('@/components/tables/AccountsTable', () => jest.fn(
+  () => <div data-testid="AccountsTable" />,
 ));
 
 jest.mock('@/components/pages/account/TotalWidget', () => jest.fn(
   () => <div data-testid="TotalWidget" />,
 ));
 
-jest.mock('@/components/pages/accounts/AccountsTable', () => jest.fn(
+jest.mock('@/components/tables/AccountsTable', () => jest.fn(
   () => <div data-testid="AccountsTable" />,
 ));
 
@@ -30,8 +35,8 @@ describe('IEInfo', () => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-03-01') as DateTime<true>);
     account = {
       guid: 'guid',
-      name: 'Assets',
-      type: 'ASSET',
+      name: 'Expenses',
+      type: 'EXPENSE',
       commodity: {
         mnemonic: 'EUR',
       },
@@ -42,14 +47,14 @@ describe('IEInfo', () => {
     jest.clearAllMocks();
   });
 
-  it('renders as expected when no splits', () => {
+  it('renders as expected when not placeholder', () => {
     const { container } = render(
       <IEInfo account={account} />,
     );
 
     expect(MonthlyTotalHistogram).toBeCalledWith(
       {
-        accounts: [account],
+        guids: [account.guid],
         title: '',
         interval: Interval.fromDateTimes(
           DateTime.now().minus({ year: 1 }).startOf('month'),
@@ -65,24 +70,35 @@ describe('IEInfo', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('shows account table when placeholder', () => {
+  it('renders as expected when placeholder', () => {
     account.placeholder = true;
-    render(
+    account.childrenIds = ['1', '2'];
+    const { container } = render(
       <IEInfo account={account} />,
     );
 
-    expect(StatisticsWidget).toBeCalledTimes(1);
-    expect(StatisticsWidget).toHaveBeenNthCalledWith(
-      1,
+    expect(AccountsTable).toBeCalledWith({ guids: ['1', '2'] }, {});
+    expect(TotalsPie).toBeCalledWith(
       {
-        className: 'mr-2',
-        title: 'Subaccounts',
-        description: '',
-        statsTextClass: '!font-normal',
-        // Don't know how to check for AccountsTable here
-        stats: expect.anything(),
+        guids: ['1', '2'],
+        backgroundColor: EXPENSE_COLORS,
+        showDataLabels: false,
+        showTooltip: true,
+        title: 'Total spent',
       },
       {},
     );
+    expect(MonthlyTotalHistogram).toBeCalledWith(
+      {
+        guids: ['1', '2'],
+        title: '',
+        interval: Interval.fromDateTimes(
+          DateTime.now().minus({ year: 1 }).startOf('month'),
+          DateTime.now(),
+        ),
+      },
+      {},
+    );
+    expect(container).toMatchSnapshot();
   });
 });

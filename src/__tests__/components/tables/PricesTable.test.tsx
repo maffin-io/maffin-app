@@ -5,13 +5,13 @@ import {
   screen,
 } from '@testing-library/react';
 
-import Table from '@/components/Table';
+import Table from '@/components/tables/Table';
 import FormButton from '@/components/buttons/FormButton';
 import PriceForm from '@/components/forms/price/PriceForm';
-import { PricesTable } from '@/components/pages/commodity';
+import { PricesTable } from '@/components/tables';
 import type { Price } from '@/book/entities';
 
-jest.mock('@/components/Table', () => jest.fn(
+jest.mock('@/components/tables/Table', () => jest.fn(
   () => <div data-testid="Table" />,
 ));
 

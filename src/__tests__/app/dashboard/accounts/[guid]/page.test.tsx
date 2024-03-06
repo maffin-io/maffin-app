@@ -12,9 +12,9 @@ import {
   Header,
   IEInfo,
   AssetInfo,
-  TransactionsTable,
   InvestmentInfo,
 } from '@/components/pages/account';
+import { TransactionsTable } from '@/components/tables';
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
@@ -25,7 +25,7 @@ jest.mock('@/components/pages/account/Header', () => jest.fn(
   () => <div data-testid="Header" />,
 ));
 
-jest.mock('@/components/pages/account/TransactionsTable', () => jest.fn(
+jest.mock('@/components/tables/TransactionsTable', () => jest.fn(
   () => <div data-testid="TransactionsTable" />,
 ));
 

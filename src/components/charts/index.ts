@@ -6,3 +6,5 @@ export { default as Sankey } from './Sankey';
 
 export { default as NetWorthHistogram } from './NetWorthHistogram';
 export { default as AssetSankey } from './AssetSankey';
+export { default as MonthlyTotalHistogram } from './MonthlyTotalHistogram';
+export { default as TotalsPie } from './TotalsPie';

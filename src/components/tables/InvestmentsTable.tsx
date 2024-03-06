@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import Link from 'next/link';
 
 import { toFixed, moneyToString } from '@/helpers/number';
-import Table from '@/components/Table';
+import Table from '@/components/tables/Table';
 import type { InvestmentAccount } from '@/book/models';
 import { currencyToSymbol } from '@/book/helpers';
 import * as API from '@/hooks/api';

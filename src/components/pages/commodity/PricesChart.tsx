@@ -4,13 +4,13 @@ import Line from '@/components/charts/Line';
 import { moneyToString } from '@/helpers/number';
 import { Price } from '@/book/entities';
 
-export type TotalLineChartProps = {
+export type PricesChartProps = {
   prices: Price[],
 };
 
 export default function PricesChart({
   prices,
-}: TotalLineChartProps): JSX.Element {
+}: PricesChartProps): JSX.Element {
   const currency = (prices.length && prices[0].currency.mnemonic) || '';
 
   const data: { x: number, y: number }[] = [];

@@ -3,12 +3,12 @@
 import React from 'react';
 
 import {
-  TransactionsTable,
   Header,
   InvestmentInfo,
   AssetInfo,
   IEInfo,
 } from '@/components/pages/account';
+import { TransactionsTable } from '@/components/tables';
 import { useAccount } from '@/hooks/api';
 import Loading from '@/components/Loading';
 import { isAsset, isLiability, isInvestment } from '@/book/helpers';

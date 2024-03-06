@@ -7,18 +7,21 @@ import { BiPlusCircle } from 'react-icons/bi';
 import FormButton from '@/components/buttons/FormButton';
 import AccountForm from '@/components/forms/account/AccountForm';
 import {
-  AccountsTable,
-  NetWorthPie,
-  MonthlyTotalHistogram,
   IncomeExpenseHistogram,
   LatestTransactions,
 } from '@/components/pages/accounts';
-import { NetWorthHistogram } from '@/components/charts';
+import {
+  MonthlyTotalHistogram,
+  NetWorthHistogram,
+  TotalsPie,
+} from '@/components/charts';
+import { AccountsTable } from '@/components/tables';
 import Loading from '@/components/Loading';
 import DateRangeInput from '@/components/DateRangeInput';
 import Onboarding from '@/components/onboarding/Onboarding';
 import { useAccounts } from '@/hooks/api';
 import mapAccounts from '@/helpers/mapAccounts';
+import { ASSET, LIABILITY } from '@/constants/colors';
 
 export default function AccountsPage(): JSX.Element {
   const { data, isLoading } = useAccounts();
@@ -69,10 +72,13 @@ export default function AccountsPage(): JSX.Element {
           </FormButton>
         </div>
       </div>
-      <div className="grid grid-cols-12 items-start items-top">
+      <div className="grid grid-cols-12 items-start">
         <div className="grid grid-cols-12 col-span-3">
           <div className="card col-span-12">
-            <NetWorthPie
+            <TotalsPie
+              title="Net worth"
+              backgroundColor={[ASSET, LIABILITY]}
+              guids={[accountsMap.type_asset?.guid, accountsMap.type_liability?.guid]}
               selectedDate={selectedDate}
             />
             <div id="accounts-table" className="divide-y divide-slate-400/25 mt-4">
@@ -112,9 +118,7 @@ export default function AccountsPage(): JSX.Element {
           </div>
           <div className="card col-span-4">
             <MonthlyTotalHistogram
-              accounts={
-                accountsMap?.type_income?.childrenIds.map((guid: string) => accountsMap?.[guid])
-              }
+              guids={accountsMap?.type_income?.childrenIds}
               title="Income"
               interval={
                 Interval.fromDateTimes(
@@ -131,9 +135,7 @@ export default function AccountsPage(): JSX.Element {
           </div>
           <div className="card col-span-4">
             <MonthlyTotalHistogram
-              accounts={
-                accountsMap?.type_expense?.childrenIds.map((guid: string) => accountsMap?.[guid])
-              }
+              guids={accountsMap?.type_expense?.childrenIds}
               title="Expenses"
               interval={
                 Interval.fromDateTimes(

@@ -3,7 +3,7 @@ import React from 'react';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import type { Account } from '@/book/entities';
 import { AssetSankey, NetWorthHistogram } from '@/components/charts';
-import { AccountsTable } from '@/components/pages/accounts';
+import { AccountsTable } from '@/components/tables';
 import TotalWidget from './TotalWidget';
 import SpendWidget from './SpendWidget';
 import EarnWidget from './EarnWidget';

@@ -10,7 +10,7 @@ jest.mock('@/components/charts/Line', () => jest.fn(
   () => <div data-testid="Line" />,
 ));
 
-describe('TotalLineChart', () => {
+describe('PricesChart', () => {
   it('creates Line with expected params', () => {
     render(
       <PricesChart

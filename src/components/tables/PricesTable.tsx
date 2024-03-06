@@ -5,8 +5,8 @@ import { BiEdit, BiXCircle } from 'react-icons/bi';
 
 import FormButton from '@/components/buttons/FormButton';
 import PriceForm from '@/components/forms/price/PriceForm';
-import Table from '@/components/Table';
 import { Commodity, Price } from '@/book/entities';
+import Table from '@/components/tables/Table';
 import Money from '@/book/Money';
 
 export type PricesTableProps = {

@@ -6,8 +6,8 @@ import classNames from 'classnames';
 import {
   WeightsChart,
   DividendChart,
-  InvestmentsTable,
 } from '@/components/pages/investments';
+import { InvestmentsTable } from '@/components/tables';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import { toFixed } from '@/helpers/number';
 import Loading from '@/components/Loading';

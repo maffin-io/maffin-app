@@ -6,7 +6,7 @@ import {
 import userEvent from '@testing-library/user-event';
 import { ColumnDef } from '@tanstack/react-table';
 
-import Table from '@/components/Table';
+import Table from '@/components/tables/Table';
 
 type TestDataType = {
   name: string;
