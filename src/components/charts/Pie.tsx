@@ -19,6 +19,11 @@ export const OPTIONS: ChartOptions<'doughnut'> = {
       borderWidth: 0,
     },
   },
+  plugins: {
+    autocolors: {
+      mode: 'data',
+    },
+  },
 };
 
 export default function Doughnut({
@@ -32,6 +37,10 @@ export default function Doughnut({
       options={{
         ...OPTIONS,
         ...options,
+        plugins: {
+          ...OPTIONS.plugins,
+          ...options?.plugins,
+        },
       }}
     />
   );

@@ -32,6 +32,11 @@ describe('Pie', () => {
               borderWidth: 0,
             },
           },
+          plugins: {
+            autocolors: {
+              mode: 'data',
+            },
+          },
         },
         type: 'doughnut',
       },
@@ -44,7 +49,11 @@ describe('Pie', () => {
       <Pie
         data={{ datasets: [] }}
         options={{
-          plugins: undefined,
+          plugins: {
+            title: {
+              display: true,
+            },
+          },
         }}
       />,
     );
@@ -60,7 +69,14 @@ describe('Pie', () => {
               borderWidth: 0,
             },
           },
-          plugins: undefined,
+          plugins: {
+            title: {
+              display: true,
+            },
+            autocolors: {
+              mode: 'data',
+            },
+          },
         },
         type: 'doughnut',
       },
