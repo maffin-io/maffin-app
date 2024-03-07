@@ -1,4 +1,6 @@
-import Money from '../Money';
+import { Commodity, Price } from '../entities';
+import Money, { convert } from '../Money';
+import { PriceDBMap } from '../prices';
 
 describe('Money', () => {
   let money: Money;
@@ -183,5 +185,78 @@ describe('Money', () => {
       money = new Money(-100, 'EUR');
       expect(money.abs().toString()).toEqual('100.00 EUR');
     });
+  });
+});
+
+describe('convert', () => {
+  let eur: Commodity;
+  let usd: Commodity;
+  let prices: PriceDBMap;
+
+  beforeEach(() => {
+    prices = new PriceDBMap([]);
+    eur = { guid: 'eur', mnemonic: 'EUR', namespace: 'CURRENCY' } as Commodity;
+    usd = { guid: 'usd', mnemonic: 'USD', namespace: 'CURRENCY' } as Commodity;
+  });
+
+  it('converts as expected', () => {
+    const rate = new Price();
+    rate.value = 0.987;
+    rate.fk_commodity = usd;
+    rate.fk_currency = eur;
+    jest.spyOn(prices, 'getPrice').mockReturnValue(rate);
+
+    const money = convert(
+      new Money(10, 'USD'),
+      usd,
+      eur,
+      prices,
+    );
+
+    expect(money.toString()).toEqual('9.87 EUR');
+  });
+
+  it('converts as expected when investment', () => {
+    const ticker = { guid: 'ticker', mnemonic: 'TICKER', namespace: 'STOCK' } as Commodity;
+
+    const rate = new Price();
+    rate.value = 100;
+    rate.fk_commodity = ticker;
+    rate.fk_currency = eur;
+    jest.spyOn(prices, 'getInvestmentPrice').mockReturnValue(rate);
+
+    const money = convert(
+      new Money(10, 'TICKER'),
+      ticker,
+      eur,
+      prices,
+    );
+
+    expect(money.toString()).toEqual('1000.00 EUR');
+  });
+
+  it('converts as expected when investment with different currency', () => {
+    const ticker = { guid: 'ticker', mnemonic: 'TICKER', namespace: 'STOCK' } as Commodity;
+
+    const trate = new Price();
+    trate.value = 100;
+    trate.fk_commodity = ticker;
+    trate.fk_currency = usd;
+    jest.spyOn(prices, 'getInvestmentPrice').mockReturnValue(trate);
+
+    const rate = new Price();
+    rate.value = 0.987;
+    rate.fk_commodity = usd;
+    rate.fk_currency = eur;
+    jest.spyOn(prices, 'getPrice').mockReturnValue(rate);
+
+    const money = convert(
+      new Money(10, 'TICKER'),
+      ticker,
+      eur,
+      prices,
+    );
+
+    expect(money.toString()).toEqual('987.00 EUR');
   });
 });

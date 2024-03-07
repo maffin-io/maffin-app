@@ -15,7 +15,6 @@ import {
 } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
 import 'chartjs-adapter-luxon';
-import autocolors from 'chartjs-plugin-autocolors';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import type { ChartProps } from 'react-chartjs-2';
 
@@ -30,7 +29,6 @@ C.register(
   LinearScale,
   PointElement,
   LineElement,
-  autocolors,
 );
 
 C.defaults.color = '#94a3b8';

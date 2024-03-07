@@ -7,7 +7,6 @@ import TotalWidget from '@/components/pages/account/TotalWidget';
 import type { Account } from '@/book/entities';
 import { TotalsPie, MonthlyTotalHistogram } from '@/components/charts';
 import { AccountsTable } from '@/components/tables';
-import { EXPENSE_COLORS } from '@/constants/colors';
 
 jest.mock('@/components/charts/MonthlyTotalHistogram', () => jest.fn(
   () => <div data-testid="MonthlyTotalHistogram" />,
@@ -81,7 +80,6 @@ describe('IEInfo', () => {
     expect(TotalsPie).toBeCalledWith(
       {
         guids: ['1', '2'],
-        backgroundColor: EXPENSE_COLORS,
         showDataLabels: false,
         showTooltip: true,
         title: 'Total spent',

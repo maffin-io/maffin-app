@@ -9,6 +9,7 @@ import { TotalsPie } from '@/components/charts';
 import * as apiHook from '@/hooks/api';
 import type { Account, Commodity } from '@/book/entities';
 import type { AccountsTotals } from '@/types/book';
+import type { PriceDBMap } from '@/book/prices';
 
 jest.mock('@/components/charts/Pie', () => jest.fn(
   () => <div data-testid="Pie" />,
@@ -21,9 +22,10 @@ jest.mock('@/hooks/api', () => ({
 
 describe('TotalsPie', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
+    jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { guid: 'eur', mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
     jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
+    jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: {} } as UseQueryResult<PriceDBMap>);
   });
 
   afterEach(() => {
@@ -80,8 +82,8 @@ describe('TotalsPie', () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [
-          { guid: 'type_asset', name: 'Assets' },
-          { guid: 'type_liability', name: 'Liabilities' },
+          { guid: 'type_asset', name: 'Assets', commodity: { guid: 'eur' } },
+          { guid: 'type_liability', name: 'Liabilities', commodity: { guid: 'eur' } },
         ],
       } as UseQueryResult<Account[]>,
     );
@@ -128,10 +130,10 @@ describe('TotalsPie', () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [
-          { guid: '1', name: 'Groceries' },
-          { guid: '2', name: 'Rent' },
-          { guid: '3', name: 'Electricity' },
-          { guid: '4', name: 'Water' },
+          { guid: '1', name: 'Groceries', commodity: { guid: 'eur' } },
+          { guid: '2', name: 'Rent', commodity: { guid: 'eur' } },
+          { guid: '3', name: 'Electricity', commodity: { guid: 'eur' } },
+          { guid: '4', name: 'Water', commodity: { guid: 'eur' } },
         ],
       } as UseQueryResult<Account[]>,
     );
@@ -173,6 +175,56 @@ describe('TotalsPie', () => {
     expect(plugins.datalabels.display).toBe(false);
     expect(plugins.tooltip.enabled).toBe(true);
     expect(plugins.tooltip.callbacks.label({ raw: '50' })).toEqual('€50.00 (7.69%)');
+  });
+
+  it('works with investment', () => {
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+      {
+        data: [
+          { guid: '1', name: 'ticker1', commodity: { guid: 'ticker1' } },
+          { guid: '2', name: 'ticker2', commodity: { guid: 'ticker2' } },
+        ],
+      } as UseQueryResult<Account[]>,
+    );
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue(
+      {
+        data: {
+          1: new Money(50, 'TICKER1'),
+          2: new Money(500, 'TICKER2'),
+        } as AccountsTotals,
+      } as UseQueryResult<AccountsTotals>,
+    );
+    jest.spyOn(apiHook, 'usePrices').mockReturnValue(
+      // @ts-ignore
+      {
+        data: {
+          getInvestmentPrice: () => ({ value: 100, currency: { guid: 'eur' } }),
+          getPrice: () => ({ value: 0.987 }),
+        },
+      } as UseQueryResult<PriceDBMap>,
+    );
+
+    render(
+      <TotalsPie
+        title=""
+        guids={['1', '2']}
+      />,
+    );
+
+    screen.getByText('€55,000.00');
+    expect(Pie).toBeCalledWith(
+      expect.objectContaining({
+        data: {
+          datasets: [
+            {
+              data: [5000, 50000],
+            },
+          ],
+          labels: ['ticker1', 'ticker2'],
+        },
+      }),
+      {},
+    );
   });
 
   it('passes selectedDate', () => {

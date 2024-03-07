@@ -1,11 +1,16 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 
-import Money from '@/book/Money';
+import Money, { convert } from '@/book/Money';
 import Pie from '@/components/charts/Pie';
-import { useAccounts, useAccountsTotals, useMainCurrency } from '@/hooks/api';
-import type { Account } from '@/book/entities';
+import {
+  useAccounts,
+  useAccountsTotals,
+  useMainCurrency,
+  usePrices,
+} from '@/hooks/api';
 import { moneyToString, toFixed } from '@/helpers/number';
+import type { Account } from '@/book/entities';
 
 export type TotalsPieProps = {
   guids?: string[],
@@ -28,9 +33,24 @@ export default function TotalsPie({
   const { data: accounts } = useAccounts();
 
   const { data: currency } = useMainCurrency();
+  const { data: prices } = usePrices({});
   const unit = currency?.mnemonic || '';
 
-  const data = guids.map(guid => totals?.[guid] || new Money(0, unit));
+  const data = React.useMemo(() => {
+    if (!accounts || !prices || !currency || !totals) {
+      return [];
+    }
+
+    return guids.map(guid => {
+      let total = totals?.[guid] || new Money(0, unit);
+      const account = accounts?.find(a => a.guid === guid) as Account;
+      if (currency && account.commodity.guid !== currency?.guid) {
+        total = convert(total, account.commodity, currency, prices, selectedDate);
+      }
+      return total;
+    });
+  }, [guids, currency, totals, unit, accounts, prices, selectedDate]);
+
   const total = data.reduce(
     (t, d) => t.add(d),
     new Money(0, unit),
