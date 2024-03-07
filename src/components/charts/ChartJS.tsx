@@ -16,6 +16,7 @@ import {
 import { Chart } from 'react-chartjs-2';
 import 'chartjs-adapter-luxon';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import autocolors from 'chartjs-plugin-autocolors';
 import type { ChartProps } from 'react-chartjs-2';
 
 C.register(
@@ -29,6 +30,8 @@ C.register(
   LinearScale,
   PointElement,
   LineElement,
+  // Fixes issue of dynamic datasets becoming black
+  autocolors,
 );
 
 C.defaults.color = '#94a3b8';
