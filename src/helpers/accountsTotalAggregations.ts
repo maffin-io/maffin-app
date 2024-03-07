@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 
-import Money from '@/book/Money';
-import { Account, Commodity } from '@/book/entities';
+import Money, { convert } from '@/book/Money';
+import { Account } from '@/book/entities';
 import type { AccountsTotals, AccountsMap } from '@/types/book';
 import type { PriceDBMap } from '@/book/prices';
 import mapAccounts from './mapAccounts';
@@ -47,7 +47,7 @@ function aggregateWorth(
 
 /**
  * Given an AccountsTotal, aggregate the totals of the children into
- * their the account identified by 'guid'.
+ * their parent.
  *
  * If the children have different commodities, convert
  * them accordingly.
@@ -90,7 +90,7 @@ function aggregateTotals(
 
   current.childrenIds.forEach((childId: string) => {
     aggregatedTotals[current.guid] = aggregatedTotals[current.guid].add(
-      convertToParentCommodity(
+      convert(
         aggregateTotals(childId, accounts, prices, selectedDate, totals, aggregatedTotals),
         accounts[childId].commodity,
         current.commodity,
@@ -101,41 +101,4 @@ function aggregateTotals(
   });
 
   return aggregatedTotals[current.guid];
-}
-
-/**
- * Given a Money amount it converts it to the specified currency in parameter
- * to.
- *
- * If the passed commodity in from is an investment, we retrieve the price of the
- * stock and if the currency of the stock doesn't match the specified currency,
- * we re-convert again
- */
-function convertToParentCommodity(
-  amount: Money,
-  from: Commodity,
-  to: Commodity,
-  prices: PriceDBMap,
-  selectedDate: DateTime,
-): Money {
-  let rate = 1;
-  let currency = from;
-
-  if (currency.namespace !== 'CURRENCY') {
-    const stockPrice = prices.getInvestmentPrice(
-      currency.mnemonic,
-      selectedDate,
-    );
-    rate = stockPrice.value;
-    currency = stockPrice.currency;
-  }
-  if (currency.guid !== to.guid) {
-    rate *= prices.getPrice(
-      currency.mnemonic,
-      to.mnemonic,
-      selectedDate,
-    ).value;
-  }
-
-  return amount.convert(to.mnemonic, rate);
 }

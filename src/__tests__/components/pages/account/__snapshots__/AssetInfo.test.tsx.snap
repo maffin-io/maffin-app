@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AssetInfo renders as expected when no splits 1`] = `
+exports[`AssetInfo renders as expected when not placeholder 1`] = `
 <div>
   <div
     class="grid grid-cols-12"
@@ -9,7 +9,7 @@ exports[`AssetInfo renders as expected when no splits 1`] = `
       class="col-span-6"
     >
       <div
-        class="grid grid-cols-12"
+        class="grid grid-cols-12 items-start"
       >
         <div
           class="col-span-4"
@@ -31,6 +31,61 @@ exports[`AssetInfo renders as expected when no splits 1`] = `
             data-testid="AssetSankey"
           />
         </div>
+      </div>
+    </div>
+    <div
+      class="grid grid-cols-12 col-span-6"
+    >
+      <div
+        class="card col-span-12"
+      >
+        <div
+          data-testid="NetWorthHistogram"
+        />
+      </div>
+      <div
+        class="col-span-12"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`AssetInfo renders as expected when placeholder 1`] = `
+<div>
+  <div
+    class="grid grid-cols-12"
+  >
+    <div
+      class="col-span-6"
+    >
+      <div
+        class="grid grid-cols-12 items-start"
+      >
+        <div
+          class="card col-span-6"
+        >
+          <div
+            class="items-center"
+          >
+            <div
+              data-testid="TotalsPie"
+            />
+            <div
+              data-testid="MonthChange"
+            />
+            <div
+              class="mt-4"
+            >
+              <div
+                data-testid="AccountsTable"
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          class="card col-span-6"
+        />
       </div>
     </div>
     <div

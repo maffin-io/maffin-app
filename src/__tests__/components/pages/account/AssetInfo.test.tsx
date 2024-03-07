@@ -3,12 +3,13 @@ import { render } from '@testing-library/react';
 import { DateTime } from 'luxon';
 
 import { AssetInfo } from '@/components/pages/account';
-import { NetWorthHistogram, AssetSankey } from '@/components/charts';
-import StatisticsWidget from '@/components/StatisticsWidget';
+import { TotalsPie, NetWorthHistogram, AssetSankey } from '@/components/charts';
 import TotalWidget from '@/components/pages/account/TotalWidget';
 import SpendWidget from '@/components/pages/account/SpendWidget';
 import EarnWidget from '@/components/pages/account/EarnWidget';
 import type { Account } from '@/book/entities';
+import { AccountsTable } from '@/components/tables';
+import MonthChange from '@/components/widgets/MonthChange';
 
 jest.mock('@/components/charts/NetWorthHistogram', () => jest.fn(
   () => <div data-testid="NetWorthHistogram" />,
@@ -16,6 +17,14 @@ jest.mock('@/components/charts/NetWorthHistogram', () => jest.fn(
 
 jest.mock('@/components/StatisticsWidget', () => jest.fn(
   () => <div data-testid="StatisticsWidget" />,
+));
+
+jest.mock('@/components/tables/AccountsTable', () => jest.fn(
+  () => <div data-testid="AccountsTable" />,
+));
+
+jest.mock('@/components/charts/TotalsPie', () => jest.fn(
+  () => <div data-testid="TotalsPie" />,
 ));
 
 jest.mock('@/components/charts/AssetSankey', () => jest.fn(
@@ -32,6 +41,10 @@ jest.mock('@/components/pages/account/SpendWidget', () => jest.fn(
 
 jest.mock('@/components/pages/account/EarnWidget', () => jest.fn(
   () => <div data-testid="EarnWidget" />,
+));
+
+jest.mock('@/components/widgets/MonthChange', () => jest.fn(
+  () => <div data-testid="MonthChange" />,
 ));
 
 jest.mock('@/components/tables/AccountsTable', () => jest.fn(
@@ -56,14 +69,13 @@ describe('AssetInfo', () => {
     jest.clearAllMocks();
   });
 
-  it('renders as expected when no splits', () => {
+  it('renders as expected when not placeholder', () => {
     const { container } = render(
       <AssetInfo account={account} />,
     );
 
     expect(NetWorthHistogram).toBeCalledWith(
       {
-        height: 300,
         assetsGuid: 'guid',
         assetsLabel: 'Assets',
         hideAssets: true,
@@ -73,7 +85,7 @@ describe('AssetInfo', () => {
       },
       {},
     );
-    expect(AssetSankey).toBeCalledWith({ guid: 'guid' }, {});
+    expect(AssetSankey).toBeCalledWith({ height: 270, guid: 'guid' }, {});
     expect(TotalWidget).toBeCalledWith(
       { account },
       {},
@@ -89,24 +101,42 @@ describe('AssetInfo', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('shows account table when placeholder', () => {
+  it('renders as expected when placeholder', () => {
     account.placeholder = true;
-    render(
+    account.childrenIds = ['1', '2'];
+
+    const { container } = render(
       <AssetInfo account={account} />,
     );
 
-    expect(StatisticsWidget).toBeCalledTimes(1);
-    expect(StatisticsWidget).toHaveBeenNthCalledWith(
-      1,
+    expect(NetWorthHistogram).toBeCalledWith(
       {
-        className: 'mr-2',
-        title: 'Subaccounts',
-        description: '',
-        statsTextClass: '!font-normal',
-        // Don't know how to check for AccountsTable here
-        stats: expect.anything(),
+        assetsGuid: 'guid',
+        assetsLabel: 'Assets',
+        hideAssets: true,
+        hideLiabilities: true,
+        liabilitiesGuid: '',
+        showLegend: false,
       },
       {},
     );
+    expect(AccountsTable).toBeCalledWith({ guids: ['1', '2'] }, {});
+    expect(TotalsPie).toBeCalledWith(
+      {
+        guids: ['1', '2'],
+        showDataLabels: false,
+        showTooltip: true,
+        title: '',
+      },
+      {},
+    );
+    expect(MonthChange).toBeCalledWith(
+      {
+        account,
+        className: 'justify-center text-sm mt-1',
+      },
+      {},
+    );
+    expect(container).toMatchSnapshot();
   });
 });

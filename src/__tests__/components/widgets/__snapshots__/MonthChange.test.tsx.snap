@@ -1,0 +1,79 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MonthChange renders as expected with decrease 1`] = `
+<div>
+  <div
+    class="flex items-center "
+  >
+    <svg
+      class="mr-1 amount-negative"
+      fill="currentColor"
+      height="1em"
+      stroke="currentColor"
+      stroke-width="0"
+      viewBox="0 0 24 24"
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="m14 9.586-4 4-6.293-6.293-1.414 1.414L10 16.414l4-4 4.293 4.293L16 19h6v-6l-2.293 2.293z"
+      />
+    </svg>
+    -€100.00
+     
+    from last month
+  </div>
+</div>
+`;
+
+exports[`MonthChange renders as expected with increase 1`] = `
+<div>
+  <div
+    class="flex items-center "
+  >
+    <svg
+      class="mr-1 amount-positive"
+      fill="currentColor"
+      height="1em"
+      stroke="currentColor"
+      stroke-width="0"
+      viewBox="0 0 24 24"
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="m10 10.414 4 4 5.707-5.707L22 11V5h-6l2.293 2.293L14 11.586l-4-4-7.707 7.707 1.414 1.414z"
+      />
+    </svg>
+    €100.00
+     
+    from last month
+  </div>
+</div>
+`;
+
+exports[`MonthChange renders with no data 1`] = `
+<div>
+  <div
+    class="flex items-center mt-1"
+  >
+    <svg
+      class="mr-1 amount-positive"
+      fill="currentColor"
+      height="1em"
+      stroke="currentColor"
+      stroke-width="0"
+      viewBox="0 0 24 24"
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="m10 10.414 4 4 5.707-5.707L22 11V5h-6l2.293 2.293L14 11.586l-4-4-7.707 7.707 1.414 1.414z"
+      />
+    </svg>
+    €0.00
+     
+    from last month
+  </div>
+</div>
+`;

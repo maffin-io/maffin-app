@@ -5,7 +5,6 @@ import classNames from 'classnames';
 import type { Account } from '@/book/entities';
 import { AccountsTable } from '@/components/tables';
 import { TotalsPie, MonthlyTotalHistogram } from '@/components/charts';
-import { EXPENSE_COLORS, INCOME_COLORS } from '@/constants/colors';
 import TotalWidget from './TotalWidget';
 
 export type IEInfoProps = {
@@ -32,7 +31,6 @@ export default function IEInfo({
                   <>
                     <TotalsPie
                       title={account.type === 'EXPENSE' ? 'Total spent' : 'Total earned'}
-                      backgroundColor={account.type === 'EXPENSE' ? EXPENSE_COLORS : INCOME_COLORS}
                       guids={account.childrenIds}
                       showTooltip
                       showDataLabels={false}

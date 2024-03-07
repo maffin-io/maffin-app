@@ -1,8 +1,11 @@
+import { DateTime } from 'luxon';
 import * as currencies from '@dinero.js/currencies';
 import type { Currency as DineroCurrency } from 'dinero.js';
 import * as djs from 'dinero.js';
 
 import { toAmountWithScale, moneyToString } from '@/helpers/number';
+import type { PriceDBMap } from './prices';
+import type { Commodity } from './entities';
 
 export default class Money {
   private _raw: djs.Dinero<number>;
@@ -177,4 +180,41 @@ function toCurrency(currency: string): DineroCurrency<number> {
     };
   }
   return dineroCurrency;
+}
+
+/**
+ * Given a Money amount it converts it to the specified currency in parameter
+ * to.
+ *
+ * If the passed commodity in from is an investment, we retrieve the price of the
+ * stock and if the currency of the stock doesn't match the specified currency,
+ * we re-convert again
+ */
+export function convert(
+  amount: Money,
+  from: Commodity,
+  to: Commodity,
+  prices: PriceDBMap,
+  selectedDate: DateTime = DateTime.now(),
+): Money {
+  let rate = 1;
+  let currency = from;
+
+  if (currency.namespace !== 'CURRENCY') {
+    const stockPrice = prices.getInvestmentPrice(
+      currency.mnemonic,
+      selectedDate,
+    );
+    rate = stockPrice.value;
+    currency = stockPrice.currency;
+  }
+  if (currency.guid !== to.guid) {
+    rate *= prices.getPrice(
+      currency.mnemonic,
+      to.mnemonic,
+      selectedDate,
+    ).value;
+  }
+
+  return amount.convert(to.mnemonic, rate);
 }

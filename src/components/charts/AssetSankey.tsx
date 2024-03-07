@@ -8,10 +8,12 @@ import Sankey from './Sankey';
 
 export type AssetSankeyProps = {
   guid: string,
+  height?: number,
 };
 
 export default function AssetSankey({
   guid,
+  height = 250,
 }: AssetSankeyProps): JSX.Element {
   const { data: byAccount, isPending } = useCashFlow(guid);
   const { data: currency } = useMainCurrency();
@@ -77,7 +79,7 @@ export default function AssetSankey({
 
   return (
     <Sankey
-      height={250}
+      height={height}
       data={{
         datasets,
       }}

@@ -145,7 +145,8 @@ export function useAccountTotal(
 
 /**
  * Calculates the total for each existing account. The total is calculated
- * by accumulating the splits for each account.
+ * by accumulating the splits for each account. The total of each account
+ * is in the commodity of the account
  *
  * By default, it aggregates the splits of the children into their parent but an
  * optional select parameter can be passed to change that behavior.
