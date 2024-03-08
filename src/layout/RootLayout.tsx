@@ -24,9 +24,12 @@ const queryClient = new QueryClient({
       retry: false,
       staleTime: Infinity,
       refetchOnMount: true,
-      refetchOnReconnect: false,
       refetchOnWindowFocus: false,
       gcTime: 300000, // 5 minutes
+      // This doesnt work and needs to be set for each query.
+      // It stops working when the navigation state changes. I.e. you start
+      // online and then go to offline, subsequent queries are paused...
+      networkMode: 'always',
     },
   },
 });

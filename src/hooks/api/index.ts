@@ -28,6 +28,7 @@ export function useStartDate(): UseQueryResult<DateTime> {
   return useQuery({
     queryKey: [...Transaction.CACHE_KEY, { name: 'start' }],
     queryFn: fetcher(queries.getEarliestDate, `/${Transaction.CACHE_KEY.join('/')}/start`),
+    networkMode: 'always',
   });
 }
 
@@ -35,5 +36,6 @@ export function useLatestTxs(): UseQueryResult<Transaction[]> {
   return useQuery({
     queryKey: [...Transaction.CACHE_KEY, { name: 'latest' }],
     queryFn: fetcher(queries.getLatestTxs, `/${Transaction.CACHE_KEY.join('/')}/latest`),
+    networkMode: 'always',
   });
 }

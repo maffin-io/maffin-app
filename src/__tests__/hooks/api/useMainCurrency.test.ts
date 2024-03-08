@@ -15,6 +15,7 @@ describe('useMainCurrency', () => {
       queryKey: ['api', 'commodities', { guid: 'main' }],
       queryFn: expect.any(Function),
       gcTime: Infinity,
+      networkMode: 'always',
     });
 
     const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];

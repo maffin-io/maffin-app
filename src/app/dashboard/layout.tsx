@@ -31,16 +31,8 @@ export default function DashboardLayout({
   children,
 }: React.PropsWithChildren): JSX.Element {
   const router = useRouter();
-  const { data: theme } = useTheme();
+  useTheme();
   const { isLoading, isAuthenticated } = useSession();
-
-  React.useLayoutEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  });
 
   React.useLayoutEffect(() => {
     if (!isLoading && !isAuthenticated) {

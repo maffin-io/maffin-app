@@ -10,5 +10,6 @@ export function useMainCurrency(): UseQueryResult<Commodity> {
     queryKey: [...Commodity.CACHE_KEY, { guid: 'main' }],
     queryFn: fetcher(getMainCurrency, `/${Commodity.CACHE_KEY.join('/')}/main`),
     gcTime: Infinity,
+    networkMode: 'always',
   });
 }

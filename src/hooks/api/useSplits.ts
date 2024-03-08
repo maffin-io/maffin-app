@@ -57,6 +57,7 @@ export function useSplits(
       }),
       queryKey,
     ),
+    networkMode: 'always',
   });
 
   return result;
@@ -91,6 +92,7 @@ export function useSplitsPagination(
         .getMany(),
       queryKey,
     ),
+    networkMode: 'always',
   });
 
   return result;
@@ -109,6 +111,7 @@ export function useSplitsCount(
       async () => Split.count({ where: { fk_account: { guid: account } } }),
       queryKey,
     ),
+    networkMode: 'always',
   });
 
   return result;
@@ -138,6 +141,7 @@ export function useAccountTotal(
       },
       queryKey,
     ),
+    networkMode: 'always',
   });
 
   return result;
@@ -189,6 +193,7 @@ export function useAccountsTotals(
     ),
     enabled: !!accounts,
     select: select || aggregate,
+    networkMode: 'always',
   });
 
   return result;
@@ -245,6 +250,7 @@ export function useAccountsMonthlyTotal(
     ),
     enabled: !!accounts,
     select: aggregate,
+    networkMode: 'always',
   });
 
   return result;
@@ -321,6 +327,7 @@ export function useAccountsMonthlyWorth(
     ),
     enabled: !!accounts && !!totalsUpdatedAt,
     select: aggregate,
+    networkMode: 'always',
   });
 
   return result;
@@ -362,6 +369,7 @@ export function useCashFlow(
       HAVING SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) != 0
       ORDER BY total
     `),
+    networkMode: 'always',
   }) as UseQueryResult<{ guid: string, total: number, type: string, name: string }[]>;
 
   return result;

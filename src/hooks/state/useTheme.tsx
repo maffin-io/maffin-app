@@ -1,3 +1,4 @@
+import React from 'react';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
 /**
@@ -5,7 +6,7 @@ import { useQuery, UseQueryResult } from '@tanstack/react-query';
  * and if nothing found there, use system preferences.
  */
 export function useTheme(): UseQueryResult<'dark' | 'light'> {
-  return useQuery({
+  const result = useQuery({
     queryKey: ['state', 'theme'],
     queryFn: () => {
       const preferredTheme = (window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
@@ -14,5 +15,16 @@ export function useTheme(): UseQueryResult<'dark' | 'light'> {
     },
     enabled: typeof window !== 'undefined',
     gcTime: Infinity,
+    networkMode: 'always',
   });
+
+  React.useLayoutEffect(() => {
+    if (result.data === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  });
+
+  return result;
 }

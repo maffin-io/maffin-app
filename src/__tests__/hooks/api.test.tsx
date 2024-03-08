@@ -35,6 +35,7 @@ describe('API', () => {
       expect(query.useQuery).toBeCalledWith({
         queryKey: ['api', 'txs', { name: 'start' }],
         queryFn: expect.any(Function),
+        networkMode: 'always',
       });
 
       const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];
@@ -50,6 +51,7 @@ describe('API', () => {
       expect(query.useQuery).toBeCalledWith({
         queryKey: ['api', 'txs', { name: 'latest' }],
         queryFn: expect.any(Function),
+        networkMode: 'always',
       });
 
       const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];

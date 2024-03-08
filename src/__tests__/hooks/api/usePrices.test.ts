@@ -20,6 +20,7 @@ describe('usePrices', () => {
       queryKey: ['api', 'prices', { from: 'guid' }],
       queryFn: expect.any(Function),
       enabled: true,
+      networkMode: 'always',
     });
 
     const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];
@@ -37,6 +38,7 @@ describe('usePrices', () => {
       queryKey: ['api', 'prices', { from: 'guid', to: 'to' }],
       queryFn: expect.any(Function),
       enabled: true,
+      networkMode: 'always',
     });
 
     const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];

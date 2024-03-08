@@ -26,5 +26,6 @@ export function usePrices(params: {
       || !!('to' in params && params.to)
       || (!('from' in params) && !('to' in params))
     ),
+    networkMode: 'always',
   });
 }
