@@ -79,6 +79,7 @@ export function useInvestment(guid: string): UseQueryResult<InvestmentAccount> {
       `/${InvestmentAccount.CACHE_KEY.join('/')}/${guid}`,
     ),
     enabled: !!account && !!splits && !!mainCurrency,
+    networkMode: 'always',
   });
 
   if (result.error) {
@@ -111,6 +112,7 @@ export function useInvestments(): UseQueryResult<InvestmentAccount[]> {
       `/${InvestmentAccount.CACHE_KEY.join('/')}`,
     ),
     enabled: !!accounts && !!splits && !!mainCurrency,
+    networkMode: 'always',
   });
 
   if (result.error) {

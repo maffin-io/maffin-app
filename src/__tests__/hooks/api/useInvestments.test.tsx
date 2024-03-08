@@ -133,6 +133,7 @@ describe('useInvestment', () => {
       ],
       queryFn: expect.any(Function),
       enabled: true,
+      networkMode: 'always',
     });
 
     const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];
@@ -245,6 +246,7 @@ describe('useInvestments', () => {
       queryKey: ['api', 'investments'],
       queryFn: expect.any(Function),
       enabled: true,
+      networkMode: 'always',
     });
 
     const callArgs = (query.useQuery as jest.Mock).mock.calls[0][0];

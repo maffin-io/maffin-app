@@ -21,6 +21,7 @@ export function useCommodities<TData = Commodity[]>(
     queryKey: [...Commodity.CACHE_KEY],
     queryFn: fetcher(() => Commodity.find(), Commodity.CACHE_KEY),
     select,
+    networkMode: 'always',
   });
 
   return result;

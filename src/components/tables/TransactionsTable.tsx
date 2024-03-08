@@ -123,6 +123,7 @@ function useTransaction(guid: string): UseQueryResult<Transaction> {
       }),
       queryKey,
     ),
+    networkMode: 'always',
   });
 }
 

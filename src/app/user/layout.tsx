@@ -11,15 +11,7 @@ export default function UserLayout({
 }: {
   children: React.ReactNode
 }): JSX.Element {
-  const { data: theme } = useTheme();
-
-  React.useLayoutEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  });
+  useTheme();
 
   return (
     <div className="flex h-screen place-content-center place-items-center">

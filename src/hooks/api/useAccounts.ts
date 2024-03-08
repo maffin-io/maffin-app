@@ -29,6 +29,7 @@ export function useAccounts<TData = Account[]>(
       Account.CACHE_KEY,
     ),
     select,
+    networkMode: 'always',
   });
 
   return result;
