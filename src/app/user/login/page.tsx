@@ -8,7 +8,7 @@ import { isStaging } from '@/helpers/env';
 
 export default function LoginPage(): JSX.Element {
   const router = useRouter();
-  const { isAuthenticated, loginWithPopup } = useAuth0();
+  const { isAuthenticated, loginWithPopup, error } = useAuth0();
 
   React.useEffect(() => {
     if (isStaging() || isAuthenticated) {
@@ -17,16 +17,22 @@ export default function LoginPage(): JSX.Element {
   }, [isAuthenticated, router]);
 
   return (
-    <button
-      className="btn btn-primary"
-      type="button"
-      onClick={() => {
-        if (!isStaging()) {
-          loginWithPopup();
-        }
-      }}
-    >
-      Sign In
-    </button>
+    <>
+      <button
+        className="btn btn-primary"
+        type="button"
+        onClick={() => {
+          if (!isStaging()) {
+            loginWithPopup();
+          }
+        }}
+      >
+        Sign In
+      </button>
+      {
+        error
+        && <p className="invalid-feedback">{error.message}</p>
+      }
+    </>
   );
 }

@@ -72,4 +72,17 @@ describe('LoginPage', () => {
 
     expect(mockLogin).toBeCalled();
   });
+
+  it('shows error', async () => {
+    const mockLogin = jest.fn();
+    jest.spyOn(auth0, 'useAuth0').mockReturnValue({
+      error: { message: 'auth failed' },
+      loginWithPopup: mockLogin as Function,
+    } as auth0.Auth0ContextInterface<auth0.User>);
+
+    render(<LoginPage />);
+    screen.getByText('Sign In').click();
+
+    screen.getByText('auth failed');
+  });
 });
