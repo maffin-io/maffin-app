@@ -19,6 +19,7 @@ import { MIGRATIONS } from '@/book/migrations';
 import { isStaging } from '@/helpers/env';
 import { useQueryClient } from '@tanstack/react-query';
 import type BookStorage from '@/lib/storage/BookStorage';
+import { MaffinError } from '@/helpers/errors';
 
 export type DataSourceContextType = {
   datasource: DataSource | null,
@@ -110,8 +111,13 @@ async function save(storage: BookStorage) {
   DATASOURCE.options.extra.queryClient.setQueryData(['state', 'isSaving'], true);
   await DATASOURCE.query('VACUUM');
   const rawBook = DATASOURCE.sqljsManager.exportDatabase();
-  await storage.save(rawBook);
-  DATASOURCE.options.extra.queryClient.setQueryData(['state', 'isSaving'], false);
+  try {
+    await storage.save(rawBook);
+  } catch (e) {
+    (e as MaffinError).show();
+  } finally {
+    DATASOURCE.options.extra.queryClient.setQueryData(['state', 'isSaving'], false);
+  }
 }
 
 async function importBook(storage: BookStorage, rawData: Uint8Array) {

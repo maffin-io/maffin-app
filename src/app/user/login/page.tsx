@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth0 } from '@auth0/auth0-react';
 
 import { isStaging } from '@/helpers/env';
+import { AuthError } from '@/helpers/errors';
 
 export default function LoginPage(): JSX.Element {
   const router = useRouter();
@@ -16,23 +17,25 @@ export default function LoginPage(): JSX.Element {
     }
   }, [isAuthenticated, router]);
 
+  if (error) {
+    if (error.message === 'INVALID_SUBSCRIPTION') {
+      new AuthError(error.message, error.message).show();
+    } else {
+      new AuthError(error.message, 'UNKNOWN').show();
+    }
+  }
+
   return (
-    <>
-      <button
-        className="btn btn-primary"
-        type="button"
-        onClick={() => {
-          if (!isStaging()) {
-            loginWithPopup();
-          }
-        }}
-      >
-        Sign In
-      </button>
-      {
-        error
-        && <p className="invalid-feedback">{error.message}</p>
-      }
-    </>
+    <button
+      className="btn btn-primary"
+      type="button"
+      onClick={() => {
+        if (!isStaging()) {
+          loginWithPopup();
+        }
+      }}
+    >
+      Sign In
+    </button>
   );
 }

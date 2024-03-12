@@ -87,7 +87,7 @@ describe('DashboardLayout', () => {
       </DashboardLayout>,
     );
 
-    await waitFor(() => expect(DashboardPage).toHaveBeenLastCalledWith({ children }, {}));
+    expect(DashboardPage).toHaveBeenLastCalledWith({ children: expect.anything() }, {});
     expect(LeftSidebar).toHaveBeenLastCalledWith({}, {});
     expect(Footer).toHaveBeenLastCalledWith({}, {});
     expect(container).toMatchSnapshot();

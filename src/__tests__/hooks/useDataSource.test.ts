@@ -10,6 +10,7 @@ import * as gnucash from '@/lib/gnucash';
 import * as queries from '@/lib/queries';
 import type BookStorage from '@/lib/storage/GDriveBookStorage';
 import type { QueryClient } from '@tanstack/react-query';
+import { MaffinError } from '@/helpers/errors';
 
 jest.mock('@tanstack/react-query');
 
@@ -223,8 +224,10 @@ describe('useDataSource', () => {
   });
 
   describe('dynamic functions', () => {
+    let rawBook: Uint8Array;
+
     beforeEach(async () => {
-      const rawBook = new Uint8Array([21, 31]);
+      rawBook = new Uint8Array([21, 31]);
       jest.spyOn(storageHooks, 'default').mockReturnValue({
         storage: {
           get: jest.fn().mockResolvedValue(
@@ -262,6 +265,22 @@ describe('useDataSource', () => {
 
         const mockStorage = (storageHooks.default as jest.Mock).mock.results[0].value.storage;
         expect(mockStorage.save).toBeCalledWith(new Uint8Array([22, 33]));
+      });
+
+      it('shows error toast on failure', async () => {
+        jest.spyOn(MaffinError.prototype, 'show');
+        jest.spyOn(storageHooks, 'default').mockReturnValue({
+          storage: {
+            get: jest.fn().mockResolvedValue(rawBook) as typeof BookStorage.prototype.get,
+            save: jest.fn(() => { throw new MaffinError('e', 'code'); }) as typeof BookStorage.prototype.save,
+          } as BookStorage,
+        });
+        const { result } = renderHook(() => useDataSource());
+
+        await waitFor(() => expect(result.current.isLoaded).toBe(true));
+        await result.current.save();
+
+        expect(MaffinError.prototype.show).toBeCalled();
       });
     });
 

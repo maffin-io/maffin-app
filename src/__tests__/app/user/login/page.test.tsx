@@ -6,9 +6,9 @@ import * as auth0 from '@auth0/auth0-react';
 
 import LoginPage from '@/app/user/login/page';
 import * as helpers_env from '@/helpers/env';
+import * as errors from '@/helpers/errors';
 
 jest.mock('next/navigation');
-
 jest.mock('@auth0/auth0-react', () => ({
   __esModule: true,
   ...jest.requireActual('@auth0/auth0-react'),
@@ -22,6 +22,11 @@ jest.mock('@/lib/Stocker', () => ({
 jest.mock('@/helpers/env', () => ({
   __esModule: true,
   isStaging: () => false,
+}));
+
+jest.mock('@/helpers/errors', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/helpers/errors'),
 }));
 
 describe('LoginPage', () => {
@@ -73,16 +78,26 @@ describe('LoginPage', () => {
     expect(mockLogin).toBeCalled();
   });
 
-  it('shows error', async () => {
+  it.each(
+    [
+      ['auth failed', 'UNKNOWN'],
+      ['INVALID_SUBSCRIPTION', 'INVALID_SUBSCRIPTION'],
+    ],
+  )('shows %s error', async (message, code) => {
+    const mockShow = jest.fn();
+    jest.spyOn(errors, 'AuthError').mockReturnValue({
+      show: mockShow as Function,
+    } as errors.StorageError);
     const mockLogin = jest.fn();
     jest.spyOn(auth0, 'useAuth0').mockReturnValue({
-      error: { message: 'auth failed' },
+      error: { message },
       loginWithPopup: mockLogin as Function,
     } as auth0.Auth0ContextInterface<auth0.User>);
 
     render(<LoginPage />);
     screen.getByText('Sign In').click();
 
-    screen.getByText('auth failed');
+    expect(errors.AuthError).toBeCalledWith(message, code);
+    expect(mockShow).toBeCalled();
   });
 });
