@@ -47,11 +47,11 @@ export default function DashboardLayout({
       <div className="mt-20 ml-20 p-3 pb-7">
         <QueryClientProvider client={queryClient}>
           <ReactQueryDevtools initialIsOpen={false} />
-          <DashboardPage>
-            <ErrorBoundary fallbackRender={({ error }) => error.show()}>
+          <ErrorBoundary fallbackRender={({ error }) => error.show()}>
+            <DashboardPage>
               {children}
-            </ErrorBoundary>
-          </DashboardPage>
+            </DashboardPage>
+          </ErrorBoundary>
         </QueryClientProvider>
       </div>
       <Footer />
