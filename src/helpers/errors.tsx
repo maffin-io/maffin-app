@@ -1,6 +1,7 @@
 import React from 'react';
 import { toast, ToastOptions } from 'react-hot-toast';
 import { BiError, BiX } from 'react-icons/bi';
+import Link from 'next/link';
 
 export class MaffinError extends Error {
   code: string;
@@ -11,7 +12,7 @@ export class MaffinError extends Error {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  toUI(): string {
+  toUI(): string | JSX.Element {
     return 'Unknown error';
   }
 
@@ -27,9 +28,19 @@ export class MaffinError extends Error {
 }
 
 export class StorageError extends MaffinError {
-  toUI(): string {
+  toUI(): string | JSX.Element {
     if (this.code === 'UNAUTHORIZED') {
-      return 'Invalid Google session, please log in again';
+      return (
+        <>
+          Invalid Google session
+          <Link
+            href="/user/logout"
+            className="ml-1"
+          >
+            log in again
+          </Link>
+        </>
+      );
     }
 
     if (this.code === 'OFFLINE') {
@@ -41,7 +52,7 @@ export class StorageError extends MaffinError {
 }
 
 export class AuthError extends MaffinError {
-  toUI(): string {
+  toUI(): string | JSX.Element {
     if (this.code === 'INVALID_SUBSCRIPTION') {
       return 'You need a valid subscription';
     }
@@ -55,7 +66,7 @@ function ToastComponent({
   message,
 }: {
   toastId: string,
-  message: string,
+  message: string | JSX.Element,
 }): JSX.Element {
   return (
     <div className="flex items-center">

@@ -51,7 +51,7 @@ describe('StorageError', () => {
     it('returns unauthorized error', () => {
       const error = new StorageError('message', 'UNAUTHORIZED');
 
-      expect(error.toUI()).toEqual('Invalid Google session, please log in again');
+      expect(error.toUI()).toMatchSnapshot();
     });
 
     it('returns offline error', () => {

@@ -45,3 +45,15 @@ exports[`MaffinError show shows toast 1`] = `
   </div>
 </div>
 `;
+
+exports[`StorageError toUI returns unauthorized error 1`] = `
+<React.Fragment>
+  Invalid Google session
+  <ForwardRef(LinkComponent)
+    className="ml-1"
+    href="/user/logout"
+  >
+    log in again
+  </ForwardRef(LinkComponent)>
+</React.Fragment>
+`;
