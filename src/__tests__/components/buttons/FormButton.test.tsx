@@ -120,7 +120,7 @@ describe('FormButton', () => {
   });
 
   it('on form save closes modal and saves', async () => {
-    const mockSave = jest.fn();
+    const mockSave = jest.fn(() => Promise.resolve());
     render(
       <DataSourceContext.Provider value={{ save: mockSave as Function } as DataSourceContextType}>
         <FormButton

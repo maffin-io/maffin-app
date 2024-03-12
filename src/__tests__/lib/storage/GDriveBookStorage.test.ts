@@ -87,6 +87,23 @@ describe('GoogleDrive', () => {
       const parentFolderId = await instance.findParentFolderId();
       expect(parentFolderId).toEqual('');
     });
+
+    it('throws UNKNOWN when 500', async () => {
+      mockDriveClient.files.list = jest.fn(() => {
+        // eslint-disable-next-line @typescript-eslint/no-throw-literal
+        throw {
+          status: 500,
+        };
+      }) as jest.Mock;
+
+      // @ts-ignore
+      await expect(() => instance.findParentFolderId()).rejects.toThrowError(
+        expect.objectContaining({
+          message: 'Failed to fetch',
+          code: 'OFFLINE',
+        }),
+      );
+    });
   });
 
   describe('findBookFileId', () => {
@@ -130,11 +147,21 @@ describe('GoogleDrive', () => {
       expect(bookFileId).toEqual('');
     });
 
-    it('fails when parentFolderId is not set', async () => {
+    it('throws Invalid token when 401', async () => {
+      mockDriveClient.files.list = jest.fn(() => {
+        // eslint-disable-next-line @typescript-eslint/no-throw-literal
+        throw {
+          status: 401,
+        };
+      }) as jest.Mock;
+
       // @ts-ignore
-      instance.parentFolderId = '';
-      // @ts-ignore
-      await expect(instance.findBookFileId('book1')).rejects.toThrow('Parent folder id is not set');
+      await expect(() => instance.findBookFileId('book1')).rejects.toThrowError(
+        expect.objectContaining({
+          message: 'Invalid token',
+          code: 'UNAUTHORIZED',
+        }),
+      );
     });
   });
 
@@ -209,42 +236,10 @@ describe('GoogleDrive', () => {
       expect(mockDriveClient.files.create).not.toHaveBeenCalled();
     });
 
-    it('raises an error when cant find parent id after creating', async () => {
-      // @ts-ignore
-      jest.spyOn(instance, 'findParentFolderId').mockReturnValue(Promise.resolve(''));
-      // @ts-ignore
-      mockDriveClient.files.create = jest.fn(async () => (
-        {
-          result: {
-            id: undefined,
-          },
-        }
-      ));
-
-      await expect(instance.initStorage()).rejects.toThrow('Couldnt get parent folder id');
-    });
-
     it('calls findBookFileId', async () => {
       await instance.initStorage();
       // @ts-ignore
       expect(instance.findBookFileId).toHaveBeenCalledTimes(1);
-    });
-
-    it('raises an error when cant find book id after creating', async () => {
-      // @ts-ignore
-      jest.spyOn(instance, 'findParentFolderId').mockReturnValue(Promise.resolve('parentFolderId'));
-      // @ts-ignore
-      jest.spyOn(instance, 'findBookFileId').mockReturnValue(Promise.resolve(''));
-      // @ts-ignore
-      mockDriveClient.files.create = jest.fn(async () => (
-        {
-          result: {
-            id: undefined,
-          },
-        }
-      ));
-
-      await expect(instance.initStorage()).rejects.toThrow('Couldnt get bookFile id');
     });
   });
 
@@ -286,6 +281,11 @@ describe('GoogleDrive', () => {
     });
 
     it('saves book as expected', async () => {
+      mockFetch = jest.spyOn(global, 'fetch').mockImplementation(
+        jest.fn(() => Promise.resolve({
+          status: 200,
+        })) as jest.Mock,
+      );
       // @ts-ignore
       instance.parentFolderId = 'parentFolderId';
       // @ts-ignore
@@ -309,6 +309,30 @@ describe('GoogleDrive', () => {
       const resultBlobData = await fileToArrayBuffer(blob);
       const expectedBlobData = await fileToArrayBuffer(blob);
       expect(resultBlobData).toEqual(expectedBlobData);
+    });
+
+    it('throws Invalid token when 401', async () => {
+      mockFetch = jest.spyOn(global, 'fetch').mockImplementation(
+        jest.fn(() => Promise.resolve({
+          status: 401,
+        })) as jest.Mock,
+      );
+
+      await expect(() => instance.save(rawBook)).rejects.toThrowError(expect.objectContaining({
+        message: 'Invalid token',
+        code: 'UNAUTHORIZED',
+      }));
+    });
+
+    it('throws Failed to fetch when 500', async () => {
+      mockFetch = jest.spyOn(global, 'fetch').mockImplementation(
+        jest.fn(() => { throw new Error(); }) as jest.Mock,
+      );
+
+      await expect(() => instance.save(rawBook)).rejects.toThrowError(expect.objectContaining({
+        message: 'Failed to fetch',
+        code: 'OFFLINE',
+      }));
     });
   });
 });

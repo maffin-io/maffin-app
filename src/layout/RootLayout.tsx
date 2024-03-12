@@ -3,8 +3,9 @@
 import React from 'react';
 import { Settings } from 'luxon';
 import Script from 'next/script';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { toast, Toaster } from 'react-hot-toast';
 
 import '@/css/globals.css';
 import { Auth0Provider } from '@/lib/auth0-provider';
@@ -32,6 +33,9 @@ const queryClient = new QueryClient({
       networkMode: 'always',
     },
   },
+  queryCache: new QueryCache({
+    onError: error => toast.error(`Something went wrong: ${error.message}`),
+  }),
 });
 
 export default function RootLayout({
@@ -56,6 +60,14 @@ export default function RootLayout({
           </QueryClientProvider>
         </Auth0Provider>
         <div id="modals" />
+        <Toaster
+          toastOptions={{
+            className: 'text-sm bg-light text-light-600/90 dark:text-slate-400 dark:bg-dark-800',
+            error: {
+              duration: 7000,
+            },
+          }}
+        />
         <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];

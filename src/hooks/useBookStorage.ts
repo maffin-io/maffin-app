@@ -14,14 +14,23 @@ export default function useBookStorage(): UseBookStorageReturn {
   const [isGapiLoaded] = useGapiClient();
   const [storage, setStorage] = React.useState<BookStorage | null>(null);
 
+  const [error, setError] = React.useState<Error | null>(null);
+  if (error) {
+    throw error;
+  }
+
   React.useEffect(() => {
     async function load() {
       const instance = !isStaging()
         ? new GDriveBookStorage(window.gapi.client)
         : new DemoBookStorage();
 
-      await instance.initStorage();
-      setStorage(instance);
+      try {
+        await instance.initStorage();
+        setStorage(instance);
+      } catch (e) {
+        setError(e as Error);
+      }
     }
 
     if (isGapiLoaded) {

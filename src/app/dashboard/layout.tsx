@@ -4,6 +4,7 @@ import React from 'react';
 import Modal from 'react-modal';
 import { keepPreviousData, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import Footer from '@/layout/Footer';
 import LeftSidebar from '@/layout/LeftSidebar';
@@ -47,7 +48,9 @@ export default function DashboardLayout({
         <QueryClientProvider client={queryClient}>
           <ReactQueryDevtools initialIsOpen={false} />
           <DashboardPage>
-            {children}
+            <ErrorBoundary fallbackRender={({ error }) => error.show()}>
+              {children}
+            </ErrorBoundary>
           </DashboardPage>
         </QueryClientProvider>
       </div>

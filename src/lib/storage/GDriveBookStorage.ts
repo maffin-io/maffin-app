@@ -1,6 +1,7 @@
 import pako from 'pako';
 
 import BookStorage from '@/lib/storage/BookStorage';
+import { StorageError } from '@/helpers/errors';
 
 export default class GDriveBookStorage implements BookStorage {
   private gapiClient: typeof gapi.client;
@@ -25,34 +26,37 @@ export default class GDriveBookStorage implements BookStorage {
   async initStorage(): Promise<void> {
     this.parentFolderId = await this.findParentFolderId();
     if (!this.parentFolderId) {
-      const response = await this.driveClient.files.create({
-        fields: 'id',
-        resource: {
-          name: 'maffin.io',
-          mimeType: 'application/vnd.google-apps.folder',
-        },
-      });
-      if (response.result.id === undefined) {
-        throw new Error('Couldnt get parent folder id');
+      try {
+        const response = await this.driveClient.files.create({
+          fields: 'id',
+          resource: {
+            name: 'maffin.io',
+            mimeType: 'application/vnd.google-apps.folder',
+          },
+        });
+        this.parentFolderId = response.result.id as string;
+      } catch (e) {
+        throwFromStatus((e as gapi.client.Response<gapi.client.drive.File>).status);
+        throw e;
       }
-      this.parentFolderId = response.result.id;
     }
 
     this.bookFileId = await this.findBookFileId('book1');
     if (!this.bookFileId) {
-      const response = await this.driveClient.files.create({
-        fields: 'id',
-        resource: {
-          name: 'book1.sqlite.gz',
-          mimeType: 'application/vnd.sqlite3',
-          parents: [this.parentFolderId],
-        },
-      });
-
-      if (response.result.id === undefined) {
-        throw new Error('Couldnt get bookFile id');
+      try {
+        const response = await this.driveClient.files.create({
+          fields: 'id',
+          resource: {
+            name: 'book1.sqlite.gz',
+            mimeType: 'application/vnd.sqlite3',
+            parents: [this.parentFolderId],
+          },
+        });
+        this.bookFileId = response.result.id as string;
+      } catch (e) {
+        throwFromStatus((e as gapi.client.Response<gapi.client.drive.File>).status);
+        throw e;
       }
-      this.bookFileId = response.result.id;
     }
   }
 
@@ -93,17 +97,26 @@ export default class GDriveBookStorage implements BookStorage {
    */
   async save(rawBook: Uint8Array): Promise<void> {
     const start = performance.now();
-    await fetch(
-      `https://www.googleapis.com/upload/drive/v3/files/${this.bookFileId}`,
-      {
-        method: 'PATCH',
-        headers: new Headers({
-          Authorization: `Bearer ${this.gapiClient.getToken().access_token}`,
-          'Content-Type': 'application/vnd.sqlite3',
-        }),
-        body: new Blob([pako.gzip(rawBook, { level: 9 })], { type: 'application/vnd.sqlite3' }),
-      },
-    );
+
+    let response: Response | undefined;
+    try {
+      response = await fetch(
+        `https://www.googleapis.com/upload/drive/v3/files/${this.bookFileId}`,
+        {
+          method: 'PATCH',
+          headers: new Headers({
+            Authorization: `Bearer ${this.gapiClient.getToken().access_token}`,
+            'Content-Type': 'application/vnd.sqlite3',
+          }),
+          body: new Blob([pako.gzip(rawBook, { level: 9 })], { type: 'application/vnd.sqlite3' }),
+        },
+      );
+    } catch (e) {
+      throwFromStatus(500);
+    }
+
+    throwFromStatus(response?.status || 500);
+
     const end = performance.now();
     console.log(`save book: ${end - start}`);
   }
@@ -115,11 +128,15 @@ export default class GDriveBookStorage implements BookStorage {
    */
   private async findParentFolderId(): Promise<string> {
     const app = 'maffin.io';
-    const response = await this.driveClient.files.list({
-      q: `mimeType = 'application/vnd.google-apps.folder' and name='${app}' and trashed = false`,
-    });
-
-    return response.result.files?.[0]?.id || '';
+    try {
+      const response = await this.driveClient.files.list({
+        q: `mimeType = 'application/vnd.google-apps.folder' and name='${app}' and trashed = false`,
+      });
+      return response.result.files?.[0]?.id || '';
+    } catch (e) {
+      throwFromStatus((e as gapi.client.Response<gapi.client.drive.FileList>).status);
+      throw e;
+    }
   }
 
   /**
@@ -128,14 +145,28 @@ export default class GDriveBookStorage implements BookStorage {
    * found it returns empty string
    */
   private async findBookFileId(book: string): Promise<string> {
-    if (this.parentFolderId === '') {
-      throw new Error('Parent folder id is not set');
+    try {
+      const response = await this.driveClient.files.list({
+        q: `name='${book}.sqlite.gz' and trashed = false and '${this.parentFolderId}' in parents`,
+      });
+      return response.result.files?.[0]?.id || '';
+    } catch (e) {
+      throwFromStatus((e as gapi.client.Response<gapi.client.drive.FileList>).status);
+      throw e;
     }
+  }
+}
 
-    const response = await this.driveClient.files.list({
-      q: `name='${book}.sqlite.gz' and trashed = false and '${this.parentFolderId}' in parents`,
-    });
+function throwFromStatus(status: number | undefined, message?: string) {
+  if (status === 401) {
+    throw new StorageError('Invalid token', 'UNAUTHORIZED');
+  }
 
-    return response.result.files?.[0]?.id || '';
+  if (status === 500) {
+    throw new StorageError('Failed to fetch', 'OFFLINE');
+  }
+
+  if (status && status > 400) {
+    throw new StorageError(message || 'Unknown error', 'UNKNOWN');
   }
 }
