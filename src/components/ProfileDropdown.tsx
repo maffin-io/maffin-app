@@ -37,8 +37,11 @@ export default function ProfileDropdown(): JSX.Element {
         </div>
       </button>
       <ul className="absolute rounded-md w-40 hidden py-1 group-hover:block bg-white dark:bg-dark-700 ">
-        <li className="px-3 py-2 text-sm hover:bg-light-100 dark:hover:bg-dark-800">
-          <ImportButton />
+        <li className="text-sm hover:bg-light-100 dark:hover:bg-dark-800">
+          <ImportButton
+            className="text-left px-3 py-2 w-full text-cyan-700 hover:text-cyan-600 whitespace-nowrap"
+            role="menuitem"
+          />
         </li>
         <li className="block px-3 py-2 text-sm hover:bg-light-100 dark:hover:bg-dark-800">
           <Link

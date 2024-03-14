@@ -3,53 +3,11 @@
 exports[`CommodityForm renders as expected with add 1`] = `
 <div>
   <form>
-    <div
-      class="grid grid-cols-12 text-sm my-5 gap-2"
-    >
-      <fieldset
-        class="col-span-6"
-      >
-        <label
-          class="inline-block text-sm my-2"
-          for="mnemonicInput"
-        >
-          Code
-        </label>
-        <input
-          class="w-full m-0"
-          id="mnemonicInput"
-          name="mnemonic"
-          type="text"
-        />
-        <p
-          class="invalid-feedback"
-        />
-      </fieldset>
-      <fieldset
-        class="col-span-6"
-      >
-        <label
-          class="inline-block text-sm my-2"
-          for="fullNameInput"
-        >
-          Name
-        </label>
-        <input
-          class="w-full m-0"
-          id="fullNameInput"
-          name="fullname"
-          type="text"
-        />
-        <p
-          class="invalid-feedback"
-        />
-      </fieldset>
-    </div>
     <fieldset
-      class="col-start-8 col-span-2"
+      class="my-5 col-start-8 col-span-2"
     >
       <label
-        class="inline-block mb-2"
+        class="inline-block text-sm mb-2"
         for="namespaceInput"
       >
         Type
@@ -156,24 +114,7 @@ exports[`CommodityForm renders as expected with add 1`] = `
       />
     </fieldset>
     <div
-      class="flex w-full justify-center mt-5"
-    >
-      <button
-        class="btn capitalize btn-primary"
-        type="submit"
-      >
-        add
-      </button>
-    </div>
-  </form>
-</div>
-`;
-
-exports[`CommodityForm renders as expected with delete 1`] = `
-<div>
-  <form>
-    <div
-      class="grid grid-cols-12 text-sm my-5 gap-2"
+      class="grid grid-cols-12 text-sm gap-2"
     >
       <fieldset
         class="col-span-6"
@@ -186,7 +127,6 @@ exports[`CommodityForm renders as expected with delete 1`] = `
         </label>
         <input
           class="w-full m-0"
-          disabled=""
           id="mnemonicInput"
           name="mnemonic"
           type="text"
@@ -206,7 +146,6 @@ exports[`CommodityForm renders as expected with delete 1`] = `
         </label>
         <input
           class="w-full m-0"
-          disabled=""
           id="fullNameInput"
           name="fullname"
           type="text"
@@ -216,11 +155,28 @@ exports[`CommodityForm renders as expected with delete 1`] = `
         />
       </fieldset>
     </div>
+    <div
+      class="flex w-full justify-center mt-5"
+    >
+      <button
+        class="btn capitalize btn-primary"
+        type="submit"
+      >
+        add
+      </button>
+    </div>
+  </form>
+</div>
+`;
+
+exports[`CommodityForm renders as expected with delete 1`] = `
+<div>
+  <form>
     <fieldset
-      class="col-start-8 col-span-2"
+      class="my-5 col-start-8 col-span-2"
     >
       <label
-        class="inline-block mb-2"
+        class="inline-block text-sm mb-2"
         for="namespaceInput"
       >
         Type
@@ -324,24 +280,7 @@ exports[`CommodityForm renders as expected with delete 1`] = `
       />
     </fieldset>
     <div
-      class="flex w-full justify-center mt-5"
-    >
-      <button
-        class="btn capitalize btn-danger"
-        type="submit"
-      >
-        delete
-      </button>
-    </div>
-  </form>
-</div>
-`;
-
-exports[`CommodityForm renders as expected with update 1`] = `
-<div>
-  <form>
-    <div
-      class="grid grid-cols-12 text-sm my-5 gap-2"
+      class="grid grid-cols-12 text-sm gap-2"
     >
       <fieldset
         class="col-span-6"
@@ -354,6 +293,7 @@ exports[`CommodityForm renders as expected with update 1`] = `
         </label>
         <input
           class="w-full m-0"
+          disabled=""
           id="mnemonicInput"
           name="mnemonic"
           type="text"
@@ -373,6 +313,7 @@ exports[`CommodityForm renders as expected with update 1`] = `
         </label>
         <input
           class="w-full m-0"
+          disabled=""
           id="fullNameInput"
           name="fullname"
           type="text"
@@ -382,11 +323,28 @@ exports[`CommodityForm renders as expected with update 1`] = `
         />
       </fieldset>
     </div>
+    <div
+      class="flex w-full justify-center mt-5"
+    >
+      <button
+        class="btn capitalize btn-danger"
+        type="submit"
+      >
+        delete
+      </button>
+    </div>
+  </form>
+</div>
+`;
+
+exports[`CommodityForm renders as expected with update 1`] = `
+<div>
+  <form>
     <fieldset
-      class="col-start-8 col-span-2"
+      class="my-5 col-start-8 col-span-2"
     >
       <label
-        class="inline-block mb-2"
+        class="inline-block text-sm mb-2"
         for="namespaceInput"
       >
         Type
@@ -492,6 +450,48 @@ exports[`CommodityForm renders as expected with update 1`] = `
         class="invalid-feedback"
       />
     </fieldset>
+    <div
+      class="grid grid-cols-12 text-sm gap-2"
+    >
+      <fieldset
+        class="col-span-6"
+      >
+        <label
+          class="inline-block text-sm my-2"
+          for="mnemonicInput"
+        >
+          Code
+        </label>
+        <input
+          class="w-full m-0"
+          id="mnemonicInput"
+          name="mnemonic"
+          type="text"
+        />
+        <p
+          class="invalid-feedback"
+        />
+      </fieldset>
+      <fieldset
+        class="col-span-6"
+      >
+        <label
+          class="inline-block text-sm my-2"
+          for="fullNameInput"
+        >
+          Name
+        </label>
+        <input
+          class="w-full m-0"
+          id="fullNameInput"
+          name="fullname"
+          type="text"
+        />
+        <p
+          class="invalid-feedback"
+        />
+      </fieldset>
+    </div>
     <div
       class="flex w-full justify-center mt-5"
     >

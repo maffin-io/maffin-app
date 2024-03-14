@@ -13,14 +13,13 @@ export class MaffinError extends Error {
 
   // eslint-disable-next-line class-methods-use-this
   toUI(): string | JSX.Element {
-    return 'Unknown error';
+    return this.message;
   }
 
   show(options?: ToastOptions) {
     toast(
       (t) => <ToastComponent message={this.toUI()} toastId={t.id} />,
       {
-        duration: Infinity,
         ...options,
       },
     );
@@ -45,6 +44,10 @@ export class StorageError extends MaffinError {
 
     if (this.code === 'OFFLINE') {
       return 'Your changes could not be saved. Check your internet connection';
+    }
+
+    if (this.code === 'INVALID_FILE') {
+      return 'The selected file is not valid. Make sure you select a file exported from Maffin';
     }
 
     return super.toUI();

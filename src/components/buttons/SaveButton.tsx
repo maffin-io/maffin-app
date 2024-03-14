@@ -10,7 +10,7 @@ import classNames from 'classnames';
 export default function SaveButton(): JSX.Element {
   const { data: isSaving } = useQuery({
     queryKey: ['state', 'isSaving'],
-    placeholderData: false,
+    queryFn: () => false,
     networkMode: 'always',
   });
   const { isLoaded, save } = React.useContext(DataSourceContext);

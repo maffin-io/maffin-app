@@ -240,7 +240,7 @@ function ActionsCell({ row }: CellContext<Split, unknown>): JSX.Element {
         id="edit-tx"
         modalTitle="Edit transaction"
         buttonContent={<BiEdit className="flex" />}
-        className="link"
+        className="text-left text-cyan-700 hover:text-cyan-600"
       >
         <TransactionForm
           action="update"
@@ -254,7 +254,7 @@ function ActionsCell({ row }: CellContext<Split, unknown>): JSX.Element {
         id="delete-tx"
         modalTitle="Confirm you want to remove this transaction"
         buttonContent={<BiXCircle className="flex" />}
-        className="link"
+        className="text-left text-cyan-700 hover:text-cyan-600"
       >
         <TransactionForm
           action="delete"

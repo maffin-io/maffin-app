@@ -11,6 +11,8 @@ import maffinLogo from '@/assets/images/maffin_logo_sm.png';
 import { DataSourceContext } from '@/hooks';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import { useTheme } from '@/hooks/state';
+import ImportButton from '@/components/buttons/ImportButton';
+import Link from 'next/link';
 
 type OnboardingProps = {
   show?: boolean;
@@ -20,7 +22,7 @@ export default function Onboarding({
   show = false,
 }: OnboardingProps): JSX.Element {
   const { save, datasource } = React.useContext(DataSourceContext);
-  const [run] = React.useState(show);
+  const [run, setRun] = React.useState(show);
   const [stepIndex, setStepIndex] = React.useState(0);
   const { data: accounts } = useAccounts();
   const { data: theme } = useTheme();
@@ -40,18 +42,55 @@ export default function Onboarding({
                 className="text-left leading-relaxed"
               >
                 <p>
-                  Welcome! I&apos;m Maffin and I will help you navigate through the first steps
+                  Welcome! I&apos;m
+                  {' '}
+                  <span
+                    className="bg-clip-text font-extrabold text-transparent bg-gradient-to-r from-green-600/70 to-cyan-600/70"
+                  >
+                    Maffin
+                  </span>
+                  {' '}
+                  and I will help you navigate through the first steps
                   on your journey to unify all your financial life in here.
                 </p>
-                <div className="flex py-3 justify-center">
-                  <Image src={maffinLogo} alt="logo" height="45" />
+                <div className="flex py-3 pb-5 justify-center">
+                  <Image src={maffinLogo} alt="logo" height="65" />
                 </div>
+                <div>
+                  Or you can just import a data file you may have exported before
+                </div>
+              </span>
+              <div className="flex justify-center gap-3 mt-6">
+                <button
+                  type="button"
+                  className="btn btn-cta"
+                  onClick={() => setStepIndex(stepIndex + 1)}
+                >
+                  Show me!
+                </button>
+                <ImportButton
+                  onImport={() => setRun(false)}
+                  className="btn btn-primary"
+                />
+              </div>
+            </div>
+          ),
+          placement: 'center',
+          target: '#add-account',
+          disableBeacon: true,
+        },
+        {
+          content: (
+            <div>
+              <span
+                className="text-left leading-relaxed"
+              >
                 <p>
-                  Before everything, you need to decide which currency
+                  Before anything, you need to decide which currency
                   is going to be your main one. This is the currency that will be used to show
                   reports and calculate other things like net worth.
                 </p>
-                <p className="badge rounded-md info mt-3 text-left">
+                <p className="badge info rounded-md mt-3 text-left">
                   The main currency cannot be changed later so make sure you
                   choose the right one for you!
                 </p>
@@ -95,6 +134,34 @@ export default function Onboarding({
             </div>
           ),
           target: '#accounts-table',
+        },
+        {
+          content: (
+            <div className="text-left leading-relaxed">
+              <p className="mb-2">
+                After this onboarding, you can add more accounts by clicking here.
+                Each user will end up with their own custom accounts tree but if you want some
+                examples
+                {' '}
+                <Link
+                  href="https://demo.maffin.io"
+                >
+                  check our demo
+                </Link>
+                .
+              </p>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => setStepIndex(stepIndex + 1)}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          ),
+          target: '#add-account',
         },
         {
           content: (
@@ -156,7 +223,7 @@ export default function Onboarding({
         {
           content: (
             <div className="text-left leading-relaxed">
-              <span>
+              <p>
                 Now that you have
                 {' '}
                 <span className="badge info">
@@ -171,7 +238,11 @@ export default function Onboarding({
                 {' '}
                 accounts let&apos;s add the first transaction to
                 record a &quot;Groceries&quot; expense.
-              </span>
+              </p>
+              <p className="mt-3">
+                Later you can add more transactions by going into any account page and clicking the
+                &quot;Add transaction&quot; button.
+              </p>
               <TransactionForm
                 onSave={() => {
                   save();
@@ -235,8 +306,17 @@ export default function Onboarding({
                   Good job! From here onwards you just need to keep adding
                   transactions and accounts to reflect your financial life as you need.
                 </p>
+                <p>
+                  Check out
+                  {' '}
+                  <Link href="https://blog.maffin.io/docs" target="_blank">
+                    our docs
+                  </Link>
+                  {' '}
+                  for more information!
+                </p>
                 <div className="flex py-3 justify-center">
-                  <Image src={maffinLogo} alt="logo" height="45" />
+                  <Image src={maffinLogo} alt="logo" height="65" />
                 </div>
                 <p className="badge rounded-md warning mt-3">
                   You own your data which means you have to be careful. Do not

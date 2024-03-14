@@ -126,7 +126,7 @@ describe('PricesTable', () => {
     expect(FormButton).toHaveBeenNthCalledWith(
       1,
       expect.objectContaining({
-        className: 'link',
+        className: 'text-left text-cyan-700 hover:text-cyan-600',
         id: 'edit-price',
         modalTitle: 'Edit price',
       }),
@@ -149,7 +149,7 @@ describe('PricesTable', () => {
     expect(FormButton).toHaveBeenNthCalledWith(
       2,
       expect.objectContaining({
-        className: 'link',
+        className: 'text-left text-cyan-700 hover:text-cyan-600',
         id: 'delete-price',
         modalTitle: 'Confirm you want to remove this price',
       }),

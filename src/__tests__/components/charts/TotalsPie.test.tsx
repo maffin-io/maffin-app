@@ -77,6 +77,30 @@ describe('TotalsPie', () => {
     );
   });
 
+  it('ignores accounts that are not found', () => {
+    render(
+      <TotalsPie
+        title=""
+        guids={['1', '2']}
+      />,
+    );
+
+    screen.getByText('€0.00');
+    expect(Pie).toBeCalledWith(
+      expect.objectContaining({
+        data: {
+          datasets: [
+            {
+              data: [],
+            },
+          ],
+          labels: ['', ''],
+        },
+      }),
+      {},
+    );
+  });
+
   it('works with asset/liability', () => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-02-20') as DateTime<true>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(

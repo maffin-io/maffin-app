@@ -1,12 +1,12 @@
 import React from 'react';
-import { DataSource } from 'typeorm';
+import { DataSource, QueryFailedError } from 'typeorm';
 import initSqlJs from 'sql.js';
 import { Settings } from 'luxon';
 import pako from 'pako';
 
 import { insertTodayPrices } from '@/lib/Stocker';
 import useBookStorage from '@/hooks/useBookStorage';
-import { importBook as importGnucashBook } from '@/lib/gnucash';
+import { migrate as migrateFromGnucash } from '@/lib/gnucash';
 import {
   Account,
   Book,
@@ -19,7 +19,7 @@ import { MIGRATIONS } from '@/book/migrations';
 import { isStaging } from '@/helpers/env';
 import { useQueryClient } from '@tanstack/react-query';
 import type BookStorage from '@/lib/storage/BookStorage';
-import { MaffinError } from '@/helpers/errors';
+import { MaffinError, StorageError } from '@/helpers/errors';
 
 export type DataSourceContextType = {
   datasource: DataSource | null,
@@ -131,9 +131,24 @@ async function importBook(storage: BookStorage, rawData: Uint8Array) {
     parsedData = rawData;
   }
 
-  const rawBook = await importGnucashBook(parsedData);
-  await DATASOURCE.sqljsManager.loadDatabase(rawBook);
+  const previousData = DATASOURCE.sqljsManager.exportDatabase();
+  await DATASOURCE.sqljsManager.loadDatabase(parsedData);
+  try {
+    // Sadly loadDatabase doesn't check that the file is valid so we call this to trigger
+    // errors if any
+    await DATASOURCE.query('VACUUM');
+  } catch (e) {
+    let code = 'UNKNOWN';
+    if (e instanceof QueryFailedError) {
+      code = 'INVALID_FILE';
+    }
+    new StorageError((e as Error).message, code).show();
+    await DATASOURCE.sqljsManager.loadDatabase(previousData);
+    return;
+  }
 
+  // We probably should do this conditionally only for when it is a gnucash file
+  await migrateFromGnucash();
   DATASOURCE.options.extra.queryClient.refetchQueries({
     queryKey: ['api'],
     type: 'all',
