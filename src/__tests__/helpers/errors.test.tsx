@@ -1,5 +1,7 @@
+import React from 'react';
 import * as toast from 'react-hot-toast';
 import { render } from '@testing-library/react';
+import Link from 'next/link';
 
 import { AuthError, MaffinError, StorageError } from '@/helpers/errors';
 
@@ -20,8 +22,8 @@ describe('MaffinError', () => {
   });
 
   describe('toUI', () => {
-    it('returns unknown', () => {
-      expect(error.toUI()).toEqual('Unknown error');
+    it('returns message when unknown', () => {
+      expect(error.toUI()).toEqual('message');
     });
   });
 
@@ -30,7 +32,7 @@ describe('MaffinError', () => {
       jest.spyOn(toast, 'toast');
       error.show();
 
-      expect(toast.toast).toBeCalledWith(expect.any(Function), { duration: Infinity });
+      expect(toast.toast).toBeCalledWith(expect.any(Function), {});
       // @ts-ignore
       const fn = (toast.toast as jest.Mock).mock.calls[0][0];
 
@@ -48,16 +50,27 @@ describe('StorageError', () => {
   });
 
   describe('toUI', () => {
-    it('returns unauthorized error', () => {
-      const error = new StorageError('message', 'UNAUTHORIZED');
+    it.each([
+      [
+        'UNAUTHORIZED',
+        (
+          <>
+            Invalid Google session
+            <Link
+              href="/user/logout"
+              className="ml-1"
+            >
+              log in again
+            </Link>
+          </>
+        ),
+      ],
+      ['OFFLINE', 'Your changes could not be saved. Check your internet connection'],
+      ['INVALID_FILE', 'The selected file is not valid. Make sure you select a file exported from Maffin'],
+    ])('shows message for %s', (code, expected) => {
+      const error = new StorageError('message', code);
 
-      expect(error.toUI()).toMatchSnapshot();
-    });
-
-    it('returns offline error', () => {
-      const error = new StorageError('message', 'OFFLINE');
-
-      expect(error.toUI()).toEqual('Your changes could not be saved. Check your internet connection');
+      expect(error.toUI()).toEqual(expected);
     });
 
     it('calls super when unknown', () => {

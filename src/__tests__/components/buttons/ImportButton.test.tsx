@@ -21,7 +21,7 @@ describe('ImportButton', () => {
       </DataSourceContext.Provider>,
     );
 
-    const e = await screen.findByRole('menuitem', { name: 'Import' });
+    const e = await screen.findByRole('button', { name: 'Import' });
     expect(e).toBeDisabled();
     expect(container).toMatchSnapshot();
   });
@@ -33,11 +33,12 @@ describe('ImportButton', () => {
       </DataSourceContext.Provider>,
     );
 
-    const e = await screen.findByRole('menuitem', { name: 'Import' });
+    const e = await screen.findByRole('button', { name: 'Import' });
     expect(e).not.toBeDisabled();
   });
 
   it('uploads and imports data into datasource', async () => {
+    const mockOnImport = jest.fn();
     const mockImportBook = jest.fn();
     const file = new File(['hello'], 'hello.png', { type: 'image/png' });
     const user = userEvent.setup();
@@ -49,15 +50,16 @@ describe('ImportButton', () => {
           importBook: mockImportBook as Function,
         } as DataSourceContextType}
       >
-        <ImportButton />
+        <ImportButton onImport={mockOnImport} />
       </DataSourceContext.Provider>,
     );
 
-    const importButton = await screen.findByRole('menuitem', { name: 'Import' });
+    const importButton = await screen.findByRole('button', { name: 'Import' });
     await user.click(importButton);
 
     await userEvent.upload(screen.getByLabelText('importInput'), file);
 
     expect(mockImportBook).toBeCalledWith(new Uint8Array([104, 101, 108, 108, 111]));
+    expect(mockOnImport).toBeCalled();
   });
 });

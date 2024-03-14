@@ -1,1 +1,1 @@
-export { default as importBook } from './importBook';
+export { default as migrate } from './migrate';

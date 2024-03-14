@@ -78,7 +78,7 @@ const columns: ColumnDef<Price>[] = [
             id="edit-price"
             modalTitle="Edit price"
             buttonContent={<BiEdit className="flex" />}
-            className="link"
+            className="text-left text-cyan-700 hover:text-cyan-600"
           >
             <PriceForm
               action="update"
@@ -89,7 +89,7 @@ const columns: ColumnDef<Price>[] = [
             id="delete-price"
             modalTitle="Confirm you want to remove this price"
             buttonContent={<BiXCircle className="flex" />}
-            className="link"
+            className="text-left text-cyan-700 hover:text-cyan-600"
           >
             <PriceForm
               action="delete"

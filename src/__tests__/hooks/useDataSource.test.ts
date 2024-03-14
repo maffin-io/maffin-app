@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import type { InitSqlJsStatic } from 'sql.js';
-import type { DataSource } from 'typeorm';
+import { DataSource, QueryFailedError } from 'typeorm';
 import * as query from '@tanstack/react-query';
 
 import { Account, Book, Commodity } from '@/book/entities';
@@ -10,7 +10,7 @@ import * as gnucash from '@/lib/gnucash';
 import * as queries from '@/lib/queries';
 import type BookStorage from '@/lib/storage/GDriveBookStorage';
 import type { QueryClient } from '@tanstack/react-query';
-import { MaffinError } from '@/helpers/errors';
+import { MaffinError, StorageError } from '@/helpers/errors';
 
 jest.mock('@tanstack/react-query');
 
@@ -230,9 +230,7 @@ describe('useDataSource', () => {
       rawBook = new Uint8Array([21, 31]);
       jest.spyOn(storageHooks, 'default').mockReturnValue({
         storage: {
-          get: jest.fn().mockResolvedValue(
-            rawBook,
-          ) as typeof BookStorage.prototype.get,
+          get: jest.fn().mockResolvedValue(rawBook) as typeof BookStorage.prototype.get,
           save: jest.fn() as typeof BookStorage.prototype.save,
         } as BookStorage,
       });
@@ -267,7 +265,7 @@ describe('useDataSource', () => {
         expect(mockStorage.save).toBeCalledWith(new Uint8Array([22, 33]));
       });
 
-      it('shows error toast on failure', async () => {
+      it('shows error on failure', async () => {
         jest.spyOn(MaffinError.prototype, 'show');
         jest.spyOn(storageHooks, 'default').mockReturnValue({
           storage: {
@@ -286,7 +284,11 @@ describe('useDataSource', () => {
 
     describe('importBook', () => {
       beforeEach(() => {
-        jest.spyOn(gnucash, 'importBook').mockResolvedValue(new Uint8Array([44, 55]));
+        jest.spyOn(gnucash, 'migrate').mockImplementation();
+      });
+
+      afterEach(() => {
+        jest.clearAllMocks();
       });
 
       it('loads datasource database, updates state and saves', async () => {
@@ -295,30 +297,45 @@ describe('useDataSource', () => {
         await waitFor(() => expect(result.current.isLoaded).toBe(true));
         const datasource = result.current.datasource as DataSource;
 
-        const rawData = new Uint8Array([22, 33]);
-        await result.current.importBook(rawData);
+        await result.current.importBook(rawBook);
 
-        expect(gnucash.importBook).toHaveBeenCalledWith(rawData);
-        expect(datasource.sqljsManager.loadDatabase).toBeCalledWith(new Uint8Array([44, 55]));
+        expect(gnucash.migrate).toBeCalled();
+        expect(datasource.sqljsManager.loadDatabase).toBeCalledWith(rawBook);
 
         expect(datasource.options.extra.queryClient.refetchQueries).toBeCalledWith({
           queryKey: ['api'],
           type: 'all',
         });
 
-        expect(datasource.options.extra.queryClient.setQueryData).toHaveBeenNthCalledWith(
-          1,
-          ['state', 'isSaving'],
-          true,
-        );
-        expect(datasource.options.extra.queryClient.setQueryData).toHaveBeenNthCalledWith(
-          2,
-          ['state', 'isSaving'],
-          false,
-        );
-
         const mockStorage = (storageHooks.default as jest.Mock).mock.results[0].value.storage;
         expect(mockStorage.save).toBeCalledWith(new Uint8Array([22, 33]));
+      });
+
+      it('shows error and rolls back to old db when invalid file', async () => {
+        jest.spyOn(StorageError.prototype, 'show');
+        const { result } = renderHook(() => useDataSource());
+
+        await waitFor(() => expect(result.current.isLoaded).toBe(true));
+        const datasource = result.current.datasource as DataSource;
+
+        const previousData = new Uint8Array([11, 11]);
+        jest.spyOn(datasource.sqljsManager, 'loadDatabase').mockImplementation();
+        jest.spyOn(datasource.sqljsManager, 'exportDatabase').mockReturnValue(previousData);
+        jest.spyOn(datasource, 'query').mockImplementation(
+          async () => { throw new QueryFailedError('a', [], new Error('')); },
+        );
+
+        await result.current.importBook(rawBook);
+
+        expect(
+          datasource.sqljsManager.loadDatabase,
+        ).toHaveBeenNthCalledWith(2, new Uint8Array(rawBook));
+        expect(
+          datasource.sqljsManager.loadDatabase,
+        ).toHaveBeenNthCalledWith(3, previousData);
+
+        expect(datasource.options.extra.queryClient.refetchQueries).not.toBeCalled();
+        expect(StorageError.prototype.show).toBeCalled();
       });
     });
   });

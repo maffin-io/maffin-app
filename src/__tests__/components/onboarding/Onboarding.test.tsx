@@ -70,8 +70,12 @@ describe('Onboarding', () => {
       </QueryClientProvider>,
     );
 
-    // Select main currency and create initial accounts
+    // STEP 1: Welcome message
     await screen.findByText('Welcome!', { exact: false });
+    await user.click(screen.getByText('Show me!'));
+
+    // STEP 2: Select main currency and create initial accounts
+    await screen.findByText('Before anything', { exact: false });
 
     await user.click(screen.getByRole('combobox', { name: 'currency-selector' }));
     await user.click(screen.getByText('EUR'));
@@ -163,11 +167,15 @@ describe('Onboarding', () => {
     // Make sure the useAccounts hook is returning all the accounts we created
     await waitFor(() => expect(result.current.data).toHaveLength(11));
 
-    // Show accounts tree
+    // STEP 3: Show accounts tree
     await screen.findByText('This represents your accounts tree', { exact: false });
     await user.click(screen.getByText('Next'));
 
-    // Adds a bank account, all data is prefilled except the opening balance
+    // STEP 4: Show add account button
+    await screen.findByText('After this onboarding', { exact: false });
+    await user.click(screen.getByText('Next'));
+
+    // STEP 5: Adds a bank account, all data is prefilled except the opening balance
     await screen.findByText('Let\'s add your first', { exact: false });
     await screen.findByText('Assets');
     await user.type(screen.getByLabelText('Opening balance'), '1000');
@@ -187,11 +195,11 @@ describe('Onboarding', () => {
     ({ result } = renderHook(() => API.useAccounts(), { wrapper }));
     await waitFor(() => expect(result.current.data).toHaveLength(12));
 
-    // Show accounts tree again
+    // STEP 6: Show accounts tree again
     await screen.findByText('See that now your bank account', { exact: false });
     await user.click(screen.getByText('Next'));
 
-    // Adds a transaction between bank account and groceries account
+    // STEP 7: Adds a transaction between bank account and groceries account
     await screen.findByText('add the first transaction', { exact: false });
     await user.type(screen.getByLabelText('Date'), DateTime.now().toISODate() as string);
 
@@ -224,12 +232,11 @@ describe('Onboarding', () => {
       ],
     }));
 
-    // Shows about the Save button
+    // STEP 8: Shows about the Save button
     await screen.findByText('We save the data automatically', { exact: false });
     await user.click(screen.getByText('Next'));
 
-    // STEP 8
-    // Shows final disclaimer
+    // STEP 9: Final disclaimer
     await screen.findByText('Good job!', { exact: false });
     await user.click(screen.getByText('Agreed!'));
   }, 10000);

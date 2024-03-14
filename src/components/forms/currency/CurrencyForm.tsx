@@ -2,17 +2,14 @@ import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 import { SingleValue } from 'react-select';
+import * as currencies from '@dinero.js/currencies';
 
 import { Commodity } from '@/book/entities';
 import Selector from '@/components/selectors/Selector';
 
 const resolver = classValidatorResolver(Commodity, { validator: { stopAtFirstError: true } });
 
-const CURRENCIES = [
-  { label: 'EUR' },
-  { label: 'USD' },
-  { label: 'SGD' },
-];
+const CURRENCIES = Object.keys(currencies).map(c => ({ label: c }));
 
 type CurrencyOption = { [code: string]: string };
 
@@ -41,14 +38,13 @@ export default function CurrencyForm({ onSave }: CurrencyFormProps): JSX.Element
               <Selector<CurrencyOption>
                 className="min-w-[322px]"
                 id="currency-selector"
-                creatable
                 isClearable={false}
                 getOptionLabel={(option: CurrencyOption) => option.label}
                 getOptionValue={(option: CurrencyOption) => option.label}
                 onChange={(newValue: SingleValue<CurrencyOption> | null) => {
                   field.onChange(newValue?.label, undefined);
                 }}
-                defaultOptions={CURRENCIES}
+                options={CURRENCIES}
                 placeholder="Choose or type your currency"
               />
               <p className="invalid-feedback">{fieldState.error?.message}</p>

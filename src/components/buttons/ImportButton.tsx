@@ -3,20 +3,28 @@ import { BiImport } from 'react-icons/bi';
 
 import { DataSourceContext } from '@/hooks';
 
-export default function ImportButton(): JSX.Element {
+export interface ImportButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  className?: string;
+  onImport?: Function;
+}
+
+export default function ImportButton({
+  className = 'btn btn-primary',
+  onImport,
+  ...props
+}: ImportButtonProps): JSX.Element {
   const { isLoaded, importBook } = React.useContext(DataSourceContext);
   const fileImportInput = React.useRef<HTMLInputElement>(null);
 
   return (
     <>
       <button
-        id="menu-item-0"
+        id="import-button"
         type="button"
-        role="menuitem"
         disabled={!isLoaded}
-        tabIndex={-1}
-        className="link inline-block w-full whitespace-nowrap"
+        className={className}
         onClick={() => fileImportInput.current !== null && fileImportInput.current.click()}
+        {...props}
       >
         <BiImport className="inline-block align-middle mr-1" />
         <span className="inline-block align-middle">Import</span>
@@ -26,7 +34,7 @@ export default function ImportButton(): JSX.Element {
         className="hidden"
         type="file"
         ref={fileImportInput}
-        onChange={(e) => i(e, importBook)}
+        onChange={(e) => i(e, importBook, onImport)}
       />
     </>
   );
@@ -35,6 +43,7 @@ export default function ImportButton(): JSX.Element {
 function i(
   event: React.ChangeEvent<HTMLInputElement>,
   importBook: Function,
+  onImport?: Function,
 ) {
   if (event.target.files !== null && event.target.files[0] !== null) {
     const fileReader = new FileReader();
@@ -42,6 +51,7 @@ function i(
       if (loadEvent.target !== null && loadEvent.target.result !== null) {
         const rawBook = new Uint8Array(loadEvent.target.result as ArrayBuffer);
         await importBook(rawBook);
+        onImport?.();
       }
     };
 

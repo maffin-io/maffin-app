@@ -10,7 +10,6 @@ import {
   usePrices,
 } from '@/hooks/api';
 import { moneyToString, toFixed } from '@/helpers/number';
-import type { Account } from '@/book/entities';
 
 export type TotalsPieProps = {
   guids?: string[],
@@ -43,8 +42,8 @@ export default function TotalsPie({
 
     return guids.map(guid => {
       let total = totals?.[guid] || new Money(0, unit);
-      const account = accounts?.find(a => a.guid === guid) as Account;
-      if (currency && account.commodity.guid !== currency?.guid) {
+      const account = accounts?.find(a => a.guid === guid);
+      if (account && currency && account.commodity.guid !== currency?.guid) {
         total = convert(total, account.commodity, currency, prices, selectedDate);
       }
       return total;

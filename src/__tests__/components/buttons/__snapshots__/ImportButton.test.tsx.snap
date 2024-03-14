@@ -3,11 +3,9 @@
 exports[`ImportButton loads while unavailable datasource 1`] = `
 <div>
   <button
-    class="link inline-block w-full whitespace-nowrap"
+    class="btn btn-primary"
     disabled=""
-    id="menu-item-0"
-    role="menuitem"
-    tabindex="-1"
+    id="import-button"
     type="button"
   >
     <svg

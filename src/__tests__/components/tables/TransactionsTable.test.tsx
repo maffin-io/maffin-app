@@ -371,7 +371,7 @@ describe('TransactionsTable', () => {
     expect(FormButton).toHaveBeenNthCalledWith(
       1,
       expect.objectContaining({
-        className: 'link',
+        className: 'text-left text-cyan-700 hover:text-cyan-600',
         id: 'edit-tx',
         modalTitle: 'Edit transaction',
       }),
@@ -398,7 +398,7 @@ describe('TransactionsTable', () => {
     expect(FormButton).toHaveBeenNthCalledWith(
       2,
       expect.objectContaining({
-        className: 'link',
+        className: 'text-left text-cyan-700 hover:text-cyan-600',
         id: 'delete-tx',
         modalTitle: 'Confirm you want to remove this transaction',
       }),

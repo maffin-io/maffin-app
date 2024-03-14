@@ -26,14 +26,6 @@
   input[type="checkbox"] {
     @apply appearance-none checked:bg-cyan-700 cursor-pointer disabled:cursor-default rounded-md border-solid border-2 border-dark-800;
   }
-
-  button.link {
-    @apply text-left text-cyan-700;
-  }
-
-  button.link:not:disabled {
-    @apply text-left text-cyan-700 hover:text-cyan-600;
-  }
 }
 
 @tailwind components;
@@ -54,6 +46,12 @@
   
   .btn {
     @apply inline-flex items-center uppercase font-bold text-xs text-white shadow-sm rounded-lg py-2 px-4;
+  }
+
+  .btn-cta {
+    @apply btn text-white font-bold w-full mb-4 sm:w-auto sm:mb-0;
+    @apply bg-gradient-to-r from-green-600/70 to-cyan-600/70;
+    @apply hover:-translate-y-2 duration-300;
   }
 
   .btn-primary {

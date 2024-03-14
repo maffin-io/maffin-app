@@ -3,9 +3,9 @@
 import React from 'react';
 import { Settings } from 'luxon';
 import Script from 'next/script';
-import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { toast, Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 
 import '@/css/globals.css';
 import { Auth0Provider } from '@/lib/auth0-provider';
@@ -31,11 +31,9 @@ const queryClient = new QueryClient({
       // It stops working when the navigation state changes. I.e. you start
       // online and then go to offline, subsequent queries are paused...
       networkMode: 'always',
+      throwOnError: true,
     },
   },
-  queryCache: new QueryCache({
-    onError: error => toast.error(`Something went wrong: ${error.message}`),
-  }),
 });
 
 export default function RootLayout({

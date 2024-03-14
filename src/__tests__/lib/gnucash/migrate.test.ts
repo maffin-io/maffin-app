@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
 
-import { importBook } from '@/lib/gnucash';
+import { migrate } from '@/lib/gnucash';
 import {
   Account,
   Commodity,
@@ -68,19 +68,9 @@ describe('importBook', () => {
       { type: 'ROOT', parent: undefined },
     );
 
-    const rawBook = await importBook(datasource.sqljsManager.exportDatabase());
+    await migrate();
 
-    const ds = new DataSource({
-      type: 'sqljs',
-      dropSchema: true,
-      entities: [Account, Commodity, Split, Transaction],
-      synchronize: true,
-      logging: false,
-    });
-    await ds.initialize();
-    await ds.sqljsManager.loadDatabase(rawBook);
-
-    const accounts = await ds.getRepository(Account).findBy({
+    const accounts = await Account.findBy({
       type: 'ROOT',
     });
     expect(accounts).toHaveLength(1);

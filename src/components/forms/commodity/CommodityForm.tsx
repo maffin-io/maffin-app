@@ -30,7 +30,30 @@ export default function CommodityForm({
 
   return (
     <form onSubmit={form.handleSubmit((data) => onSubmit(data, action, onSave))}>
-      <div className="grid grid-cols-12 text-sm my-5 gap-2">
+      <fieldset className="my-5 col-start-8 col-span-2">
+        <label htmlFor="namespaceInput" className="inline-block text-sm mb-2">Type</label>
+        <Controller
+          control={form.control}
+          name="namespace"
+          render={({ field, fieldState }) => (
+            <>
+              <NamespaceSelector
+                id="namespaceInput"
+                isDisabled={disabled}
+                isClearable={false}
+                placeholder="<commodity type>"
+                onChange={field.onChange}
+                defaultValue={
+                  (defaultValues?.namespace && { namespace: defaultValues.namespace }) || undefined
+                }
+              />
+              <p className="invalid-feedback">{fieldState.error?.message}</p>
+            </>
+          )}
+        />
+      </fieldset>
+
+      <div className="grid grid-cols-12 text-sm gap-2">
         <fieldset className="col-span-6">
           <label htmlFor="mnemonicInput" className="inline-block text-sm my-2">Code</label>
           <input
@@ -55,29 +78,6 @@ export default function CommodityForm({
           <p className="invalid-feedback">{errors.fullname?.message}</p>
         </fieldset>
       </div>
-
-      <fieldset className="col-start-8 col-span-2">
-        <label htmlFor="namespaceInput" className="inline-block mb-2">Type</label>
-        <Controller
-          control={form.control}
-          name="namespace"
-          render={({ field, fieldState }) => (
-            <>
-              <NamespaceSelector
-                id="namespaceInput"
-                isDisabled={disabled}
-                isClearable={false}
-                placeholder="<commodity type>"
-                onChange={field.onChange}
-                defaultValue={
-                  (defaultValues?.namespace && { namespace: defaultValues.namespace }) || undefined
-                }
-              />
-              <p className="invalid-feedback">{fieldState.error?.message}</p>
-            </>
-          )}
-        />
-      </fieldset>
 
       <div className="flex w-full justify-center mt-5">
         <button
