@@ -20,6 +20,8 @@ Object.defineProperty(global.self, 'crypto', {
   },
 });
 
+global.URL.createObjectURL = jest.fn();
+
 jest.mock('chart.js', () => ({
   __esModule: true,
   ...jest.requireActual('chart.js'),
