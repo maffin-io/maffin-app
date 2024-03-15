@@ -5,6 +5,7 @@ import ProfileDropdown from '@/components/ProfileDropdown';
 import * as sessionHook from '@/hooks/useSession';
 import type { User } from '@auth0/auth0-react';
 import ImportButton from '@/components/buttons/ImportButton';
+import ExportButton from '@/components/buttons/ExportButton';
 
 jest.mock('@/hooks/useSession', () => ({
   __esModule: true,
@@ -13,6 +14,10 @@ jest.mock('@/hooks/useSession', () => ({
 
 jest.mock('@/components/buttons/ImportButton', () => jest.fn(
   () => <div data-testid="ImportButton" />,
+));
+
+jest.mock('@/components/buttons/ExportButton', () => jest.fn(
+  () => <div data-testid="ExportButton" />,
 ));
 
 describe('ProfileDropdown', () => {
@@ -44,6 +49,13 @@ describe('ProfileDropdown', () => {
 
     expect(container).toMatchSnapshot();
     expect(ImportButton).toBeCalledWith(
+      {
+        role: 'menuitem',
+        className: 'text-left px-3 py-2 w-full text-cyan-700 hover:text-cyan-600 whitespace-nowrap',
+      },
+      {},
+    );
+    expect(ExportButton).toBeCalledWith(
       {
         role: 'menuitem',
         className: 'text-left px-3 py-2 w-full text-cyan-700 hover:text-cyan-600 whitespace-nowrap',
