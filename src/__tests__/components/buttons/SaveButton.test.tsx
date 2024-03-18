@@ -110,6 +110,5 @@ describe('SaveButton', () => {
     );
 
     expect(screen.getByRole('button')).toBeDisabled();
-    process.env.NEXT_PUBLIC_ENV = '';
   });
 });
