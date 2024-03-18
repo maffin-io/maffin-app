@@ -72,7 +72,7 @@ export default function SaveButton(): JSX.Element {
         }
       </button>
       {
-        IS_FREE_PLAN
+        !IS_PAID_PLAN
         && <UpgradeTooltip />
       }
     </>
