@@ -17,7 +17,9 @@ jest.mock('@tanstack/react-query');
 
 jest.mock('@/helpers/env', () => ({
   __esModule: true,
-  isStaging: () => false,
+  get IS_PAID_PLAN() {
+    return true;
+  },
 }));
 
 jest.mock('@/hooks/state', () => ({
@@ -99,8 +101,8 @@ describe('SaveButton', () => {
     await waitFor(() => expect(mockSave).toBeCalledTimes(1));
   });
 
-  it('is disabled when staging', async () => {
-    jest.spyOn(helpers_env, 'isStaging').mockReturnValue(true);
+  it('is disabled when not PAID_PLAN', async () => {
+    jest.spyOn(helpers_env, 'IS_PAID_PLAN', 'get').mockReturnValue(false);
     render(
       <DataSourceContext.Provider value={{ isLoaded: true } as DataSourceContextType}>
         <SaveButton />

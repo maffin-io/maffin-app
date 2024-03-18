@@ -8,10 +8,10 @@ import classNames from 'classnames';
 import Link from 'next/link';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { BiEdit, BiXCircle } from 'react-icons/bi';
-import { Tooltip } from 'react-tooltip';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
 import FormButton from '@/components/buttons/FormButton';
+import { Tooltip } from '@/components/tooltips';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import Table from '@/components/tables/Table';
 import Money from '@/book/Money';
@@ -80,7 +80,7 @@ const columns: ColumnDef<Split>[] = [
         >
           {row.original.transaction.date.toISODate()}
         </span>
-        <Tooltip clickable className="tooltip" id={row.original.txId} />
+        <Tooltip clickable id={row.original.txId} />
       </>
     ),
   },

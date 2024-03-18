@@ -4,6 +4,7 @@ import useBookStorage from '@/hooks/useBookStorage';
 import * as gapiHooks from '@/hooks/useGapiClient';
 import BookStorage from '@/lib/storage/GDriveBookStorage';
 import DemoBookStorage from '@/lib/storage/DemoBookStorage';
+import { FreeBookStorage } from '@/lib/storage';
 import * as helpers_env from '@/helpers/env';
 
 jest.mock('@/hooks/useGapiClient', () => ({
@@ -15,13 +16,21 @@ jest.mock('@/lib/storage/GDriveBookStorage');
 
 jest.mock('@/helpers/env', () => ({
   __esModule: true,
-  isStaging: () => false,
+  get IS_DEMO_PLAN() {
+    return false;
+  },
+  get IS_PAID_PLAN() {
+    return false;
+  },
+  get IS_FREE_PLAN() {
+    return false;
+  },
 }));
 
 describe('useBookStorage', () => {
   beforeEach(() => {
     jest.spyOn(gapiHooks, 'default').mockReturnValue([false]);
-    jest.spyOn(helpers_env, 'isStaging').mockReturnValue(false);
+    jest.spyOn(helpers_env, 'IS_PAID_PLAN', 'get').mockReturnValue(true);
   });
 
   afterEach(() => {
@@ -48,8 +57,9 @@ describe('useBookStorage', () => {
     });
   });
 
-  it('returns DemoStorage when env is staging', async () => {
-    jest.spyOn(helpers_env, 'isStaging').mockReturnValue(true);
+  it('returns DemoStorage when IS_DEMO_PLAN', async () => {
+    jest.spyOn(helpers_env, 'IS_PAID_PLAN', 'get').mockReturnValue(false);
+    jest.spyOn(helpers_env, 'IS_DEMO_PLAN', 'get').mockReturnValue(true);
     window.gapi = {
       client: {} as typeof gapi.client,
     } as typeof gapi;
@@ -61,7 +71,22 @@ describe('useBookStorage', () => {
     await waitFor(() => {
       expect(result.current).toEqual({ storage: expect.any(DemoBookStorage) });
     });
-    process.env.NEXT_PUBLIC_ENV = '';
+  });
+
+  it('returns FreeStorage when IS_FREE_PLAN', async () => {
+    jest.spyOn(helpers_env, 'IS_PAID_PLAN', 'get').mockReturnValue(false);
+    jest.spyOn(helpers_env, 'IS_FREE_PLAN', 'get').mockReturnValue(true);
+    window.gapi = {
+      client: {} as typeof gapi.client,
+    } as typeof gapi;
+    jest.spyOn(gapiHooks, 'default').mockReturnValue([true]);
+
+    const { result, rerender } = renderHook(() => useBookStorage());
+    rerender();
+
+    await waitFor(() => {
+      expect(result.current).toEqual({ storage: expect.any(FreeBookStorage) });
+    });
   });
 
   it('inits storage', async () => {

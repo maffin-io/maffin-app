@@ -1,8 +1,8 @@
 import React from 'react';
 import { useFieldArray } from 'react-hook-form';
 import type { UseFormReturn } from 'react-hook-form';
-import { Tooltip } from 'react-tooltip';
 
+import { Tooltip } from '@/components/tooltips';
 import { Split } from '@/book/entities';
 import type { FormValues } from './types';
 import SplitField from './SplitField';
@@ -107,15 +107,13 @@ export default function SplitsField({
           >
             Add split
             <span
-              className="badge ml-0.5"
+              className="badge default ml-0.5"
               data-tooltip-id="add-split-help"
             >
               ?
             </span>
             <Tooltip
               id="add-split-help"
-              className="tooltip"
-              disableStyleInjection
             >
               <p className="mb-2">
                 Adding extra splits to a transaction is helpful when you want to split

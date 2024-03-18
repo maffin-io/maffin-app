@@ -3,9 +3,9 @@ import { DateTime } from 'luxon';
 import { ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
 import { BiCircle, BiSolidRightArrow, BiSolidDownArrow } from 'react-icons/bi';
-import { Tooltip } from 'react-tooltip';
 
 import Money from '@/book/Money';
+import { Tooltip } from '@/components/tooltips';
 import Table from '@/components/tables/Table';
 import type { AccountsMap } from '@/types/book';
 import { Account } from '@/book/entities';
@@ -112,7 +112,7 @@ const columns: ColumnDef<AccountsTableRow>[] = [
         )}
         <Link
           data-tooltip-id={row.original.account.guid}
-          className={accountColorCode(row.original.account, 'badge hover:text-slate-300')}
+          className={accountColorCode(row.original.account, 'badge hover:text-white')}
           href={`/dashboard/accounts/${row.original.account.guid}`}
         >
           {row.original.account.name}
@@ -122,9 +122,9 @@ const columns: ColumnDef<AccountsTableRow>[] = [
           row.original.account.description
           && (
             <Tooltip
+              place="bottom"
+              className="max-w-[80%]"
               id={row.original.account.guid}
-              className="tooltip"
-              disableStyleInjection
             >
               {row.original.account.description}
             </Tooltip>

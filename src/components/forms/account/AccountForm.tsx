@@ -10,6 +10,7 @@ import {
   Split,
   Transaction,
 } from '@/book/entities';
+import { Tooltip } from '@/components/tooltips';
 import {
   AccountSelector,
   CommoditySelector,
@@ -19,7 +20,6 @@ import { useMainCurrency } from '@/hooks/api';
 import { getAllowedSubAccounts } from '@/book/helpers/accountType';
 import { toAmountWithScale } from '@/helpers/number';
 import createEquityAccount from '@/lib/createEquityAccount';
-import { Tooltip } from 'react-tooltip';
 import type { FormValues } from '@/components/forms/account/types';
 
 const resolver = classValidatorResolver(Account, { validator: { stopAtFirstError: true } });
@@ -93,8 +93,6 @@ export default function AccountForm({
           </span>
           <Tooltip
             id="hidden-help"
-            className="tooltip"
-            disableStyleInjection
           >
             <p>
               For accounts that are closed or not used anymore.
@@ -119,15 +117,13 @@ export default function AccountForm({
         >
           <label htmlFor="placeholderInput" className="inline-block mb-2">Parent</label>
           <span
-            className="badge ml-0.5"
+            className="badge default ml-0.5"
             data-tooltip-id="placeholder-help"
           >
             ?
           </span>
           <Tooltip
             id="placeholder-help"
-            className="tooltip"
-            disableStyleInjection
           >
             <p>
               For accounts that are parent categories. These accounts cannot have
@@ -216,15 +212,13 @@ export default function AccountForm({
         >
           <label htmlFor="balanceInput" className="inline-block mb-2">Opening balance</label>
           <span
-            className="badge ml-0.5"
+            className="badge default ml-0.5"
             data-tooltip-id="balance-help"
           >
             ?
           </span>
           <Tooltip
             id="balance-help"
-            className="tooltip"
-            disableStyleInjection
           >
             <p>
               The initial amount you have in the account for the date
@@ -258,8 +252,6 @@ export default function AccountForm({
           </span>
           <Tooltip
             id="date-help"
-            className="tooltip"
-            disableStyleInjection
           >
             <p>
               The date for the opening balance you&apos;ve selected.

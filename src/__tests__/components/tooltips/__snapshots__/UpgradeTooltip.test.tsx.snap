@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UpgradeTooltip renders as expected 1`] = `
+<div>
+  <span
+    data-tooltip-id="upgrade-tooltip"
+  >
+    upgrade
+  </span>
+  <div
+    class="react-tooltip core-styles-module_tooltip__3vRRp styles-module_tooltip__mnnfp styles-module_dark__xNqje !bg-light-50 !text-light-600/90 dark:!bg-dark-900 dark:!text-slate-200 shadow-xl !rounded-lg !z-50 !opacity-100 whitespace-pre-wrap !overflow-visible max-w-80 react-tooltip__place-top core-styles-module_closing__sGnxF react-tooltip__closing core-styles-module_clickable__ZuTTB"
+    id="upgrade-tooltip"
+    role="tooltip"
+  >
+    <h2
+      class="flex font-normal items-center justify-center text-cyan-600"
+    >
+      <svg
+        class="mr-1 font-thin"
+        fill="currentColor"
+        height="1em"
+        stroke="currentColor"
+        stroke-width="0"
+        viewBox="0 0 24 24"
+        width="1em"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M11.219 3.375 8 7.399 4.781 3.375A1.002 1.002 0 0 0 3 4v15c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V4a1.002 1.002 0 0 0-1.781-.625L16 7.399l-3.219-4.024c-.381-.474-1.181-.474-1.562 0zM5 19v-2h14.001v2H5zm10.219-9.375c.381.475 1.182.475 1.563 0L19 6.851 19.001 15H5V6.851l2.219 2.774c.381.475 1.182.475 1.563 0L12 5.601l3.219 4.024z"
+        />
+      </svg>
+      Premium
+    </h2>
+    <div
+      class="text-center"
+    >
+      Auto saving to persistent storage only available for premium users.
+    </div>
+    <a
+      class="btn btn-cta hover:text-white hover:-translate-y-0 table mx-auto my-4"
+      href="https://maffin.io"
+      target="_blank"
+    >
+      Check more
+    </a>
+    <div
+      class="react-tooltip-arrow core-styles-module_arrow__cvMwQ styles-module_arrow__K0L3T"
+    />
+  </div>
+</div>
+`;

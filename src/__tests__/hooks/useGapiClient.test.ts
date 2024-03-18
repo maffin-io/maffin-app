@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 
 import useGapiClient from '@/hooks/useGapiClient';
 import * as sessionHook from '@/hooks/useSession';
@@ -11,7 +11,9 @@ jest.mock('@/hooks/useSession', () => ({
 
 jest.mock('@/helpers/env', () => ({
   __esModule: true,
-  isStaging: () => false,
+  get IS_PAID_PLAN() {
+    return true;
+  },
 }));
 
 describe('useGapiClient', () => {
@@ -19,7 +21,7 @@ describe('useGapiClient', () => {
     // @ts-ignore
     window.gapi = null;
 
-    jest.spyOn(helpers_env, 'isStaging').mockReturnValue(false);
+    jest.spyOn(helpers_env, 'IS_PAID_PLAN', 'get').mockReturnValue(true);
     jest.spyOn(sessionHook, 'default').mockReturnValue({
       accessToken: '',
     } as sessionHook.SessionReturn);
@@ -63,8 +65,8 @@ describe('useGapiClient', () => {
     expect(document.body.getElementsByTagName('script').length).toEqual(1);
   });
 
-  it('returns true when isStaging', () => {
-    jest.spyOn(helpers_env, 'isStaging').mockReturnValue(true);
+  it('returns true when not PAID_PLAN', () => {
+    jest.spyOn(helpers_env, 'IS_PAID_PLAN', 'get').mockReturnValue(false);
     const { result } = renderHook(() => useGapiClient());
 
     expect(result.current).toEqual([true]);
@@ -150,7 +152,7 @@ describe('useGapiClient', () => {
       }
     });
 
-    expect(result.current).toEqual([true]);
+    await waitFor(() => expect(result.current).toEqual([true]));
     expect(mockGapiLoad).toHaveBeenCalledWith('client', expect.any(Function));
     expect(mockGapiClientSetToken).toHaveBeenCalledWith({ access_token: 'access_token' });
     expect(mockGapiClientLoad).toHaveBeenCalledWith(

@@ -1,10 +1,13 @@
 import React from 'react';
 
 import useGapiClient from '@/hooks/useGapiClient';
-import { isStaging } from '@/helpers/env';
+import { IS_FREE_PLAN, IS_PAID_PLAN } from '@/helpers/env';
 import type BookStorage from '@/lib/storage/BookStorage';
-import GDriveBookStorage from '@/lib/storage/GDriveBookStorage';
-import DemoBookStorage from '@/lib/storage/DemoBookStorage';
+import {
+  GDriveBookStorage,
+  DemoBookStorage,
+  FreeBookStorage,
+} from '@/lib/storage';
 
 type UseBookStorageReturn = {
   storage: BookStorage | null,
@@ -21,9 +24,15 @@ export default function useBookStorage(): UseBookStorageReturn {
 
   React.useEffect(() => {
     async function load() {
-      const instance = !isStaging()
-        ? new GDriveBookStorage(window.gapi.client)
-        : new DemoBookStorage();
+      let instance: BookStorage = new DemoBookStorage();
+
+      if (IS_FREE_PLAN) {
+        instance = new FreeBookStorage();
+      }
+
+      if (IS_PAID_PLAN) {
+        instance = new GDriveBookStorage(window.gapi.client);
+      }
 
       try {
         await instance.initStorage();

@@ -32,7 +32,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
         Description
       </label>
       <span
-        class="badge ml-0.5"
+        class="badge default ml-0.5"
         data-tooltip-id="description-help"
       >
         ?
@@ -80,7 +80,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
             class="flex items-center rounded-md hidden"
           >
             <span
-              class="badge mx-3"
+              class="badge default mx-3"
               data-tooltip-id="value-help"
             >
               <svg
@@ -286,7 +286,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
       >
         Add split
         <span
-          class="badge ml-0.5"
+          class="badge default ml-0.5"
           data-tooltip-id="add-split-help"
         >
           ?
@@ -350,7 +350,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
         Description
       </label>
       <span
-        class="badge ml-0.5"
+        class="badge default ml-0.5"
         data-tooltip-id="description-help"
       >
         ?
@@ -400,7 +400,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
             class="flex items-center rounded-md hidden"
           >
             <span
-              class="badge mx-3"
+              class="badge default mx-3"
               data-tooltip-id="value-help"
             >
               <svg
@@ -660,7 +660,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
         Description
       </label>
       <span
-        class="badge ml-0.5"
+        class="badge default ml-0.5"
         data-tooltip-id="description-help"
       >
         ?
@@ -1005,7 +1005,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
       >
         Add split
         <span
-          class="badge ml-0.5"
+          class="badge default ml-0.5"
           data-tooltip-id="add-split-help"
         >
           ?

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { isStaging } from '@/helpers/env';
+import { IS_PAID_PLAN } from '@/helpers/env';
 import useSession from './useSession';
 
 const isBrowser = typeof window !== 'undefined';
@@ -49,8 +49,11 @@ export default function useGapiClient() {
     }
   }, [isLoaded, accessToken]);
 
-  // eslint-disable-next-line no-unneeded-ternary
-  return [(isLoaded && accessToken) || isStaging() ? true : false];
+  if (!IS_PAID_PLAN) {
+    return [true];
+  }
+
+  return [!!(isLoaded && accessToken)];
 }
 
 /**

@@ -2,7 +2,7 @@ import pako from 'pako';
 
 import BookStorage from '@/lib/storage/DemoBookStorage';
 
-describe('GoogleDrive', () => {
+describe('DemoBookStorage', () => {
   let rawBook: Uint8Array;
   let instance: BookStorage;
   let mockFetch: jest.SpyInstance;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { BiSolidMoon, BiSolidSun } from 'react-icons/bi';
-import { Tooltip } from 'react-tooltip';
 
+import { Tooltip } from '@/components/tooltips';
 import { useTheme } from '@/hooks/state';
 
 export default function ThemeButton(): JSX.Element {
@@ -27,7 +27,6 @@ export default function ThemeButton(): JSX.Element {
       </span>
       <Tooltip
         id="theme-help"
-        className="tooltip"
         place="right"
       >
         {text}

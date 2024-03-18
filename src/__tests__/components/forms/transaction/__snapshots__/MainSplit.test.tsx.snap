@@ -32,7 +32,7 @@ exports[`MainSplit renders with empty data 1`] = `
       class="flex items-center rounded-md hidden"
     >
       <span
-        class="badge mx-3"
+        class="badge default mx-3"
         data-tooltip-id="value-help"
       >
         <svg

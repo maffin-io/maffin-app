@@ -39,7 +39,7 @@ exports[`SplitsField renders with default values 1`] = `
           class="flex items-center rounded-md hidden"
         >
           <span
-            class="badge mx-3"
+            class="badge default mx-3"
             data-tooltip-id="value-help"
           >
             <svg
@@ -245,7 +245,7 @@ exports[`SplitsField renders with default values 1`] = `
     >
       Add split
       <span
-        class="badge ml-0.5"
+        class="badge default ml-0.5"
         data-tooltip-id="add-split-help"
       >
         ?

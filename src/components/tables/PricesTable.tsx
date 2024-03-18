@@ -1,8 +1,8 @@
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { Tooltip } from 'react-tooltip';
 import { BiEdit, BiXCircle } from 'react-icons/bi';
 
+import { Tooltip } from '@/components/tooltips';
 import FormButton from '@/components/buttons/FormButton';
 import PriceForm from '@/components/forms/price/PriceForm';
 import { Commodity, Price } from '@/book/entities';
@@ -48,7 +48,7 @@ const columns: ColumnDef<Price>[] = [
         >
           {row.original.date.toISODate()}
         </span>
-        <Tooltip clickable className="tooltip" id={row.original.guid} />
+        <Tooltip clickable id={row.original.guid} />
       </>
     ),
   },

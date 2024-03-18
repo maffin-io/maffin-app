@@ -57,7 +57,7 @@ exports[`AccountForm renders as expected with add 1`] = `
           Parent
         </label>
         <span
-          class="badge ml-0.5"
+          class="badge default ml-0.5"
           data-tooltip-id="placeholder-help"
         >
           ?
@@ -303,7 +303,7 @@ exports[`AccountForm renders as expected with add 1`] = `
           Opening balance
         </label>
         <span
-          class="badge ml-0.5"
+          class="badge default ml-0.5"
           data-tooltip-id="balance-help"
         >
           ?
@@ -534,7 +534,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
           Parent
         </label>
         <span
-          class="badge ml-0.5"
+          class="badge default ml-0.5"
           data-tooltip-id="placeholder-help"
         >
           ?
@@ -778,7 +778,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
           Opening balance
         </label>
         <span
-          class="badge ml-0.5"
+          class="badge default ml-0.5"
           data-tooltip-id="balance-help"
         >
           ?
@@ -1005,7 +1005,7 @@ exports[`AccountForm renders as expected with update 1`] = `
           Parent
         </label>
         <span
-          class="badge ml-0.5"
+          class="badge default ml-0.5"
           data-tooltip-id="placeholder-help"
         >
           ?
@@ -1251,7 +1251,7 @@ exports[`AccountForm renders as expected with update 1`] = `
           Opening balance
         </label>
         <span
-          class="badge ml-0.5"
+          class="badge default ml-0.5"
           data-tooltip-id="balance-help"
         >
           ?

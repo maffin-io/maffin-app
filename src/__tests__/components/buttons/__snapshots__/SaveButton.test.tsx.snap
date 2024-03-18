@@ -15,6 +15,7 @@ exports[`SaveButton renders as expected when datasource ready and not saving 1`]
 <div>
   <button
     class="btn btn-primary"
+    data-tooltip-id="upgrade-tooltip"
     id="save-button"
     type="button"
   >
@@ -46,6 +47,7 @@ exports[`SaveButton renders as expected when datasource ready and saving 1`] = `
 <div>
   <button
     class="btn btn-primary"
+    data-tooltip-id="upgrade-tooltip"
     disabled=""
     id="save-button"
     type="button"
@@ -75,6 +77,7 @@ exports[`SaveButton renders as expected when offline 1`] = `
 <div>
   <button
     class="btn btn-primary btn-danger"
+    data-tooltip-id="upgrade-tooltip"
     disabled=""
     id="save-button"
     type="button"

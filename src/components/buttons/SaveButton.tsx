@@ -1,11 +1,12 @@
 import React from 'react';
 import { BiCloudUpload, BiLoader, BiWifiOff } from 'react-icons/bi';
 import { useQuery } from '@tanstack/react-query';
+import classNames from 'classnames';
 
 import { DataSourceContext } from '@/hooks';
-import { isStaging } from '@/helpers/env';
+import { IS_FREE_PLAN, IS_PAID_PLAN } from '@/helpers/env';
 import { useOnline } from '@/hooks/state';
-import classNames from 'classnames';
+import { UpgradeTooltip } from '@/components/tooltips';
 
 export default function SaveButton(): JSX.Element {
   const { data: isSaving } = useQuery({
@@ -28,45 +29,52 @@ export default function SaveButton(): JSX.Element {
   }
 
   return (
-    <button
-      id="save-button"
-      type="button"
-      className={classNames(
-        'btn btn-primary',
+    <>
+      <button
+        id="save-button"
+        type="button"
+        className={classNames(
+          'btn btn-primary',
+          {
+            'btn-danger': !isOnline,
+          },
+        )}
+        disabled={isSaving || !IS_PAID_PLAN || !isOnline}
+        data-tooltip-id="upgrade-tooltip"
+        onClick={async () => {
+          await save();
+        }}
+      >
         {
-          'btn-danger': !isOnline,
-        },
-      )}
-      disabled={isSaving || isStaging() || !isOnline}
-      onClick={async () => {
-        await save();
-      }}
-    >
-      {
-        (
-          isSaving
-          && isOnline
-          && (
-          <>
-            <BiLoader className="mr-1 animate-spin" />
-            <span>Saving...</span>
-          </>
-          )
-        ) || (
-          !isOnline
-          && (
+          (
+            isSaving
+            && isOnline
+            && (
             <>
-              <BiWifiOff className="mr-1" />
+              <BiLoader className="mr-1 animate-spin" />
+              <span>Saving...</span>
+            </>
+            )
+          ) || (
+            !isOnline
+            && (
+              <>
+                <BiWifiOff className="mr-1" />
+                <span>Save</span>
+              </>
+            )
+          ) || (
+            <>
+              <BiCloudUpload className="mr-1" />
               <span>Save</span>
             </>
           )
-        ) || (
-          <>
-            <BiCloudUpload className="mr-1" />
-            <span>Save</span>
-          </>
-        )
+        }
+      </button>
+      {
+        IS_FREE_PLAN
+        && <UpgradeTooltip />
       }
-    </button>
+    </>
   );
 }
