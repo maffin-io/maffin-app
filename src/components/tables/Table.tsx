@@ -55,7 +55,7 @@ export default function Table<T extends object = {}>(
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-md">
+      <div className="relative rounded-md">
         <table id={id} className="w-full text-sm text-left">
           {
             showHeader

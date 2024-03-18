@@ -2,15 +2,15 @@ import React from 'react';
 import { DateTime } from 'luxon';
 import classNames from 'classnames';
 import type { UseFormReturn } from 'react-hook-form';
-import { Tooltip } from 'react-tooltip';
 import { BiRightArrowAlt } from 'react-icons/bi';
 import Link from 'next/link';
 
-import type { Account } from '@/book/entities';
+import { Tooltip } from '@/components/tooltips';
 import { Price } from '@/book/entities';
 import { toFixed } from '@/helpers/number';
 import { currencyToSymbol } from '@/helpers/currency';
 import { usePrices } from '@/hooks/api';
+import type { Account } from '@/book/entities';
 import type { FormValues } from './types';
 
 export type MainSplitProps = {
@@ -90,15 +90,13 @@ export default function MainSplit({
         }
       >
         <span
-          className="badge mx-3"
+          className="badge default mx-3"
           data-tooltip-id="value-help"
         >
           <BiRightArrowAlt />
         </span>
         <Tooltip
           id="value-help"
-          className="tooltip"
-          disableStyleInjection
           clickable
         >
           <p className="mb-2">

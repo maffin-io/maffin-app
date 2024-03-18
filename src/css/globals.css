@@ -5,6 +5,18 @@
     @apply bg-light-100 text-light-600/90 dark:bg-dark-800 dark:text-slate-400;
   } 
 
+  h1 {
+    @apply text-2xl font-bold py-5;
+  }
+
+  h2 {
+    @apply text-xl font-bold py-4;
+  }
+
+  h3 {
+    @apply text-lg font-semibold py-3;
+  }
+
   a {
     @apply text-cyan-700 hover:text-cyan-600;
   }

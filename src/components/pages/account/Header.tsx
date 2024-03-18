@@ -2,9 +2,9 @@ import React from 'react';
 import classNames from 'classnames';
 import { BiEdit, BiXCircle, BiPlusCircle } from 'react-icons/bi';
 import { DateTime } from 'luxon';
-import { Tooltip } from 'react-tooltip';
 import { useRouter } from 'next/navigation';
 
+import { Tooltip } from '@/components/tooltips';
 import FormButton from '@/components/buttons/FormButton';
 import AccountForm from '@/components/forms/account/AccountForm';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
@@ -139,8 +139,6 @@ export default function Header({
             && (
               <Tooltip
                 id="delete-help"
-                className="tooltip"
-                disableStyleInjection
               >
                 <p>
                   Accounts that contain transactions can&apos;t be deleted.

@@ -3,7 +3,7 @@
 exports[`Table renders headers with empty data 1`] = `
 <div>
   <div
-    class="relative overflow-hidden rounded-md"
+    class="relative rounded-md"
   >
     <table
       class="w-full text-sm text-left"

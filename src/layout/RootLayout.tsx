@@ -9,13 +9,13 @@ import { Toaster } from 'react-hot-toast';
 
 import '@/css/globals.css';
 import { Auth0Provider } from '@/lib/auth0-provider';
-import { isProd, isStaging } from '@/helpers/env';
+import { CONFIG, IS_DEMO_PLAN } from '@/helpers/env';
 
 if (process.env.NODE_ENV === 'development') {
   Settings.throwOnInvalid = true;
 }
 
-if (isStaging()) {
+if (IS_DEMO_PLAN) {
   Settings.now = () => 1703980800000; // 2023-12-31
 }
 
@@ -44,11 +44,11 @@ export default function RootLayout({
       <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <Auth0Provider
-          domain={`maffin${isProd() ? '' : '-dev'}.eu.auth0.com`}
-          clientId={isProd() ? 'cEXnN96kEP3ER2EDJjmjRW0u2MEFBUKK' : 'mMmnR4NbQOnim9B8QZfe9wfFuaKb8rwW'}
+          domain={CONFIG.auth0.domain}
+          clientId={CONFIG.auth0.clientId}
           authorizationParams={{
             redirect_uri: (typeof window !== 'undefined' && window.location.origin) || '',
-            scope: 'profile email https://www.googleapis.com/auth/drive.file',
+            scope: CONFIG.auth0.scopes,
             connection: 'maffin-gcp',
           }}
         >

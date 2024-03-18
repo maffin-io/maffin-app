@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Tooltip renders as expected 1`] = `
+<div>
+  <span
+    data-tooltip-id="tooltip"
+  >
+    hello
+  </span>
+  <div
+    class="react-tooltip core-styles-module_tooltip__3vRRp styles-module_tooltip__mnnfp styles-module_dark__xNqje !bg-light-50 !text-light-600/90 dark:!bg-dark-900 dark:!text-slate-200 shadow-xl !rounded-lg !z-50 !opacity-100 whitespace-pre-wrap !overflow-visible class react-tooltip__place-top core-styles-module_closing__sGnxF react-tooltip__closing"
+    id="tooltip"
+    role="tooltip"
+  >
+    text
+    <div
+      class="react-tooltip-arrow core-styles-module_arrow__cvMwQ styles-module_arrow__K0L3T"
+    />
+  </div>
+</div>
+`;

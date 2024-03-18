@@ -16,7 +16,7 @@ import {
   Transaction,
 } from '@/book/entities';
 import { MIGRATIONS } from '@/book/migrations';
-import { isStaging } from '@/helpers/env';
+import { IS_DEMO_PLAN, IS_PAID_PLAN } from '@/helpers/env';
 import { useQueryClient } from '@tanstack/react-query';
 import type BookStorage from '@/lib/storage/BookStorage';
 import { MaffinError, StorageError } from '@/helpers/errors';
@@ -121,7 +121,7 @@ async function save(storage: BookStorage) {
 }
 
 async function importBook(storage: BookStorage, rawData: Uint8Array) {
-  if (isStaging()) {
+  if (IS_DEMO_PLAN) {
     Settings.now = () => Date.now();
   }
   let parsedData;
@@ -176,7 +176,7 @@ async function createEmptyBook() {
 }
 
 async function loadStockerPrices() {
-  if (!isStaging()) {
+  if (IS_PAID_PLAN) {
     try {
       // We have to await because we use Price.upsert. Once we correct this,
       // saving Price already updates the local cache so we don't need await

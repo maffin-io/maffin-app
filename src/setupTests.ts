@@ -22,6 +22,12 @@ Object.defineProperty(global.self, 'crypto', {
 
 global.URL.createObjectURL = jest.fn();
 
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));
+
 jest.mock('chart.js', () => ({
   __esModule: true,
   ...jest.requireActual('chart.js'),

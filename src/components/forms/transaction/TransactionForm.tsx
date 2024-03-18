@@ -52,15 +52,13 @@ export default function TransactionForm({
       <fieldset className="text-sm my-5">
         <label htmlFor="descriptionInput" className="inline-block mb-2">Description</label>
         <span
-          className="badge ml-0.5"
+          className="badge default ml-0.5"
           data-tooltip-id="description-help"
         >
           ?
         </span>
         <Tooltip
           id="description-help"
-          className="tooltip"
-          disableStyleInjection
         >
           <p className="mb-2">
             Add a meaningful description to your transaction. The description is shown in the
