@@ -4,7 +4,7 @@ import {
   render,
 } from '@testing-library/react';
 import { DateTime, Interval } from 'luxon';
-import type { UseQueryResult } from '@tanstack/react-query';
+import type { DefinedUseQueryResult, UseQueryResult } from '@tanstack/react-query';
 
 import type { Account } from '@/book/entities';
 import AccountsPage from '@/app/dashboard/accounts/page';
@@ -18,10 +18,16 @@ import { AccountsTable } from '@/components/tables';
 import { TotalsPie, MonthlyTotalHistogram, NetWorthHistogram } from '@/components/charts';
 import IncomeExpenseHistogram from '@/components/pages/accounts/IncomeExpenseHistogram';
 import * as apiHook from '@/hooks/api';
+import * as stateHooks from '@/hooks/state';
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
   ...jest.requireActual('@/hooks/api'),
+}));
+
+jest.mock('@/hooks/state', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/state'),
 }));
 
 jest.mock('@/components/buttons/FormButton', () => jest.fn(
@@ -69,9 +75,17 @@ jest.mock('@/components/Loading', () => jest.fn(
 ));
 
 describe('AccountsPage', () => {
+  let interval: Interval;
+
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02') as DateTime<true>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
+
+    interval = Interval.fromDateTimes(
+      DateTime.now().minus({ months: 6 }).startOf('month'),
+      DateTime.now().endOf('day'),
+    );
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: interval } as DefinedUseQueryResult<Interval>);
   });
 
   afterEach(() => {
@@ -113,7 +127,6 @@ describe('AccountsPage', () => {
     expect(AccountsTable).toBeCalledWith(
       {
         guids: [undefined, undefined],
-        selectedDate: DateTime.fromISO('2023-01-02'),
         isExpanded: true,
       },
       {},
@@ -121,7 +134,6 @@ describe('AccountsPage', () => {
     expect(AccountsTable).toBeCalledWith(
       {
         guids: [undefined, undefined],
-        selectedDate: DateTime.fromISO('2023-01-02'),
         isExpanded: true,
       },
       {},
@@ -133,7 +145,6 @@ describe('AccountsPage', () => {
         backgroundColor: ['#06B6D4', '#FF6600'],
         guids: [undefined, undefined],
         title: 'Net worth',
-        selectedDate: DateTime.fromISO('2023-01-02'),
       },
       {},
     );
@@ -141,7 +152,6 @@ describe('AccountsPage', () => {
     await screen.findByTestId('IncomeExpenseHistogram');
     expect(IncomeExpenseHistogram).toHaveBeenLastCalledWith(
       {
-        selectedDate: DateTime.fromISO('2023-01-02'),
       },
       {},
     );
@@ -162,10 +172,7 @@ describe('AccountsPage', () => {
       {
         title: 'Income',
         accounts: undefined,
-        interval: Interval.fromDateTimes(
-          DateTime.now().minus({ month: 6 }).startOf('month'),
-          DateTime.now(),
-        ),
+        interval,
       },
       {},
     );
@@ -174,10 +181,7 @@ describe('AccountsPage', () => {
       {
         title: 'Expenses',
         accounts: undefined,
-        interval: Interval.fromDateTimes(
-          DateTime.now().minus({ month: 6 }).startOf('month'),
-          DateTime.now(),
-        ),
+        interval,
       },
       {},
     );
@@ -275,25 +279,17 @@ describe('AccountsPage', () => {
     expect(AccountsTable).toBeCalledWith({
       guids: ['a7', 'a8'],
       isExpanded: false,
-      selectedDate: DateTime.now(),
     }, {});
     expect(AccountsTable).toBeCalledWith({
       guids: ['a5', 'a3'],
       isExpanded: false,
-      selectedDate: DateTime.now(),
     }, {});
     expect(TotalsPie).toHaveBeenLastCalledWith({
       backgroundColor: ['#06B6D4', '#FF6600'],
       guids: ['a7', 'a8'],
       title: 'Net worth',
-      selectedDate: DateTime.now(),
     }, {});
-    expect(IncomeExpenseHistogram).toHaveBeenLastCalledWith(
-      {
-        selectedDate: DateTime.fromISO('2023-01-02'),
-      },
-      {},
-    );
+    expect(IncomeExpenseHistogram).toHaveBeenLastCalledWith({}, {});
     expect(NetWorthHistogram).toHaveBeenLastCalledWith(
       {
         assetsGuid: 'type_asset',
@@ -305,10 +301,7 @@ describe('AccountsPage', () => {
       1,
       {
         title: 'Income',
-        interval: Interval.fromDateTimes(
-          DateTime.now().minus({ month: 6 }).startOf('month'),
-          DateTime.now(),
-        ),
+        interval,
         guids: [accounts[4].guid],
       },
       {},
@@ -317,10 +310,7 @@ describe('AccountsPage', () => {
       2,
       {
         title: 'Expenses',
-        interval: Interval.fromDateTimes(
-          DateTime.now().minus({ month: 6 }).startOf('month'),
-          DateTime.now(),
-        ),
+        interval,
         guids: [accounts[2].guid],
       },
       {},

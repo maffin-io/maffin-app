@@ -1,23 +1,14 @@
 import React from 'react';
-import { DateTime, Interval } from 'luxon';
 import type { ChartDataset } from 'chart.js';
 
 import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
 import { useAccountsMonthlyTotal, useMainCurrency } from '@/hooks/api';
+import { useInterval } from '@/hooks/state';
 import monthlyDates from '@/helpers/monthlyDates';
 
-export type IncomeExpenseHistogramProps = {
-  selectedDate?: DateTime,
-};
-
-export default function IncomeExpenseHistogram({
-  selectedDate = DateTime.now(),
-}: IncomeExpenseHistogramProps): JSX.Element {
-  const interval = Interval.fromDateTimes(
-    selectedDate.minus({ months: 6 }).startOf('month'),
-    selectedDate,
-  );
+export default function IncomeExpenseHistogram(): JSX.Element {
+  const { data: interval } = useInterval();
   const { data: monthlyTotals } = useAccountsMonthlyTotal(interval);
   const incomeSeries = monthlyTotals?.map(m => m.type_income?.toNumber() || 0);
   const expenseSeries = monthlyTotals?.map(m => m.type_expense?.toNumber() || 0);
@@ -42,7 +33,17 @@ export default function IncomeExpenseHistogram({
       backgroundColor: '#06B6D4',
       datalabels: {
         anchor: 'end',
-        display: true,
+        display: (ctx) => {
+          if (ctx.dataset.data.length < 8) {
+            return true;
+          }
+
+          if (ctx.dataIndex % 2) {
+            return true;
+          }
+
+          return false;
+        },
         formatter: (value) => moneyToString(value, unit),
         align: 'end',
         backgroundColor: '#06B6D4FF',
@@ -63,7 +64,7 @@ export default function IncomeExpenseHistogram({
         options={{
           layout: {
             padding: {
-              right: 15,
+              right: 20,
             },
           },
           maintainAspectRatio: false,

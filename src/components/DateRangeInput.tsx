@@ -14,7 +14,7 @@ export default function DateRangeInput(): JSX.Element {
   const now = DateTime.now();
   const shortcuts: { [key: string]: { text: string, period: { start: Date, end: Date } } } = {
     t: {
-      text: 'Today',
+      text: 'Last 6 months',
       period: {
         start: now.minus({ months: 6 }).startOf('month').toJSDate(),
         end: now.toJSDate(),
@@ -29,12 +29,11 @@ export default function DateRangeInput(): JSX.Element {
     const yearDiff = value as number;
     const key = now.year - yearDiff;
     shortcuts[key] = {
-      text: `End of ${now.year - yearDiff}`,
+      text: `Year ${now.year - yearDiff}`,
       period: {
         start: now.minus(
           { year: yearDiff },
-        ).endOf('year').minus({ months: 6 }).startOf('month')
-          .toJSDate(),
+        ).startOf('year').toJSDate(),
         end: now.minus({ year: yearDiff }).endOf('year').toJSDate(),
       },
     };
@@ -46,7 +45,6 @@ export default function DateRangeInput(): JSX.Element {
         startDate: interval.start?.toJSDate() || null,
         endDate: interval.end?.toJSDate() || null,
       }}
-      useRange={false}
       minDate={earliestDate && earliestDate.toJSDate()}
       maxDate={now.toJSDate()}
       displayFormat="DD-MM-YYYY"
@@ -70,7 +68,7 @@ export default function DateRangeInput(): JSX.Element {
         shortcuts,
       }}
       containerClassName="relative text-sm"
-      inputClassName="relative transition-all duration-300 text-right py-2.5 px-4 rounded-lg tracking-wide bg-light-100 dark:bg-dark-800 w-[210px]"
+      inputClassName="relative transition-all duration-300 text-right py-2.5 px-4 rounded-lg tracking-wide bg-light-100 dark:bg-dark-800 w-[220px]"
       toggleClassName="hidden"
     />
   );

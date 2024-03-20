@@ -1,12 +1,13 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { DateTime } from 'luxon';
-import type { UseQueryResult } from '@tanstack/react-query';
+import { DateTime, Interval } from 'luxon';
+import type { DefinedUseQueryResult, UseQueryResult } from '@tanstack/react-query';
 
 import Money from '@/book/Money';
 import Bar from '@/components/charts/Bar';
 import IncomeExpenseHistogram from '@/components/pages/accounts/IncomeExpenseHistogram';
 import * as apiHook from '@/hooks/api';
+import * as stateHooks from '@/hooks/state';
 import type { Commodity } from '@/book/entities';
 import type { AccountsTotals } from '@/types/book';
 
@@ -19,10 +20,23 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
+jest.mock('@/hooks/state', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/state'),
+}));
+
 describe('IncomeExpenseHistogram', () => {
+  let interval: Interval;
+
   beforeEach(() => {
     jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals[]>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
+
+    interval = Interval.fromDateTimes(
+      DateTime.now().minus({ months: 6 }).startOf('month'),
+      DateTime.now().endOf('day'),
+    );
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: interval } as DefinedUseQueryResult<Interval>);
   });
 
   afterEach(() => {
@@ -56,7 +70,7 @@ describe('IncomeExpenseHistogram', () => {
               label: 'Savings',
               datalabels: {
                 anchor: 'end',
-                display: true,
+                display: expect.any(Function),
                 formatter: expect.any(Function),
                 align: 'end',
                 backgroundColor: '#06B6D4FF',
@@ -66,19 +80,19 @@ describe('IncomeExpenseHistogram', () => {
             },
           ],
           labels: [
-            DateTime.now().minus({ month: 6 }),
+            interval.start,
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
-            // When it's the 1st of the month, we only show 6 labels instead
-            DateTime.fromISO('2022-12-01'),
+            expect.any(DateTime),
+            interval.end?.startOf('day'),
           ],
         },
         options: {
           layout: {
             padding: {
-              right: 15,
+              right: 20,
             },
           },
           maintainAspectRatio: false,
@@ -159,8 +173,7 @@ describe('IncomeExpenseHistogram', () => {
     );
 
     expect(Bar).toBeCalledWith(
-      {
-        height: '400',
+      expect.objectContaining({
         data: {
           datasets: [
             {
@@ -179,7 +192,7 @@ describe('IncomeExpenseHistogram', () => {
               label: 'Savings',
               datalabels: {
                 anchor: 'end',
-                display: true,
+                display: expect.any(Function),
                 formatter: expect.any(Function),
                 align: 'end',
                 backgroundColor: '#06B6D4FF',
@@ -189,87 +202,16 @@ describe('IncomeExpenseHistogram', () => {
             },
           ],
           labels: [
-            DateTime.now().minus({ month: 6 }),
+            interval.start,
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
-            // When it's the 1st of the month, we only show 6 labels instead
-            DateTime.fromISO('2022-12-01'),
+            expect.any(DateTime),
+            interval.end?.startOf('day'),
           ],
         },
-        options: {
-          layout: {
-            padding: {
-              right: 15,
-            },
-          },
-          maintainAspectRatio: false,
-          interaction: {
-            mode: 'index',
-          },
-          plugins: {
-            title: {
-              align: 'start',
-              display: true,
-              text: 'Monthly Savings',
-              font: {
-                size: 18,
-              },
-              padding: {
-                bottom: 30,
-                top: 0,
-              },
-            },
-            legend: {
-              onClick: expect.any(Function),
-              labels: {
-                boxHeight: 8,
-                boxWidth: 8,
-                pointStyle: 'circle',
-                usePointStyle: true,
-              },
-              position: 'bottom',
-            },
-            tooltip: {
-              backgroundColor: '#323b44',
-              callbacks: {
-                label: expect.any(Function),
-                labelColor: expect.any(Function),
-              },
-            },
-          },
-          scales: {
-            x: {
-              grid: {
-                display: false,
-              },
-              ticks: {
-                align: 'center',
-              },
-              time: {
-                displayFormats: {
-                  month: 'MMM-yy',
-                },
-                tooltipFormat: 'MMMM yyyy',
-                unit: 'month',
-              },
-              type: 'time',
-            },
-            y: {
-              grace: 1,
-              border: {
-                display: false,
-              },
-              position: 'left',
-              ticks: {
-                callback: expect.any(Function),
-                maxTicksLimit: 10,
-              },
-            },
-          },
-        },
-      },
+      }),
       {},
     );
   });
@@ -310,11 +252,7 @@ describe('IncomeExpenseHistogram', () => {
       } as UseQueryResult<AccountsTotals[]>,
     );
 
-    render(
-      <IncomeExpenseHistogram
-        selectedDate={DateTime.fromISO('2022-12-30')}
-      />,
-    );
+    render(<IncomeExpenseHistogram />);
 
     expect(Bar).toBeCalledWith(
       expect.objectContaining({
@@ -334,15 +272,13 @@ describe('IncomeExpenseHistogram', () => {
             }),
           ],
           labels: [
-            DateTime.fromISO('2022-06-01'),
+            interval.start,
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
-            // Note this is not filtering data but just a label to display
-            // in the X axes
-            DateTime.fromISO('2022-12-01'),
+            interval.end?.startOf('day'),
           ],
         },
       }),

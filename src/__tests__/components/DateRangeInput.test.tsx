@@ -56,10 +56,9 @@ describe('DateRangeInput', () => {
     expect(Datepicker).toBeCalledTimes(1);
     expect(Datepicker).toBeCalledWith(
       {
-        useRange: false,
         containerClassName: 'relative text-sm',
         displayFormat: 'DD-MM-YYYY',
-        inputClassName: 'relative transition-all duration-300 text-right py-2.5 px-4 rounded-lg tracking-wide bg-light-100 dark:bg-dark-800 w-[210px]',
+        inputClassName: 'relative transition-all duration-300 text-right py-2.5 px-4 rounded-lg tracking-wide bg-light-100 dark:bg-dark-800 w-[220px]',
         toggleClassName: 'hidden',
         maxDate: DateTime.now().toJSDate(),
         minDate: undefined,
@@ -76,7 +75,7 @@ describe('DateRangeInput', () => {
         configs: {
           shortcuts: {
             t: {
-              text: 'Today',
+              text: 'Last 6 months',
               period: {
                 start: interval.start?.toJSDate(),
                 end: interval.end?.toJSDate(),
@@ -106,17 +105,17 @@ describe('DateRangeInput', () => {
         configs: {
           shortcuts: expect.objectContaining({
             t: {
-              text: 'Today',
+              text: 'Last 6 months',
               period: {
                 start: DateTime.fromISO('2022-07-01').toJSDate(),
                 end: DateTime.fromISO('2023-01-30').toJSDate(),
               },
             },
             2022: {
-              text: 'End of 2022',
+              text: 'Year 2022',
               period: {
-                start: DateTime.fromISO('2022-06-01').toJSDate(),
-                end: DateTime.fromISO('2022-12-31').endOf('day').toJSDate(),
+                start: DateTime.fromISO('2022').startOf('year').toJSDate(),
+                end: DateTime.fromISO('2022').endOf('year').toJSDate(),
               },
             },
           }),

@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { DateTime, Interval } from 'luxon';
 import { BiPlusCircle } from 'react-icons/bi';
 
 import FormButton from '@/components/buttons/FormButton';
@@ -17,15 +16,15 @@ import {
 } from '@/components/charts';
 import { AccountsTable } from '@/components/tables';
 import Loading from '@/components/Loading';
-import DateRangeInput from '@/components/DateRangeInput';
 import Onboarding from '@/components/onboarding/Onboarding';
 import { useAccounts } from '@/hooks/api';
+import { useInterval } from '@/hooks/state';
 import mapAccounts from '@/helpers/mapAccounts';
 import { ASSET, LIABILITY } from '@/constants/colors';
 
 export default function AccountsPage(): JSX.Element {
   const { data, isLoading } = useAccounts();
-  const [selectedDate, setSelectedDate] = React.useState(DateTime.now());
+  const { data: interval } = useInterval();
 
   if (isLoading) {
     return (
@@ -69,7 +68,6 @@ export default function AccountsPage(): JSX.Element {
               title="Net worth"
               backgroundColor={[ASSET, LIABILITY]}
               guids={[accountsMap.type_asset?.guid, accountsMap.type_liability?.guid]}
-              selectedDate={selectedDate}
             />
             <div id="accounts-table" className="divide-y divide-slate-400/25 mt-4">
               <div className="pb-2">
@@ -78,7 +76,6 @@ export default function AccountsPage(): JSX.Element {
                     accountsMap.type_asset?.guid,
                     accountsMap.type_liability?.guid,
                   ]}
-                  selectedDate={selectedDate}
                   isExpanded={showOnboarding}
                 />
               </div>
@@ -88,7 +85,6 @@ export default function AccountsPage(): JSX.Element {
                     accountsMap.type_income?.guid,
                     accountsMap.type_expense?.guid,
                   ]}
-                  selectedDate={selectedDate}
                   isExpanded={showOnboarding}
                 />
               </div>
@@ -109,29 +105,17 @@ export default function AccountsPage(): JSX.Element {
             <MonthlyTotalHistogram
               guids={accountsMap?.type_income?.childrenIds}
               title="Income"
-              interval={
-                Interval.fromDateTimes(
-                  selectedDate.minus({ months: 6 }).startOf('month'),
-                  selectedDate,
-                )
-              }
+              interval={interval}
             />
           </div>
           <div className="card col-span-8">
-            <IncomeExpenseHistogram
-              selectedDate={selectedDate}
-            />
+            <IncomeExpenseHistogram />
           </div>
           <div className="card col-span-4">
             <MonthlyTotalHistogram
               guids={accountsMap?.type_expense?.childrenIds}
               title="Expenses"
-              interval={
-                Interval.fromDateTimes(
-                  selectedDate.minus({ months: 6 }).startOf('month'),
-                  selectedDate,
-                )
-              }
+              interval={interval}
             />
           </div>
         </div>
