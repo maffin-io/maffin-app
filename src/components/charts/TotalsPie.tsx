@@ -9,13 +9,13 @@ import {
   useMainCurrency,
   usePrices,
 } from '@/hooks/api';
+import { useInterval } from '@/hooks/state';
 import { moneyToString, toFixed } from '@/helpers/number';
 
 export type TotalsPieProps = {
   guids?: string[],
   title: string,
   backgroundColor?: string[],
-  selectedDate?: DateTime,
   showTooltip?: boolean,
   showDataLabels?: boolean,
 };
@@ -24,11 +24,11 @@ export default function TotalsPie({
   title,
   guids = [],
   backgroundColor,
-  selectedDate,
   showTooltip = false,
   showDataLabels = true,
 }: TotalsPieProps): JSX.Element {
-  const { data: totals } = useAccountsTotals(selectedDate);
+  const { data: interval } = useInterval();
+  const { data: totals } = useAccountsTotals(interval.end as DateTime<true>);
   const { data: accounts } = useAccounts();
 
   const { data: currency } = useMainCurrency();
@@ -44,11 +44,11 @@ export default function TotalsPie({
       let total = totals?.[guid] || new Money(0, unit);
       const account = accounts?.find(a => a.guid === guid);
       if (account && currency && account.commodity.guid !== currency?.guid) {
-        total = convert(total, account.commodity, currency, prices, selectedDate);
+        total = convert(total, account.commodity, currency, prices, interval.end as DateTime<true>);
       }
       return total;
     });
-  }, [guids, currency, totals, unit, accounts, prices, selectedDate]);
+  }, [guids, currency, totals, unit, accounts, prices, interval.end]);
 
   const total = data.reduce(
     (t, d) => t.add(d),

@@ -4,6 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 
 import ProfileDropdown from '@/components/ProfileDropdown';
+import DateRangeInput from '@/components/DateRangeInput';
 import SaveButton from '@/components/buttons/SaveButton';
 import { AccountSelector } from '@/components/selectors';
 import ThemeButton from '@/components/buttons/ThemeButton';
@@ -30,6 +31,10 @@ export default function Topbar(): JSX.Element {
 
       <div className="col-span-9">
         <div className="flex h-full items-center justify-end">
+
+          <span className="mr-3">
+            <DateRangeInput />
+          </span>
           <div className="px-2">
             <SaveButton />
           </div>

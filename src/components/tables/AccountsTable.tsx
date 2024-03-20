@@ -10,24 +10,24 @@ import Table from '@/components/tables/Table';
 import type { AccountsMap } from '@/types/book';
 import { Account } from '@/book/entities';
 import { useAccounts, useAccountsTotals } from '@/hooks/api';
+import { useInterval } from '@/hooks/state';
 import mapAccounts from '@/helpers/mapAccounts';
 import { accountColorCode } from '@/helpers/classNames';
 
 export type AccountsTableProps = {
   guids: string[],
-  selectedDate?: DateTime,
   isExpanded?: boolean,
 };
 
 export default function AccountsTable(
   {
     guids,
-    selectedDate = DateTime.now(),
     isExpanded = false,
   }: AccountsTableProps,
 ): JSX.Element {
   const { data } = useAccounts();
-  const { data: accountsTotal } = useAccountsTotals(selectedDate);
+  const { data: interval } = useInterval();
+  const { data: accountsTotal } = useAccountsTotals(interval.end as DateTime<true>);
 
   const accounts = mapAccounts(data);
   const trees: AccountsTableRow[] = [];
@@ -37,7 +37,7 @@ export default function AccountsTable(
         accounts[guid],
         accounts,
         accountsTotal || {},
-        selectedDate,
+        interval.end as DateTime<true>,
       ));
     }
   });

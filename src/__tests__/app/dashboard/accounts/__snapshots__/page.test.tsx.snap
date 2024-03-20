@@ -13,14 +13,9 @@ exports[`AccountsPage renders as expected when no data showing onboarding 1`] = 
     >
       Dashboard
     </span>
-    <span
-      class="ml-auto mr-3"
+    <div
+      class="ml-auto"
     >
-      <div
-        data-testid="DateRangeInput"
-      />
-    </span>
-    <div>
       <div
         data-testid="FormButton"
       >

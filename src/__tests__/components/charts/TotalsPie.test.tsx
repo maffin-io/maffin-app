@@ -1,12 +1,13 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { DateTime } from 'luxon';
-import type { UseQueryResult } from '@tanstack/react-query';
+import { DateTime, Interval } from 'luxon';
+import type { DefinedUseQueryResult, UseQueryResult } from '@tanstack/react-query';
 
 import Money from '@/book/Money';
 import Pie from '@/components/charts/Pie';
 import { TotalsPie } from '@/components/charts';
 import * as apiHook from '@/hooks/api';
+import * as stateHooks from '@/hooks/state';
 import type { Account, Commodity } from '@/book/entities';
 import type { AccountsTotals } from '@/types/book';
 import type { PriceDBMap } from '@/book/prices';
@@ -20,12 +21,25 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
+jest.mock('@/hooks/state', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/state'),
+}));
+
 describe('TotalsPie', () => {
+  let interval: Interval;
+
   beforeEach(() => {
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { guid: 'eur', mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
     jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: {} } as UseQueryResult<PriceDBMap>);
+
+    interval = Interval.fromDateTimes(
+      DateTime.now().minus({ months: 6 }).startOf('month'),
+      DateTime.now().endOf('day'),
+    );
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: interval } as DefinedUseQueryResult<Interval>);
   });
 
   afterEach(() => {
@@ -251,16 +265,14 @@ describe('TotalsPie', () => {
     );
   });
 
-  it('passes selectedDate', () => {
-    const date = DateTime.fromISO('2023-01-01');
+  it('passes interval date', () => {
     render(
       <TotalsPie
         title=""
         guids={[]}
-        selectedDate={date}
       />,
     );
 
-    expect(apiHook.useAccountsTotals).toBeCalledWith(date);
+    expect(apiHook.useAccountsTotals).toBeCalledWith(interval.end);
   });
 });

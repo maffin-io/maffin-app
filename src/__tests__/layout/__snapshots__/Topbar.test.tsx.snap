@@ -18,6 +18,13 @@ exports[`Topbar renders as expected 1`] = `
       <div
         class="flex h-full items-center justify-end"
       >
+        <span
+          class="mr-3"
+        >
+          <div
+            data-testid="DateRangeInput"
+          />
+        </span>
         <div
           class="px-2"
         >

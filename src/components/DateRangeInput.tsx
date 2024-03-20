@@ -1,30 +1,22 @@
 import React from 'react';
 import Datepicker from 'react-tailwindcss-datepicker';
-import { DateTime } from 'luxon';
+import { DateTime, Interval } from 'luxon';
 
 import { useStartDate } from '@/hooks/api';
+import { useInterval } from '@/hooks/state';
+import { useQueryClient } from '@tanstack/react-query';
 
-export type DateRangeInputProps = {
-  asSingle?: boolean,
-  dateRange?: {
-    start?: DateTime,
-    end?: DateTime,
-  },
-  onChange: Function,
-};
-
-export default function DateRangeInput({
-  dateRange = {},
-  onChange,
-  asSingle = false,
-}: DateRangeInputProps): JSX.Element {
+export default function DateRangeInput(): JSX.Element {
   const { data: earliestDate } = useStartDate();
+  const queryClient = useQueryClient();
+  const { data: interval } = useInterval();
+
   const now = DateTime.now();
   const shortcuts: { [key: string]: { text: string, period: { start: Date, end: Date } } } = {
     t: {
-      text: 'Today',
+      text: 'Last 6 months',
       period: {
-        start: now.toJSDate(),
+        start: now.minus({ months: 6 }).startOf('month').toJSDate(),
         end: now.toJSDate(),
       },
     },
@@ -37,9 +29,11 @@ export default function DateRangeInput({
     const yearDiff = value as number;
     const key = now.year - yearDiff;
     shortcuts[key] = {
-      text: `End of ${now.year - yearDiff}`,
+      text: `Year ${now.year - yearDiff}`,
       period: {
-        start: now.minus({ year: yearDiff }).endOf('year').toJSDate(),
+        start: now.minus(
+          { year: yearDiff },
+        ).startOf('year').toJSDate(),
         end: now.minus({ year: yearDiff }).endOf('year').toJSDate(),
       },
     };
@@ -48,33 +42,33 @@ export default function DateRangeInput({
   return (
     <Datepicker
       value={{
-        startDate: dateRange?.start?.toJSDate() || null,
-        endDate: dateRange?.end?.toJSDate() || null,
+        startDate: interval.start?.toJSDate() || null,
+        endDate: interval.end?.toJSDate() || null,
       }}
-      asSingle={asSingle}
-      useRange={!asSingle}
       minDate={earliestDate && earliestDate.toJSDate()}
       maxDate={now.toJSDate()}
-      displayFormat="DD MMMM YYYY"
+      displayFormat="DD-MM-YYYY"
       placeholder="Select date range"
       primaryColor="cyan"
       onChange={(newValue) => {
         if (newValue) {
-          onChange({
-            start: DateTime.fromISO(newValue.startDate as string).endOf('day'),
-            end: DateTime.fromISO(newValue.endDate as string),
-          });
+          queryClient.setQueryData(
+            ['state', 'interval'],
+            Interval.fromDateTimes(
+              DateTime.fromISO(newValue.startDate as string),
+              DateTime.fromISO(newValue.endDate as string).endOf('day'),
+            ),
+          );
         }
       }}
       startWeekOn="mon"
-      separator="-"
       popoverDirection="down"
       showShortcuts
       configs={{
         shortcuts,
       }}
-      containerClassName="relative w-full text-sm"
-      inputClassName="relative transition-all duration-300 text-right py-2.5 px-4 rounded-lg tracking-wide bg-white dark:bg-dark-700"
+      containerClassName="relative text-sm"
+      inputClassName="relative transition-all duration-300 text-right py-2.5 px-4 rounded-lg tracking-wide bg-light-100 dark:bg-dark-800 w-[220px]"
       toggleClassName="hidden"
     />
   );

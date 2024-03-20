@@ -1,5 +1,4 @@
 import React from 'react';
-import { DateTime, Interval } from 'luxon';
 import type { ChartDataset } from 'chart.js';
 import {
   Chart as C,
@@ -11,6 +10,7 @@ import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
 import { useAccountsMonthlyWorth } from '@/hooks/api';
 import monthlyDates from '@/helpers/monthlyDates';
+import { useInterval } from '@/hooks/state';
 
 // We are using Bar chart here but one of the axis uses Line so
 // we have to register here or otherwise we get an error.
@@ -27,7 +27,6 @@ export type NetWorthHistogramProps = {
   liabilitiesGuid: string,
   liabilitiesLabel?: string,
   hideLiabilities?: boolean,
-  selectedDate?: DateTime,
   showLegend?: boolean,
   height?: number,
 };
@@ -39,15 +38,10 @@ export default function NetWorthHistogram({
   liabilitiesGuid,
   liabilitiesLabel = 'Liabilities',
   hideLiabilities = false,
-  selectedDate = DateTime.now(),
   showLegend = true,
   height = 400,
 }: NetWorthHistogramProps): JSX.Element {
-  const interval = Interval.fromDateTimes(
-    selectedDate.minus({ months: 6 }).startOf('month'),
-    selectedDate,
-  );
-
+  const { data: interval } = useInterval();
   const { data: monthlyWorth } = useAccountsMonthlyWorth(interval);
   const assetSeries = monthlyWorth?.map(m => m[assetsGuid]?.toNumber() || 0);
   const liabilitySeries = monthlyWorth?.map(m => m[liabilitiesGuid]?.toNumber() || 0);
