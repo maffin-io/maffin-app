@@ -1,12 +1,13 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { DateTime } from 'luxon';
-import type { UseQueryResult } from '@tanstack/react-query';
+import { DateTime, Interval } from 'luxon';
+import type { DefinedUseQueryResult, UseQueryResult } from '@tanstack/react-query';
 
 import Money from '@/book/Money';
 import Bar from '@/components/charts/Bar';
 import { NetWorthHistogram } from '@/components/charts';
 import * as apiHook from '@/hooks/api';
+import * as stateHooks from '@/hooks/state';
 import type { Commodity } from '@/book/entities';
 import type { AccountsTotals } from '@/types/book';
 
@@ -19,10 +20,23 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
+jest.mock('@/hooks/state', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/state'),
+}));
+
 describe('NetWorthHistogram', () => {
+  let interval: Interval;
+
   beforeEach(() => {
     jest.spyOn(apiHook, 'useAccountsMonthlyWorth').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals[]>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
+
+    interval = Interval.fromDateTimes(
+      DateTime.now().minus({ months: 6 }).startOf('month'),
+      DateTime.now().endOf('day'),
+    );
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: interval } as DefinedUseQueryResult<Interval>);
   });
 
   afterEach(() => {
@@ -76,7 +90,8 @@ describe('NetWorthHistogram', () => {
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
-            DateTime.fromISO('2022-12-01'),
+            expect.any(DateTime),
+            DateTime.fromISO('2023-01-01'),
           ],
         },
         options: {
@@ -217,7 +232,8 @@ describe('NetWorthHistogram', () => {
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
-            DateTime.fromISO('2022-12-01'),
+            expect.any(DateTime),
+            DateTime.fromISO('2023-01-01'),
           ],
         },
         options: {
@@ -363,7 +379,6 @@ describe('NetWorthHistogram', () => {
       <NetWorthHistogram
         assetsGuid="type_asset"
         liabilitiesGuid="type_liability"
-        selectedDate={DateTime.fromISO('2023-01-30')}
       />,
     );
 

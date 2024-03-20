@@ -47,17 +47,7 @@ export default function AccountsPage(): JSX.Element {
         <span className="title">
           Dashboard
         </span>
-        <span className="ml-auto mr-3">
-          <DateRangeInput
-            dateRange={{
-              start: selectedDate,
-              end: selectedDate,
-            }}
-            onChange={(value: { start: DateTime, end: DateTime }) => setSelectedDate(value.start)}
-            asSingle
-          />
-        </span>
-        <div>
+        <div className="ml-auto">
           <FormButton
             id="add-account"
             modalTitle="Add account"
@@ -113,7 +103,6 @@ export default function AccountsPage(): JSX.Element {
             <NetWorthHistogram
               assetsGuid="type_asset"
               liabilitiesGuid="type_liability"
-              selectedDate={selectedDate}
             />
           </div>
           <div className="card col-span-4">

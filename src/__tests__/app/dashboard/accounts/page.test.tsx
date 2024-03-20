@@ -10,7 +10,6 @@ import type { Account } from '@/book/entities';
 import AccountsPage from '@/app/dashboard/accounts/page';
 import FormButton from '@/components/buttons/FormButton';
 import AccountForm from '@/components/forms/account/AccountForm';
-import DateRangeInput from '@/components/DateRangeInput';
 import Onboarding from '@/components/onboarding/Onboarding';
 import {
   LatestTransactions,
@@ -39,10 +38,6 @@ jest.mock('@/components/forms/account/AccountForm', () => jest.fn(
 
 jest.mock('@/components/tables/AccountsTable', () => jest.fn(
   () => <div data-testid="AccountsTable" />,
-));
-
-jest.mock('@/components/DateRangeInput', () => jest.fn(
-  () => <div data-testid="DateRangeInput" />,
 ));
 
 jest.mock('@/components/charts/TotalsPie', () => jest.fn(
@@ -132,19 +127,6 @@ describe('AccountsPage', () => {
       {},
     );
 
-    await screen.findByTestId('DateRangeInput');
-    expect(DateRangeInput).toHaveBeenLastCalledWith(
-      {
-        asSingle: true,
-        dateRange: {
-          start: DateTime.fromISO('2023-01-02'),
-          end: DateTime.fromISO('2023-01-02'),
-        },
-        onChange: expect.any(Function),
-      },
-      {},
-    );
-
     await screen.findByTestId('TotalsPie');
     expect(TotalsPie).toHaveBeenLastCalledWith(
       {
@@ -169,7 +151,6 @@ describe('AccountsPage', () => {
       {
         assetsGuid: 'type_asset',
         liabilitiesGuid: 'type_liability',
-        selectedDate: DateTime.fromISO('2023-01-02'),
       },
       {},
     );
@@ -317,7 +298,6 @@ describe('AccountsPage', () => {
       {
         assetsGuid: 'type_asset',
         liabilitiesGuid: 'type_liability',
-        selectedDate: DateTime.fromISO('2023-01-02'),
       },
       {},
     );
