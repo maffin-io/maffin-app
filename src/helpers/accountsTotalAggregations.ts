@@ -15,13 +15,19 @@ import mapAccounts from './mapAccounts';
  * at that time.
  */
 export function aggregateMonthlyWorth(
-  guid: string,
+  guids: string[],
   accounts: Account[],
   monthlyTotals: AccountsTotals[],
   dates: DateTime[],
 ): AccountsTotals[] {
   const aggregatedTotals = Array.from({ length: dates.length }, () => ({}));
-  aggregateWorth(guid, mapAccounts(accounts), monthlyTotals, dates, aggregatedTotals);
+  const accountsMap = mapAccounts(accounts);
+  guids.forEach((guid: string) => {
+    if (guid in accountsMap) {
+      aggregateWorth(guid, accountsMap, monthlyTotals, dates, aggregatedTotals);
+    }
+  });
+
   return aggregatedTotals;
 }
 
@@ -33,15 +39,16 @@ function aggregateWorth(
   aggregatedTotals: AccountsTotals[],
 ) {
   const current: Account = accounts[guid];
-  current.childrenIds.forEach(childId => {
-    aggregateWorth(childId, accounts, monthlyTotals, dates, aggregatedTotals);
-  });
 
   dates.forEach((_, i) => {
     const zero = new Money(0, current.commodity?.mnemonic);
-    const previousMonth = aggregatedTotals[i - 1]?.[current.guid] || zero;
-    const currentMonth = monthlyTotals[i][current.guid] || zero;
-    aggregatedTotals[i][current.guid] = currentMonth.add(previousMonth);
+    const previousMonth = aggregatedTotals[i - 1]?.[guid] || zero;
+    const currentMonth = monthlyTotals[i]?.[guid] || zero;
+    aggregatedTotals[i][guid] = currentMonth.add(previousMonth);
+  });
+
+  current.childrenIds.forEach(childId => {
+    aggregateWorth(childId, accounts, monthlyTotals, dates, aggregatedTotals);
   });
 }
 
@@ -53,7 +60,7 @@ function aggregateWorth(
  * them accordingly.
  */
 export function aggregateChildrenTotals(
-  guid: string,
+  guids: string[],
   accounts: Account[],
   prices: PriceDBMap,
   selectedDate: DateTime,
@@ -61,17 +68,17 @@ export function aggregateChildrenTotals(
 ): AccountsTotals {
   const accountsMap = mapAccounts(accounts);
   const aggregatedTotals: AccountsTotals = {};
-  accountsMap[guid].childrenIds.forEach((childId: string) => {
-    aggregateTotals(
-      childId,
-      accountsMap,
-      prices,
-      selectedDate,
-      totals,
-      aggregatedTotals,
-    );
-
-    aggregatedTotals[`type_${accountsMap[childId].type.toLowerCase()}`] = aggregatedTotals[childId];
+  guids.forEach((guid: string) => {
+    if (guid in accountsMap) {
+      aggregateTotals(
+        guid,
+        accountsMap,
+        prices,
+        selectedDate,
+        totals,
+        aggregatedTotals,
+      );
+    }
   });
 
   return aggregatedTotals;
@@ -99,6 +106,12 @@ function aggregateTotals(
       ),
     );
   });
+
+  // This is kind of a hack to be able to access root asset/liability
+  // accounts for global networth, etc. We should find a better way.
+  if (accounts[current.parentId].type === 'ROOT') {
+    aggregatedTotals[`type_${accounts[current.guid].type.toLowerCase()}`] = aggregatedTotals[current.guid];
+  }
 
   return aggregatedTotals[current.guid];
 }

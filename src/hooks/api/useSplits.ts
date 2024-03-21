@@ -3,18 +3,19 @@ import {
   useQuery,
   UseQueryResult,
 } from '@tanstack/react-query';
-import type { FindOptionsWhere } from 'typeorm';
+import { Between, FindOptionsWhere } from 'typeorm';
 import { DateTime, Interval } from 'luxon';
 
 import { Split } from '@/book/entities';
 import type { Account } from '@/book/entities';
-import { getAccountsTotals, getMonthlyTotals } from '@/lib/queries';
+import { getMonthlyTotals } from '@/lib/queries';
 import type { PriceDBMap } from '@/book/prices';
 import type { AccountsTotals } from '@/types/book';
 import { aggregateChildrenTotals, aggregateMonthlyWorth } from '@/helpers/accountsTotalAggregations';
 import monthlyDates from '@/helpers/monthlyDates';
 import { useAccounts } from './useAccounts';
 import { usePrices } from './usePrices';
+import { useBalanceSheet } from './reports';
 import fetcher from './fetcher';
 
 /**
@@ -69,27 +70,44 @@ export function useSplits(
  */
 export function useSplitsPagination(
   account: string,
+  interval: Interval,
   pagination: { pageSize: number, pageIndex: number } = { pageSize: 10, pageIndex: 0 },
 ): UseQueryResult<Split[]> {
-  const queryKey = [...Split.CACHE_KEY, account, 'page', pagination];
+  const queryKey = [
+    ...Split.CACHE_KEY,
+    account,
+    'page',
+    { ...pagination, interval: interval.toISODate() },
+  ];
   const result = useQuery({
     queryKey,
     queryFn: fetcher(
-      async () => Split.getRepository().createQueryBuilder('splits')
-        .select([
-          'splits',
-          'tx.date',
-          'tx.guid',
-          'SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) OVER (ORDER BY tx.post_date, tx.enter_date) AS splits_balance',
-        ])
-        .leftJoin('splits.fk_transaction', 'tx', 'splits.tx_guid = tx.guid')
-        .where('splits.account_guid = :account_guid', { account_guid: account })
-        .orderBy('tx.post_date', 'DESC')
-        .addOrderBy('tx.enter_date', 'DESC')
-        .addOrderBy('splits.quantity_num', 'ASC')
-        .limit(pagination.pageSize)
-        .offset(pagination.pageSize * pagination.pageIndex)
-        .getMany(),
+      async () => {
+        const r = await Split.getRepository().createQueryBuilder('splits')
+          .select('COALESCE(SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom), 0)', 'totalSum')
+          .leftJoin('splits.fk_transaction', 'tx')
+          .where('splits.account_guid = :account_guid', { account_guid: account })
+          .andWhere('tx.post_date < :start', { start: interval.start?.toSQLDate() })
+          .getRawOne();
+
+        return Split.getRepository().createQueryBuilder('splits')
+          .select([
+            'splits',
+            'tx.date',
+            'tx.guid',
+            `SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) OVER (ORDER BY tx.post_date, tx.enter_date) + ${r.totalSum} AS splits_balance`,
+          ])
+          .leftJoin('splits.fk_transaction', 'tx', 'splits.tx_guid = tx.guid')
+          .where('splits.account_guid = :account_guid', { account_guid: account })
+          .andWhere('tx.post_date >= :start', { start: interval.start?.toSQLDate() })
+          .andWhere('tx.post_date <= :end', { end: interval.end?.toSQLDate() })
+          .orderBy('tx.post_date', 'DESC')
+          .addOrderBy('tx.enter_date', 'DESC')
+          .addOrderBy('splits.quantity_num', 'ASC')
+          .limit(pagination.pageSize)
+          .offset(pagination.pageSize * pagination.pageIndex)
+          .getMany();
+      },
       queryKey,
     ),
     networkMode: 'always',
@@ -103,96 +121,22 @@ export function useSplitsPagination(
  */
 export function useSplitsCount(
   account: string,
+  interval: Interval,
 ): UseQueryResult<number> {
-  const queryKey = [...Split.CACHE_KEY, account, 'count'];
+  const queryKey = [...Split.CACHE_KEY, account, 'count', { interval: interval.toISODate() }];
   const result = useQuery({
     queryKey,
     queryFn: fetcher(
-      async () => Split.count({ where: { fk_account: { guid: account } } }),
+      async () => Split.count({
+        where: {
+          fk_account: { guid: account },
+          fk_transaction: {
+            date: Between(interval.start, interval.end),
+          },
+        },
+      }),
       queryKey,
     ),
-    networkMode: 'always',
-  });
-
-  return result;
-}
-
-/**
- * Calculates total sum of split quantities for a given account
- */
-export function useAccountTotal(
-  account: string,
-  selectedDate: DateTime = DateTime.now(),
-): UseQueryResult<number> {
-  const queryKey = [...Split.CACHE_KEY, account, 'total', selectedDate.toISODate()];
-  const result = useQuery({
-    queryKey,
-    queryFn: fetcher(
-      async () => {
-        const r = await Split.query(`
-          SELECT
-            SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) as total
-          FROM splits
-          JOIN transactions as tx ON splits.tx_guid = tx.guid
-          WHERE splits.account_guid = :guid
-            AND post_date <= '${selectedDate.toSQLDate()}'
-        `, [account]);
-        return r[0].total;
-      },
-      queryKey,
-    ),
-    networkMode: 'always',
-  });
-
-  return result;
-}
-
-/**
- * Calculates the total for each existing account. The total is calculated
- * by accumulating the splits for each account. The total of each account
- * is in the commodity of the account
- *
- * By default, it aggregates the splits of the children into their parent but an
- * optional select parameter can be passed to change that behavior.
- */
-export function useAccountsTotals(
-  selectedDate: DateTime = DateTime.now(),
-  select?: (data: AccountsTotals) => AccountsTotals,
-): UseQueryResult<AccountsTotals> {
-  const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
-  const { data: prices, dataUpdatedAt: pricesUpdatedAt } = usePrices({});
-
-  const aggregate = React.useCallback(
-    ((data: AccountsTotals) => aggregateChildrenTotals(
-      'type_root',
-      accounts as Account[],
-      prices as PriceDBMap,
-      selectedDate,
-      data,
-    )),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [accountsUpdatedAt, pricesUpdatedAt, selectedDate.toISODate()],
-  );
-
-  const queryKey = [
-    ...Split.CACHE_KEY,
-    {
-      aggregation: 'total',
-      date: selectedDate.toISODate(),
-      accountsUpdatedAt,
-    },
-  ];
-  const result = useQuery({
-    queryKey,
-    queryFn: fetcher(
-      async () => getAccountsTotals(
-        accounts as Account[],
-        selectedDate,
-      ),
-      queryKey,
-    ),
-    enabled: !!accounts,
-    select: select || aggregate,
     networkMode: 'always',
   });
 
@@ -206,12 +150,8 @@ export function useAccountsTotals(
  * exchange rate for that month
  */
 export function useAccountsMonthlyTotal(
-  interval?: Interval,
+  interval: Interval,
 ): UseQueryResult<AccountsTotals[]> {
-  interval = interval || Interval.fromDateTimes(
-    DateTime.now().minus({ month: 6 }).startOf('month'),
-    DateTime.now(),
-  );
   const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
   const { data: prices, dataUpdatedAt: pricesUpdatedAt } = usePrices({});
 
@@ -220,7 +160,7 @@ export function useAccountsMonthlyTotal(
       const dates = monthlyDates(interval as Interval).map(d => d.endOf('month'));
       dates[dates.length - 1] = (interval as Interval).end as DateTime;
       return data.map((d, i) => aggregateChildrenTotals(
-        'type_root',
+        ['type_income', 'type_expense'],
         accounts as Account[],
         prices as PriceDBMap,
         dates[i],
@@ -235,7 +175,7 @@ export function useAccountsMonthlyTotal(
     ...Split.CACHE_KEY,
     {
       aggregation: 'monthly-total',
-      dates: interval.toISODate(),
+      interval: interval.toISODate(),
       accountsUpdatedAt,
     },
   ];
@@ -265,17 +205,12 @@ export function useAccountsMonthlyTotal(
  * exchange rate for each respective month
  */
 export function useAccountsMonthlyWorth(
-  interval?: Interval,
+  interval: Interval,
 ): UseQueryResult<AccountsTotals[]> {
-  interval = interval
-    || Interval.fromDateTimes(
-      DateTime.now().minus({ month: 6 }).startOf('month'),
-      DateTime.now(),
-    );
   const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
   const { data: prices, dataUpdatedAt: pricesUpdatedAt } = usePrices({});
-  const { data: totals, dataUpdatedAt: totalsUpdatedAt } = useAccountsTotals(
-    (interval.start as DateTime).endOf('month') as DateTime,
+  const { data: totals, dataUpdatedAt: totalsUpdatedAt } = useBalanceSheet(
+    interval.start?.endOf('month') as DateTime<true>,
     (data) => data,
   );
 
@@ -284,7 +219,7 @@ export function useAccountsMonthlyWorth(
       const dates = monthlyDates(interval as Interval).map(d => d.endOf('month'));
       dates[dates.length - 1] = (interval as Interval).end as DateTime;
       const aggregated = aggregateMonthlyWorth(
-        'type_root',
+        ['type_asset', 'type_liability'],
         accounts as Account[],
         [
           totals as AccountsTotals,
@@ -293,7 +228,7 @@ export function useAccountsMonthlyWorth(
         dates,
       );
       return aggregated.map((d, i) => aggregateChildrenTotals(
-        'type_root',
+        ['type_asset', 'type_liability'],
         accounts as Account[],
         prices as PriceDBMap,
         dates[i],
@@ -308,7 +243,7 @@ export function useAccountsMonthlyWorth(
     ...Split.CACHE_KEY,
     {
       aggregation: 'monthly-worth',
-      dates: interval.toISODate(),
+      interval: interval.toISODate(),
       totalsUpdatedAt,
       accountsUpdatedAt,
     },
@@ -341,12 +276,8 @@ export function useAccountsMonthlyWorth(
  */
 export function useCashFlow(
   account: string,
-  interval?: Interval,
+  interval: Interval,
 ): UseQueryResult<{ guid: string, total: number, type: string, name: string }[]> {
-  interval = interval || Interval.fromDateTimes(
-    DateTime.now().startOf('month'),
-    DateTime.now(),
-  );
   const result = useQuery({
     queryKey: [...Split.CACHE_KEY, account, 'cashflow', interval.toISODate()],
     queryFn: () => Split.query(`

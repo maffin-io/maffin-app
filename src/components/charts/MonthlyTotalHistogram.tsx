@@ -1,5 +1,5 @@
 import React from 'react';
-import { DateTime, Interval } from 'luxon';
+import { Interval } from 'luxon';
 import type { ChartDataset } from 'chart.js';
 
 import Bar from '@/components/charts/Bar';
@@ -10,7 +10,7 @@ import monthlyDates from '@/helpers/monthlyDates';
 
 export type MonthlyTotalHistogramProps = {
   title?: string,
-  interval?: Interval,
+  interval: Interval,
   guids: string[],
 };
 
@@ -19,24 +19,16 @@ export default function MonthlyTotalHistogram({
   title,
   guids = [],
 }: MonthlyTotalHistogramProps): JSX.Element {
-  interval = interval || Interval.fromDateTimes(
-    DateTime.now().minus({ months: 6 }).startOf('month'),
-    DateTime.now(),
-  );
   const { data: monthlyTotals } = useAccountsMonthlyTotal(interval);
   const { data: accounts } = useAccounts();
 
   const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
 
-  const dates = monthlyDates(interval);
   const datasets: ChartDataset<'bar'>[] = [];
-
   if (accounts && monthlyTotals) {
     guids.forEach(guid => {
-      const data = dates.map((_, i) => (
-        monthlyTotals[i][guid]?.toNumber() || 0
-      ));
+      const data = monthlyTotals?.map(m => (m[guid]?.toNumber() || 0));
       if (!data.every(v => v === 0)) {
         datasets.push({
           label: (accounts.find(a => a.guid === guid) as Account).name,
@@ -50,7 +42,7 @@ export default function MonthlyTotalHistogram({
     <Bar
       height="400"
       data={{
-        labels: dates,
+        labels: monthlyDates(interval),
         datasets,
       }}
       options={{

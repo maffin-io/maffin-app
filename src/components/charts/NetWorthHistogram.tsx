@@ -102,7 +102,7 @@ export default function NetWorthHistogram({
       <Bar
         height={height}
         data={{
-          labels: monthlyDates(interval),
+          labels: monthlyDates(interval).map(d => d.startOf('month')),
           datasets,
         }}
         options={{
@@ -128,9 +128,6 @@ export default function NetWorthHistogram({
               },
               grid: {
                 display: false,
-              },
-              ticks: {
-                align: 'center',
               },
             },
             y: {

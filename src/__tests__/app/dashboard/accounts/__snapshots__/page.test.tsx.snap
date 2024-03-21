@@ -8,11 +8,18 @@ exports[`AccountsPage renders as expected when no data showing onboarding 1`] = 
   <div
     class="header"
   >
-    <span
-      class="title"
-    >
-      Dashboard
-    </span>
+    <div>
+      <p
+        class="title"
+      >
+        Your journey
+      </p>
+      <p
+        class="italic"
+      >
+        July 1, 2022 – January 1, 2023
+      </p>
+    </div>
     <div
       class="ml-auto"
     >

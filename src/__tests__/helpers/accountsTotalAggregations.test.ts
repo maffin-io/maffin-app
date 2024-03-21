@@ -78,7 +78,7 @@ describe('accountsTotalAggregations', () => {
       ];
 
       const aggregated = aggregateMonthlyWorth(
-        'root',
+        ['a1', 'a2', 'a3', 'a4'],
         accounts,
         monthlyTotals,
         [
@@ -87,9 +87,6 @@ describe('accountsTotalAggregations', () => {
           DateTime.now(),
         ],
       );
-
-      expect(aggregated[0].root.toString()).toEqual('0.00 undefined');
-      expect(aggregated[1].root.toString()).toEqual('0.00 undefined');
 
       expect(aggregated[0].a1.toString()).toEqual('100.00 EUR');
       expect(aggregated[1].a1.toString()).toEqual('300.00 EUR');
@@ -110,7 +107,7 @@ describe('accountsTotalAggregations', () => {
   describe('aggregateChildrenTotals', () => {
     it('creates default account type entries', () => {
       const totals = aggregateChildrenTotals(
-        'root',
+        ['a1', 'a2', 'a3', 'a4'],
         accounts,
         {} as PriceDBMap,
         DateTime.now(),
@@ -148,7 +145,7 @@ describe('accountsTotalAggregations', () => {
         a6: new Money(200, 'EUR'),
       };
       const aggregatedTotals = aggregateChildrenTotals(
-        'root',
+        ['a4'],
         accounts,
         {} as PriceDBMap,
         DateTime.now(),
@@ -199,7 +196,7 @@ describe('accountsTotalAggregations', () => {
       ] as Price[];
 
       const totals = aggregateChildrenTotals(
-        'root',
+        ['a4'],
         accounts,
         new PriceDBMap(prices),
         DateTime.now(),
@@ -257,7 +254,7 @@ describe('accountsTotalAggregations', () => {
       ] as Price[];
 
       const totals = aggregateChildrenTotals(
-        'root',
+        ['a4'],
         accounts,
         new PriceDBMap(prices),
         DateTime.now().minus({ month: 1 }),
@@ -333,7 +330,7 @@ describe('accountsTotalAggregations', () => {
       ] as Price[];
 
       const totals = aggregateChildrenTotals(
-        'root',
+        ['a1'],
         accounts,
         new PriceDBMap(prices),
         DateTime.now(),
@@ -350,7 +347,7 @@ describe('accountsTotalAggregations', () => {
     });
 
     it('works with children without totals', () => {
-      accounts[4].childrenIds = ['a5'];
+      accounts[1].childrenIds = ['a5'];
       accounts = [
         ...accounts,
         {
@@ -363,7 +360,7 @@ describe('accountsTotalAggregations', () => {
       ];
 
       const totals = aggregateChildrenTotals(
-        'root',
+        ['a1'],
         accounts,
         {} as PriceDBMap,
         DateTime.now(),

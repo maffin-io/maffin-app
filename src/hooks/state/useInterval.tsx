@@ -4,17 +4,18 @@ import type { DefinedUseQueryResult } from '@tanstack/react-query';
 
 /**
  * Controls the interval set by the user. If no interval selected,
- * it defaults to last 6 months.
+ * it defaults to last 6-7 months (depending on the start day the user
+ * selects it will include a partial month)
  */
 export function useInterval(): DefinedUseQueryResult<Interval> {
   const result = useQuery<Interval>({
     queryKey: ['state', 'interval'],
     queryFn: () => Interval.fromDateTimes(
-      DateTime.now().minus({ months: 6 }).startOf('month'),
+      DateTime.now().minus({ months: 5 }).startOf('month'),
       DateTime.now().endOf('day'),
     ),
     initialData: Interval.fromDateTimes(
-      DateTime.now().minus({ months: 6 }).startOf('month'),
+      DateTime.now().minus({ months: 5 }).startOf('month'),
       DateTime.now().endOf('day'),
     ),
     gcTime: Infinity,

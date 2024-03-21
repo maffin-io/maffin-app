@@ -75,17 +75,10 @@ jest.mock('@/components/Loading', () => jest.fn(
 ));
 
 describe('AccountsPage', () => {
-  let interval: Interval;
-
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02') as DateTime<true>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
-
-    interval = Interval.fromDateTimes(
-      DateTime.now().minus({ months: 6 }).startOf('month'),
-      DateTime.now().endOf('day'),
-    );
-    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: interval } as DefinedUseQueryResult<Interval>);
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
   });
 
   afterEach(() => {
@@ -172,7 +165,7 @@ describe('AccountsPage', () => {
       {
         title: 'Income',
         accounts: undefined,
-        interval,
+        interval: TEST_INTERVAL,
       },
       {},
     );
@@ -181,7 +174,7 @@ describe('AccountsPage', () => {
       {
         title: 'Expenses',
         accounts: undefined,
-        interval,
+        interval: TEST_INTERVAL,
       },
       {},
     );
@@ -301,7 +294,7 @@ describe('AccountsPage', () => {
       1,
       {
         title: 'Income',
-        interval,
+        interval: TEST_INTERVAL,
         guids: [accounts[4].guid],
       },
       {},
@@ -310,7 +303,7 @@ describe('AccountsPage', () => {
       2,
       {
         title: 'Expenses',
-        interval,
+        interval: TEST_INTERVAL,
         guids: [accounts[2].guid],
       },
       {},

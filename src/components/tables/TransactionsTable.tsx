@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-table';
 import classNames from 'classnames';
 import Link from 'next/link';
+import { DateTime } from 'luxon';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { BiEdit, BiXCircle } from 'react-icons/bi';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
@@ -21,6 +22,7 @@ import {
   Transaction,
 } from '@/book/entities';
 import { useAccounts, useSplitsCount, useSplitsPagination } from '@/hooks/api';
+import { useInterval } from '@/hooks/state';
 import type { Commodity } from '@/book/entities';
 import { accountColorCode } from '@/helpers/classNames';
 import fetcher from '@/hooks/api/fetcher';
@@ -36,8 +38,10 @@ export default function TransactionsTable({
     pageIndex: 0,
     pageSize: 10,
   });
-  const { data: splitsCount } = useSplitsCount(account.guid);
-  const { data: splits } = useSplitsPagination(account.guid, { pageSize, pageIndex });
+  const { data: interval } = useInterval();
+  const { data: splitsCount } = useSplitsCount(account.guid, interval);
+  const { data: splits } = useSplitsPagination(account.guid, interval, { pageSize, pageIndex });
+  console.log(splits);
 
   columns[3].cell = AmountPartial(account);
   columns[4].cell = TotalPartial(account);
@@ -78,7 +82,7 @@ const columns: ColumnDef<Split>[] = [
           data-tooltip-id={row.original.txId}
           data-tooltip-content={row.original.txId}
         >
-          {row.original.transaction.date.toISODate()}
+          {row.original.transaction.date.toLocaleString(DateTime.DATE_SHORT)}
         </span>
         <Tooltip clickable id={row.original.txId} />
       </>
@@ -100,7 +104,7 @@ const columns: ColumnDef<Split>[] = [
     enableSorting: false,
   },
   {
-    header: 'Total',
+    header: 'Balance',
     enableSorting: false,
   },
   {
@@ -194,6 +198,7 @@ function TotalPartial(
   account: Account,
 ) {
   return function TotalCell({ row }: CellContext<Split, unknown>): JSX.Element {
+    console.log(row.original);
     return (
       <span>
         {new Money(row.original.balance, account.commodity.mnemonic).format()}
