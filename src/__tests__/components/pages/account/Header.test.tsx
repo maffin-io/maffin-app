@@ -18,6 +18,11 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
+jest.mock('@/hooks/state', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/state'),
+}));
+
 jest.mock('@/components/buttons/FormButton', () => jest.fn(
   (props: React.PropsWithChildren) => (
     <div data-testid="FormButton">

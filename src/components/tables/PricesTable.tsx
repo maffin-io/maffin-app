@@ -1,5 +1,6 @@
 import React from 'react';
-import { ColumnDef } from '@tanstack/react-table';
+import { DateTime } from 'luxon';
+import type { ColumnDef } from '@tanstack/react-table';
 import { BiEdit, BiXCircle } from 'react-icons/bi';
 
 import { Tooltip } from '@/components/tooltips';
@@ -46,7 +47,7 @@ const columns: ColumnDef<Price>[] = [
           data-tooltip-id={row.original.guid}
           data-tooltip-content={row.original.guid}
         >
-          {row.original.date.toISODate()}
+          {row.original.date.toLocaleString(DateTime.DATE_SHORT)}
         </span>
         <Tooltip clickable id={row.original.guid} />
       </>
