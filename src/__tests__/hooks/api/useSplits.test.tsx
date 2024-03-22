@@ -8,8 +8,6 @@ import {
   useSplits,
   useSplitsCount,
   useSplitsPagination,
-  useAccountTotal,
-  useAccountsTotals,
   useAccountsMonthlyTotal,
   useAccountsMonthlyWorth,
   useCashFlow,
@@ -135,7 +133,7 @@ describe('useSplits', () => {
 
     it('calls query as expected', async () => {
       const { result } = renderHook(
-        () => useSplitsPagination('guid', { pageIndex: 0, pageSize: 1 }),
+        () => useSplitsPagination('guid', TEST_INTERVAL, { pageIndex: 0, pageSize: 1 }),
         { wrapper },
       );
 
@@ -177,146 +175,6 @@ describe('useSplits', () => {
     });
   });
 
-  describe('useAccountTotal', () => {
-    beforeEach(async () => {
-      const commodity = await Commodity.create({
-        mnemonic: 'EUR',
-        namespace: 'CURRENCY',
-      }).save();
-
-      const account2 = await Account.create({
-        name: 'Bank',
-        fk_commodity: commodity,
-        parent: account1,
-        type: 'ASSET',
-      }).save();
-
-      await Transaction.create({
-        fk_currency: commodity,
-        description: 'description',
-        date: DateTime.now().minus({ day: 1 }),
-        splits: [
-          split1,
-          Split.create({
-            fk_account: account2,
-            valueNum: -50,
-            valueDenom: 1,
-            quantityNum: -100,
-            quantityDenom: 1,
-          }),
-        ],
-      }).save();
-    });
-
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-
-    it('calls query as expected', async () => {
-      const { result } = renderHook(
-        () => useAccountTotal('guid'),
-        { wrapper },
-      );
-
-      await waitFor(() => expect(result.current.status).toEqual('success'));
-      expect(result.current.data).toEqual(100);
-
-      const queryCache = queryClient.getQueryCache().getAll();
-      expect(queryCache).toHaveLength(1);
-      expect(queryCache[0].queryKey).toEqual(
-        ['api', 'splits', 'guid', 'total', '2023-01-01'],
-      );
-    });
-  });
-
-  describe('useAccountsTotals', () => {
-    beforeEach(() => {
-      jest.spyOn(useAccountsHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
-      jest.spyOn(usePricesHook, 'usePrices').mockReturnValue({ data: {} } as UseQueryResult<PriceDBMap>);
-      jest.spyOn(queries, 'getAccountsTotals').mockResolvedValue({
-        type_asset: new Money(0, 'EUR'),
-      } as AccountsTotals);
-      jest.spyOn(aggregations, 'aggregateChildrenTotals').mockReturnValue({
-        type_asset: new Money(0, 'EUR'),
-      } as AccountsTotals);
-    });
-
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-
-    it('is pending when no accounts/prices', async () => {
-      const { result } = renderHook(
-        () => useAccountsTotals(DateTime.fromISO('2023-01-01')),
-        { wrapper },
-      );
-
-      await waitFor(() => expect(result.current.status).toEqual('pending'));
-
-      const queryCache = queryClient.getQueryCache().getAll();
-      expect(queryCache).toHaveLength(1);
-      expect(queryCache[0].queryKey).toEqual(
-        ['api', 'splits', { aggregation: 'total', date: '2023-01-01' }],
-      );
-      expect(aggregations.aggregateChildrenTotals).not.toBeCalled();
-    });
-
-    it('calls query as expected', async () => {
-      jest.spyOn(useAccountsHook, 'useAccounts').mockReturnValue({
-        data: [] as Account[],
-        dataUpdatedAt: 1,
-      } as UseQueryResult<Account[]>);
-
-      const { result } = renderHook(
-        () => useAccountsTotals(DateTime.fromISO('2023-01-01')),
-        { wrapper },
-      );
-
-      await waitFor(() => expect(result.current.status).toEqual('success'));
-      const queryCache = queryClient.getQueryCache().getAll();
-      expect(queryCache[0].queryKey).toEqual(
-        [
-          'api',
-          'splits',
-          {
-            aggregation: 'total',
-            date: '2023-01-01',
-            accountsUpdatedAt: 1,
-          }],
-      );
-
-      expect(useAccountsHook.useAccounts).toBeCalledWith();
-      expect(usePricesHook.usePrices).toBeCalledWith({});
-      expect(queries.getAccountsTotals).toBeCalledWith([], DateTime.fromISO('2023-01-01'));
-      expect(result.current.data?.type_asset.toString()).toEqual('0.00 EUR');
-      expect(aggregations.aggregateChildrenTotals).toBeCalledWith(
-        'type_root',
-        [],
-        {},
-        DateTime.now(),
-        { type_asset: expect.any(Money) },
-      );
-    });
-
-    it('uses alternative select', async () => {
-      jest.spyOn(useAccountsHook, 'useAccounts').mockReturnValue({
-        data: [] as Account[],
-        dataUpdatedAt: 1,
-      } as UseQueryResult<Account[]>);
-
-      const mockSelect = jest.fn();
-      const { result } = renderHook(
-        () => useAccountsTotals(DateTime.fromISO('2023-01-01'), mockSelect),
-        { wrapper },
-      );
-
-      await waitFor(() => expect(result.current.status).toEqual('success'));
-
-      expect(aggregations.aggregateChildrenTotals).not.toBeCalled();
-      expect(mockSelect).toBeCalledWith({ type_asset: expect.any(Money) });
-    });
-  });
-
   describe('useAccountsMonthlyTotal', () => {
     beforeEach(() => {
       jest.spyOn(useAccountsHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
@@ -342,7 +200,7 @@ describe('useSplits', () => {
 
     it('is pending when no accounts', async () => {
       const { result } = renderHook(
-        () => useAccountsMonthlyTotal(),
+        () => useAccountsMonthlyTotal(TEST_INTERVAL),
         { wrapper },
       );
 
@@ -356,7 +214,7 @@ describe('useSplits', () => {
           'splits',
           {
             aggregation: 'monthly-total',
-            dates: '2022-07-01/2023-01-01',
+            interval: TEST_INTERVAL.toISODate(),
           },
         ],
       );
@@ -368,12 +226,8 @@ describe('useSplits', () => {
         dataUpdatedAt: 1,
       } as UseQueryResult<Account[]>);
 
-      const interval = Interval.fromDateTimes(
-        DateTime.now().minus({ months: 10 }),
-        DateTime.now().minus({ months: 8 }),
-      );
       const { result } = renderHook(
-        () => useAccountsMonthlyTotal(interval),
+        () => useAccountsMonthlyTotal(TEST_INTERVAL),
         { wrapper },
       );
 
@@ -385,31 +239,33 @@ describe('useSplits', () => {
           'splits',
           {
             aggregation: 'monthly-total',
-            dates: '2022-03-01/2022-05-01',
+            interval: TEST_INTERVAL.toISODate(),
             accountsUpdatedAt: 1,
           }],
       );
 
       expect(useAccountsHook.useAccounts).toBeCalledWith();
       expect(usePricesHook.usePrices).toBeCalledWith({});
-      expect(queries.getMonthlyTotals).toBeCalledWith([], interval);
+      expect(queries.getMonthlyTotals).toBeCalledWith([], TEST_INTERVAL);
       expect(result.current.data?.[0].type_asset.toString()).toEqual('400.00 EUR');
 
+      // Although we pass an interval, given we only have two datapoints,
+      // it calculates only for the first two
       expect(aggregations.aggregateChildrenTotals).toBeCalledTimes(2);
       expect(aggregations.aggregateChildrenTotals).toBeCalledWith(
-        'type_root',
+        ['type_income', 'type_expense'],
         [],
         {},
-        interval.start?.endOf('month'),
+        TEST_INTERVAL.start?.endOf('month'),
         {
           type_asset: expect.any(Money),
         },
       );
       expect(aggregations.aggregateChildrenTotals).toBeCalledWith(
-        'type_root',
+        ['type_income', 'type_expense'],
         [],
         {},
-        interval.end,
+        TEST_INTERVAL.start?.plus({ month: 1 }).endOf('month'),
         {
           type_asset: expect.any(Money),
         },
@@ -447,7 +303,7 @@ describe('useSplits', () => {
 
     it('is pending when no accounts', async () => {
       const { result } = renderHook(
-        () => useAccountsMonthlyWorth(),
+        () => useAccountsMonthlyWorth(TEST_INTERVAL),
         { wrapper },
       );
 
@@ -455,14 +311,14 @@ describe('useSplits', () => {
 
       const queryCache = queryClient.getQueryCache().getAll();
       expect(queryCache).toHaveLength(2);
-      // this hook depends on the useAccountsTotals hook
+      // this hook depends on the useBalanceSheet hook
       expect(queryCache[0].queryKey).toEqual(
         [
           'api',
           'splits',
           {
-            aggregation: 'total',
-            date: '2022-07-31',
+            aggregation: 'balance-sheet',
+            date: TEST_INTERVAL.start?.endOf('month').toISODate(),
           },
         ],
       );
@@ -472,7 +328,7 @@ describe('useSplits', () => {
           'splits',
           {
             aggregation: 'monthly-worth',
-            dates: '2022-07-01/2023-01-01',
+            interval: TEST_INTERVAL.toISODate(),
             totalsUpdatedAt: 0,
           },
         ],
@@ -488,16 +344,13 @@ describe('useSplits', () => {
         type_asset: new Money(500, 'EUR'),
       } as AccountsTotals);
 
-      const interval = Interval.fromDateTimes(
-        DateTime.now().minus({ months: 10 }),
-        DateTime.now().minus({ months: 8 }),
-      );
       const { result } = renderHook(
-        () => useAccountsMonthlyWorth(interval),
+        () => useAccountsMonthlyWorth(TEST_INTERVAL),
         { wrapper },
       );
 
       await waitFor(() => expect(result.current.status).toEqual('success'));
+      expect(result.current.data?.[0].type_asset.toString()).toEqual('1000.00 EUR');
       const queryCache = queryClient.getQueryCache().getAll();
       expect(queryCache[1].queryKey).toEqual(
         [
@@ -505,7 +358,7 @@ describe('useSplits', () => {
           'splits',
           {
             aggregation: 'monthly-worth',
-            dates: '2022-03-01/2022-05-01',
+            interval: TEST_INTERVAL.toISODate(),
             accountsUpdatedAt: 1,
             totalsUpdatedAt: 0,
           }],
@@ -513,19 +366,11 @@ describe('useSplits', () => {
 
       expect(useAccountsHook.useAccounts).toBeCalledWith();
       expect(usePricesHook.usePrices).toBeCalledWith({});
-      expect(queries.getMonthlyTotals).toBeCalledWith(
-        [],
-        Interval.fromDateTimes(
-          // +1 month because initial month is computed with useAccountsTotals
-          (interval.start as DateTime).plus({ month: 1 }),
-          interval.end as DateTime,
-        ),
-      );
-      expect(result.current.data?.[0].type_asset.toString()).toEqual('1000.00 EUR');
+      expect(queries.getMonthlyTotals).toBeCalledWith([], TEST_INTERVAL);
 
       expect(aggregations.aggregateMonthlyWorth).toBeCalledTimes(1);
       expect(aggregations.aggregateMonthlyWorth).toBeCalledWith(
-        'type_root',
+        ['type_asset', 'type_liability'],
         [],
         [
           {
@@ -536,8 +381,14 @@ describe('useSplits', () => {
           },
         ],
         [
-          interval.start?.endOf('month'),
-          interval.end,
+          // For calculating the balance for a month, we use the last day of the month
+          TEST_INTERVAL.start?.endOf('month'),
+          expect.any(DateTime),
+          expect.any(DateTime),
+          expect.any(DateTime),
+          expect.any(DateTime),
+          expect.any(DateTime),
+          TEST_INTERVAL.end,
         ],
       );
       expect(
@@ -547,21 +398,23 @@ describe('useSplits', () => {
         (aggregations.aggregateMonthlyWorth as jest.Mock).mock.calls[0][2][1].type_asset.toString(),
       ).toEqual('200.00 EUR');
 
+      // Although we pass an interval, given we only have two datapoints,
+      // it calculates only for the first two
       expect(aggregations.aggregateChildrenTotals).toBeCalledTimes(2);
       expect(aggregations.aggregateChildrenTotals).toBeCalledWith(
-        'type_root',
+        ['type_asset', 'type_liability'],
         [],
         {},
-        interval.start?.endOf('month'),
+        TEST_INTERVAL.start?.endOf('month'),
         {
           type_asset: expect.any(Money),
         },
       );
       expect(aggregations.aggregateChildrenTotals).toBeCalledWith(
-        'type_root',
+        ['type_asset', 'type_liability'],
         [],
         {},
-        interval.end,
+        TEST_INTERVAL.start?.plus({ month: 1 }).endOf('month'),
         {
           type_asset: expect.any(Money),
         },

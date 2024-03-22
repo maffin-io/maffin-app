@@ -1,7 +1,9 @@
 import React from 'react';
 import { DateTime, Interval } from 'luxon';
+import { BiCalendar } from 'react-icons/bi';
 
 import { useMainCurrency, useCashFlow } from '@/hooks/api';
+import { useInterval } from '@/hooks/state';
 import type { Account } from '@/book/entities';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import { moneyToString } from '@/helpers/number';
@@ -14,35 +16,36 @@ export default function EarnWidget({
   account,
 }: EarnWidgetProps): JSX.Element {
   const { data: currency } = useMainCurrency();
-  const { data: cashflow0 } = useCashFlow(account.guid);
-  const { data: cashflow1 } = useCashFlow(
+  const { data: interval } = useInterval();
+  const { data: periodCashflow } = useCashFlow(account.guid, interval);
+  const periodEarn = periodCashflow?.filter(c => c.total < 0).reduce(
+    (total, c) => c.total + total,
+    0,
+  ) || 0;
+
+  const { data: currentMonthCashflow } = useCashFlow(
     account.guid,
     Interval.fromDateTimes(
-      DateTime.now().minus({ month: 1 }).startOf('month'),
-      DateTime.now().minus({ month: 1 }).endOf('month'),
+      DateTime.now().startOf('month'),
+      DateTime.now(),
     ),
   );
-  const totalEarn0 = Math.abs(cashflow0?.filter(c => c.type === 'INCOME').reduce(
+  const monthEarn = currentMonthCashflow?.filter(c => c.total < 0).reduce(
     (total, c) => c.total + total,
     0,
-  ) || 0);
-  const totalEarn1 = Math.abs(cashflow1?.filter(c => c.type === 'INCOME').reduce(
-    (total, c) => c.total + total,
-    0,
-  ) || 0);
-  const cashflowDifference = totalEarn0 - totalEarn1;
+  ) || 0;
 
   return (
     <StatisticsWidget
       className="mr-2"
-      title="This month income"
-      stats={moneyToString(totalEarn0, currency?.mnemonic || '')}
+      title="Money in"
+      stats={moneyToString(Math.abs(periodEarn), currency?.mnemonic || '')}
       description={(
-        <div>
-          {(cashflowDifference < 0 ? '' : '+')}
-          {moneyToString(cashflowDifference, currency?.mnemonic || '')}
+        <div className="flex items-center">
+          <BiCalendar className="mr-1" />
+          {moneyToString(Math.abs(monthEarn), currency?.mnemonic || '')}
           {' '}
-          from last month
+          this month
         </div>
       )}
     />

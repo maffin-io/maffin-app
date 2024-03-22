@@ -1,4 +1,4 @@
-import { DateTime, Interval } from 'luxon';
+import { Interval } from 'luxon';
 
 import { Split } from '@/book/entities';
 import Money from '@/book/Money';
@@ -6,18 +6,14 @@ import mapAccounts from '@/helpers/mapAccounts';
 import type { Account } from '@/book/entities';
 import type { AccountsTotals } from '@/types/book';
 import monthlyDates from '@/helpers/monthlyDates';
-import getEarliestDate from './getEarliestDate';
 
 /**
  * Given an interval it aggregates monthly splits for each account
  */
 export default async function getMonthlyTotals(
   accounts: Account[],
-  interval?: Interval,
+  interval: Interval,
 ): Promise<AccountsTotals[]> {
-  interval = interval
-    || Interval.fromDateTimes(await getEarliestDate(), DateTime.now());
-
   const rows: { date: string, total: number, accountId: string }[] = await Split
     .query(`
       SELECT

@@ -3,7 +3,7 @@
 import React from 'react';
 import { Settings } from 'luxon';
 import Script from 'next/script';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { keepPreviousData, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 
@@ -26,12 +26,13 @@ const queryClient = new QueryClient({
       staleTime: Infinity,
       refetchOnMount: true,
       refetchOnWindowFocus: false,
-      gcTime: 300000, // 5 minutes
+      gcTime: 60000, // 5 minutes
       // This doesnt work and needs to be set for each query.
       // It stops working when the navigation state changes. I.e. you start
       // online and then go to offline, subsequent queries are paused...
       networkMode: 'always',
       throwOnError: true,
+      placeholderData: keepPreviousData,
     },
   },
 });

@@ -1,7 +1,7 @@
 import React from 'react';
-import { DateTime } from 'luxon';
+import { DateTime, Interval } from 'luxon';
 import { render, screen } from '@testing-library/react';
-import type { UseQueryResult } from '@tanstack/react-query';
+import type { UseQueryResult, DefinedUseQueryResult } from '@tanstack/react-query';
 
 import Line from '@/components/charts/Line';
 import {
@@ -14,6 +14,7 @@ import InvestmentChart from '@/components/pages/account/InvestmentChart';
 import { InvestmentAccount } from '@/book/models';
 import { PriceDBMap } from '@/book/prices';
 import * as apiHook from '@/hooks/api';
+import * as stateHooks from '@/hooks/state';
 
 jest.mock('@/components/charts/Line', () => jest.fn(
   () => <div data-testid="Line" />,
@@ -28,6 +29,11 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
+jest.mock('@/hooks/state', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/state'),
+}));
+
 describe('InvestmentChart', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
@@ -37,6 +43,7 @@ describe('InvestmentChart', () => {
       date: DateTime.now(),
       value: 1,
     } as Price);
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
   });
 
   afterEach(() => {
@@ -194,6 +201,12 @@ describe('InvestmentChart', () => {
     } as UseQueryResult<InvestmentAccount>);
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-04-01') as DateTime<true>);
 
+    const interval = Interval.fromDateTimes(
+      DateTime.now().minus({ months: 6 }).startOf('month'),
+      DateTime.now().endOf('day'),
+    );
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: interval } as DefinedUseQueryResult<Interval>);
+
     render(
       <InvestmentChart
         account={account}
@@ -323,7 +336,8 @@ describe('InvestmentChart', () => {
               border: {
                 display: false,
               },
-              min: account.splits[0].transaction.date.toISODate(),
+              min: interval?.start?.toISODate(),
+              max: interval?.end?.toISODate(),
             },
             yStocks: {
               offset: true,
@@ -451,6 +465,12 @@ describe('InvestmentChart', () => {
     } as UseQueryResult<InvestmentAccount>);
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-04') as DateTime<true>);
 
+    const interval = Interval.fromDateTimes(
+      DateTime.now().minus({ months: 6 }).startOf('month'),
+      DateTime.now().endOf('day'),
+    );
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: interval } as DefinedUseQueryResult<Interval>);
+
     render(
       <InvestmentChart
         account={account}
@@ -580,7 +600,8 @@ describe('InvestmentChart', () => {
               border: {
                 display: false,
               },
-              min: account.splits[0].transaction.date.toISODate(),
+              min: interval.start?.toISODate(),
+              max: interval.end?.toISODate(),
             },
             yStocks: {
               offset: true,

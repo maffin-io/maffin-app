@@ -4,7 +4,8 @@ import { useAccountsTotals } from '@/hooks/api';
 import Money from '@/book/Money';
 import type { Account } from '@/book/entities';
 import StatisticsWidget from '@/components/StatisticsWidget';
-import MonthChange from '@/components/widgets/MonthChange';
+import TotalChange from '@/components/widgets/TotalChange';
+import { useInterval } from '@/hooks/state';
 
 export type TotalWidgetProps = {
   account: Account,
@@ -13,7 +14,8 @@ export type TotalWidgetProps = {
 export default function TotalWidget({
   account,
 }: TotalWidgetProps): JSX.Element {
-  const { data: t0 } = useAccountsTotals();
+  const { data: interval } = useInterval();
+  const { data: t0 } = useAccountsTotals(interval);
   const total0 = t0?.[account.guid] || new Money(0, account.commodity.mnemonic);
 
   return (
@@ -21,7 +23,7 @@ export default function TotalWidget({
       className="mr-2"
       title="Total"
       stats={total0.abs().format()}
-      description={<MonthChange account={account} />}
+      description={<TotalChange account={account} />}
     />
   );
 }

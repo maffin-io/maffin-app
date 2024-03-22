@@ -27,19 +27,12 @@ jest.mock('@/hooks/state', () => ({
 }));
 
 describe('TotalsPie', () => {
-  let interval: Interval;
-
   beforeEach(() => {
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { guid: 'eur', mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
     jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: {} } as UseQueryResult<PriceDBMap>);
-
-    interval = Interval.fromDateTimes(
-      DateTime.now().minus({ months: 6 }).startOf('month'),
-      DateTime.now().endOf('day'),
-    );
-    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: interval } as DefinedUseQueryResult<Interval>);
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
   });
 
   afterEach(() => {
@@ -265,7 +258,7 @@ describe('TotalsPie', () => {
     );
   });
 
-  it('passes interval date', () => {
+  it('passes interval', () => {
     render(
       <TotalsPie
         title=""
@@ -273,6 +266,6 @@ describe('TotalsPie', () => {
       />,
     );
 
-    expect(apiHook.useAccountsTotals).toBeCalledWith(interval.end);
+    expect(apiHook.useAccountsTotals).toBeCalledWith(TEST_INTERVAL);
   });
 });

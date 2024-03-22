@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames';
 
 import { DataSourceContext } from '@/hooks';
-import { IS_FREE_PLAN, IS_PAID_PLAN } from '@/helpers/env';
+import { IS_PAID_PLAN } from '@/helpers/env';
 import { useOnline } from '@/hooks/state';
 import { UpgradeTooltip } from '@/components/tooltips';
 

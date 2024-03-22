@@ -2,6 +2,7 @@ import React from 'react';
 import type { ChartDataset } from 'chart.js';
 
 import { useCashFlow, useMainCurrency } from '@/hooks/api';
+import { useInterval } from '@/hooks/state';
 import { isAsset, isLiability } from '@/book/helpers/accountType';
 import { moneyToString, toFixed } from '@/helpers/number';
 import Sankey from './Sankey';
@@ -15,7 +16,8 @@ export default function AssetSankey({
   guid,
   height = 250,
 }: AssetSankeyProps): JSX.Element {
-  const { data: byAccount, isPending } = useCashFlow(guid);
+  const { data: interval } = useInterval();
+  const { data: byAccount, isPending } = useCashFlow(guid, interval);
   const { data: currency } = useMainCurrency();
 
   const assetName = byAccount?.find(r => r.guid === guid)?.name || '';

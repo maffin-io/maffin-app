@@ -1,15 +1,22 @@
 import React from 'react';
+import { Interval } from 'luxon';
 import { render } from '@testing-library/react';
-import type { UseQueryResult } from '@tanstack/react-query';
+import type { DefinedUseQueryResult, UseQueryResult } from '@tanstack/react-query';
 
 import SpendWidget from '@/components/pages/account/SpendWidget';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import * as apiHook from '@/hooks/api';
+import * as stateHooks from '@/hooks/state';
 import type { Account, Commodity } from '@/book/entities';
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
   ...jest.requireActual('@/hooks/api'),
+}));
+
+jest.mock('@/hooks/state', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/state'),
 }));
 
 jest.mock('@/components/StatisticsWidget', () => jest.fn(
@@ -22,6 +29,8 @@ describe('SpendWidgetTest', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
     jest.spyOn(apiHook, 'useCashFlow').mockReturnValue({ data: undefined } as UseQueryResult<{ guid: string, total: number, type: string, name: string }[]>);
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
+
     account = {
       guid: 'guid',
       commodity: {
@@ -42,7 +51,7 @@ describe('SpendWidgetTest', () => {
         className: 'mr-2',
         description: expect.anything(),
         stats: '€0.00',
-        title: 'This month expenses',
+        title: 'Money out',
       },
       {},
     );
@@ -114,8 +123,8 @@ describe('SpendWidgetTest', () => {
       {
         className: 'mr-2',
         description: expect.anything(),
-        stats: '€20.00',
-        title: 'This month expenses',
+        stats: '€70.00',
+        title: 'Money out',
       },
       {},
     );

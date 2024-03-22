@@ -35,15 +35,9 @@ const wrapper = ({ children }: React.PropsWithChildren) => (
 );
 
 describe('DateRangeInput', () => {
-  let interval: Interval;
   beforeEach(() => {
-    jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-30') as DateTime<true>);
     jest.spyOn(apiHook, 'useStartDate').mockReturnValue({ data: undefined } as UseQueryResult<DateTime>);
-    interval = Interval.fromDateTimes(
-      DateTime.now().minus({ months: 6 }).startOf('month'),
-      DateTime.now(),
-    );
-    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: interval } as DefinedUseQueryResult<Interval>);
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
   });
 
   afterEach(() => {
@@ -69,16 +63,16 @@ describe('DateRangeInput', () => {
         showShortcuts: true,
         startWeekOn: 'mon',
         value: {
-          startDate: interval.start?.toJSDate(),
-          endDate: interval.end?.toJSDate(),
+          startDate: TEST_INTERVAL.start?.toJSDate(),
+          endDate: TEST_INTERVAL.end?.toJSDate(),
         },
         configs: {
           shortcuts: {
             t: {
               text: 'Last 6 months',
               period: {
-                start: interval.start?.toJSDate(),
-                end: interval.end?.toJSDate(),
+                start: TEST_INTERVAL.start?.toJSDate(),
+                end: TEST_INTERVAL.end?.toJSDate(),
               },
             },
           },
@@ -98,8 +92,8 @@ describe('DateRangeInput', () => {
     expect(Datepicker).toBeCalledWith(
       expect.objectContaining({
         value: {
-          startDate: DateTime.fromISO('2022-07-01').toJSDate(),
-          endDate: DateTime.fromISO('2023-01-30').toJSDate(),
+          startDate: TEST_INTERVAL.start?.toJSDate(),
+          endDate: TEST_INTERVAL.end?.toJSDate(),
         },
         minDate: DateTime.fromISO('2022-01-01').toJSDate(),
         configs: {
@@ -107,8 +101,8 @@ describe('DateRangeInput', () => {
             t: {
               text: 'Last 6 months',
               period: {
-                start: DateTime.fromISO('2022-07-01').toJSDate(),
-                end: DateTime.fromISO('2023-01-30').toJSDate(),
+                start: TEST_INTERVAL.start?.toJSDate(),
+                end: TEST_INTERVAL.end?.toJSDate(),
               },
             },
             2022: {

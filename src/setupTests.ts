@@ -5,7 +5,7 @@
 import '@testing-library/jest-dom';
 import crypto from 'crypto';
 
-import { Settings } from 'luxon';
+import { DateTime, Interval, Settings } from 'luxon';
 
 // https://github.com/chartjs/chartjs-adapter-luxon/issues/91
 jest.mock('chartjs-adapter-luxon', jest.fn());
@@ -47,3 +47,18 @@ window.matchMedia = jest.fn().mockReturnValue({ matches: true });
 Settings.defaultZone = 'utc';
 Settings.throwOnInvalid = true;
 Settings.now = () => 1672531200000; // 2023-01-01
+
+declare global {
+  const TEST_INTERVAL: Interval;
+}
+
+Object.defineProperty(
+  global,
+  'TEST_INTERVAL',
+  {
+    value: Interval.fromDateTimes(
+      DateTime.now().minus({ month: 6 }).startOf('month'),
+      DateTime.now().endOf('day'),
+    ),
+  },
+);

@@ -27,18 +27,11 @@ jest.mock('@/hooks/state', () => ({
 }));
 
 describe('AccountsTable', () => {
-  let interval: Interval;
-
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-01') as DateTime<true>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
     jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals>);
-
-    interval = Interval.fromDateTimes(
-      DateTime.now().minus({ months: 6 }).startOf('month'),
-      DateTime.now(),
-    );
-    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: interval } as DefinedUseQueryResult<Interval>);
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
   });
 
   afterEach(() => {
@@ -78,7 +71,7 @@ describe('AccountsTable', () => {
       },
       {},
     );
-    expect(apiHook.useAccountsTotals).toBeCalledWith(DateTime.now());
+    expect(apiHook.useAccountsTotals).toBeCalledWith(TEST_INTERVAL);
     expect(container).toMatchSnapshot();
   });
 

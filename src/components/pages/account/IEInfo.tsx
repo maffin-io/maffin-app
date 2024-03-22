@@ -1,10 +1,10 @@
 import React from 'react';
-import { DateTime, Interval } from 'luxon';
 import classNames from 'classnames';
 
 import type { Account } from '@/book/entities';
 import { AccountsTable } from '@/components/tables';
 import { TotalsPie, MonthlyTotalHistogram } from '@/components/charts';
+import { useInterval } from '@/hooks/state';
 import TotalWidget from './TotalWidget';
 
 export type IEInfoProps = {
@@ -14,6 +14,8 @@ export type IEInfoProps = {
 export default function IEInfo({
   account,
 }: IEInfoProps): JSX.Element {
+  const { data: interval } = useInterval();
+
   return (
     <div className="grid grid-cols-12 items-start">
       <div className="col-span-6">
@@ -60,12 +62,7 @@ export default function IEInfo({
           <MonthlyTotalHistogram
             title=""
             guids={account.placeholder ? account.childrenIds : [account.guid]}
-            interval={
-              Interval.fromDateTimes(
-                DateTime.now().minus({ year: 1 }).startOf('month'),
-                DateTime.now(),
-              )
-            }
+            interval={interval}
           />
         </div>
         <div className="col-span-12" />

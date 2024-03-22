@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon';
+import { Interval } from 'luxon';
 
 import Money from '@/book/Money';
 import { Split } from '@/book/entities';
@@ -8,11 +8,15 @@ import type { AccountsTotals } from '@/types/book';
 
 /**
  * Returns the sum of splits amounts for each account
- * up until the selected date
+ * for a given interval.
+ *
+ * For the case of accounts that are assets or
+ * liabilities, we don't filter with the start date of the interval as
+ * the total net worth depends on all the historical splits.
  */
 export default async function getAccountsTotals(
   accounts: Account[],
-  selectedDate: DateTime,
+  interval: Interval,
 ): Promise<AccountsTotals> {
   const rows: { total: number, accountId: string, mnemonic: string }[] = await Split
     .query(`
@@ -21,7 +25,9 @@ export default async function getAccountsTotals(
         splits.account_guid as accountId
       FROM splits
       JOIN transactions as tx ON splits.tx_guid = tx.guid
-      WHERE post_date <= '${selectedDate.toSQLDate()}'
+      WHERE post_date <= '${interval.end?.toSQLDate()}'
+      AND post_date >= '${interval.start?.toSQLDate()}'
+      AND splits.account_guid IN ('${accounts.map(a => a.guid).join('\',\'')}')
       GROUP BY 
         accountId
       HAVING SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) != 0

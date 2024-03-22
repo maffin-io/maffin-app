@@ -1,10 +1,12 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import type { UseQueryResult } from '@tanstack/react-query';
+import { Interval } from 'luxon';
+import type { DefinedUseQueryResult, UseQueryResult } from '@tanstack/react-query';
 
 import TotalWidget from '@/components/pages/account/TotalWidget';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import * as apiHook from '@/hooks/api';
+import * as stateHooks from '@/hooks/state';
 import Money from '@/book/Money';
 import type { AccountsTotals } from '@/types/book';
 import type { Account, Commodity } from '@/book/entities';
@@ -12,6 +14,11 @@ import type { Account, Commodity } from '@/book/entities';
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
   ...jest.requireActual('@/hooks/api'),
+}));
+
+jest.mock('@/hooks/state', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/state'),
 }));
 
 jest.mock('@/components/StatisticsWidget', () => jest.fn(
@@ -23,6 +30,7 @@ describe('TotalWidgetTest', () => {
 
   beforeEach(() => {
     jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals>);
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
     account = {
       guid: 'guid',
       commodity: {
@@ -47,6 +55,7 @@ describe('TotalWidgetTest', () => {
       },
       {},
     );
+    expect(apiHook.useAccountsTotals).toBeCalledWith(TEST_INTERVAL);
   });
 
   it('renders as expected', () => {

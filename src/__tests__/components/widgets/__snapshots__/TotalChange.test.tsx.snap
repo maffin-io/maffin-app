@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MonthChange renders as expected with decrease 1`] = `
+exports[`TotalChange renders as expected with decrease 1`] = `
 <div>
   <div
     class="flex items-center "
@@ -21,12 +21,12 @@ exports[`MonthChange renders as expected with decrease 1`] = `
     </svg>
     -€100.00
      
-    from last month
+    this period
   </div>
 </div>
 `;
 
-exports[`MonthChange renders as expected with increase 1`] = `
+exports[`TotalChange renders as expected with increase 1`] = `
 <div>
   <div
     class="flex items-center "
@@ -47,12 +47,12 @@ exports[`MonthChange renders as expected with increase 1`] = `
     </svg>
     €100.00
      
-    from last month
+    this period
   </div>
 </div>
 `;
 
-exports[`MonthChange renders with no data 1`] = `
+exports[`TotalChange renders with no data 1`] = `
 <div>
   <div
     class="flex items-center mt-1"
@@ -73,7 +73,7 @@ exports[`MonthChange renders with no data 1`] = `
     </svg>
     €0.00
      
-    from last month
+    this period
   </div>
 </div>
 `;

@@ -8,6 +8,7 @@ import Line from '@/components/charts/Line';
 import { moneyToString } from '@/helpers/number';
 import type { Account } from '@/book/entities';
 import { useInvestment, usePrices } from '@/hooks/api';
+import { useInterval } from '@/hooks/state';
 import Loading from '@/components/Loading';
 import monthlyDates from '@/helpers/monthlyDates';
 
@@ -22,6 +23,7 @@ export default function InvestmentChart({
 }: InvestmentChartProps): JSX.Element {
   const { data: investment } = useInvestment(account.guid);
   const { data: pricesMap } = usePrices({ from: account.commodity });
+  const { data: selectedInterval } = useInterval();
 
   if (!investment || !pricesMap) {
     return <Loading />;
@@ -166,9 +168,8 @@ export default function InvestmentChart({
             border: {
               display: false,
             },
-            min: (startDate.toMillis() > DateTime.now().minus({ year: 1 }).toMillis())
-              ? startDate.toISODate() || undefined
-              : DateTime.now().minus({ year: 1 }).toISODate() || undefined,
+            min: selectedInterval.start?.toISODate(),
+            max: selectedInterval.end?.toISODate(),
           },
           yStocks: {
             offset: true,

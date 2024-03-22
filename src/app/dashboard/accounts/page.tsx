@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { DateTime } from 'luxon';
 import { BiPlusCircle } from 'react-icons/bi';
 
 import FormButton from '@/components/buttons/FormButton';
@@ -43,9 +44,14 @@ export default function AccountsPage(): JSX.Element {
     <>
       <Onboarding show={showOnboarding} />
       <div className="header">
-        <span className="title">
-          Dashboard
-        </span>
+        <div>
+          <p className="title">
+            Your journey
+          </p>
+          <p className="italic">
+            {interval.toLocaleString(DateTime.DATE_FULL)}
+          </p>
+        </div>
         <div className="ml-auto">
           <FormButton
             id="add-account"

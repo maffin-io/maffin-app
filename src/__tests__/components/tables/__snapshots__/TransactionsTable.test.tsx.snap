@@ -73,7 +73,7 @@ exports[`TransactionsTable renders Date column as expected 1`] = `
     data-tooltip-content="tx_guid"
     data-tooltip-id="tx_guid"
   >
-    2023-01-01
+    1/1/2023
   </span>
 </div>
 `;

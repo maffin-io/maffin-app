@@ -1,12 +1,14 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { DateTime, Interval } from 'luxon';
+import type { DefinedUseQueryResult } from '@tanstack/react-query';
 
 import { IEInfo } from '@/components/pages/account';
 import TotalWidget from '@/components/pages/account/TotalWidget';
 import type { Account } from '@/book/entities';
 import { TotalsPie, MonthlyTotalHistogram } from '@/components/charts';
 import { AccountsTable } from '@/components/tables';
+import * as stateHooks from '@/hooks/state';
 
 jest.mock('@/components/charts/MonthlyTotalHistogram', () => jest.fn(
   () => <div data-testid="MonthlyTotalHistogram" />,
@@ -28,8 +30,14 @@ jest.mock('@/components/tables/AccountsTable', () => jest.fn(
   () => <div data-testid="AccountsTable" />,
 ));
 
+jest.mock('@/hooks/state', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/state'),
+}));
+
 describe('IEInfo', () => {
   let account: Account;
+
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-03-01') as DateTime<true>);
     account = {
@@ -40,6 +48,7 @@ describe('IEInfo', () => {
         mnemonic: 'EUR',
       },
     } as Account;
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
   });
 
   afterEach(() => {
@@ -55,10 +64,7 @@ describe('IEInfo', () => {
       {
         guids: [account.guid],
         title: '',
-        interval: Interval.fromDateTimes(
-          DateTime.now().minus({ year: 1 }).startOf('month'),
-          DateTime.now(),
-        ),
+        interval: TEST_INTERVAL,
       },
       {},
     );
@@ -90,10 +96,7 @@ describe('IEInfo', () => {
       {
         guids: ['1', '2'],
         title: '',
-        interval: Interval.fromDateTimes(
-          DateTime.now().minus({ year: 1 }).startOf('month'),
-          DateTime.now(),
-        ),
+        interval: TEST_INTERVAL,
       },
       {},
     );

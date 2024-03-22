@@ -26,17 +26,10 @@ jest.mock('@/hooks/state', () => ({
 }));
 
 describe('NetWorthHistogram', () => {
-  let interval: Interval;
-
   beforeEach(() => {
     jest.spyOn(apiHook, 'useAccountsMonthlyWorth').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals[]>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
-
-    interval = Interval.fromDateTimes(
-      DateTime.now().minus({ months: 6 }).startOf('month'),
-      DateTime.now().endOf('day'),
-    );
-    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: interval } as DefinedUseQueryResult<Interval>);
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
   });
 
   afterEach(() => {

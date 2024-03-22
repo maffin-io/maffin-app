@@ -1,12 +1,12 @@
 import React from 'react';
-import { DateTime } from 'luxon';
+import { DateTime, Interval } from 'luxon';
 import {
   render,
   screen,
 } from '@testing-library/react';
 import * as query from '@tanstack/react-query';
 import type { LinkProps } from 'next/link';
-import type { UseQueryResult } from '@tanstack/react-query';
+import type { DefinedUseQueryResult, UseQueryResult } from '@tanstack/react-query';
 
 import {
   Account,
@@ -19,6 +19,7 @@ import { TransactionsTable } from '@/components/tables';
 import FormButton from '@/components/buttons/FormButton';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import * as apiHook from '@/hooks/api';
+import * as stateHooks from '@/hooks/state';
 
 jest.mock('@tanstack/react-query');
 jest.mock('next/link', () => jest.fn(
@@ -49,6 +50,11 @@ jest.mock('@/components/forms/transaction/TransactionForm', () => jest.fn(
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
   ...jest.requireActual('@/hooks/api'),
+}));
+
+jest.mock('@/hooks/state', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/state'),
 }));
 
 describe('TransactionsTable', () => {
@@ -87,6 +93,7 @@ describe('TransactionsTable', () => {
     jest.spyOn(apiHook, 'useSplitsPagination').mockReturnValue(
       { data: [split] } as UseQueryResult<Split[]>,
     );
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
   });
 
   afterEach(async () => {
@@ -140,7 +147,7 @@ describe('TransactionsTable', () => {
             cell: expect.any(Function),
           },
           {
-            header: 'Total',
+            header: 'Balance',
             enableSorting: false,
             cell: expect.any(Function),
           },
@@ -154,7 +161,8 @@ describe('TransactionsTable', () => {
       },
       {},
     );
-    expect(apiHook.useSplitsPagination).toBeCalledWith('account_guid_1', { pageIndex: 0, pageSize: 10 });
+    expect(apiHook.useSplitsCount).toBeCalledWith('account_guid_1', TEST_INTERVAL);
+    expect(apiHook.useSplitsPagination).toBeCalledWith('account_guid_1', TEST_INTERVAL, { pageIndex: 0, pageSize: 10 });
   });
 
   it('creates Table with expected params', async () => {

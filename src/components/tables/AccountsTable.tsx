@@ -27,7 +27,7 @@ export default function AccountsTable(
 ): JSX.Element {
   const { data } = useAccounts();
   const { data: interval } = useInterval();
-  const { data: accountsTotal } = useAccountsTotals(interval.end as DateTime<true>);
+  const { data: accountsTotal } = useAccountsTotals(interval);
 
   const accounts = mapAccounts(data);
   const trees: AccountsTableRow[] = [];
