@@ -140,7 +140,7 @@ describe('TransactionsTable', () => {
             cell: expect.any(Function),
           },
           {
-            header: 'Total',
+            header: 'Balance',
             enableSorting: false,
             cell: expect.any(Function),
           },
@@ -154,6 +154,7 @@ describe('TransactionsTable', () => {
       },
       {},
     );
+    expect(apiHook.useSplitsCount).toBeCalledWith('account_guid_1');
     expect(apiHook.useSplitsPagination).toBeCalledWith('account_guid_1', { pageIndex: 0, pageSize: 10 });
   });
 

@@ -3,7 +3,7 @@ import {
   useQuery,
   UseQueryResult,
 } from '@tanstack/react-query';
-import type { FindOptionsWhere } from 'typeorm';
+import { Between, FindOptionsWhere } from 'typeorm';
 import { DateTime, Interval } from 'luxon';
 
 import { Split } from '@/book/entities';
@@ -12,6 +12,7 @@ import { getAccountsTotals, getMonthlyTotals } from '@/lib/queries';
 import type { PriceDBMap } from '@/book/prices';
 import type { AccountsTotals } from '@/types/book';
 import { aggregateChildrenTotals, aggregateMonthlyWorth } from '@/helpers/accountsTotalAggregations';
+import { useInterval } from '@/hooks/state';
 import monthlyDates from '@/helpers/monthlyDates';
 import { useAccounts } from './useAccounts';
 import { usePrices } from './usePrices';
@@ -71,25 +72,43 @@ export function useSplitsPagination(
   account: string,
   pagination: { pageSize: number, pageIndex: number } = { pageSize: 10, pageIndex: 0 },
 ): UseQueryResult<Split[]> {
-  const queryKey = [...Split.CACHE_KEY, account, 'page', pagination];
+  const { data: interval } = useInterval();
+
+  const queryKey = [
+    ...Split.CACHE_KEY,
+    account,
+    'page',
+    { ...pagination, interval: interval.toISODate() },
+  ];
   const result = useQuery({
     queryKey,
     queryFn: fetcher(
-      async () => Split.getRepository().createQueryBuilder('splits')
-        .select([
-          'splits',
-          'tx.date',
-          'tx.guid',
-          'SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) OVER (ORDER BY tx.post_date, tx.enter_date) AS splits_balance',
-        ])
-        .leftJoin('splits.fk_transaction', 'tx', 'splits.tx_guid = tx.guid')
-        .where('splits.account_guid = :account_guid', { account_guid: account })
-        .orderBy('tx.post_date', 'DESC')
-        .addOrderBy('tx.enter_date', 'DESC')
-        .addOrderBy('splits.quantity_num', 'ASC')
-        .limit(pagination.pageSize)
-        .offset(pagination.pageSize * pagination.pageIndex)
-        .getMany(),
+      async () => {
+        const r = await Split.getRepository().createQueryBuilder('splits')
+          .select('COALESCE(SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom), 0)', 'totalSum')
+          .leftJoin('splits.fk_transaction', 'tx')
+          .where('splits.account_guid = :account_guid', { account_guid: account })
+          .andWhere('tx.post_date < :start', { start: interval.start?.toSQLDate() })
+          .getRawOne();
+
+        return Split.getRepository().createQueryBuilder('splits')
+          .select([
+            'splits',
+            'tx.date',
+            'tx.guid',
+            `SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) OVER (ORDER BY tx.post_date, tx.enter_date) + ${r.totalSum} AS splits_balance`,
+          ])
+          .leftJoin('splits.fk_transaction', 'tx', 'splits.tx_guid = tx.guid')
+          .where('splits.account_guid = :account_guid', { account_guid: account })
+          .andWhere('tx.post_date >= :start', { start: interval.start?.toSQLDate() })
+          .andWhere('tx.post_date <= :end', { end: interval.end?.toSQLDate() })
+          .orderBy('tx.post_date', 'DESC')
+          .addOrderBy('tx.enter_date', 'DESC')
+          .addOrderBy('splits.quantity_num', 'ASC')
+          .limit(pagination.pageSize)
+          .offset(pagination.pageSize * pagination.pageIndex)
+          .getMany();
+      },
       queryKey,
     ),
     networkMode: 'always',
@@ -104,11 +123,20 @@ export function useSplitsPagination(
 export function useSplitsCount(
   account: string,
 ): UseQueryResult<number> {
-  const queryKey = [...Split.CACHE_KEY, account, 'count'];
+  const { data: interval } = useInterval();
+
+  const queryKey = [...Split.CACHE_KEY, account, 'count', { interval: interval.toISODate() }];
   const result = useQuery({
     queryKey,
     queryFn: fetcher(
-      async () => Split.count({ where: { fk_account: { guid: account } } }),
+      async () => Split.count({
+        where: {
+          fk_account: { guid: account },
+          fk_transaction: {
+            date: Between(interval.start, interval.end),
+          },
+        },
+      }),
       queryKey,
     ),
     networkMode: 'always',

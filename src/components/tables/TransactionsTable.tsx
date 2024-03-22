@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import Link from 'next/link';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { BiEdit, BiXCircle } from 'react-icons/bi';
+import { DateTime } from 'luxon';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
 import FormButton from '@/components/buttons/FormButton';
@@ -40,7 +41,7 @@ export default function TransactionsTable({
   const { data: splits } = useSplitsPagination(account.guid, { pageSize, pageIndex });
 
   columns[3].cell = AmountPartial(account);
-  columns[4].cell = TotalPartial(account);
+  columns[4].cell = BalancePartial(account);
 
   const pagination = React.useMemo(
     () => ({
@@ -78,7 +79,7 @@ const columns: ColumnDef<Split>[] = [
           data-tooltip-id={row.original.txId}
           data-tooltip-content={row.original.txId}
         >
-          {row.original.transaction.date.toISODate()}
+          {row.original.transaction.date.toLocaleString(DateTime.DATE_SHORT)}
         </span>
         <Tooltip clickable id={row.original.txId} />
       </>
@@ -100,7 +101,7 @@ const columns: ColumnDef<Split>[] = [
     enableSorting: false,
   },
   {
-    header: 'Total',
+    header: 'Balance',
     enableSorting: false,
   },
   {
@@ -190,10 +191,10 @@ function AmountPartial(
   };
 }
 
-function TotalPartial(
+function BalancePartial(
   account: Account,
 ) {
-  return function TotalCell({ row }: CellContext<Split, unknown>): JSX.Element {
+  return function BalanceCell({ row }: CellContext<Split, unknown>): JSX.Element {
     return (
       <span>
         {new Money(row.original.balance, account.commodity.mnemonic).format()}
