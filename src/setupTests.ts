@@ -56,8 +56,9 @@ Object.defineProperty(
   global,
   'TEST_INTERVAL',
   {
+    // default interval for useInterval
     value: Interval.fromDateTimes(
-      DateTime.now().minus({ month: 6 }).startOf('month'),
+      DateTime.now().minus({ month: 5 }).startOf('month'),
       DateTime.now().endOf('day'),
     ),
   },

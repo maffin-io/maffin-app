@@ -17,11 +17,11 @@ export {
   useSplitsCount,
   useAccountTotal,
   useAccountsTotals,
-  useCashFlow,
   useAccountsMonthlyTotal,
   useAccountsMonthlyWorth,
 } from '@/hooks/api/useSplits';
 export { usePrices } from '@/hooks/api/usePrices';
+export { useCashFlow } from '@/hooks/api/useCashFlow';
 export { useMainCurrency } from '@/hooks/api/useMainCurrency';
 
 export function useStartDate(): UseQueryResult<DateTime> {

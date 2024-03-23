@@ -13,10 +13,17 @@ export default function DateRangeInput(): JSX.Element {
 
   const now = DateTime.now();
   const shortcuts: { [key: string]: { text: string, period: { start: Date, end: Date } } } = {
-    t: {
+    t3: {
+      text: 'Last 3 months',
+      period: {
+        start: now.minus({ months: 2 }).startOf('month').toJSDate(),
+        end: now.toJSDate(),
+      },
+    },
+    t6: {
       text: 'Last 6 months',
       period: {
-        start: now.minus({ months: 6 }).startOf('month').toJSDate(),
+        start: now.minus({ months: 5 }).startOf('month').toJSDate(),
         end: now.toJSDate(),
       },
     },

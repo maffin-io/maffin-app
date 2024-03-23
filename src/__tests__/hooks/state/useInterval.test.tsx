@@ -19,17 +19,12 @@ describe('useMainCurrency', () => {
     const { result } = renderHook(() => useInterval(), { wrapper });
 
     const expected = Interval.fromDateTimes(
-      DateTime.now().minus({ month: 6 }).startOf('month'),
+      DateTime.now().minus({ month: 5 }).startOf('month'),
       DateTime.now().endOf('day'),
     );
     await waitFor(() => expect(result.current.data).toEqual(expected));
 
-    /**
-     * We are subtracting 6 months but this means we include 7 months in the range even though
-     * it's only partially. Because our aggregations are monthly, we want to include all months
-     * inside the range.
-     */
-    expect(result.current.data.splitBy({ month: 1 })).toHaveLength(7);
+    expect(result.current.data.splitBy({ month: 1 })).toHaveLength(6);
 
     const queryCache = queryClient.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
