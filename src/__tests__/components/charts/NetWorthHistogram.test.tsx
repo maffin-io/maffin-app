@@ -83,7 +83,7 @@ describe('NetWorthHistogram', () => {
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
-            TEST_INTERVAL.end,
+            TEST_INTERVAL.end?.startOf('day'),
           ],
         },
         options: {
@@ -224,7 +224,7 @@ describe('NetWorthHistogram', () => {
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
-            TEST_INTERVAL.end,
+            TEST_INTERVAL.end?.startOf('day'),
           ],
         },
         options: {

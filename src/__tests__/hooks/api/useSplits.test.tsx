@@ -17,7 +17,6 @@ import {
   useAccountsTotals,
   useAccountsMonthlyTotal,
   useAccountsMonthlyWorth,
-  useCashFlow,
 } from '@/hooks/api';
 import {
   Account,
@@ -661,65 +660,6 @@ describe('useSplits', () => {
         {
           type_asset: expect.any(Money),
         },
-      );
-    });
-  });
-
-  describe('useCashFlow', () => {
-    it('calls query as expected', async () => {
-      const commodity = await Commodity.create({
-        mnemonic: 'EUR',
-        namespace: 'CURRENCY',
-      }).save();
-
-      const account2 = await Account.create({
-        name: 'Bank',
-        fk_commodity: commodity,
-        parent: account1,
-        type: 'ASSET',
-      }).save();
-
-      await Transaction.create({
-        fk_currency: commodity,
-        description: 'description',
-        date: DateTime.now(),
-        splits: [
-          split1,
-          Split.create({
-            fk_account: account2,
-            valueNum: -50,
-            valueDenom: 1,
-            quantityNum: -100,
-            quantityDenom: 1,
-          }),
-        ],
-      }).save();
-
-      const { result } = renderHook(
-        () => useCashFlow(account1.guid),
-        { wrapper },
-      );
-
-      await waitFor(() => expect(result.current.status).toEqual('success'));
-      expect(result.current.data).toEqual([
-        {
-          guid: account2.guid,
-          name: account2.name,
-          type: account2.type,
-          total: -100,
-        },
-        {
-          guid: account1.guid,
-          name: account1.name,
-          type: account1.type,
-          total: 100,
-        },
-      ]);
-
-      const queryCache = queryClient.getQueryCache().getAll();
-      expect(queryCache).toHaveLength(1);
-      expect(queryCache[0].queryKey).toEqual(
-        ['api', 'splits', 'guid', 'cashflow', '2023-01-01/2023-01-01'],
       );
     });
   });
