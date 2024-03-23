@@ -8,7 +8,7 @@
     "axios": "^1.6.7",
     "body-parser": "^1.17.1",
     "cors": "^2.8.5",
-    "express": "^4.18.3",
+    "express": "^4.19.1",
     "luxon": "^3.3.4"
   },
   "scripts": {
@@ -74,6 +74,6 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "jest": "^27.4.6",
     "ts-jest": "^29.1.2",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.3"
   }
 }

@@ -78,13 +78,12 @@ describe('NetWorthHistogram', () => {
             },
           ],
           labels: [
-            DateTime.now().minus({ months: 6 }),
+            TEST_INTERVAL.start,
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
-            expect.any(DateTime),
-            DateTime.fromISO('2023-01-01'),
+            TEST_INTERVAL.end?.startOf('day'),
           ],
         },
         options: {
@@ -220,13 +219,12 @@ describe('NetWorthHistogram', () => {
             },
           ],
           labels: [
-            DateTime.now().minus({ months: 6 }),
+            TEST_INTERVAL.start,
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
             expect.any(DateTime),
-            expect.any(DateTime),
-            DateTime.fromISO('2023-01-01'),
+            TEST_INTERVAL.end?.startOf('day'),
           ],
         },
         options: {
@@ -349,10 +347,6 @@ describe('NetWorthHistogram', () => {
             type_liability: new Money(0, 'EUR'),
           },
           {
-            type_asset: new Money(0, 'EUR'),
-            type_liability: new Money(0, 'EUR'),
-          },
-          {
             type_asset: new Money(800, 'EUR'),
             type_liability: new Money(-200, 'EUR'),
           },
@@ -380,20 +374,19 @@ describe('NetWorthHistogram', () => {
         data: {
           datasets: [
             expect.objectContaining({
-              data: [0, 0, 0, 0, 800, 1200, 1200],
+              data: [0, 0, 0, 800, 1200, 1200],
               label: 'Assets',
             }),
             expect.objectContaining({
-              data: [0, 0, 0, 0, -200, -200, -200],
+              data: [0, 0, 0, -200, -200, -200],
               label: 'Liabilities',
             }),
             expect.objectContaining({
-              data: [0, 0, 0, 0, 600, 1000, 1000],
+              data: [0, 0, 0, 600, 1000, 1000],
               label: 'Net worth',
             }),
           ],
           labels: [
-            DateTime.fromISO('2022-07-01'),
             DateTime.fromISO('2022-08-01'),
             DateTime.fromISO('2022-09-01'),
             DateTime.fromISO('2022-10-01'),
