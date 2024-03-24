@@ -1,48 +1,55 @@
 import React from 'react';
+import { BiCalendar } from 'react-icons/bi';
 import { DateTime, Interval } from 'luxon';
 
 import { useMainCurrency, useCashFlow } from '@/hooks/api';
 import type { Account } from '@/book/entities';
 import StatisticsWidget from '@/components/StatisticsWidget';
-import { moneyToString } from '@/helpers/number';
+import Money from '@/book/Money';
 
 export type EarnWidgetProps = {
   account: Account,
 };
 
+/**
+ * Given a cashflow, compute the money that has been earned in this account
+ * through INCOME accounts
+ */
 export default function EarnWidget({
   account,
 }: EarnWidgetProps): JSX.Element {
   const { data: currency } = useMainCurrency();
-  const { data: cashflow0 } = useCashFlow(account.guid);
-  const { data: cashflow1 } = useCashFlow(
+  const zero = new Money(0, currency?.mnemonic || '');
+
+  const { data: periodCashflow } = useCashFlow(account.guid);
+  const periodEarn = periodCashflow?.filter(c => c.type === 'INCOME').reduce(
+    (total, c) => c.total.add(total),
+    zero,
+  ) || zero;
+
+  const { data: currentMonthCashflow } = useCashFlow(
     account.guid,
     Interval.fromDateTimes(
-      DateTime.now().minus({ month: 1 }).startOf('month'),
-      DateTime.now().minus({ month: 1 }).endOf('month'),
+      DateTime.now().startOf('month'),
+      DateTime.now(),
     ),
   );
-  const totalEarn0 = Math.abs(cashflow0?.filter(c => c.type === 'INCOME').reduce(
-    (total, c) => c.total + total,
-    0,
-  ) || 0);
-  const totalEarn1 = Math.abs(cashflow1?.filter(c => c.type === 'INCOME').reduce(
-    (total, c) => c.total + total,
-    0,
-  ) || 0);
-  const cashflowDifference = totalEarn0 - totalEarn1;
+  const monthEarn = currentMonthCashflow?.filter(c => c.type === 'INCOME').reduce(
+    (total, c) => c.total.add(total),
+    zero,
+  ) || zero;
 
   return (
     <StatisticsWidget
       className="mr-2"
-      title="This month income"
-      stats={moneyToString(totalEarn0, currency?.mnemonic || '')}
+      title="Income"
+      stats={periodEarn.abs().format()}
       description={(
-        <div>
-          {(cashflowDifference < 0 ? '' : '+')}
-          {moneyToString(cashflowDifference, currency?.mnemonic || '')}
+        <div className="flex items-center">
+          <BiCalendar className="mr-1" />
+          {monthEarn.abs().format()}
           {' '}
-          from last month
+          this month
         </div>
       )}
     />

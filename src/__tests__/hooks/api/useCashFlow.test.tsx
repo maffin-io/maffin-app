@@ -16,6 +16,7 @@ import {
   Transaction,
 } from '@/book/entities';
 import * as stateHooks from '@/hooks/state';
+import Money from '@/book/Money';
 
 jest.mock('@/hooks/state', () => ({
   __esModule: true,
@@ -31,6 +32,7 @@ describe('useCashFlow', () => {
   let datasource: DataSource;
   let account1: Account;
   let account2: Account;
+  let tx: Transaction;
 
   beforeEach(async () => {
     datasource = new DataSource({
@@ -57,7 +59,7 @@ describe('useCashFlow', () => {
       type: 'ASSET',
     }).save();
 
-    await Transaction.create({
+    tx = await Transaction.create({
       fk_currency: eur,
       description: 'description',
       date: DateTime.now(),
@@ -66,14 +68,14 @@ describe('useCashFlow', () => {
           fk_account: account1,
           valueNum: 50,
           valueDenom: 1,
-          quantityNum: 100,
+          quantityNum: 50,
           quantityDenom: 1,
         }),
         Split.create({
           fk_account: account2,
           valueNum: -50,
           valueDenom: 1,
-          quantityNum: -100,
+          quantityNum: -50,
           quantityDenom: 1,
         }),
       ],
@@ -98,15 +100,17 @@ describe('useCashFlow', () => {
         guid: account2.guid,
         name: account2.name,
         type: account2.type,
-        total: -100,
+        total: expect.any(Money),
       },
       {
         guid: account1.guid,
         name: account1.name,
         type: account1.type,
-        total: 100,
+        total: expect.any(Money),
       },
     ]);
+    expect(result.current.data?.[0].total.toString()).toEqual('-50.00 EUR');
+    expect(result.current.data?.[1].total.toString()).toEqual('50.00 EUR');
 
     const queryCache = queryClient.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
@@ -134,6 +138,30 @@ describe('useCashFlow', () => {
     expect(queryCache).toHaveLength(1);
     expect(queryCache[0].queryKey).toEqual(
       ['api', 'splits', 'guid', 'cashflow', '2022-01-01/2022-01-02'],
+    );
+  });
+
+  it('works with different commodities', async () => {
+    account2.fk_commodity = await Commodity.create({ mnemonic: 'USD', namespace: 'CURRENCY' }).save();
+    await account2.save();
+
+    tx.splits[1].quantityNum = -55;
+    await tx.save();
+
+    const { result } = renderHook(
+      () => useCashFlow(account1.guid),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.status).toEqual('success'));
+
+    expect(result.current.data?.[0].total.toString()).toEqual('-50.00 EUR');
+    expect(result.current.data?.[1].total.toString()).toEqual('50.00 EUR');
+
+    const queryCache = queryClient.getQueryCache().getAll();
+    expect(queryCache).toHaveLength(1);
+    expect(queryCache[0].queryKey).toEqual(
+      ['api', 'splits', 'guid', 'cashflow', TEST_INTERVAL.toISODate()],
     );
   });
 });

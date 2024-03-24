@@ -4,8 +4,10 @@ import type { UseQueryResult } from '@tanstack/react-query';
 
 import { AssetSankey } from '@/components/charts';
 import Sankey from '@/components/charts/Sankey';
+import Money from '@/book/Money';
 import * as apiHooks from '@/hooks/api';
 import type { Commodity } from '@/book/entities';
+import type { CashFlowRow } from '@/hooks/api/useCashFlow';
 
 jest.mock('@/hooks/api');
 
@@ -15,7 +17,7 @@ jest.mock('@/components/charts/Sankey', () => jest.fn(
 
 describe('AssetSankey', () => {
   beforeEach(() => {
-    jest.spyOn(apiHooks, 'useCashFlow').mockReturnValue({ data: undefined } as UseQueryResult<{ guid: string, total: number, type: string, name: string }[]>);
+    jest.spyOn(apiHooks, 'useCashFlow').mockReturnValue({ data: undefined } as UseQueryResult<CashFlowRow[]>);
     jest.spyOn(apiHooks, 'useMainCurrency').mockReturnValue(
       { data: { mnemonic: 'EUR' } as Commodity } as UseQueryResult<Commodity>,
     );
@@ -39,40 +41,40 @@ describe('AssetSankey', () => {
             guid: 'guid1',
             name: '1',
             type: 'BANK',
-            total: 10,
+            total: new Money(10, 'EUR'),
           },
           {
             guid: 'guid2',
             name: '2',
             type: 'INCOME',
-            total: -10,
+            total: new Money(-10, 'EUR'),
           },
           {
             guid: 'guid3',
             name: '3',
             type: 'INCOME',
-            total: -20,
+            total: new Money(-20, 'EUR'),
           },
           {
             guid: 'guid4',
             name: '4',
             type: 'EXPENSE',
-            total: 10,
+            total: new Money(10, 'EUR'),
           },
           {
             guid: 'guid5',
             name: '5',
             type: 'LIABILITY',
-            total: 20,
+            total: new Money(20, 'EUR'),
           },
           {
             guid: 'guid6',
             name: '6',
             type: 'ASSET',
-            total: 30,
+            total: new Money(30, 'EUR'),
           },
         ],
-      } as UseQueryResult<{ guid: string, total: number, type: string, name: string }[]>,
+      } as UseQueryResult<CashFlowRow[]>,
     );
 
     render(<AssetSankey guid="guid1" />);

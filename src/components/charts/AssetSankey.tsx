@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ChartDataset } from 'chart.js';
 
+import Money from '@/book/Money';
 import { useCashFlow, useMainCurrency } from '@/hooks/api';
 import { isAsset, isLiability } from '@/book/helpers/accountType';
 import { moneyToString, toFixed } from '@/helpers/number';
@@ -20,29 +21,29 @@ export default function AssetSankey({
 
   const assetName = byAccount?.find(r => r.guid === guid)?.name || '';
 
-  let totalIn = 0;
-  let totalOut = 0;
+  let totalIn = new Money(0, currency?.mnemonic || '');
+  let totalOut = new Money(0, currency?.mnemonic || '');
 
   const data = byAccount?.filter(r => r.guid !== guid).map(r => {
-    if (r.total < 0) {
-      totalIn += Math.abs(r.total);
+    if (r.total.isNegative()) {
+      totalIn = totalIn.add(r.total.abs());
 
       return {
         from: r.name,
         fromType: r.type,
         to: assetName,
         toType: 'ASSET',
-        flow: Math.abs(r.total),
+        flow: r.total.abs().toNumber(),
       };
     }
 
-    totalOut += r.total;
+    totalOut = totalOut.add(r.total);
     return {
       from: assetName,
       fromType: 'ASSET',
       to: r.name,
       toType: r.type,
-      flow: r.total,
+      flow: r.total.toNumber(),
     };
   });
 
@@ -104,9 +105,9 @@ export default function AssetSankey({
               label: (ctx) => {
                 const raw = ctx.raw as { flow: number, toType: string };
                 let absolute = moneyToString(-raw.flow, currency?.mnemonic || '');
-                let percentage = toFixed((raw.flow / totalOut) * 100);
+                let percentage = toFixed((raw.flow / totalOut.toNumber()) * 100);
                 if (isAsset(raw.toType)) {
-                  percentage = toFixed((raw.flow / totalIn) * 100);
+                  percentage = toFixed((raw.flow / totalIn.toNumber()) * 100);
                   absolute = moneyToString(raw.flow, currency?.mnemonic || '');
                 }
                 return `${absolute} (${percentage} %)`;

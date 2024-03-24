@@ -1,57 +1,60 @@
 import React from 'react';
+import { BiCalendar } from 'react-icons/bi';
 import { DateTime, Interval } from 'luxon';
-import { BiHappy, BiSad } from 'react-icons/bi';
 
 import { useMainCurrency, useCashFlow } from '@/hooks/api';
 import type { Account } from '@/book/entities';
 import StatisticsWidget from '@/components/StatisticsWidget';
-import { moneyToString } from '@/helpers/number';
+import Money from '@/book/Money';
+import { isLiability } from '@/book/helpers';
 
 export type SpendWidgetProps = {
   account: Account,
 };
 
+/**
+ * Given a cashflow, compute the money that has been spent in this account
+ * through INCOME accounts
+ */
 export default function SpendWidget({
   account,
 }: SpendWidgetProps): JSX.Element {
   const { data: currency } = useMainCurrency();
-  const { data: cashflow0 } = useCashFlow(account.guid);
-  const { data: cashflow1 } = useCashFlow(
+  const zero = new Money(0, currency?.mnemonic || '');
+
+  const { data: periodCashflow } = useCashFlow(account.guid);
+  const periodSpend = periodCashflow?.filter(
+    c => c.type === 'EXPENSE' || isLiability(c.type),
+  ).reduce(
+    (total, c) => c.total.add(total),
+    zero,
+  ) || zero;
+
+  const { data: currentMonthCashflow } = useCashFlow(
     account.guid,
     Interval.fromDateTimes(
-      DateTime.now().minus({ month: 1 }).startOf('month'),
-      DateTime.now().minus({ month: 1 }).endOf('month'),
+      DateTime.now().startOf('month'),
+      DateTime.now(),
     ),
   );
-  const totalSpend0 = cashflow0?.filter(c => c.type === 'EXPENSE').reduce(
-    (total, c) => c.total + total,
-    0,
-  ) || 0;
-  const totalSpend1 = cashflow1?.filter(c => c.type === 'EXPENSE').reduce(
-    (total, c) => c.total + total,
-    0,
-  ) || 0;
-  const cashflowDifference = totalSpend0 - totalSpend1;
+  const monthSpend = currentMonthCashflow?.filter(
+    c => c.type === 'EXPENSE' || isLiability(c.type),
+  ).reduce(
+    (total, c) => c.total.add(total),
+    zero,
+  ) || zero;
 
   return (
     <StatisticsWidget
       className="mr-2"
-      title="This month expenses"
-      stats={moneyToString(totalSpend0, currency?.mnemonic || '')}
+      title="Expenses"
+      stats={periodSpend.format()}
       description={(
         <div className="flex items-center">
-          {
-            cashflowDifference > 0
-            && <BiSad className="mr-1 amount-negative" />
-          }
-          {
-            cashflowDifference <= 0
-            && <BiHappy className="mr-1 amount-positive" />
-          }
-          {(cashflowDifference < 0 ? '' : '+')}
-          {moneyToString(cashflowDifference, currency?.mnemonic || '')}
+          <BiCalendar className="mr-1" />
+          {monthSpend.abs().format()}
           {' '}
-          from last month
+          this month
         </div>
       )}
     />
