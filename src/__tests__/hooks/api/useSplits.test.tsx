@@ -3,7 +3,6 @@ import { DateTime, Interval } from 'luxon';
 import { DataSource } from 'typeorm';
 import { renderHook, waitFor } from '@testing-library/react';
 import {
-  QueryClient,
   QueryClientProvider,
   UseQueryResult,
   DefinedUseQueryResult,
@@ -52,9 +51,8 @@ jest.mock('@/hooks/state', () => ({
   ...jest.requireActual('@/hooks/state'),
 }));
 
-const queryClient = new QueryClient();
 const wrapper = ({ children }: React.PropsWithChildren) => (
-  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  <QueryClientProvider client={QUERY_CLIENT}>{children}</QueryClientProvider>
 );
 
 describe('useSplits', () => {
@@ -97,7 +95,7 @@ describe('useSplits', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    queryClient.removeQueries();
+    QUERY_CLIENT.removeQueries();
   });
 
   describe('useSplits', () => {
@@ -132,7 +130,7 @@ describe('useSplits', () => {
         },
       });
 
-      const queryCache = queryClient.getQueryCache().getAll();
+      const queryCache = QUERY_CLIENT.getQueryCache().getAll();
       expect(queryCache).toHaveLength(1);
       expect(queryCache[0].queryKey).toEqual(['api', 'splits', 'guid', { guid: 'guid' }]);
     });
@@ -219,7 +217,7 @@ describe('useSplits', () => {
           }),
         ]);
 
-        const queryCache = queryClient.getQueryCache().getAll();
+        const queryCache = QUERY_CLIENT.getQueryCache().getAll();
         expect(queryCache).toHaveLength(1);
         expect(queryCache[0].queryKey).toEqual(
           ['api', 'splits', 'guid', 'page', { interval: TEST_INTERVAL.toISODate(), pageIndex: 0, pageSize: 1 }],
@@ -245,7 +243,7 @@ describe('useSplits', () => {
           }),
         ]);
 
-        const queryCache = queryClient.getQueryCache().getAll();
+        const queryCache = QUERY_CLIENT.getQueryCache().getAll();
         expect(queryCache).toHaveLength(1);
         expect(queryCache[0].queryKey).toEqual(
           ['api', 'splits', 'guid', 'page', { interval: TEST_INTERVAL.toISODate(), pageIndex: 0, pageSize: 1 }],
@@ -263,7 +261,7 @@ describe('useSplits', () => {
         await waitFor(() => expect(result.current.status).toEqual('success'));
         expect(result.current.data).toEqual(1);
 
-        const queryCache = queryClient.getQueryCache().getAll();
+        const queryCache = QUERY_CLIENT.getQueryCache().getAll();
         expect(queryCache).toHaveLength(1);
         expect(queryCache[0].queryKey).toEqual(
           ['api', 'splits', 'guid', 'count', { interval: TEST_INTERVAL.toISODate() }],
@@ -316,7 +314,7 @@ describe('useSplits', () => {
       await waitFor(() => expect(result.current.status).toEqual('success'));
       expect(result.current.data).toEqual(100);
 
-      const queryCache = queryClient.getQueryCache().getAll();
+      const queryCache = QUERY_CLIENT.getQueryCache().getAll();
       expect(queryCache).toHaveLength(1);
       expect(queryCache[0].queryKey).toEqual(
         ['api', 'splits', 'guid', 'total', '2023-01-01'],
@@ -348,7 +346,7 @@ describe('useSplits', () => {
 
       await waitFor(() => expect(result.current.status).toEqual('pending'));
 
-      const queryCache = queryClient.getQueryCache().getAll();
+      const queryCache = QUERY_CLIENT.getQueryCache().getAll();
       expect(queryCache).toHaveLength(1);
       expect(queryCache[0].queryKey).toEqual(
         ['api', 'splits', { aggregation: 'total', date: '2023-01-01' }],
@@ -368,7 +366,7 @@ describe('useSplits', () => {
       );
 
       await waitFor(() => expect(result.current.status).toEqual('success'));
-      const queryCache = queryClient.getQueryCache().getAll();
+      const queryCache = QUERY_CLIENT.getQueryCache().getAll();
       expect(queryCache[0].queryKey).toEqual(
         [
           'api',
@@ -443,7 +441,7 @@ describe('useSplits', () => {
 
       await waitFor(() => expect(result.current.status).toEqual('pending'));
 
-      const queryCache = queryClient.getQueryCache().getAll();
+      const queryCache = QUERY_CLIENT.getQueryCache().getAll();
       expect(queryCache).toHaveLength(1);
       expect(queryCache[0].queryKey).toEqual(
         [
@@ -473,7 +471,7 @@ describe('useSplits', () => {
       );
 
       await waitFor(() => expect(result.current.status).toEqual('success'));
-      const queryCache = queryClient.getQueryCache().getAll();
+      const queryCache = QUERY_CLIENT.getQueryCache().getAll();
       expect(queryCache[0].queryKey).toEqual(
         [
           'api',
@@ -548,7 +546,7 @@ describe('useSplits', () => {
 
       await waitFor(() => expect(result.current.status).toEqual('pending'));
 
-      const queryCache = queryClient.getQueryCache().getAll();
+      const queryCache = QUERY_CLIENT.getQueryCache().getAll();
       expect(queryCache).toHaveLength(2);
       // this hook depends on the useAccountsTotals hook
       expect(queryCache[0].queryKey).toEqual(
@@ -593,7 +591,7 @@ describe('useSplits', () => {
       );
 
       await waitFor(() => expect(result.current.status).toEqual('success'));
-      const queryCache = queryClient.getQueryCache().getAll();
+      const queryCache = QUERY_CLIENT.getQueryCache().getAll();
       expect(queryCache[1].queryKey).toEqual(
         [
           'api',

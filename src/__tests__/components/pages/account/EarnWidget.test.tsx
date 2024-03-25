@@ -6,6 +6,8 @@ import EarnWidget from '@/components/pages/account/EarnWidget';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import * as apiHook from '@/hooks/api';
 import type { Account, Commodity } from '@/book/entities';
+import type { CashFlowRow } from '@/hooks/api/useCashFlow';
+import Money from '@/book/Money';
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
@@ -21,7 +23,7 @@ describe('EarnWidgetTest', () => {
 
   beforeEach(() => {
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
-    jest.spyOn(apiHook, 'useCashFlow').mockReturnValue({ data: undefined } as UseQueryResult<{ guid: string, total: number, type: string, name: string }[]>);
+    jest.spyOn(apiHook, 'useCashFlow').mockReturnValue({ data: undefined } as UseQueryResult<CashFlowRow[]>);
     account = {
       guid: 'guid',
       commodity: {
@@ -42,7 +44,7 @@ describe('EarnWidgetTest', () => {
         className: 'mr-2',
         description: expect.anything(),
         stats: '€0.00',
-        title: 'This month income',
+        title: 'Income',
       },
       {},
     );
@@ -52,61 +54,63 @@ describe('EarnWidgetTest', () => {
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
     jest.spyOn(apiHook, 'useCashFlow')
       .mockReturnValueOnce({
+        // period cash flow
         data: [
           {
             guid: 'guid3',
             name: '3',
             type: 'INCOME',
-            total: -30,
+            total: new Money(-30, 'EUR'),
           },
           {
             guid: 'guid4',
             name: '4',
             type: 'EXPENSE',
-            total: 20,
+            total: new Money(20, 'EUR'),
           },
           {
             guid: 'guid5',
             name: '5',
             type: 'LIABILITY',
-            total: 20,
+            total: new Money(20, 'EUR'),
           },
           {
             guid: 'guid6',
             name: '6',
             type: 'ASSET',
-            total: 30,
+            total: new Money(30, 'EUR'),
           },
         ],
-      } as UseQueryResult<{ guid: string, total: number, type: string, name: string }[]>)
+      } as UseQueryResult<CashFlowRow[]>)
+      // last month cash flow
       .mockReturnValueOnce({
         data: [
           {
             guid: 'guid3',
             name: '3',
             type: 'INCOME',
-            total: -20,
+            total: new Money(-20, 'EUR'),
           },
           {
             guid: 'guid4',
             name: '4',
             type: 'EXPENSE',
-            total: 10,
+            total: new Money(10, 'EUR'),
           },
           {
             guid: 'guid5',
             name: '5',
             type: 'LIABILITY',
-            total: 20,
+            total: new Money(20, 'EUR'),
           },
           {
             guid: 'guid6',
             name: '6',
             type: 'ASSET',
-            total: 30,
+            total: new Money(30, 'EUR'),
           },
         ],
-      } as UseQueryResult<{ guid: string, total: number, type: string, name: string }[]>);
+      } as UseQueryResult<CashFlowRow[]>);
 
     render(<EarnWidget account={account} />);
 
@@ -115,7 +119,7 @@ describe('EarnWidgetTest', () => {
         className: 'mr-2',
         description: expect.anything(),
         stats: '€30.00',
-        title: 'This month income',
+        title: 'Income',
       },
       {},
     );

@@ -85,7 +85,7 @@ describe('AssetInfo', () => {
       },
       {},
     );
-    expect(AssetSankey).toBeCalledWith({ height: 270, guid: 'guid' }, {});
+    expect(AssetSankey).toBeCalledWith({ height: 270, account }, {});
     expect(TotalWidget).toBeCalledWith(
       { account },
       {},

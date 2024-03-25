@@ -1,6 +1,6 @@
 import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider, UseQueryResult } from '@tanstack/react-query';
+import { QueryClientProvider, UseQueryResult } from '@tanstack/react-query';
 
 import { useMainCurrency } from '@/hooks/api';
 import * as queries from '@/lib/queries';
@@ -13,9 +13,8 @@ jest.mock('@/hooks/api/useAccounts', () => ({
   ...jest.requireActual('@/hooks/api/useAccounts'),
 }));
 
-const queryClient = new QueryClient();
 const wrapper = ({ children }: React.PropsWithChildren) => (
-  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  <QueryClientProvider client={QUERY_CLIENT}>{children}</QueryClientProvider>
 );
 
 describe('useMainCurrency', () => {
@@ -25,7 +24,7 @@ describe('useMainCurrency', () => {
     } as UseQueryResult<Account[]>);
     renderHook(() => useMainCurrency(), { wrapper });
 
-    const queryCache = queryClient.getQueryCache().getAll();
+    const queryCache = QUERY_CLIENT.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
     // @ts-ignore
     expect(queryCache[0].options.enabled).toBe(false);
@@ -44,7 +43,7 @@ describe('useMainCurrency', () => {
     const { result } = renderHook(() => useMainCurrency(), { wrapper });
 
     await waitFor(() => expect(result.current.data).toEqual({ guid: 'eur' }));
-    const queryCache = queryClient.getQueryCache().getAll();
+    const queryCache = QUERY_CLIENT.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
     // @ts-ignore
     expect(queryCache[0].options.enabled).toBe(true);

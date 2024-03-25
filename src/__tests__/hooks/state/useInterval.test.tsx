@@ -1,18 +1,17 @@
 import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { DateTime, Interval } from 'luxon';
 
 import { useInterval } from '@/hooks/state';
 
-const queryClient = new QueryClient();
 const wrapper = ({ children }: React.PropsWithChildren) => (
-  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  <QueryClientProvider client={QUERY_CLIENT}>{children}</QueryClientProvider>
 );
 
 describe('useMainCurrency', () => {
   beforeEach(() => {
-    queryClient.removeQueries();
+    QUERY_CLIENT.removeQueries();
   });
 
   it('sets now - 6 months as default', async () => {
@@ -26,7 +25,7 @@ describe('useMainCurrency', () => {
 
     expect(result.current.data.splitBy({ month: 1 })).toHaveLength(6);
 
-    const queryCache = queryClient.getQueryCache().getAll();
+    const queryCache = QUERY_CLIENT.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
     expect(queryCache[0].queryKey).toEqual(['state', 'interval']);
     expect(queryCache[0].gcTime).toEqual(Infinity);

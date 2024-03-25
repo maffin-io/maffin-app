@@ -1,13 +1,12 @@
 import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 
 import { useCommodity, useCommodities } from '@/hooks/api';
 import { Commodity } from '@/book/entities';
 
-const queryClient = new QueryClient();
 const wrapper = ({ children }: React.PropsWithChildren) => (
-  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  <QueryClientProvider client={QUERY_CLIENT}>{children}</QueryClientProvider>
 );
 
 describe('useCommodities', () => {
@@ -26,7 +25,7 @@ describe('useCommodities', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    queryClient.removeQueries();
+    QUERY_CLIENT.removeQueries();
   });
 
   it('calls query as expected', async () => {
@@ -36,7 +35,7 @@ describe('useCommodities', () => {
     expect(Commodity.find).toBeCalledWith();
     expect(result.current.data).toEqual([commodity1, commodity2]);
 
-    const queryCache = queryClient.getQueryCache().getAll();
+    const queryCache = QUERY_CLIENT.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
     expect(queryCache[0].queryKey).toEqual(['api', 'commodities']);
   });
@@ -58,7 +57,7 @@ describe('useCommodity', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    queryClient.removeQueries();
+    QUERY_CLIENT.removeQueries();
   });
 
   it('calls query as expected', async () => {
@@ -68,7 +67,7 @@ describe('useCommodity', () => {
     expect(Commodity.find).toBeCalledWith();
     expect(result.current.data).toEqual(commodity1);
 
-    const queryCache = queryClient.getQueryCache().getAll();
+    const queryCache = QUERY_CLIENT.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
     expect(queryCache[0].queryKey).toEqual(['api', 'commodities']);
   });

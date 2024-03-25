@@ -6,6 +6,7 @@ import '@testing-library/jest-dom';
 import crypto from 'crypto';
 
 import { DateTime, Interval, Settings } from 'luxon';
+import { QueryClient } from '@tanstack/react-query';
 
 // https://github.com/chartjs/chartjs-adapter-luxon/issues/91
 jest.mock('chartjs-adapter-luxon', jest.fn());
@@ -50,6 +51,7 @@ Settings.now = () => 1672531200000; // 2023-01-01
 
 declare global {
   const TEST_INTERVAL: Interval;
+  const QUERY_CLIENT: QueryClient;
 }
 
 Object.defineProperty(
@@ -61,5 +63,19 @@ Object.defineProperty(
       DateTime.now().minus({ month: 5 }).startOf('month'),
       DateTime.now().endOf('day'),
     ),
+  },
+);
+
+Object.defineProperty(
+  global,
+  'QUERY_CLIENT',
+  {
+    value: new QueryClient({
+      defaultOptions: {
+        queries: {
+          throwOnError: true,
+        },
+      },
+    }),
   },
 );

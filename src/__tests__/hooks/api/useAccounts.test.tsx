@@ -1,13 +1,12 @@
 import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 
 import { useAccount, useAccounts } from '@/hooks/api';
 import { Account } from '@/book/entities';
 
-const queryClient = new QueryClient();
 const wrapper = ({ children }: React.PropsWithChildren) => (
-  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  <QueryClientProvider client={QUERY_CLIENT}>{children}</QueryClientProvider>
 );
 
 describe('useAccounts', () => {
@@ -32,7 +31,7 @@ describe('useAccounts', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    queryClient.removeQueries();
+    QUERY_CLIENT.removeQueries();
   });
 
   it('calls query as expected', async () => {
@@ -42,7 +41,7 @@ describe('useAccounts', () => {
     expect(Account.find).toBeCalledWith();
     expect(result.current.data).toEqual([account1, account2]);
 
-    const queryCache = queryClient.getQueryCache().getAll();
+    const queryCache = QUERY_CLIENT.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
     expect(queryCache[0].queryKey).toEqual(['api', 'accounts']);
   });
@@ -93,7 +92,7 @@ describe('useAccount', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    queryClient.removeQueries();
+    QUERY_CLIENT.removeQueries();
   });
 
   it('calls query as expected', async () => {
@@ -103,7 +102,7 @@ describe('useAccount', () => {
     expect(Account.find).toBeCalledWith();
     expect(result.current.data).toEqual(account1);
 
-    const queryCache = queryClient.getQueryCache().getAll();
+    const queryCache = QUERY_CLIENT.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
     expect(queryCache[0].queryKey).toEqual(['api', 'accounts']);
   });

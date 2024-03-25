@@ -8,7 +8,7 @@ import {
 import { DataSource } from 'typeorm';
 import { DateTime } from 'luxon';
 import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import Onboarding from '@/components/onboarding/Onboarding';
@@ -26,9 +26,8 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
-const queryClient = new QueryClient();
 const wrapper = ({ children }: React.PropsWithChildren) => (
-  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  <QueryClientProvider client={QUERY_CLIENT}>{children}</QueryClientProvider>
 );
 
 describe('Onboarding', () => {
@@ -56,10 +55,10 @@ describe('Onboarding', () => {
   // This test is huge but doing it like this because the onboarding
   // steps are linked one after the other
   it('full onboarding', async () => {
-    queryClient.removeQueries();
+    QUERY_CLIENT.removeQueries();
     const user = userEvent.setup();
     render(
-      <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={QUERY_CLIENT}>
         <div>
           <span id="save-button" />
           <span id="theme-button" />
