@@ -2,7 +2,7 @@ import React from 'react';
 import { BiCalendar } from 'react-icons/bi';
 import { DateTime, Interval } from 'luxon';
 
-import { useMainCurrency, useCashFlow } from '@/hooks/api';
+import { useCashFlow } from '@/hooks/api';
 import type { Account } from '@/book/entities';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import Money from '@/book/Money';
@@ -18,8 +18,7 @@ export type EarnWidgetProps = {
 export default function EarnWidget({
   account,
 }: EarnWidgetProps): JSX.Element {
-  const { data: currency } = useMainCurrency();
-  const zero = new Money(0, currency?.mnemonic || '');
+  const zero = new Money(0, account.commodity.mnemonic || '');
 
   const { data: periodCashflow } = useCashFlow(account.guid);
   const periodEarn = periodCashflow?.filter(c => c.type === 'INCOME').reduce(

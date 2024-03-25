@@ -2,7 +2,7 @@ import React from 'react';
 import { BiCalendar } from 'react-icons/bi';
 import { DateTime, Interval } from 'luxon';
 
-import { useMainCurrency, useCashFlow } from '@/hooks/api';
+import { useCashFlow } from '@/hooks/api';
 import type { Account } from '@/book/entities';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import Money from '@/book/Money';
@@ -14,18 +14,15 @@ export type SpendWidgetProps = {
 
 /**
  * Given a cashflow, compute the money that has been spent in this account
- * through INCOME accounts
+ * through EXPENSE accounts.
  */
 export default function SpendWidget({
   account,
 }: SpendWidgetProps): JSX.Element {
-  const { data: currency } = useMainCurrency();
-  const zero = new Money(0, currency?.mnemonic || '');
+  const zero = new Money(0, account.commodity.mnemonic || '');
 
   const { data: periodCashflow } = useCashFlow(account.guid);
-  const periodSpend = periodCashflow?.filter(
-    c => c.type === 'EXPENSE' || isLiability(c.type),
-  ).reduce(
+  const periodSpend = periodCashflow?.filter(c => c.type === 'EXPENSE').reduce(
     (total, c) => c.total.add(total),
     zero,
   ) || zero;

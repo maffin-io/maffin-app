@@ -1,18 +1,17 @@
 import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 
 import { useTheme } from '@/hooks/state';
 
-const queryClient = new QueryClient();
 const wrapper = ({ children }: React.PropsWithChildren) => (
-  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  <QueryClientProvider client={QUERY_CLIENT}>{children}</QueryClientProvider>
 );
 
 describe('useMainCurrency', () => {
   beforeEach(() => {
     localStorage.removeItem('theme');
-    queryClient.removeQueries();
+    QUERY_CLIENT.removeQueries();
   });
 
   // We set dark theme as default in setupTests
@@ -20,7 +19,7 @@ describe('useMainCurrency', () => {
     const { result } = renderHook(() => useTheme(), { wrapper });
 
     await waitFor(() => expect(result.current.data).toEqual('dark'));
-    const queryCache = queryClient.getQueryCache().getAll();
+    const queryCache = QUERY_CLIENT.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
     expect(queryCache[0].queryKey).toEqual(['state', 'theme']);
     expect(queryCache[0].gcTime).toEqual(Infinity);
@@ -32,7 +31,7 @@ describe('useMainCurrency', () => {
     const { result } = renderHook(() => useTheme(), { wrapper });
 
     await waitFor(() => expect(result.current.data).toEqual('light'));
-    const queryCache = queryClient.getQueryCache().getAll();
+    const queryCache = QUERY_CLIENT.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
     expect(queryCache[0].gcTime).toEqual(Infinity);
   });

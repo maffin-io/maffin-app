@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import Datepicker from 'react-tailwindcss-datepicker';
 import { DateTime, Interval } from 'luxon';
-import { DefinedUseQueryResult, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { DefinedUseQueryResult, QueryClientProvider } from '@tanstack/react-query';
 import * as query from '@tanstack/react-query';
 import type { UseQueryResult } from '@tanstack/react-query';
 
@@ -29,9 +29,8 @@ jest.mock('@/hooks/state', () => ({
   ...jest.requireActual('@/hooks/state'),
 }));
 
-const queryClient = new QueryClient();
 const wrapper = ({ children }: React.PropsWithChildren) => (
-  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  <QueryClientProvider client={QUERY_CLIENT}>{children}</QueryClientProvider>
 );
 
 describe('DateRangeInput', () => {

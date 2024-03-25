@@ -2,36 +2,40 @@ import React from 'react';
 import type { ChartDataset } from 'chart.js';
 
 import Money from '@/book/Money';
-import { useCashFlow, useMainCurrency } from '@/hooks/api';
-import { isAsset, isLiability } from '@/book/helpers/accountType';
+import { useCashFlow } from '@/hooks/api';
+import { isLiability } from '@/book/helpers/accountType';
 import { moneyToString, toFixed } from '@/helpers/number';
+import type { Account } from '@/book/entities';
 import Sankey from './Sankey';
 
 export type AssetSankeyProps = {
-  guid: string,
+  account: Account,
   height?: number,
 };
 
 export default function AssetSankey({
-  guid,
+  account,
   height = 250,
 }: AssetSankeyProps): JSX.Element {
-  const { data: byAccount, isPending } = useCashFlow(guid);
-  const { data: currency } = useMainCurrency();
+  const { data: cashflow, isPending } = useCashFlow(account.guid);
 
-  const assetName = byAccount?.find(r => r.guid === guid)?.name || '';
+  const labels: { [guid: string]: string } = {
+    [account.guid]: account.name,
+  };
 
-  let totalIn = new Money(0, currency?.mnemonic || '');
-  let totalOut = new Money(0, currency?.mnemonic || '');
+  let totalIn = new Money(0, account.commodity.mnemonic);
+  let totalOut = new Money(0, account.commodity.mnemonic);
 
-  const data = byAccount?.filter(r => r.guid !== guid).map(r => {
+  const data = cashflow?.filter(r => r.guid !== account.guid).map(r => {
+    labels[r.guid] = r.name;
+
     if (r.total.isNegative()) {
       totalIn = totalIn.add(r.total.abs());
 
       return {
-        from: r.name,
+        from: r.guid,
         fromType: r.type,
-        to: assetName,
+        to: account.guid,
         toType: 'ASSET',
         flow: r.total.abs().toNumber(),
       };
@@ -39,9 +43,9 @@ export default function AssetSankey({
 
     totalOut = totalOut.add(r.total);
     return {
-      from: assetName,
+      from: account.guid,
       fromType: 'ASSET',
-      to: r.name,
+      to: r.guid,
       toType: r.type,
       flow: r.total.toNumber(),
     };
@@ -50,7 +54,7 @@ export default function AssetSankey({
   if (!isPending && !data?.length) {
     return (
       <div className="flex h-[400px] text-sm place-content-center place-items-center">
-        No movements this month yet!
+        No movements for this period!
       </div>
     );
   }
@@ -58,6 +62,7 @@ export default function AssetSankey({
   const datasets: ChartDataset<'sankey'>[] = [
     {
       data: data || [],
+      labels,
       colorFrom: (d) => {
         if (!d.raw) {
           return '';
@@ -103,12 +108,12 @@ export default function AssetSankey({
             displayColors: false,
             callbacks: {
               label: (ctx) => {
-                const raw = ctx.raw as { flow: number, toType: string };
-                let absolute = moneyToString(-raw.flow, currency?.mnemonic || '');
+                const raw = ctx.raw as { flow: number, to: string };
+                let absolute = moneyToString(-raw.flow, account.commodity.mnemonic);
                 let percentage = toFixed((raw.flow / totalOut.toNumber()) * 100);
-                if (isAsset(raw.toType)) {
+                if (raw.to === account.guid) {
                   percentage = toFixed((raw.flow / totalIn.toNumber()) * 100);
-                  absolute = moneyToString(raw.flow, currency?.mnemonic || '');
+                  absolute = moneyToString(raw.flow, account.commodity.mnemonic);
                 }
                 return `${absolute} (${percentage} %)`;
               },

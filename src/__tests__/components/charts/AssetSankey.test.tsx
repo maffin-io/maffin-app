@@ -6,7 +6,7 @@ import { AssetSankey } from '@/components/charts';
 import Sankey from '@/components/charts/Sankey';
 import Money from '@/book/Money';
 import * as apiHooks from '@/hooks/api';
-import type { Commodity } from '@/book/entities';
+import type { Account } from '@/book/entities';
 import type { CashFlowRow } from '@/hooks/api/useCashFlow';
 
 jest.mock('@/hooks/api');
@@ -16,11 +16,15 @@ jest.mock('@/components/charts/Sankey', () => jest.fn(
 ));
 
 describe('AssetSankey', () => {
+  let account: Account;
+
   beforeEach(() => {
+    account = {
+      guid: 'guid1',
+      name: '1',
+      commodity: { mnemonic: 'EUR' },
+    } as Account;
     jest.spyOn(apiHooks, 'useCashFlow').mockReturnValue({ data: undefined } as UseQueryResult<CashFlowRow[]>);
-    jest.spyOn(apiHooks, 'useMainCurrency').mockReturnValue(
-      { data: { mnemonic: 'EUR' } as Commodity } as UseQueryResult<Commodity>,
-    );
   });
 
   afterEach(() => {
@@ -28,21 +32,15 @@ describe('AssetSankey', () => {
   });
 
   it('renders with no data', () => {
-    render(<AssetSankey guid="guid" />);
+    render(<AssetSankey account={account} />);
 
-    screen.getByText('No movements this month yet', { exact: false });
+    screen.getByText('No movements for this period', { exact: false });
   });
 
   it('generates data as expected', () => {
     jest.spyOn(apiHooks, 'useCashFlow').mockReturnValue(
       {
         data: [
-          {
-            guid: 'guid1',
-            name: '1',
-            type: 'BANK',
-            total: new Money(10, 'EUR'),
-          },
           {
             guid: 'guid2',
             name: '2',
@@ -77,7 +75,7 @@ describe('AssetSankey', () => {
       } as UseQueryResult<CashFlowRow[]>,
     );
 
-    render(<AssetSankey guid="guid1" />);
+    render(<AssetSankey account={account} />);
 
     expect(Sankey).toBeCalledWith(
       {
@@ -113,40 +111,48 @@ describe('AssetSankey', () => {
               colorFrom: expect.any(Function),
               colorTo: expect.any(Function),
               nodeWidth: 2,
+              labels: {
+                guid1: '1',
+                guid2: '2',
+                guid3: '3',
+                guid4: '4',
+                guid5: '5',
+                guid6: '6',
+              },
               data: [
                 {
                   flow: 10,
-                  from: '2',
+                  from: 'guid2',
                   fromType: 'INCOME',
-                  to: '1',
+                  to: 'guid1',
                   toType: 'ASSET',
                 },
                 {
                   flow: 20,
-                  from: '3',
+                  from: 'guid3',
                   fromType: 'INCOME',
-                  to: '1',
+                  to: 'guid1',
                   toType: 'ASSET',
                 },
                 {
                   flow: 10,
-                  from: '1',
+                  from: 'guid1',
                   fromType: 'ASSET',
-                  to: '4',
+                  to: 'guid4',
                   toType: 'EXPENSE',
                 },
                 {
                   flow: 20,
-                  from: '1',
+                  from: 'guid1',
                   fromType: 'ASSET',
-                  to: '5',
+                  to: 'guid5',
                   toType: 'LIABILITY',
                 },
                 {
                   flow: 30,
-                  from: '1',
+                  from: 'guid1',
                   fromType: 'ASSET',
-                  to: '6',
+                  to: 'guid6',
                   toType: 'ASSET',
                 },
               ],
@@ -173,7 +179,7 @@ describe('AssetSankey', () => {
 
     const { label } = (Sankey as jest.Mock).mock.calls[0][0].options.plugins.tooltip.callbacks;
 
-    expect(label({ raw: { flow: 10, toType: 'EXPENSE' } })).toEqual('-€10.00 (16.67 %)');
-    expect(label({ raw: { flow: 10, toType: 'ASSET' } })).toEqual('€10.00 (33.33 %)');
+    expect(label({ raw: { flow: 10, to: 'guid4' } })).toEqual('-€10.00 (16.67 %)');
+    expect(label({ raw: { flow: 10, to: 'guid1' } })).toEqual('€10.00 (33.33 %)');
   });
 });

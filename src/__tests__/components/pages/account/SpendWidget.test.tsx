@@ -53,6 +53,7 @@ describe('SpendWidgetTest', () => {
   it('renders as expected', () => {
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
     jest.spyOn(apiHook, 'useCashFlow')
+      // period cash flow
       .mockReturnValueOnce({
         data: [
           {
@@ -81,6 +82,7 @@ describe('SpendWidgetTest', () => {
           },
         ],
       } as UseQueryResult<CashFlowRow[]>)
+      // last month cash flow
       .mockReturnValueOnce({
         data: [
           {
@@ -116,7 +118,7 @@ describe('SpendWidgetTest', () => {
       {
         className: 'mr-2',
         description: expect.anything(),
-        stats: '€40.00',
+        stats: '€20.00',
         title: 'Expenses',
       },
       {},

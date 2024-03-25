@@ -54,6 +54,7 @@ describe('EarnWidgetTest', () => {
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
     jest.spyOn(apiHook, 'useCashFlow')
       .mockReturnValueOnce({
+        // period cash flow
         data: [
           {
             guid: 'guid3',
@@ -81,6 +82,7 @@ describe('EarnWidgetTest', () => {
           },
         ],
       } as UseQueryResult<CashFlowRow[]>)
+      // last month cash flow
       .mockReturnValueOnce({
         data: [
           {

@@ -68,7 +68,7 @@ export default function AssetInfo({
               && (
                 <AssetSankey
                   height={270}
-                  guid={account.guid}
+                  account={account}
                 />
               )
             }
