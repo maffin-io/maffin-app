@@ -1,5 +1,4 @@
 import React from 'react';
-import { DateTime, Interval } from 'luxon';
 import type { ChartDataset } from 'chart.js';
 
 import Bar from '@/components/charts/Bar';
@@ -7,22 +6,18 @@ import type { Account } from '@/book/entities';
 import { useAccounts, useAccountsMonthlyTotal, useMainCurrency } from '@/hooks/api';
 import { moneyToString } from '@/helpers/number';
 import monthlyDates from '@/helpers/monthlyDates';
+import { useInterval } from '@/hooks/state';
 
 export type MonthlyTotalHistogramProps = {
   title?: string,
-  interval?: Interval,
   guids: string[],
 };
 
 export default function MonthlyTotalHistogram({
-  interval,
   title,
   guids = [],
 }: MonthlyTotalHistogramProps): JSX.Element {
-  interval = interval || Interval.fromDateTimes(
-    DateTime.now().minus({ months: 6 }).startOf('month'),
-    DateTime.now(),
-  );
+  const { data: interval } = useInterval();
   const { data: monthlyTotals } = useAccountsMonthlyTotal(interval);
   const { data: accounts } = useAccounts();
 
@@ -35,7 +30,7 @@ export default function MonthlyTotalHistogram({
   if (accounts && monthlyTotals) {
     guids.forEach(guid => {
       const data = dates.map((_, i) => (
-        monthlyTotals[i][guid]?.toNumber() || 0
+        monthlyTotals[i]?.[guid]?.toNumber() || 0
       ));
       if (!data.every(v => v === 0)) {
         datasets.push({

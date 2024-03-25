@@ -3,7 +3,7 @@
 import React from 'react';
 import { Settings } from 'luxon';
 import Script from 'next/script';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { keepPreviousData, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 
@@ -32,6 +32,7 @@ const queryClient = new QueryClient({
       // online and then go to offline, subsequent queries are paused...
       networkMode: 'always',
       throwOnError: true,
+      placeholderData: keepPreviousData,
     },
   },
 });

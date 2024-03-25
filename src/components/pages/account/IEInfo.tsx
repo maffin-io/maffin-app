@@ -1,5 +1,4 @@
 import React from 'react';
-import { DateTime, Interval } from 'luxon';
 import classNames from 'classnames';
 
 import type { Account } from '@/book/entities';
@@ -60,12 +59,6 @@ export default function IEInfo({
           <MonthlyTotalHistogram
             title=""
             guids={account.placeholder ? account.childrenIds : [account.guid]}
-            interval={
-              Interval.fromDateTimes(
-                DateTime.now().minus({ year: 1 }).startOf('month'),
-                DateTime.now(),
-              )
-            }
           />
         </div>
         <div className="col-span-12" />
