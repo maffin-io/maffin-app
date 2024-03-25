@@ -105,6 +105,48 @@ describe('accountsTotalAggregations', () => {
       expect(aggregated[0].a4.toString()).toEqual('0.00 EUR');
       expect(aggregated[1].a4.toString()).toEqual('0.00 EUR');
     });
+
+    /**
+     * Due to eventual consistency in state, sometimes it may be that
+     * an interval of X months is passed but the monthlyTotals are with less
+     * data points because it still has the previous query loaded.
+     */
+    it('works when less totals than amount of dates', () => {
+      const monthlyTotals = [
+        {
+          a1: new Money(100, 'EUR'),
+          a2: new Money(200, 'EUR'),
+        },
+        {
+          a1: new Money(200, 'EUR'),
+          a2: new Money(200, 'EUR'),
+        },
+      ];
+
+      const aggregated = aggregateMonthlyWorth(
+        'root',
+        accounts,
+        monthlyTotals,
+        [
+          DateTime.now().minus({ month: 2 }),
+          DateTime.now().minus({ month: 1 }),
+          DateTime.now(),
+        ],
+      );
+
+      expect(aggregated[0].root.toString()).toEqual('0.00 undefined');
+      expect(aggregated[1].root.toString()).toEqual('0.00 undefined');
+
+      expect(aggregated[0].a1.toString()).toEqual('100.00 EUR');
+      expect(aggregated[1].a1.toString()).toEqual('300.00 EUR');
+      // No monthly totals so it is +0
+      expect(aggregated[2].a1.toString()).toEqual('300.00 EUR');
+
+      expect(aggregated[0].a2.toString()).toEqual('200.00 EUR');
+      expect(aggregated[1].a2.toString()).toEqual('400.00 EUR');
+      // No monthly totals so it is +0
+      expect(aggregated[2].a2.toString()).toEqual('400.00 EUR');
+    });
   });
 
   describe('aggregateChildrenTotals', () => {

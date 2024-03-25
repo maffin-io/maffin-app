@@ -18,16 +18,10 @@ import { AccountsTable } from '@/components/tables';
 import { TotalsPie, MonthlyTotalHistogram, NetWorthHistogram } from '@/components/charts';
 import IncomeExpenseHistogram from '@/components/pages/accounts/IncomeExpenseHistogram';
 import * as apiHook from '@/hooks/api';
-import * as stateHooks from '@/hooks/state';
 
 jest.mock('@/hooks/api', () => ({
   __esModule: true,
   ...jest.requireActual('@/hooks/api'),
-}));
-
-jest.mock('@/hooks/state', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/state'),
 }));
 
 jest.mock('@/components/buttons/FormButton', () => jest.fn(
@@ -78,7 +72,6 @@ describe('AccountsPage', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-02') as DateTime<true>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
-    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
   });
 
   afterEach(() => {
@@ -165,7 +158,6 @@ describe('AccountsPage', () => {
       {
         title: 'Income',
         accounts: undefined,
-        interval: TEST_INTERVAL,
       },
       {},
     );
@@ -174,7 +166,6 @@ describe('AccountsPage', () => {
       {
         title: 'Expenses',
         accounts: undefined,
-        interval: TEST_INTERVAL,
       },
       {},
     );
@@ -294,7 +285,6 @@ describe('AccountsPage', () => {
       1,
       {
         title: 'Income',
-        interval: TEST_INTERVAL,
         guids: [accounts[4].guid],
       },
       {},
@@ -303,7 +293,6 @@ describe('AccountsPage', () => {
       2,
       {
         title: 'Expenses',
-        interval: TEST_INTERVAL,
         guids: [accounts[2].guid],
       },
       {},

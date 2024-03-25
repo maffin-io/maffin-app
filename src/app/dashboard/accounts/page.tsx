@@ -18,13 +18,11 @@ import { AccountsTable } from '@/components/tables';
 import Loading from '@/components/Loading';
 import Onboarding from '@/components/onboarding/Onboarding';
 import { useAccounts } from '@/hooks/api';
-import { useInterval } from '@/hooks/state';
 import mapAccounts from '@/helpers/mapAccounts';
 import { ASSET, LIABILITY } from '@/constants/colors';
 
 export default function AccountsPage(): JSX.Element {
   const { data, isLoading } = useAccounts();
-  const { data: interval } = useInterval();
 
   if (isLoading) {
     return (
@@ -105,7 +103,6 @@ export default function AccountsPage(): JSX.Element {
             <MonthlyTotalHistogram
               guids={accountsMap?.type_income?.childrenIds}
               title="Income"
-              interval={interval}
             />
           </div>
           <div className="card col-span-8">
@@ -115,7 +112,6 @@ export default function AccountsPage(): JSX.Element {
             <MonthlyTotalHistogram
               guids={accountsMap?.type_expense?.childrenIds}
               title="Expenses"
-              interval={interval}
             />
           </div>
         </div>

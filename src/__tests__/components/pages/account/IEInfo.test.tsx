@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { DateTime, Interval } from 'luxon';
+import { DateTime } from 'luxon';
 
 import { IEInfo } from '@/components/pages/account';
 import TotalWidget from '@/components/pages/account/TotalWidget';
@@ -55,10 +55,6 @@ describe('IEInfo', () => {
       {
         guids: [account.guid],
         title: '',
-        interval: Interval.fromDateTimes(
-          DateTime.now().minus({ year: 1 }).startOf('month'),
-          DateTime.now(),
-        ),
       },
       {},
     );
@@ -90,10 +86,6 @@ describe('IEInfo', () => {
       {
         guids: ['1', '2'],
         title: '',
-        interval: Interval.fromDateTimes(
-          DateTime.now().minus({ year: 1 }).startOf('month'),
-          DateTime.now(),
-        ),
       },
       {},
     );

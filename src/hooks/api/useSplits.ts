@@ -234,12 +234,11 @@ export function useAccountsTotals(
  * exchange rate for that month
  */
 export function useAccountsMonthlyTotal(
-  interval?: Interval,
+  selectedInterval?: Interval,
 ): UseQueryResult<AccountsTotals[]> {
-  interval = interval || Interval.fromDateTimes(
-    DateTime.now().minus({ month: 6 }).startOf('month'),
-    DateTime.now(),
-  );
+  const { data: defaultInterval } = useInterval();
+  const interval = selectedInterval || defaultInterval;
+
   const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
   const { data: prices, dataUpdatedAt: pricesUpdatedAt } = usePrices({});
 

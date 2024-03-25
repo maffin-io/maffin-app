@@ -40,7 +40,7 @@ function aggregateWorth(
   dates.forEach((_, i) => {
     const zero = new Money(0, current.commodity?.mnemonic);
     const previousMonth = aggregatedTotals[i - 1]?.[current.guid] || zero;
-    const currentMonth = monthlyTotals[i][current.guid] || zero;
+    const currentMonth = monthlyTotals[i]?.[current.guid] || zero;
     aggregatedTotals[i][current.guid] = currentMonth.add(previousMonth);
   });
 }

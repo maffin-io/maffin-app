@@ -416,6 +416,8 @@ describe('useSplits', () => {
       jest.spyOn(usePricesHook, 'usePrices').mockReturnValue({
         data: {},
       } as UseQueryResult<PriceDBMap>);
+      jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
+
       jest.spyOn(queries, 'getMonthlyTotals').mockResolvedValue([
         {
           type_asset: new Money(100, 'EUR'),
@@ -449,7 +451,7 @@ describe('useSplits', () => {
           'splits',
           {
             aggregation: 'monthly-total',
-            dates: '2022-07-01/2023-01-01',
+            dates: TEST_INTERVAL.toISODate(),
           },
         ],
       );
@@ -478,7 +480,7 @@ describe('useSplits', () => {
           'splits',
           {
             aggregation: 'monthly-total',
-            dates: '2022-03-01/2022-05-01',
+            dates: interval.toISODate(),
             accountsUpdatedAt: 1,
           }],
       );
