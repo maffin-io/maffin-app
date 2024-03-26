@@ -55,6 +55,9 @@ export default class PriceDBMap {
       fk_commodity: {
         mnemonic: from,
       },
+      fk_currency: {
+        mnemonic: from,
+      },
     });
 
     const key = from;
