@@ -2,13 +2,13 @@
 
 import React from 'react';
 import Modal from 'react-modal';
+import { useRouter } from 'next/navigation';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import Footer from '@/layout/Footer';
 import LeftSidebar from '@/layout/LeftSidebar';
 import { useTheme } from '@/hooks/state';
 import useSession from '@/hooks/useSession';
-import { useRouter } from 'next/navigation';
 import DashboardPage from '@/layout/DashboardPage';
 import { MaffinError } from '@/helpers/errors';
 
@@ -32,15 +32,13 @@ export default function DashboardLayout({
       <LeftSidebar />
       <div className="mt-20 ml-20 p-3 pb-7">
         <ErrorBoundary
-          fallbackRender={
-            ({ error }) => {
-              if (!(error instanceof MaffinError)) {
-                error = new MaffinError(error.message, 'UNKNOWN');
-              }
-
-              return error.show();
+          FallbackComponent={ErrorComponent}
+          onError={(error) => {
+            if (!(error instanceof MaffinError)) {
+              error = new MaffinError(error.message, 'UNKNOWN');
             }
-          }
+            (error as MaffinError).show();
+          }}
         >
           <DashboardPage>
             {children}
@@ -50,4 +48,8 @@ export default function DashboardLayout({
       <Footer />
     </div>
   );
+}
+
+function ErrorComponent(): JSX.Element {
+  return <span />;
 }
