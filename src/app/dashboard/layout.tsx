@@ -2,13 +2,13 @@
 
 import React from 'react';
 import Modal from 'react-modal';
+import { useRouter } from 'next/navigation';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import Footer from '@/layout/Footer';
 import LeftSidebar from '@/layout/LeftSidebar';
 import { useTheme } from '@/hooks/state';
 import useSession from '@/hooks/useSession';
-import { useRouter } from 'next/navigation';
 import DashboardPage from '@/layout/DashboardPage';
 import { MaffinError } from '@/helpers/errors';
 
