@@ -65,14 +65,14 @@ describe('getAccountsTotals', () => {
   });
 
   it('returns empty when no accounts', async () => {
-    const totals = await getAccountsTotals([], DateTime.now());
+    const totals = await getAccountsTotals([], TEST_INTERVAL);
     expect(totals).toEqual({});
   });
 
   it('returns empty when accounts with no splits', async () => {
     const totals = await getAccountsTotals(
       [root, assetAccount, expensesAccount],
-      DateTime.now(),
+      TEST_INTERVAL,
     );
     expect(totals).toEqual({});
   });
@@ -80,7 +80,7 @@ describe('getAccountsTotals', () => {
   it('sums splits and calls as expected', async () => {
     await Transaction.create({
       description: 'description',
-      date: DateTime.fromISO('2022-01-01'),
+      date: DateTime.fromISO('2022-08-01'),
       fk_currency: eur,
       splits: [
         Split.create({
@@ -101,7 +101,7 @@ describe('getAccountsTotals', () => {
     }).save();
     await Transaction.create({
       description: 'description',
-      date: DateTime.fromISO('2022-02-01'),
+      date: DateTime.fromISO('2022-09-01'),
       fk_currency: eur,
       splits: [
         Split.create({
@@ -123,7 +123,7 @@ describe('getAccountsTotals', () => {
 
     const totals = await getAccountsTotals(
       [root, assetAccount, expensesAccount],
-      DateTime.now(),
+      TEST_INTERVAL,
     );
 
     expect(totals.abcdef.toString()).toEqual('-300.00 EUR');
@@ -133,7 +133,7 @@ describe('getAccountsTotals', () => {
   it('filters by date', async () => {
     await Transaction.create({
       description: 'description',
-      date: DateTime.fromISO('2023-01-01'),
+      date: DateTime.fromISO('2022-09-01'),
       fk_currency: eur,
       splits: [
         Split.create({
@@ -154,7 +154,7 @@ describe('getAccountsTotals', () => {
     }).save();
     await Transaction.create({
       description: 'description',
-      date: DateTime.fromISO('2023-02-01'),
+      date: TEST_INTERVAL.end?.plus({ month: 1 }),
       fk_currency: eur,
       splits: [
         Split.create({
@@ -176,7 +176,7 @@ describe('getAccountsTotals', () => {
 
     const totals = await getAccountsTotals(
       [root, assetAccount, expensesAccount],
-      DateTime.fromISO('2023-01-10'),
+      TEST_INTERVAL,
     );
 
     expect(totals.abcdef.toString()).toEqual('-100.00 EUR');

@@ -257,15 +257,4 @@ describe('TotalsPie', () => {
       {},
     );
   });
-
-  it('passes interval date', () => {
-    render(
-      <TotalsPie
-        title=""
-        guids={[]}
-      />,
-    );
-
-    expect(apiHook.useAccountsTotals).toBeCalledWith(TEST_INTERVAL.end);
-  });
 });

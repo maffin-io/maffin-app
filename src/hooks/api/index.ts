@@ -15,11 +15,12 @@ export {
   useSplits,
   useSplitsPagination,
   useSplitsCount,
-  useAccountTotal,
-  useAccountsTotals,
   useAccountsMonthlyTotal,
-  useAccountsMonthlyWorth,
 } from '@/hooks/api/useSplits';
+export { useIncomeStatement } from '@/hooks/api/useIncomeStatement';
+export { useBalanceSheet } from '@/hooks/api/useBalanceSheet';
+export { useAccountsTotals } from '@/hooks/api/useAccountsTotals';
+export { useMonthlyWorth } from '@/hooks/api/useMonthlyWorth';
 export { usePrices } from '@/hooks/api/usePrices';
 export { useCashFlow } from '@/hooks/api/useCashFlow';
 export { useMainCurrency } from '@/hooks/api/useMainCurrency';
