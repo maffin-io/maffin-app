@@ -1,5 +1,4 @@
 import React from 'react';
-import { DateTime } from 'luxon';
 import { ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
 import { BiCircle, BiSolidRightArrow, BiSolidDownArrow } from 'react-icons/bi';
@@ -10,7 +9,6 @@ import Table from '@/components/tables/Table';
 import type { AccountsMap } from '@/types/book';
 import { Account } from '@/book/entities';
 import { useAccounts, useAccountsTotals } from '@/hooks/api';
-import { useInterval } from '@/hooks/state';
 import mapAccounts from '@/helpers/mapAccounts';
 import { accountColorCode } from '@/helpers/classNames';
 
@@ -26,8 +24,7 @@ export default function AccountsTable(
   }: AccountsTableProps,
 ): JSX.Element {
   const { data } = useAccounts();
-  const { data: interval } = useInterval();
-  const { data: accountsTotal } = useAccountsTotals(interval.end as DateTime<true>);
+  const { data: accountsTotal } = useAccountsTotals();
 
   const accounts = mapAccounts(data);
   const trees: AccountsTableRow[] = [];
@@ -37,7 +34,6 @@ export default function AccountsTable(
         accounts[guid],
         accounts,
         accountsTotal || {},
-        interval.end as DateTime<true>,
       ));
     }
   });
@@ -62,13 +58,12 @@ function getTree(
   current: Account,
   accounts: AccountsMap,
   accountsTotal: { [guid: string]: Money },
-  selectedDate: DateTime,
 ): AccountsTableRow {
   const leaves: AccountsTableRow[] = [];
   current.childrenIds.forEach(childId => {
     const childAccount = accounts[childId];
     if (!childAccount.hidden && childAccount.parentId === current.guid) {
-      leaves.push(getTree(childAccount, accounts, accountsTotal, selectedDate));
+      leaves.push(getTree(childAccount, accounts, accountsTotal));
     }
   });
 

@@ -8,7 +8,7 @@ import {
 
 import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
-import { useAccountsMonthlyWorth } from '@/hooks/api';
+import { useMonthlyWorth } from '@/hooks/api';
 import monthlyDates from '@/helpers/monthlyDates';
 import { useInterval } from '@/hooks/state';
 
@@ -42,7 +42,7 @@ export default function NetWorthHistogram({
   height = 400,
 }: NetWorthHistogramProps): JSX.Element {
   const { data: interval } = useInterval();
-  const { data: monthlyWorth } = useAccountsMonthlyWorth(interval);
+  const { data: monthlyWorth } = useMonthlyWorth();
   const assetSeries = monthlyWorth?.map(m => m[assetsGuid]?.toNumber() || 0);
   const liabilitySeries = monthlyWorth?.map(m => m[liabilitiesGuid]?.toNumber() || 0);
 

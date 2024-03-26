@@ -72,7 +72,7 @@ exports[`AssetInfo renders as expected when placeholder 1`] = `
               data-testid="TotalsPie"
             />
             <div
-              data-testid="MonthChange"
+              data-testid="TotalChange"
             />
             <div
               class="mt-4"

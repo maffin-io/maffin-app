@@ -9,7 +9,7 @@ import SpendWidget from '@/components/pages/account/SpendWidget';
 import EarnWidget from '@/components/pages/account/EarnWidget';
 import type { Account } from '@/book/entities';
 import { AccountsTable } from '@/components/tables';
-import MonthChange from '@/components/widgets/MonthChange';
+import TotalChange from '@/components/widgets/TotalChange';
 
 jest.mock('@/components/charts/NetWorthHistogram', () => jest.fn(
   () => <div data-testid="NetWorthHistogram" />,
@@ -43,8 +43,8 @@ jest.mock('@/components/pages/account/EarnWidget', () => jest.fn(
   () => <div data-testid="EarnWidget" />,
 ));
 
-jest.mock('@/components/widgets/MonthChange', () => jest.fn(
-  () => <div data-testid="MonthChange" />,
+jest.mock('@/components/widgets/TotalChange', () => jest.fn(
+  () => <div data-testid="TotalChange" />,
 ));
 
 jest.mock('@/components/tables/AccountsTable', () => jest.fn(
@@ -130,7 +130,7 @@ describe('AssetInfo', () => {
       },
       {},
     );
-    expect(MonthChange).toBeCalledWith(
+    expect(TotalChange).toBeCalledWith(
       {
         account,
         className: 'justify-center text-sm mt-1',

@@ -65,63 +65,8 @@ describe('getMonthlyTotals', () => {
   });
 
   it('returns empty when no transactions', async () => {
-    const monthlyTotals = await getMonthlyTotals([]);
-    expect(monthlyTotals).toEqual([]);
-  });
-
-  it('aggregates as expected without dates', async () => {
-    await Transaction.create({
-      description: 'description',
-      date: DateTime.fromISO('2022-12-30'),
-      fk_currency: eur,
-      splits: [
-        Split.create({
-          valueNum: 100,
-          valueDenom: 1,
-          quantityNum: 200,
-          quantityDenom: 1,
-          fk_account: expensesAccount,
-        }),
-        Split.create({
-          valueNum: -100,
-          valueDenom: 1,
-          quantityNum: -200,
-          quantityDenom: 1,
-          fk_account: assetAccount,
-        }),
-      ],
-    }).save();
-    await Transaction.create({
-      description: 'description',
-      date: DateTime.fromISO('2022-02-05'),
-      fk_currency: eur,
-      splits: [
-        Split.create({
-          valueNum: 200,
-          valueDenom: 1,
-          quantityNum: 400,
-          quantityDenom: 1,
-          fk_account: expensesAccount,
-        }),
-        Split.create({
-          valueNum: -200,
-          valueDenom: 1,
-          quantityNum: -400,
-          quantityDenom: 1,
-          fk_account: assetAccount,
-        }),
-      ],
-    }).save();
-    const monthlyTotals = await getMonthlyTotals(
-      [root, assetAccount, expensesAccount],
-    );
-
-    // Now is 2023-01-01 and earliest transaction is 2022-02 so 11 months
-    expect(monthlyTotals).toHaveLength(11);
-    expect(monthlyTotals[0].abcdef.toString()).toEqual('-400.00 EUR');
-    expect(monthlyTotals[10].abcdef.toString()).toEqual('-200.00 EUR');
-    expect(monthlyTotals[0].ghijk.toString()).toEqual('400.00 EUR');
-    expect(monthlyTotals[10].ghijk.toString()).toEqual('200.00 EUR');
+    const monthlyTotals = await getMonthlyTotals([], TEST_INTERVAL);
+    expect(monthlyTotals).toEqual([{}, {}, {}, {}, {}, {}]);
   });
 
   it('filters by date', async () => {

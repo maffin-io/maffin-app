@@ -28,7 +28,7 @@ export default function TotalsPie({
   showDataLabels = true,
 }: TotalsPieProps): JSX.Element {
   const { data: interval } = useInterval();
-  const { data: totals } = useAccountsTotals(interval.end as DateTime<true>);
+  const { data: totals } = useAccountsTotals();
   const { data: accounts } = useAccounts();
 
   const { data: currency } = useMainCurrency();

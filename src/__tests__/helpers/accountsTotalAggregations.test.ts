@@ -78,7 +78,7 @@ describe('accountsTotalAggregations', () => {
       ];
 
       const aggregated = aggregateMonthlyWorth(
-        'root',
+        ['a1', 'a2'],
         accounts,
         monthlyTotals,
         [
@@ -88,9 +88,6 @@ describe('accountsTotalAggregations', () => {
         ],
       );
 
-      expect(aggregated[0].root.toString()).toEqual('0.00 undefined');
-      expect(aggregated[1].root.toString()).toEqual('0.00 undefined');
-
       expect(aggregated[0].a1.toString()).toEqual('100.00 EUR');
       expect(aggregated[1].a1.toString()).toEqual('300.00 EUR');
       expect(aggregated[2].a1.toString()).toEqual('600.00 EUR');
@@ -98,12 +95,6 @@ describe('accountsTotalAggregations', () => {
       expect(aggregated[0].a2.toString()).toEqual('200.00 EUR');
       expect(aggregated[1].a2.toString()).toEqual('400.00 EUR');
       expect(aggregated[2].a2.toString()).toEqual('800.00 EUR');
-
-      expect(aggregated[0].a3.toString()).toEqual('0.00 EUR');
-      expect(aggregated[1].a3.toString()).toEqual('0.00 EUR');
-
-      expect(aggregated[0].a4.toString()).toEqual('0.00 EUR');
-      expect(aggregated[1].a4.toString()).toEqual('0.00 EUR');
     });
 
     /**
@@ -124,7 +115,7 @@ describe('accountsTotalAggregations', () => {
       ];
 
       const aggregated = aggregateMonthlyWorth(
-        'root',
+        ['a1', 'a2'],
         accounts,
         monthlyTotals,
         [
@@ -133,9 +124,6 @@ describe('accountsTotalAggregations', () => {
           DateTime.now(),
         ],
       );
-
-      expect(aggregated[0].root.toString()).toEqual('0.00 undefined');
-      expect(aggregated[1].root.toString()).toEqual('0.00 undefined');
 
       expect(aggregated[0].a1.toString()).toEqual('100.00 EUR');
       expect(aggregated[1].a1.toString()).toEqual('300.00 EUR');
@@ -152,7 +140,7 @@ describe('accountsTotalAggregations', () => {
   describe('aggregateChildrenTotals', () => {
     it('creates default account type entries', () => {
       const totals = aggregateChildrenTotals(
-        'root',
+        ['type_income', 'type_expense', 'type_asset', 'type_liability'],
         accounts,
         {} as PriceDBMap,
         DateTime.now(),
@@ -190,7 +178,7 @@ describe('accountsTotalAggregations', () => {
         a6: new Money(200, 'EUR'),
       };
       const aggregatedTotals = aggregateChildrenTotals(
-        'root',
+        ['type_expense'],
         accounts,
         {} as PriceDBMap,
         DateTime.now(),
@@ -241,7 +229,7 @@ describe('accountsTotalAggregations', () => {
       ] as Price[];
 
       const totals = aggregateChildrenTotals(
-        'root',
+        ['a4'],
         accounts,
         new PriceDBMap(prices),
         DateTime.now(),
@@ -299,7 +287,7 @@ describe('accountsTotalAggregations', () => {
       ] as Price[];
 
       const totals = aggregateChildrenTotals(
-        'root',
+        ['a4'],
         accounts,
         new PriceDBMap(prices),
         DateTime.now().minus({ month: 1 }),
@@ -375,7 +363,7 @@ describe('accountsTotalAggregations', () => {
       ] as Price[];
 
       const totals = aggregateChildrenTotals(
-        'root',
+        ['a1'],
         accounts,
         new PriceDBMap(prices),
         DateTime.now(),
@@ -392,7 +380,7 @@ describe('accountsTotalAggregations', () => {
     });
 
     it('works with children without totals', () => {
-      accounts[4].childrenIds = ['a5'];
+      accounts[1].childrenIds = ['a5'];
       accounts = [
         ...accounts,
         {
@@ -405,7 +393,7 @@ describe('accountsTotalAggregations', () => {
       ];
 
       const totals = aggregateChildrenTotals(
-        'root',
+        ['a1'],
         accounts,
         {} as PriceDBMap,
         DateTime.now(),

@@ -27,7 +27,7 @@ jest.mock('@/hooks/state', () => ({
 
 describe('NetWorthHistogram', () => {
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useAccountsMonthlyWorth').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals[]>);
+    jest.spyOn(apiHook, 'useMonthlyWorth').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals[]>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
     jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
   });
@@ -177,7 +177,7 @@ describe('NetWorthHistogram', () => {
   });
 
   it('renders with no data', () => {
-    jest.spyOn(apiHook, 'useAccountsMonthlyWorth').mockReturnValue({ data: [{}, {}] } as UseQueryResult<AccountsTotals[]>);
+    jest.spyOn(apiHook, 'useMonthlyWorth').mockReturnValue({ data: [{}, {}] } as UseQueryResult<AccountsTotals[]>);
 
     render(
       <NetWorthHistogram
@@ -331,7 +331,7 @@ describe('NetWorthHistogram', () => {
   });
 
   it('generates datasets as expected', () => {
-    jest.spyOn(apiHook, 'useAccountsMonthlyWorth').mockReturnValue(
+    jest.spyOn(apiHook, 'useMonthlyWorth').mockReturnValue(
       {
         data: [
           {

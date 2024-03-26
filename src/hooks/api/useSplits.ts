@@ -8,10 +8,10 @@ import { DateTime, Interval } from 'luxon';
 
 import { Split } from '@/book/entities';
 import type { Account } from '@/book/entities';
-import { getAccountsTotals, getMonthlyTotals } from '@/lib/queries';
+import { getMonthlyTotals } from '@/lib/queries';
 import type { PriceDBMap } from '@/book/prices';
 import type { AccountsTotals } from '@/types/book';
-import { aggregateChildrenTotals, aggregateMonthlyWorth } from '@/helpers/accountsTotalAggregations';
+import { aggregateChildrenTotals } from '@/helpers/accountsTotalAggregations';
 import { useInterval } from '@/hooks/state';
 import monthlyDates from '@/helpers/monthlyDates';
 import { useAccounts } from './useAccounts';
@@ -146,88 +146,6 @@ export function useSplitsCount(
 }
 
 /**
- * Calculates total sum of split quantities for a given account
- */
-export function useAccountTotal(
-  account: string,
-  selectedDate: DateTime = DateTime.now(),
-): UseQueryResult<number> {
-  const queryKey = [...Split.CACHE_KEY, account, 'total', selectedDate.toISODate()];
-  const result = useQuery({
-    queryKey,
-    queryFn: fetcher(
-      async () => {
-        const r = await Split.query(`
-          SELECT
-            SUM(cast(splits.quantity_num as REAL) / splits.quantity_denom) as total
-          FROM splits
-          JOIN transactions as tx ON splits.tx_guid = tx.guid
-          WHERE splits.account_guid = :guid
-            AND post_date <= '${selectedDate.toSQLDate()}'
-        `, [account]);
-        return r[0].total;
-      },
-      queryKey,
-    ),
-    networkMode: 'always',
-  });
-
-  return result;
-}
-
-/**
- * Calculates the total for each existing account. The total is calculated
- * by accumulating the splits for each account. The total of each account
- * is in the commodity of the account
- *
- * By default, it aggregates the splits of the children into their parent but an
- * optional select parameter can be passed to change that behavior.
- */
-export function useAccountsTotals(
-  selectedDate: DateTime = DateTime.now(),
-  select?: (data: AccountsTotals) => AccountsTotals,
-): UseQueryResult<AccountsTotals> {
-  const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
-  const { data: prices, dataUpdatedAt: pricesUpdatedAt } = usePrices({});
-
-  const aggregate = React.useCallback(
-    ((data: AccountsTotals) => aggregateChildrenTotals(
-      'type_root',
-      accounts as Account[],
-      prices as PriceDBMap,
-      selectedDate,
-      data,
-    )),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [accountsUpdatedAt, pricesUpdatedAt, selectedDate.toISODate()],
-  );
-
-  const queryKey = [
-    ...Split.CACHE_KEY,
-    {
-      aggregation: 'total',
-      date: selectedDate.toISODate(),
-      accountsUpdatedAt,
-    },
-  ];
-  const result = useQuery({
-    queryKey,
-    queryFn: fetcher(
-      async () => getAccountsTotals(
-        accounts as Account[],
-        selectedDate,
-      ),
-      queryKey,
-    ),
-    enabled: !!accounts,
-    select: select || aggregate,
-    networkMode: 'always',
-  });
-
-  return result;
-}
-
-/**
  * Aggregates monthly splits for each account to produce
  * monthly histograms of transactions. For accounts where their children
  * have different commodity, the monthly aggregation is converted using an
@@ -247,7 +165,7 @@ export function useAccountsMonthlyTotal(
       const dates = monthlyDates(interval as Interval).map(d => d.endOf('month'));
       dates[dates.length - 1] = (interval as Interval).end as DateTime;
       return data.map((d, i) => aggregateChildrenTotals(
-        'type_root',
+        ['type_income', 'type_expense', 'type_asset', 'type_liability'],
         accounts as Account[],
         prices as PriceDBMap,
         dates[i],
@@ -276,83 +194,6 @@ export function useAccountsMonthlyTotal(
       queryKey,
     ),
     enabled: !!accounts,
-    select: aggregate,
-    networkMode: 'always',
-  });
-
-  return result;
-}
-
-/**
- * Aggregates monthly splits for each account accumulating the value for each month.
- * This is useful to produce monthly worth histograms.
- *
- * For accounts where their children
- * have different commodity, the monthly aggregation is converted using an
- * exchange rate for each respective month
- */
-export function useAccountsMonthlyWorth(
-  interval?: Interval,
-): UseQueryResult<AccountsTotals[]> {
-  interval = interval
-    || Interval.fromDateTimes(
-      DateTime.now().minus({ month: 6 }).startOf('month'),
-      DateTime.now(),
-    );
-  const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
-  const { data: prices, dataUpdatedAt: pricesUpdatedAt } = usePrices({});
-  const { data: totals, dataUpdatedAt: totalsUpdatedAt } = useAccountsTotals(
-    (interval.start as DateTime).endOf('month') as DateTime,
-    (data) => data,
-  );
-
-  const aggregate = React.useCallback(
-    ((data: AccountsTotals[]) => {
-      const dates = monthlyDates(interval as Interval).map(d => d.endOf('month'));
-      dates[dates.length - 1] = (interval as Interval).end as DateTime;
-      const aggregated = aggregateMonthlyWorth(
-        'type_root',
-        accounts as Account[],
-        [
-          totals as AccountsTotals,
-          ...data,
-        ],
-        dates,
-      );
-      return aggregated.map((d, i) => aggregateChildrenTotals(
-        'type_root',
-        accounts as Account[],
-        prices as PriceDBMap,
-        dates[i],
-        d,
-      ));
-    }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [accountsUpdatedAt, pricesUpdatedAt, totalsUpdatedAt, interval.toISODate()],
-  );
-
-  const queryKey = [
-    ...Split.CACHE_KEY,
-    {
-      aggregation: 'monthly-worth',
-      dates: interval.toISODate(),
-      totalsUpdatedAt,
-      accountsUpdatedAt,
-    },
-  ];
-  const result = useQuery({
-    queryKey,
-    queryFn: fetcher(
-      () => getMonthlyTotals(
-        accounts as Account[],
-        Interval.fromDateTimes(
-          ((interval as Interval).start as DateTime).plus({ month: 1 }),
-          (interval as Interval).end as DateTime,
-        ),
-      ),
-      queryKey,
-    ),
-    enabled: !!accounts && !!totalsUpdatedAt,
     select: aggregate,
     networkMode: 'always',
   });

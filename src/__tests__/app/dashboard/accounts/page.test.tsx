@@ -3,8 +3,8 @@ import {
   screen,
   render,
 } from '@testing-library/react';
-import { DateTime, Interval } from 'luxon';
-import type { DefinedUseQueryResult, UseQueryResult } from '@tanstack/react-query';
+import { DateTime } from 'luxon';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import type { Account } from '@/book/entities';
 import AccountsPage from '@/app/dashboard/accounts/page';

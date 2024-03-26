@@ -4,7 +4,7 @@ import { useAccountsTotals } from '@/hooks/api';
 import Money from '@/book/Money';
 import type { Account } from '@/book/entities';
 import StatisticsWidget from '@/components/StatisticsWidget';
-import MonthChange from '@/components/widgets/MonthChange';
+import TotalChange from '@/components/widgets/TotalChange';
 
 export type TotalWidgetProps = {
   account: Account,
@@ -21,7 +21,7 @@ export default function TotalWidget({
       className="mr-2"
       title="Total"
       stats={total0.abs().format()}
-      description={<MonthChange account={account} />}
+      description={<TotalChange account={account} />}
     />
   );
 }

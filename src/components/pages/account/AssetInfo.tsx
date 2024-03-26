@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import type { Account } from '@/book/entities';
 import { AssetSankey, NetWorthHistogram, TotalsPie } from '@/components/charts';
 import { AccountsTable } from '@/components/tables';
-import MonthChange from '@/components/widgets/MonthChange';
+import TotalChange from '@/components/widgets/TotalChange';
 import TotalWidget from './TotalWidget';
 import SpendWidget from './SpendWidget';
 import EarnWidget from './EarnWidget';
@@ -37,7 +37,7 @@ export default function AssetInfo({
                       showTooltip
                       showDataLabels={false}
                     />
-                    <MonthChange
+                    <TotalChange
                       account={account}
                       className="justify-center text-sm mt-1"
                     />

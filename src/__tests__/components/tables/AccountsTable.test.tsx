@@ -1,14 +1,13 @@
 import React from 'react';
-import { DateTime, Interval } from 'luxon';
+import { DateTime } from 'luxon';
 import { render, screen } from '@testing-library/react';
-import { DefinedUseQueryResult, UseQueryResult } from '@tanstack/react-query';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import { AccountsTable } from '@/components/tables';
 import Table from '@/components/tables/Table';
 import { Account } from '@/book/entities';
 import Money from '@/book/Money';
 import * as apiHook from '@/hooks/api';
-import * as stateHooks from '@/hooks/state';
 import type { AccountsTotals } from '@/types/book';
 
 jest.mock('@/components/tables/Table', () => jest.fn(
@@ -21,17 +20,11 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
-jest.mock('@/hooks/state', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/state'),
-}));
-
 describe('AccountsTable', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-01') as DateTime<true>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
     jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals>);
-    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
   });
 
   afterEach(() => {
@@ -71,7 +64,7 @@ describe('AccountsTable', () => {
       },
       {},
     );
-    expect(apiHook.useAccountsTotals).toBeCalledWith(TEST_INTERVAL.end);
+    expect(apiHook.useAccountsTotals).toBeCalledWith();
     expect(container).toMatchSnapshot();
   });
 

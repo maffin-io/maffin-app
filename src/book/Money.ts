@@ -9,6 +9,7 @@ import type { Commodity } from './entities';
 
 export default class Money {
   private _raw: djs.Dinero<number>;
+  readable: string;
 
   /**
    * A wrapper class for dinero object to reduce verbosity and overhead. The constructor
@@ -36,6 +37,8 @@ export default class Money {
         scale,
       });
     }
+
+    this.readable = this.toString();
   }
 
   get currency(): string {
