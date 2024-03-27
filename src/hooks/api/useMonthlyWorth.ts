@@ -5,12 +5,12 @@ import type { UseQueryResult } from '@tanstack/react-query';
 
 import { useInterval } from '@/hooks/state';
 import { aggregateChildrenTotals, aggregateMonthlyWorth } from '@/helpers/accountsTotalAggregations';
-import monthlyDates from '@/helpers/monthlyDates';
 import { getMonthlyTotals } from '@/lib/queries';
 import { Split } from '@/book/entities';
 import type { AccountsTotals } from '@/types/book';
 import type { PriceDBMap } from '@/book/prices';
 import type { Account } from '@/book/entities';
+import { intervalToDates } from '@/helpers/dates';
 import { useBalanceSheet } from './useBalanceSheet';
 import { useAccounts } from './useAccounts';
 import { usePrices } from './usePrices';
@@ -33,14 +33,12 @@ export function useMonthlyWorth(
   const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
   const { data: prices, dataUpdatedAt: pricesUpdatedAt } = usePrices({});
   const { data: totals, dataUpdatedAt: totalsUpdatedAt } = useBalanceSheet(
-    interval.start?.endOf('month') as DateTime<true>,
+    (interval.start?.minus({ day: 1 }) as DateTime),
     (data) => data,
   );
 
   const aggregate = React.useCallback(
     ((data: AccountsTotals[]) => {
-      const dates = monthlyDates(interval as Interval).map(d => d.endOf('month'));
-      dates[dates.length - 1] = (interval as Interval).end as DateTime;
       const aggregated = aggregateMonthlyWorth(
         ['type_asset', 'type_liability'],
         accounts as Account[],
@@ -48,16 +46,16 @@ export function useMonthlyWorth(
           totals as AccountsTotals,
           ...data,
         ],
-        dates,
       );
 
+      const dates = [interval.start as DateTime, ...intervalToDates(interval as Interval)];
       return aggregated.map((d, i) => aggregateChildrenTotals(
         ['type_asset', 'type_liability'],
         accounts as Account[],
         prices as PriceDBMap,
         dates[i],
         d,
-      ));
+      )).slice(1);
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [accountsUpdatedAt, pricesUpdatedAt, totalsUpdatedAt, interval.toISODate()],
@@ -77,10 +75,7 @@ export function useMonthlyWorth(
     queryFn: fetcher(
       () => getMonthlyTotals(
         accounts as Account[],
-        Interval.fromDateTimes(
-          ((interval as Interval).start as DateTime).plus({ month: 1 }),
-          (interval as Interval).end as DateTime,
-        ),
+        interval,
       ),
       queryKey,
     ),

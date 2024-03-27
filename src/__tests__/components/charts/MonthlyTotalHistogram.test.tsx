@@ -255,11 +255,11 @@ describe('MonthlyTotalHistogram', () => {
         data: {
           datasets: [
             {
-              data: [1000, 0, 0, 0, 0, 0],
+              data: [1000],
               label: 'Salary',
             },
             {
-              data: [50, 0, 0, 0, 0, 0],
+              data: [50],
               label: 'Dividends',
             },
           ],

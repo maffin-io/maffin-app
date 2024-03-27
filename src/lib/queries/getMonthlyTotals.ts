@@ -5,7 +5,7 @@ import Money from '@/book/Money';
 import mapAccounts from '@/helpers/mapAccounts';
 import type { Account } from '@/book/entities';
 import type { AccountsTotals } from '@/types/book';
-import monthlyDates from '@/helpers/monthlyDates';
+import { intervalToDates } from '@/helpers/dates';
 
 /**
  * Given an interval it aggregates monthly splits for each account
@@ -33,7 +33,7 @@ export default async function getMonthlyTotals(
   const accountsMap = mapAccounts(accounts);
 
   const monthlyTotals: AccountsTotals[] = [];
-  const dates = monthlyDates(interval);
+  const dates = intervalToDates(interval);
 
   dates.forEach(date => {
     const totals: { [guid: string]: Money } = {};
