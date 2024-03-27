@@ -9,7 +9,7 @@ import { moneyToString } from '@/helpers/number';
 import type { Account } from '@/book/entities';
 import { useInvestment, usePrices } from '@/hooks/api';
 import Loading from '@/components/Loading';
-import monthlyDates from '@/helpers/monthlyDates';
+import { intervalToDates } from '@/helpers/dates';
 
 Chart.register(Filler, zoomPlugin);
 
@@ -51,7 +51,7 @@ export default function InvestmentChart({
   const valueData: { x: number, y: number }[] = [];
   const interval = Interval.fromDateTimes(startDate, DateTime.now());
   const monthly = interval.toDuration('months').months >= 3
-    ? monthlyDates(interval)
+    ? intervalToDates(interval).map(d => d.startOf('month'))
     : interval.splitBy({ day: 1 }).map(d => (d.start as DateTime));
   monthly.forEach(x => {
     investment.processSplits(x);

@@ -194,11 +194,7 @@ describe('InvestmentChart', () => {
     } as UseQueryResult<InvestmentAccount>);
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-04-01') as DateTime<true>);
 
-    render(
-      <InvestmentChart
-        account={account}
-      />,
-    );
+    render(<InvestmentChart account={account} />);
 
     expect(Line).toBeCalledWith(
       {
@@ -218,6 +214,10 @@ describe('InvestmentChart', () => {
                 },
                 {
                   x: 1677628800000,
+                  y: 5,
+                },
+                {
+                  x: 1680307200000,
                   y: 5,
                 },
               ],
@@ -262,6 +262,10 @@ describe('InvestmentChart', () => {
                 },
                 {
                   x: 1677628800000,
+                  y: 750,
+                },
+                {
+                  x: 1680307200000,
                   y: 750,
                 },
               ],
@@ -451,11 +455,7 @@ describe('InvestmentChart', () => {
     } as UseQueryResult<InvestmentAccount>);
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-04') as DateTime<true>);
 
-    render(
-      <InvestmentChart
-        account={account}
-      />,
-    );
+    render(<InvestmentChart account={account} />);
 
     expect(Line).toBeCalledWith(
       {

@@ -4,7 +4,7 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 import { Between, FindOptionsWhere } from 'typeorm';
-import { DateTime, Interval } from 'luxon';
+import { Interval } from 'luxon';
 
 import { Split } from '@/book/entities';
 import type { Account } from '@/book/entities';
@@ -13,7 +13,7 @@ import type { PriceDBMap } from '@/book/prices';
 import type { AccountsTotals } from '@/types/book';
 import { aggregateChildrenTotals } from '@/helpers/accountsTotalAggregations';
 import { useInterval } from '@/hooks/state';
-import monthlyDates from '@/helpers/monthlyDates';
+import { intervalToDates } from '@/helpers/dates';
 import { useAccounts } from './useAccounts';
 import { usePrices } from './usePrices';
 import fetcher from './fetcher';
@@ -162,8 +162,7 @@ export function useAccountsMonthlyTotal(
 
   const aggregate = React.useCallback(
     ((data: AccountsTotals[]) => {
-      const dates = monthlyDates(interval as Interval).map(d => d.endOf('month'));
-      dates[dates.length - 1] = (interval as Interval).end as DateTime;
+      const dates = intervalToDates(interval);
       return data.map((d, i) => aggregateChildrenTotals(
         ['type_income', 'type_expense', 'type_asset', 'type_liability'],
         accounts as Account[],
@@ -180,7 +179,7 @@ export function useAccountsMonthlyTotal(
     ...Split.CACHE_KEY,
     {
       aggregation: 'monthly-total',
-      dates: interval.toISODate(),
+      interval: interval.toISODate(),
       accountsUpdatedAt,
     },
   ];

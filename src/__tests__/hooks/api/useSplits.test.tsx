@@ -308,7 +308,7 @@ describe('useSplits', () => {
           'splits',
           {
             aggregation: 'monthly-total',
-            dates: TEST_INTERVAL.toISODate(),
+            interval: TEST_INTERVAL.toISODate(),
           },
         ],
       );
@@ -337,7 +337,7 @@ describe('useSplits', () => {
           'splits',
           {
             aggregation: 'monthly-total',
-            dates: interval.toISODate(),
+            interval: interval.toISODate(),
             accountsUpdatedAt: 1,
           }],
       );
@@ -348,20 +348,22 @@ describe('useSplits', () => {
       expect(result.current.data?.[0].type_asset.toString()).toEqual('400.00 EUR');
 
       expect(aggregations.aggregateChildrenTotals).toBeCalledTimes(2);
-      expect(aggregations.aggregateChildrenTotals).toBeCalledWith(
+      expect(aggregations.aggregateChildrenTotals).nthCalledWith(
+        1,
         ['type_income', 'type_expense', 'type_asset', 'type_liability'],
         [],
         {},
-        interval.start?.endOf('month'),
+        interval.start?.endOf('month').startOf('day'),
         {
           type_asset: expect.any(Money),
         },
       );
-      expect(aggregations.aggregateChildrenTotals).toBeCalledWith(
+      expect(aggregations.aggregateChildrenTotals).nthCalledWith(
+        2,
         ['type_income', 'type_expense', 'type_asset', 'type_liability'],
         [],
         {},
-        interval.end,
+        interval.start?.plus({ month: 1 }).endOf('month').startOf('day'),
         {
           type_asset: expect.any(Money),
         },

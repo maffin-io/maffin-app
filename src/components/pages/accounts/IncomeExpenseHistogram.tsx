@@ -5,7 +5,7 @@ import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
 import { useAccountsMonthlyTotal, useMainCurrency } from '@/hooks/api';
 import { useInterval } from '@/hooks/state';
-import monthlyDates from '@/helpers/monthlyDates';
+import { intervalToDates } from '@/helpers/dates';
 
 export default function IncomeExpenseHistogram(): JSX.Element {
   const { data: interval } = useInterval();
@@ -58,7 +58,7 @@ export default function IncomeExpenseHistogram(): JSX.Element {
       <Bar
         height="400"
         data={{
-          labels: monthlyDates(interval),
+          labels: intervalToDates(interval).map(d => d.startOf('month')),
           datasets,
         }}
         options={{
