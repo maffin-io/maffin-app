@@ -1,17 +1,17 @@
 import React from 'react';
 import { Chart, Filler } from 'chart.js';
-import { DateTime, Interval } from 'luxon';
-import zoomPlugin from 'chartjs-plugin-zoom';
+import { DateTime } from 'luxon';
 
 import { Price } from '@/book/entities';
 import Line from '@/components/charts/Line';
 import { moneyToString } from '@/helpers/number';
 import type { Account } from '@/book/entities';
 import { useInvestment, usePrices } from '@/hooks/api';
+import { useInterval } from '@/hooks/state';
 import Loading from '@/components/Loading';
 import { intervalToDates } from '@/helpers/dates';
 
-Chart.register(Filler, zoomPlugin);
+Chart.register(Filler);
 
 export type InvestmentChartProps = {
   account: Account,
@@ -22,6 +22,7 @@ export default function InvestmentChart({
 }: InvestmentChartProps): JSX.Element {
   const { data: investment } = useInvestment(account.guid);
   const { data: pricesMap } = usePrices({ from: account.commodity });
+  const { data: interval } = useInterval();
 
   if (!investment || !pricesMap) {
     return <Loading />;
@@ -35,7 +36,6 @@ export default function InvestmentChart({
     );
   }
 
-  const startDate = investment.splits[investment.splits.length - 1].transaction.date;
   const prices = pricesMap.prices || [];
   const currency = (prices.length && prices[0].currency.mnemonic) || '';
 
@@ -49,14 +49,12 @@ export default function InvestmentChart({
 
   const numStocksData: { x: number, y: number }[] = [];
   const valueData: { x: number, y: number }[] = [];
-  const interval = Interval.fromDateTimes(startDate, DateTime.now());
-  const monthly = interval.toDuration('months').months >= 3
-    ? intervalToDates(interval).map(d => d.startOf('month'))
-    : interval.splitBy({ day: 1 }).map(d => (d.start as DateTime));
-  monthly.forEach(x => {
+  const dates = intervalToDates(interval);
+
+  dates.forEach(x => {
     investment.processSplits(x);
     numStocksData.push({
-      x: x.toMillis(),
+      x: x.startOf('month').toMillis(),
       y: investment.quantity.toNumber(),
     });
 
@@ -69,13 +67,10 @@ export default function InvestmentChart({
     }
   });
 
-  // Process back to where we were as this object is shared in other components
-  investment.processSplits(DateTime.now());
-
   return (
     <Line
-      height="400px"
       data={{
+        labels: dates.map(d => d.startOf('month')),
         datasets: [
           {
             label: 'Num. stocks',
@@ -128,6 +123,13 @@ export default function InvestmentChart({
           tooltip: {
             backgroundColor: '#323b44',
             callbacks: {
+              title: (tooltipItems) => {
+                if (tooltipItems[0].datasetIndex === 0) {
+                  return dates[tooltipItems[0].dataIndex].toFormat('DD');
+                }
+
+                return undefined;
+              },
               label: (item) => {
                 if (item.datasetIndex === 0) {
                   return `${moneyToString(Number(item.parsed.y), investment.account.commodity.mnemonic)}`;
@@ -135,18 +137,6 @@ export default function InvestmentChart({
 
                 return `${moneyToString(Number(item.parsed.y), currency)}`;
               },
-            },
-          },
-          zoom: {
-            limits: {
-              x: {
-                min: startDate?.toMillis(),
-                max: DateTime.now().toMillis(),
-              },
-            },
-            pan: {
-              mode: 'x',
-              enabled: true,
             },
           },
         },
@@ -166,9 +156,8 @@ export default function InvestmentChart({
             border: {
               display: false,
             },
-            min: (startDate.toMillis() > DateTime.now().minus({ year: 1 }).toMillis())
-              ? startDate.toISODate() || undefined
-              : DateTime.now().minus({ year: 1 }).toISODate() || undefined,
+            min: interval.start?.toISODate(),
+            max: interval.end?.toISODate(),
           },
           yStocks: {
             offset: true,

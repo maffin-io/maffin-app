@@ -2,6 +2,7 @@ import {
   useQuery,
   UseQueryResult,
 } from '@tanstack/react-query';
+import { DateTime, Interval } from 'luxon';
 
 import { InvestmentAccount } from '@/book/models';
 import { getInvestments } from '@/lib/queries/getInvestments';
@@ -9,6 +10,7 @@ import {
   Account,
   Commodity,
 } from '@/book/entities';
+import { useInterval } from '@/hooks/state';
 import fetcher from './fetcher';
 import { useAccounts } from './useAccounts';
 import { useMainCurrency } from './useMainCurrency';
@@ -32,20 +34,31 @@ export function useInvestment(guid: string): UseQueryResult<InvestmentAccount | 
 export function useInvestments<TData = InvestmentAccount[]>(
   select?: (data: InvestmentAccount[]) => TData,
 ): UseQueryResult<TData> {
+  const { data: interval } = useInterval();
+
   const { data: accounts } = useAccounts();
   const { data: mainCurrency } = useMainCurrency();
 
+  const queryKey = [...InvestmentAccount.CACHE_KEY];
   const result = useQuery({
-    queryKey: [...InvestmentAccount.CACHE_KEY],
+    queryKey,
     queryFn: fetcher(
       () => getInvestments(
         (accounts as Account[]).filter(a => a.type === 'INVESTMENT'),
         mainCurrency as Commodity,
       ),
-      `/${InvestmentAccount.CACHE_KEY.join('/')}`,
+      queryKey,
     ),
     enabled: !!accounts && !!mainCurrency,
-    select,
+    select: (data: TData) => {
+      (data as InvestmentAccount[]).forEach(d => d.processSplits(interval.end as DateTime));
+
+      if (select) {
+        return select(data as InvestmentAccount[]);
+      }
+
+      return data;
+    },
     networkMode: 'always',
   });
 
