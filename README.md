@@ -37,7 +37,6 @@ Maffin is implemented using <a href="https://typeorm.io/" target="_blank">TypeOr
 
 - Clone this repo.
 - Install dependencies with `yarn`.
-- Run the frontend with `NEXT_PUBLIC_ENV="staging" yarn maffin:dev`. If you don't add the env variable, you'll need Oauth permissions which.. you won't have.
-- Run the backend with `yarn stocker:dev`.
+- Run the frontend with `yarn maffin:dev`. This will run using the local demo data.
 
 Happy coding 🥳.

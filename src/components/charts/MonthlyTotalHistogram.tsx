@@ -3,7 +3,7 @@ import type { ChartDataset } from 'chart.js';
 
 import Bar from '@/components/charts/Bar';
 import type { Account } from '@/book/entities';
-import { useAccounts, useAccountsMonthlyTotal, useMainCurrency } from '@/hooks/api';
+import { useAccounts, useMonthlyTotals, useMainCurrency } from '@/hooks/api';
 import { moneyToString } from '@/helpers/number';
 import { useInterval } from '@/hooks/state';
 import { intervalToDates } from '@/helpers/dates';
@@ -18,7 +18,7 @@ export default function MonthlyTotalHistogram({
   guids = [],
 }: MonthlyTotalHistogramProps): JSX.Element {
   const { data: interval } = useInterval();
-  const { data: monthlyTotals } = useAccountsMonthlyTotal(interval);
+  const { data: monthlyTotals } = useMonthlyTotals(interval);
   const { data: accounts } = useAccounts();
 
   const { data: currency } = useMainCurrency();

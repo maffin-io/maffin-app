@@ -1,12 +1,14 @@
 import React from 'react';
 import classNames from 'classnames';
 import dynamic from 'next/dynamic';
+import { DateTime } from 'luxon';
 import { BiTrendingDown, BiTrendingUp } from 'react-icons/bi';
 
 import type { Account } from '@/book/entities';
 import { useInvestment, usePrices } from '@/hooks/api';
 import Loading from '@/components/Loading';
 import StatisticsWidget from '@/components/StatisticsWidget';
+import { useInterval } from '@/hooks/state';
 import { toFixed } from '@/helpers/number';
 import Money from '@/book/Money';
 
@@ -19,6 +21,7 @@ export type InvestmentInfoProps = {
 export default function InvestmentInfo({
   account,
 }: InvestmentInfoProps): JSX.Element {
+  const { data: interval } = useInterval();
   const { data: investment } = useInvestment(account.guid);
   let { data: prices } = usePrices({ from: account.commodity });
 
@@ -27,13 +30,15 @@ export default function InvestmentInfo({
   }
 
   prices = prices || [];
-  const latestPrice = prices.getInvestmentPrice(investment.account.commodity.mnemonic);
+  const latestPrice = prices.getInvestmentPrice(
+    investment.account.commodity.mnemonic,
+    interval.end as DateTime,
+  );
 
   return (
-    <div className="grid grid-cols-12">
+    <div className="grid grid-cols-12 items-stretch">
       <div className="col-span-4">
         <div className="card text-lg">
-          <span>You currently owe</span>
           <span
             className={
               classNames(
@@ -64,7 +69,7 @@ export default function InvestmentInfo({
         <div className="grid grid-cols-12">
           <StatisticsWidget
             className="col-span-6"
-            title="Latest known price"
+            title="Closest price"
             statsTextClass={
               classNames(
                 'table-caption badge default',
@@ -78,7 +83,7 @@ export default function InvestmentInfo({
           />
           <StatisticsWidget
             className="col-span-6"
-            title="Current value is"
+            title="Value"
             stats={`${investment.value.format()}`}
             statsTextClass={classNames({
               'amount-positive': investment.unrealizedProfitPct >= 0,

@@ -1,5 +1,4 @@
 import React from 'react';
-import { DateTime } from 'luxon';
 import {
   render,
   screen,
@@ -60,28 +59,10 @@ describe('Header', () => {
         mnemonic: 'EUR',
       },
     } as Account;
-    const splits = [
-      {
-        guid: 'split_guid',
-        transaction: {
-          date: DateTime.fromISO('2023-01-01'),
-          splits: [
-            { guid: 'split_guid' },
-            { guid: 'split_guid_2' },
-          ],
-        },
-        account: {
-          guid: 'guid',
-          type: 'TYPE',
-        },
-        quantity: 100,
-      } as Split,
-    ];
 
     jest.spyOn(apiHook, 'useAccount').mockReturnValueOnce({
       data: { guid: 'parent' } as Account,
     } as UseQueryResult<Account>);
-    jest.spyOn(apiHook, 'useSplits').mockReturnValueOnce({ data: splits } as UseQueryResult<Split[]>);
 
     const { container } = render(<Header account={account} />);
 
@@ -177,7 +158,6 @@ describe('Header', () => {
     jest.spyOn(apiHook, 'useAccount').mockReturnValueOnce({
       data: { guid: 'parent' } as Account,
     } as UseQueryResult<Account>);
-    jest.spyOn(apiHook, 'useSplits').mockReturnValueOnce({ data: undefined } as UseQueryResult<Split[]>);
 
     const { container } = render(<Header account={account} />);
     expect(container).toMatchSnapshot();

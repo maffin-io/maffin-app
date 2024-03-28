@@ -1,68 +1,10 @@
-import React from 'react';
-import {
-  useQuery,
-  UseQueryResult,
-} from '@tanstack/react-query';
-import { Between, FindOptionsWhere } from 'typeorm';
-import { Interval } from 'luxon';
+import { useQuery } from '@tanstack/react-query';
+import { Between } from 'typeorm';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import { Split } from '@/book/entities';
-import type { Account } from '@/book/entities';
-import { getMonthlyTotals } from '@/lib/queries';
-import type { PriceDBMap } from '@/book/prices';
-import type { AccountsTotals } from '@/types/book';
-import { aggregateChildrenTotals } from '@/helpers/accountsTotalAggregations';
 import { useInterval } from '@/hooks/state';
-import { intervalToDates } from '@/helpers/dates';
-import { useAccounts } from './useAccounts';
-import { usePrices } from './usePrices';
 import fetcher from './fetcher';
-
-/**
- * This query is a generic way to retrieve splits. It's quite unoptimised because
- * it is used by useInvestment/s queries and they need A LOT of nested information
- * like full transation with all splits, the account, etc. We probably should separate
- * in two queries in the future.
- */
-export function useSplits(
-  findOptions: FindOptionsWhere<Account>,
-): UseQueryResult<Split[]> {
-  const queryKey = [...Split.CACHE_KEY, findOptions.guid, findOptions];
-  const result = useQuery({
-    queryKey,
-    queryFn: fetcher(
-      () => Split.find({
-        where: {
-          fk_account: {
-            ...findOptions,
-          },
-        },
-        relations: {
-          fk_transaction: {
-            splits: {
-              fk_account: true,
-            },
-          },
-          fk_account: true,
-        },
-        order: {
-          fk_transaction: {
-            date: 'DESC',
-            enterDate: 'DESC',
-          },
-          // This is so debit is always before credit
-          // so we avoid negative amounts when display
-          // partial totals
-          quantityNum: 'ASC',
-        },
-      }),
-      queryKey,
-    ),
-    networkMode: 'always',
-  });
-
-  return result;
-}
 
 /**
  * This query is specialised to be used on listing transactions for a given account.
@@ -139,61 +81,6 @@ export function useSplitsCount(
       }),
       queryKey,
     ),
-    networkMode: 'always',
-  });
-
-  return result;
-}
-
-/**
- * Aggregates monthly splits for each account to produce
- * monthly histograms of transactions. For accounts where their children
- * have different commodity, the monthly aggregation is converted using an
- * exchange rate for that month
- */
-export function useAccountsMonthlyTotal(
-  selectedInterval?: Interval,
-): UseQueryResult<AccountsTotals[]> {
-  const { data: defaultInterval } = useInterval();
-  const interval = selectedInterval || defaultInterval;
-
-  const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
-  const { data: prices, dataUpdatedAt: pricesUpdatedAt } = usePrices({});
-
-  const aggregate = React.useCallback(
-    ((data: AccountsTotals[]) => {
-      const dates = intervalToDates(interval);
-      return data.map((d, i) => aggregateChildrenTotals(
-        ['type_income', 'type_expense', 'type_asset', 'type_liability'],
-        accounts as Account[],
-        prices as PriceDBMap,
-        dates[i],
-        d,
-      ));
-    }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [accountsUpdatedAt, pricesUpdatedAt, interval.toISODate()],
-  );
-
-  const queryKey = [
-    ...Split.CACHE_KEY,
-    {
-      aggregation: 'monthly-total',
-      interval: interval.toISODate(),
-      accountsUpdatedAt,
-    },
-  ];
-  const result = useQuery({
-    queryKey,
-    queryFn: fetcher(
-      () => getMonthlyTotals(
-        accounts as Account[],
-        interval,
-      ),
-      queryKey,
-    ),
-    enabled: !!accounts,
-    select: aggregate,
     networkMode: 'always',
   });
 

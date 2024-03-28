@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { DateTime } from 'luxon';
-import type { UseQueryResult } from '@tanstack/react-query';
+import { DateTime, Interval } from 'luxon';
+import type { DefinedUseQueryResult, UseQueryResult } from '@tanstack/react-query';
 
 import { InvestmentInfo } from '@/components/pages/account';
 import InvestmentChart from '@/components/pages/account/InvestmentChart';
@@ -10,6 +10,7 @@ import type { Account, Commodity } from '@/book/entities';
 import { Price } from '@/book/entities';
 import Money from '@/book/Money';
 import * as apiHook from '@/hooks/api';
+import * as stateHooks from '@/hooks/state';
 import { PriceDBMap } from '@/book/prices';
 import type { InvestmentAccount } from '@/book/models';
 
@@ -26,6 +27,11 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
+jest.mock('@/hooks/state', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/state'),
+}));
+
 jest.mock('@/components/Loading', () => jest.fn(
   () => <div data-testid="Loading" />,
 ));
@@ -37,6 +43,8 @@ describe('InvestmentInfo', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({ data: undefined } as UseQueryResult<InvestmentAccount>);
+    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
+
     jest.spyOn(Price, 'create').mockImplementation();
 
     eur = {
@@ -79,13 +87,13 @@ describe('InvestmentInfo', () => {
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({
       data: new PriceDBMap([
         {
-          date: DateTime.fromISO('2023-01-01'),
+          date: DateTime.fromISO('2022-12-01'),
           value: 10,
           currency: eur,
           commodity: ticker,
         } as Price,
         {
-          date: DateTime.fromISO('2023-02-01'),
+          date: DateTime.fromISO('2023-01-01'),
           value: 15,
           currency: eur,
           commodity: ticker,
@@ -125,10 +133,10 @@ describe('InvestmentInfo', () => {
       1,
       {
         className: 'col-span-6',
-        title: 'Latest known price',
+        title: 'Closest price',
         statsTextClass: 'table-caption badge default',
         stats: '€15.00',
-        description: 'on 2/1/2023',
+        description: 'on 1/1/2023',
       },
       {},
     );
@@ -136,7 +144,7 @@ describe('InvestmentInfo', () => {
       2,
       {
         className: 'col-span-6',
-        title: 'Current value is',
+        title: 'Value',
         statsTextClass: 'amount-positive',
         stats: '€150.00',
         description: 'from €100.00 invested',

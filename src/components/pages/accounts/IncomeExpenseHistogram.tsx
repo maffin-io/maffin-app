@@ -3,13 +3,13 @@ import type { ChartDataset } from 'chart.js';
 
 import Bar from '@/components/charts/Bar';
 import { moneyToString } from '@/helpers/number';
-import { useAccountsMonthlyTotal, useMainCurrency } from '@/hooks/api';
+import { useMonthlyTotals, useMainCurrency } from '@/hooks/api';
 import { useInterval } from '@/hooks/state';
 import { intervalToDates } from '@/helpers/dates';
 
 export default function IncomeExpenseHistogram(): JSX.Element {
   const { data: interval } = useInterval();
-  const { data: monthlyTotals } = useAccountsMonthlyTotal(interval);
+  const { data: monthlyTotals } = useMonthlyTotals(interval);
   const incomeSeries = monthlyTotals?.map(m => m.type_income?.toNumber() || 0);
   const expenseSeries = monthlyTotals?.map(m => m.type_expense?.toNumber() || 0);
 

@@ -6,8 +6,33 @@ import getPrices from '@/lib/queries/getPrices';
 export async function getInvestments(
   accounts: Account[],
   mainCurrency: Commodity,
-  splits: Split[],
 ): Promise<InvestmentAccount[]> {
+  const splits = await Split.find({
+    where: {
+      fk_account: {
+        type: 'INVESTMENT',
+      },
+    },
+    relations: {
+      fk_transaction: {
+        splits: {
+          fk_account: true,
+        },
+      },
+      fk_account: true,
+    },
+    order: {
+      fk_transaction: {
+        date: 'DESC',
+        enterDate: 'DESC',
+      },
+      // This is so debit is always before credit
+      // so we avoid negative amounts when display
+      // partial totals
+      quantityNum: 'ASC',
+    },
+  });
+
   const investments = await Promise.all(
     accounts.map(account => initInvestment(
       account,
