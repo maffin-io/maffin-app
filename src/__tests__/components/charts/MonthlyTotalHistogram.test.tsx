@@ -29,7 +29,7 @@ describe('MonthlyTotalHistogram', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-01') as DateTime<true>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals[]>);
+    jest.spyOn(apiHook, 'useMonthlyTotals').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals[]>);
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
     jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
   });
@@ -152,7 +152,7 @@ describe('MonthlyTotalHistogram', () => {
         ],
       } as UseQueryResult<Account[]>,
     );
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue(
+    jest.spyOn(apiHook, 'useMonthlyTotals').mockReturnValue(
       {
         data: [
           {
@@ -232,7 +232,7 @@ describe('MonthlyTotalHistogram', () => {
         ],
       } as UseQueryResult<Account[]>,
     );
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue(
+    jest.spyOn(apiHook, 'useMonthlyTotals').mockReturnValue(
       {
         data: [
           {

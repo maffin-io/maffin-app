@@ -1,18 +1,15 @@
 import React from 'react';
-import { DateTime, Interval } from 'luxon';
+import { Interval } from 'luxon';
 import { DataSource } from 'typeorm';
 import { renderHook, waitFor } from '@testing-library/react';
 import {
   QueryClientProvider,
-  UseQueryResult,
   DefinedUseQueryResult,
 } from '@tanstack/react-query';
 
 import {
-  useSplits,
   useSplitsCount,
   useSplitsPagination,
-  useAccountsMonthlyTotal,
 } from '@/hooks/api';
 import {
   Account,
@@ -20,28 +17,7 @@ import {
   Split,
   Transaction,
 } from '@/book/entities';
-import * as useAccountsHook from '@/hooks/api/useAccounts';
-import * as usePricesHook from '@/hooks/api/usePrices';
-import * as queries from '@/lib/queries';
-import type { PriceDBMap } from '@/book/prices';
-import Money from '@/book/Money';
-import * as aggregations from '@/helpers/accountsTotalAggregations';
 import * as stateHooks from '@/hooks/state';
-import type { AccountsTotals } from '@/types/book';
-
-jest.mock('@/lib/queries');
-jest.mock('@/hooks/api/useAccounts', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/api/useAccounts'),
-}));
-jest.mock('@/hooks/api/usePrices', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/api/usePrices'),
-}));
-jest.mock('@/helpers/accountsTotalAggregations', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/helpers/accountsTotalAggregations'),
-}));
 
 jest.mock('@/hooks/state', () => ({
   __esModule: true,
@@ -54,7 +30,6 @@ const wrapper = ({ children }: React.PropsWithChildren) => (
 
 describe('useSplits', () => {
   let datasource: DataSource;
-  let split1: Split;
   let account1: Account;
 
   beforeEach(async () => {
@@ -72,65 +47,11 @@ describe('useSplits', () => {
       name: 'hi',
       type: 'ROOT',
     }).save();
-
-    split1 = await Split.create({
-      fk_account: account1,
-      valueNum: 50,
-      valueDenom: 1,
-      quantityNum: 100,
-      quantityDenom: 1,
-    }).save();
-
-    await Split.create({
-      fk_account: account1,
-      valueNum: 100,
-      valueDenom: 1,
-      quantityNum: 200,
-      quantityDenom: 1,
-    }).save();
   });
 
   afterEach(() => {
     jest.clearAllMocks();
     QUERY_CLIENT.removeQueries();
-  });
-
-  describe('useSplits', () => {
-    beforeEach(() => {
-      jest.spyOn(Split, 'find').mockResolvedValue([split1]);
-    });
-
-    it('calls query as expected', async () => {
-      const { result } = renderHook(() => useSplits({ guid: 'guid' }), { wrapper });
-
-      await waitFor(() => expect(result.current.data).toEqual([split1]));
-      expect(Split.find).toBeCalledWith({
-        where: {
-          fk_account: {
-            guid: 'guid',
-          },
-        },
-        relations: {
-          fk_transaction: {
-            splits: {
-              fk_account: true,
-            },
-          },
-          fk_account: true,
-        },
-        order: {
-          fk_transaction: {
-            date: 'DESC',
-            enterDate: 'DESC',
-          },
-          quantityNum: 'ASC',
-        },
-      });
-
-      const queryCache = QUERY_CLIENT.getQueryCache().getAll();
-      expect(queryCache).toHaveLength(1);
-      expect(queryCache[0].queryKey).toEqual(['api', 'splits', 'guid', { guid: 'guid' }]);
-    });
   });
 
   describe('pagination', () => {
@@ -264,110 +185,6 @@ describe('useSplits', () => {
           ['api', 'splits', 'guid', 'count', { interval: TEST_INTERVAL.toISODate() }],
         );
       });
-    });
-  });
-
-  describe('useAccountsMonthlyTotal', () => {
-    beforeEach(() => {
-      jest.spyOn(useAccountsHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
-      jest.spyOn(usePricesHook, 'usePrices').mockReturnValue({
-        data: {},
-      } as UseQueryResult<PriceDBMap>);
-      jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
-
-      jest.spyOn(queries, 'getMonthlyTotals').mockResolvedValue([
-        {
-          type_asset: new Money(100, 'EUR'),
-        },
-        {
-          type_asset: new Money(200, 'EUR'),
-        },
-      ] as AccountsTotals[]);
-      jest.spyOn(aggregations, 'aggregateChildrenTotals').mockReturnValue({
-        type_asset: new Money(400, 'EUR'),
-      } as AccountsTotals);
-    });
-
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-
-    it('is pending when no accounts', async () => {
-      const { result } = renderHook(
-        () => useAccountsMonthlyTotal(),
-        { wrapper },
-      );
-
-      await waitFor(() => expect(result.current.status).toEqual('pending'));
-
-      const queryCache = QUERY_CLIENT.getQueryCache().getAll();
-      expect(queryCache).toHaveLength(1);
-      expect(queryCache[0].queryKey).toEqual(
-        [
-          'api',
-          'splits',
-          {
-            aggregation: 'monthly-total',
-            interval: TEST_INTERVAL.toISODate(),
-          },
-        ],
-      );
-    });
-
-    it('calls query as expected', async () => {
-      jest.spyOn(useAccountsHook, 'useAccounts').mockReturnValue({
-        data: [] as Account[],
-        dataUpdatedAt: 1,
-      } as UseQueryResult<Account[]>);
-
-      const interval = Interval.fromDateTimes(
-        DateTime.now().minus({ months: 10 }),
-        DateTime.now().minus({ months: 8 }),
-      );
-      const { result } = renderHook(
-        () => useAccountsMonthlyTotal(interval),
-        { wrapper },
-      );
-
-      await waitFor(() => expect(result.current.status).toEqual('success'));
-      const queryCache = QUERY_CLIENT.getQueryCache().getAll();
-      expect(queryCache[0].queryKey).toEqual(
-        [
-          'api',
-          'splits',
-          {
-            aggregation: 'monthly-total',
-            interval: interval.toISODate(),
-            accountsUpdatedAt: 1,
-          }],
-      );
-
-      expect(useAccountsHook.useAccounts).toBeCalledWith();
-      expect(usePricesHook.usePrices).toBeCalledWith({});
-      expect(queries.getMonthlyTotals).toBeCalledWith([], interval);
-      expect(result.current.data?.[0].type_asset.toString()).toEqual('400.00 EUR');
-
-      expect(aggregations.aggregateChildrenTotals).toBeCalledTimes(2);
-      expect(aggregations.aggregateChildrenTotals).nthCalledWith(
-        1,
-        ['type_income', 'type_expense', 'type_asset', 'type_liability'],
-        [],
-        {},
-        interval.start?.endOf('month').startOf('day'),
-        {
-          type_asset: expect.any(Money),
-        },
-      );
-      expect(aggregations.aggregateChildrenTotals).nthCalledWith(
-        2,
-        ['type_income', 'type_expense', 'type_asset', 'type_liability'],
-        [],
-        {},
-        interval.start?.plus({ month: 1 }).endOf('month').startOf('day'),
-        {
-          type_asset: expect.any(Money),
-        },
-      );
     });
   });
 });
