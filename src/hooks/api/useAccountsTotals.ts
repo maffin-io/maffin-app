@@ -18,14 +18,11 @@ export function useAccountsTotals(
   const { data: defaultInterval } = useInterval();
   const interval = selectedInterval || defaultInterval;
 
-  const { data: balanceSheet, dataUpdatedAt: bsUpdatedAt } = useBalanceSheet(
+  const { data: balanceSheet } = useBalanceSheet(
     interval.end as DateTime<true>,
     select,
   );
-  const {
-    data: incomeStatement,
-    dataUpdatedAt: iesUpdatedAt,
-  } = useIncomeStatement(interval, select);
+  const { data: incomeStatement } = useIncomeStatement(interval, select);
 
   return {
     data: { ...balanceSheet, ...incomeStatement },

@@ -1,19 +1,9 @@
-import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Between } from 'typeorm';
-import { Interval } from 'luxon';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import { Split } from '@/book/entities';
-import type { Account } from '@/book/entities';
-import { getMonthlyTotals } from '@/lib/queries';
-import type { PriceDBMap } from '@/book/prices';
-import type { AccountsTotals } from '@/types/book';
-import { aggregateChildrenTotals } from '@/helpers/accountsTotalAggregations';
 import { useInterval } from '@/hooks/state';
-import { intervalToDates } from '@/helpers/dates';
-import { useAccounts } from './useAccounts';
-import { usePrices } from './usePrices';
 import fetcher from './fetcher';
 
 /**

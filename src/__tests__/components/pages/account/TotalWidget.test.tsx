@@ -1,6 +1,5 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import type { UseQueryResult } from '@tanstack/react-query';
 
 import TotalWidget from '@/components/pages/account/TotalWidget';
 import StatisticsWidget from '@/components/StatisticsWidget';
