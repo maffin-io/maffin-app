@@ -1,7 +1,5 @@
 import { DateTime, Interval } from 'luxon';
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
-import { Split } from '@/book/entities';
 import type { AccountsTotals } from '@/types/book';
 import { useInterval } from '../state';
 import { useBalanceSheet } from './useBalanceSheet';
@@ -16,7 +14,7 @@ import { useIncomeStatement } from './useIncomeStatement';
 export function useAccountsTotals(
   selectedInterval?: Interval,
   select?: (data: AccountsTotals) => AccountsTotals,
-): UseQueryResult<AccountsTotals> {
+): { data: AccountsTotals } {
   const { data: defaultInterval } = useInterval();
   const interval = selectedInterval || defaultInterval;
 
@@ -29,21 +27,7 @@ export function useAccountsTotals(
     dataUpdatedAt: iesUpdatedAt,
   } = useIncomeStatement(interval, select);
 
-  const queryKey = [
-    ...Split.CACHE_KEY,
-    {
-      aggregation: 'total',
-      interval: interval.toISODate(),
-      bsUpdatedAt,
-      iesUpdatedAt,
-    },
-  ];
-  const result = useQuery({
-    queryKey,
-    queryFn: () => ({ ...balanceSheet, ...incomeStatement }),
-    enabled: !!balanceSheet && !!incomeStatement,
-    networkMode: 'always',
-  });
-
-  return result;
+  return {
+    data: { ...balanceSheet, ...incomeStatement },
+  };
 }
