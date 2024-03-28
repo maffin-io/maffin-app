@@ -18,6 +18,7 @@ export default function AssetSankey({
   height = 250,
 }: AssetSankeyProps): JSX.Element {
   const { data: cashflow, isPending } = useCashFlow(account.guid);
+  console.log(cashflow);
 
   const labels: { [guid: string]: string } = {
     [account.guid]: account.name,

@@ -428,4 +428,123 @@ describe('useCashFlow', () => {
       ['api', 'splits', 'guid3', 'cashflow', TEST_INTERVAL.toISODate()],
     );
   });
+
+  /**
+   * When you do mortgage payments you have a transaction
+   * to two different accounts one being a liability and another
+   * being an expense. Liability accounts also display cash flow
+   * so we want to make sure that only the split related to the
+   * liability payment is shown. For example
+   *
+   * - -1000 EUR from bank account
+   * - + 700 to liability
+   * - + 300 to expense
+   *
+   * We should only see a +300 inflow to the liability account and not
+   * +1000 and -300
+   */
+  it('works with 3 splits mortgage + interest', async () => {
+    const account3 = await Account.create({
+      guid: 'guid3',
+      name: 'Loan',
+      fk_commodity: eur,
+      parent: root,
+      type: 'LIABILITY',
+    }).save();
+
+    await Transaction.create({
+      fk_currency: eur,
+      description: 'tx1',
+      date: DateTime.now(),
+      splits: [
+        Split.create({
+          fk_account: account1,
+          valueNum: -1000,
+          valueDenom: 1,
+          quantityNum: -1000,
+          quantityDenom: 1,
+        }),
+        Split.create({
+          fk_account: account2,
+          valueNum: 300,
+          valueDenom: 1,
+          quantityNum: 300,
+          quantityDenom: 1,
+        }),
+        Split.create({
+          fk_account: account3,
+          valueNum: 700,
+          valueDenom: 1,
+          quantityNum: 700,
+          quantityDenom: 1,
+        }),
+      ],
+    }).save();
+
+    const { result } = renderHook(
+      () => useCashFlow(account3.guid),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.status).toEqual('success'));
+
+    expect(result.current.data).toHaveLength(1);
+    expect(result.current.data?.[0].name).toEqual('Bank1');
+    expect(result.current.data?.[0].total.toString()).toEqual('700 EUR');
+  });
+
+  /**
+   * For tracking splits, we add a split with 0 value/quantity
+   * referencing to the stock. However, we don't want this shown in the cash
+   * flow as it is 0 so we ignore it.
+   */
+  it('ignores 0s', async () => {
+    const account3 = await Account.create({
+      guid: 'guid3',
+      name: 'Bank3',
+      fk_commodity: eur,
+      parent: root,
+      type: 'ASSET',
+    }).save();
+
+    await Transaction.create({
+      fk_currency: eur,
+      description: 'tx1',
+      date: DateTime.now(),
+      splits: [
+        Split.create({
+          fk_account: account1,
+          valueNum: 0,
+          valueDenom: 1,
+          quantityNum: 0,
+          quantityDenom: 1,
+        }),
+        Split.create({
+          fk_account: account2,
+          valueNum: 100,
+          valueDenom: 1,
+          quantityNum: 100,
+          quantityDenom: 1,
+        }),
+        Split.create({
+          fk_account: account3,
+          valueNum: -100,
+          valueDenom: 1,
+          quantityNum: -100,
+          quantityDenom: 1,
+        }),
+      ],
+    }).save();
+
+    const { result } = renderHook(
+      () => useCashFlow(account3.guid),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.status).toEqual('success'));
+
+    expect(result.current.data).toHaveLength(1);
+    expect(result.current.data?.[0].name).toEqual('Bank2');
+    expect(result.current.data?.[0].total.toString()).toEqual('100.00 EUR');
+  });
 });
