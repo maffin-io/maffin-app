@@ -44,12 +44,12 @@ export function useCashFlow(
               JOIN accounts AS main_account ON main_account.guid = '${account}'
               WHERE commodities.guid = main_account.commodity_guid
             ) AS mnemonic,
-            SUM(((cast(main_split.quantity_num as REAL) / main_split.quantity_denom) / (cast(main_split.value_num as REAL) / main_split.value_denom)) * (cast(splits.value_num as REAL) / splits.value_denom)) as total
+            SUM(((cast(account_split.quantity_num as REAL) / account_split.quantity_denom) / (cast(account_split.value_num as REAL) / account_split.value_denom)) * (cast(splits.value_num as REAL) / splits.value_denom)) as total
 
           FROM transactions AS tx
           JOIN splits ON splits.tx_guid = tx.guid
           JOIN accounts ON splits.account_guid = accounts.guid
-          JOIN splits AS main_split ON main_split.tx_guid = tx.guid AND main_split.account_guid = '${account}'
+          JOIN splits AS account_split ON account_split.tx_guid = tx.guid AND account_split.account_guid = '${account}'
 
           WHERE tx.guid IN (
             SELECT DISTINCT tx_guid
