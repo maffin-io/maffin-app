@@ -29,7 +29,7 @@ describe('IncomeExpenseHistogram', () => {
   let interval: Interval;
 
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals[]>);
+    jest.spyOn(apiHook, 'useMonthlyTotals').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals[]>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
 
     interval = Interval.fromDateTimes(
@@ -166,7 +166,7 @@ describe('IncomeExpenseHistogram', () => {
   });
 
   it('renders with no data', () => {
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue({ data: [{}, {}] } as UseQueryResult<AccountsTotals[]>);
+    jest.spyOn(apiHook, 'useMonthlyTotals').mockReturnValue({ data: [{}, {}] } as UseQueryResult<AccountsTotals[]>);
 
     render(
       <IncomeExpenseHistogram />,
@@ -217,7 +217,7 @@ describe('IncomeExpenseHistogram', () => {
   });
 
   it('generates datasets as expected', () => {
-    jest.spyOn(apiHook, 'useAccountsMonthlyTotal').mockReturnValue(
+    jest.spyOn(apiHook, 'useMonthlyTotals').mockReturnValue(
       {
         data: [
           {

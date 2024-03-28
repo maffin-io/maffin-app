@@ -18,14 +18,13 @@ export function aggregateMonthlyWorth(
   guids: string[],
   accounts: Account[],
   monthlyTotals: AccountsTotals[],
-  dates: DateTime[],
 ): AccountsTotals[] {
-  const aggregatedTotals = Array.from({ length: dates.length }, () => ({}));
+  const aggregatedTotals = Array.from({ length: monthlyTotals.length }, () => ({}));
   const accountsMap = mapAccounts(accounts);
 
   guids.forEach((guid: string) => {
     if (guid in accountsMap) {
-      aggregateWorth(guid, accountsMap, monthlyTotals, dates, aggregatedTotals);
+      aggregateWorth(guid, accountsMap, monthlyTotals, aggregatedTotals);
     }
   });
 
@@ -36,12 +35,11 @@ function aggregateWorth(
   guid: string,
   accounts: AccountsMap,
   monthlyTotals: AccountsTotals[],
-  dates: DateTime[],
   aggregatedTotals: AccountsTotals[],
 ) {
   const current: Account = accounts[guid];
 
-  dates.forEach((_, i) => {
+  monthlyTotals.forEach((_, i) => {
     const zero = new Money(0, current.commodity?.mnemonic);
     const previousMonth = aggregatedTotals[i - 1]?.[guid] || zero;
     const currentMonth = monthlyTotals[i]?.[guid] || zero;
@@ -49,7 +47,7 @@ function aggregateWorth(
   });
 
   current.childrenIds.forEach(childId => {
-    aggregateWorth(childId, accounts, monthlyTotals, dates, aggregatedTotals);
+    aggregateWorth(childId, accounts, monthlyTotals, aggregatedTotals);
   });
 }
 

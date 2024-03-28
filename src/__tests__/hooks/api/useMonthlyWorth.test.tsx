@@ -71,6 +71,9 @@ describe('useMonthlyWorth', () => {
       {
         type_asset: new Money(700, 'EUR'),
       },
+      {
+        type_asset: new Money(1000, 'EUR'),
+      },
     ] as AccountsTotals[]);
     jest.spyOn(aggregations, 'aggregateChildrenTotals').mockReturnValue({
       type_asset: new Money(1000, 'EUR'),
@@ -143,8 +146,7 @@ describe('useMonthlyWorth', () => {
     expect(queries.getMonthlyTotals).toBeCalledWith(
       [],
       Interval.fromDateTimes(
-        // +1 month because initial month is computed with useAccountsTotals
-        (TEST_INTERVAL.start as DateTime).plus({ month: 1 }),
+        TEST_INTERVAL.start as DateTime,
         TEST_INTERVAL.end as DateTime,
       ),
     );
@@ -163,14 +165,6 @@ describe('useMonthlyWorth', () => {
           type_asset: expect.any(Money),
         },
       ],
-      [
-        TEST_INTERVAL.start?.endOf('month'),
-        expect.any(DateTime),
-        expect.any(DateTime),
-        expect.any(DateTime),
-        expect.any(DateTime),
-        TEST_INTERVAL.end,
-      ],
     );
     expect(
       (aggregations.aggregateMonthlyWorth as jest.Mock).mock.calls[0][2][0].type_asset.toString(),
@@ -179,21 +173,33 @@ describe('useMonthlyWorth', () => {
       (aggregations.aggregateMonthlyWorth as jest.Mock).mock.calls[0][2][1].type_asset.toString(),
     ).toEqual('200.00 EUR');
 
-    expect(aggregations.aggregateChildrenTotals).toBeCalledTimes(2);
-    expect(aggregations.aggregateChildrenTotals).toBeCalledWith(
+    expect(aggregations.aggregateChildrenTotals).toBeCalledTimes(3);
+    expect(aggregations.aggregateChildrenTotals).toHaveBeenNthCalledWith(
+      1,
       ['type_asset', 'type_liability'],
       [],
       {},
-      TEST_INTERVAL.start?.endOf('month'),
+      TEST_INTERVAL.start?.startOf('month'),
       {
         type_asset: expect.any(Money),
       },
     );
-    expect(aggregations.aggregateChildrenTotals).toBeCalledWith(
+    expect(aggregations.aggregateChildrenTotals).toHaveBeenNthCalledWith(
+      2,
       ['type_asset', 'type_liability'],
       [],
       {},
-      TEST_INTERVAL.start?.plus({ month: 1 }).endOf('month'),
+      TEST_INTERVAL.start?.endOf('month').startOf('day'),
+      {
+        type_asset: expect.any(Money),
+      },
+    );
+    expect(aggregations.aggregateChildrenTotals).toHaveBeenNthCalledWith(
+      3,
+      ['type_asset', 'type_liability'],
+      [],
+      {},
+      TEST_INTERVAL.start?.plus({ month: 1 }).endOf('month').startOf('day'),
       {
         type_asset: expect.any(Money),
       },

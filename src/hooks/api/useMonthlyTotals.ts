@@ -1,30 +1,27 @@
 import React from 'react';
-import { DateTime, Interval } from 'luxon';
+import { Interval } from 'luxon';
 import { useQuery } from '@tanstack/react-query';
 import type { UseQueryResult } from '@tanstack/react-query';
 
-import { useInterval } from '@/hooks/state';
-import { aggregateChildrenTotals, aggregateMonthlyWorth } from '@/helpers/accountsTotalAggregations';
-import { getMonthlyTotals } from '@/lib/queries';
 import { Split } from '@/book/entities';
-import type { AccountsTotals } from '@/types/book';
-import type { PriceDBMap } from '@/book/prices';
-import type { Account } from '@/book/entities';
+import { useInterval } from '@/hooks/state';
+import { getMonthlyTotals } from '@/lib/queries';
 import { intervalToDates } from '@/helpers/dates';
-import { useBalanceSheet } from './useBalanceSheet';
+import { aggregateChildrenTotals } from '@/helpers/accountsTotalAggregations';
+import type { AccountsTotals } from '@/types/book';
+import type { Account } from '@/book/entities';
+import type { PriceDBMap } from '@/book/prices';
 import { useAccounts } from './useAccounts';
 import { usePrices } from './usePrices';
 import fetcher from './fetcher';
 
 /**
- * Aggregates monthly splits for each account accumulating the value for each month.
- * This is useful to produce monthly worth histograms.
- *
- * For accounts where their children
+ * Aggregates monthly splits for each account to produce
+ * monthly histograms of transactions. For accounts where their children
  * have different commodity, the monthly aggregation is converted using an
- * exchange rate for each respective month
+ * exchange rate for that month
  */
-export function useMonthlyWorth(
+export function useMonthlyTotals(
   selectedInterval?: Interval,
 ): UseQueryResult<AccountsTotals[]> {
   const { data: defaultInterval } = useInterval();
@@ -32,41 +29,27 @@ export function useMonthlyWorth(
 
   const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
   const { data: prices, dataUpdatedAt: pricesUpdatedAt } = usePrices({});
-  const { data: totals, dataUpdatedAt: totalsUpdatedAt } = useBalanceSheet(
-    (interval.start?.minus({ day: 1 }) as DateTime),
-    (data) => data,
-  );
 
   const aggregate = React.useCallback(
     ((data: AccountsTotals[]) => {
-      const aggregated = aggregateMonthlyWorth(
-        ['type_asset', 'type_liability'],
-        accounts as Account[],
-        [
-          totals as AccountsTotals,
-          ...data,
-        ],
-      );
-
-      const dates = [interval.start as DateTime, ...intervalToDates(interval as Interval)];
-      return aggregated.map((d, i) => aggregateChildrenTotals(
-        ['type_asset', 'type_liability'],
+      const dates = intervalToDates(interval);
+      return data.map((d, i) => aggregateChildrenTotals(
+        ['type_income', 'type_expense', 'type_asset', 'type_liability'],
         accounts as Account[],
         prices as PriceDBMap,
         dates[i],
         d,
-      )).slice(1);
+      ));
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [accountsUpdatedAt, pricesUpdatedAt, totalsUpdatedAt, interval.toISODate()],
+    [accountsUpdatedAt, pricesUpdatedAt, interval.toISODate()],
   );
 
   const queryKey = [
     ...Split.CACHE_KEY,
     {
-      aggregation: 'monthly-worth',
+      aggregation: 'monthly-total',
       interval: interval.toISODate(),
-      totalsUpdatedAt,
       accountsUpdatedAt,
     },
   ];
@@ -79,7 +62,7 @@ export function useMonthlyWorth(
       ),
       queryKey,
     ),
-    enabled: !!accounts && !!totalsUpdatedAt,
+    enabled: !!accounts,
     select: aggregate,
     networkMode: 'always',
   });

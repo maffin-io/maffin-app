@@ -29,7 +29,7 @@ jest.mock('@/hooks/state', () => ({
 describe('TotalsPie', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { guid: 'eur', mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
-    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals>);
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: {} });
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({ data: undefined } as UseQueryResult<Account[]>);
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: {} } as UseQueryResult<PriceDBMap>);
     jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
@@ -124,7 +124,7 @@ describe('TotalsPie', () => {
           type_asset: new Money(1500, 'EUR'),
           type_liability: new Money(-150, 'EUR'),
         } as AccountsTotals,
-      } as UseQueryResult<AccountsTotals>,
+      },
     );
 
     render(
@@ -175,7 +175,7 @@ describe('TotalsPie', () => {
           2: new Money(500, 'EUR'),
           3: new Money(100, 'EUR'),
         } as AccountsTotals,
-      } as UseQueryResult<AccountsTotals>,
+      },
     );
 
     render(
@@ -223,7 +223,7 @@ describe('TotalsPie', () => {
           1: new Money(50, 'TICKER1'),
           2: new Money(500, 'TICKER2'),
         } as AccountsTotals,
-      } as UseQueryResult<AccountsTotals>,
+      },
     );
     jest.spyOn(apiHook, 'usePrices').mockReturnValue(
       // @ts-ignore

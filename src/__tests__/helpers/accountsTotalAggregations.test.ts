@@ -118,22 +118,13 @@ describe('accountsTotalAggregations', () => {
         ['a1', 'a2'],
         accounts,
         monthlyTotals,
-        [
-          DateTime.now().minus({ month: 2 }),
-          DateTime.now().minus({ month: 1 }),
-          DateTime.now(),
-        ],
       );
 
       expect(aggregated[0].a1.toString()).toEqual('100.00 EUR');
       expect(aggregated[1].a1.toString()).toEqual('300.00 EUR');
-      // No monthly totals so it is +0
-      expect(aggregated[2].a1.toString()).toEqual('300.00 EUR');
 
       expect(aggregated[0].a2.toString()).toEqual('200.00 EUR');
       expect(aggregated[1].a2.toString()).toEqual('400.00 EUR');
-      // No monthly totals so it is +0
-      expect(aggregated[2].a2.toString()).toEqual('400.00 EUR');
     });
   });
 

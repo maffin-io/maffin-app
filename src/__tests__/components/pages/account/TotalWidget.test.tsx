@@ -1,6 +1,5 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import type { UseQueryResult } from '@tanstack/react-query';
 
 import TotalWidget from '@/components/pages/account/TotalWidget';
 import StatisticsWidget from '@/components/StatisticsWidget';
@@ -22,7 +21,7 @@ describe('TotalWidgetTest', () => {
   let account: Account;
 
   beforeEach(() => {
-    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: undefined } as UseQueryResult<AccountsTotals>);
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: {} });
     account = {
       guid: 'guid',
       commodity: {
@@ -52,7 +51,7 @@ describe('TotalWidgetTest', () => {
   it('renders as expected', () => {
     jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({
       data: { guid: new Money(100, 'EUR') } as AccountsTotals,
-    } as UseQueryResult<AccountsTotals>);
+    });
 
     render(<TotalWidget account={account} />);
 

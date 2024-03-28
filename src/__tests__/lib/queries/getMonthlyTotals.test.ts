@@ -120,9 +120,10 @@ describe('getMonthlyTotals', () => {
       ),
     );
 
-    expect(monthlyTotals).toHaveLength(2);
+    expect(monthlyTotals).toHaveLength(3);
     expect(monthlyTotals[0]).toEqual({});
     expect(monthlyTotals[1].abcdef.toString()).toEqual('-200.00 EUR');
     expect(monthlyTotals[1].ghijk.toString()).toEqual('200.00 EUR');
+    expect(monthlyTotals[2]).toEqual({});
   });
 });

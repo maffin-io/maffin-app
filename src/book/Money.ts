@@ -73,8 +73,14 @@ export default class Money {
     );
   }
 
-  toNumber(): number {
-    return parseFloat(djs.toDecimal(this._raw));
+  /**
+   * Return the amount with a default resolution of 10 decimals
+   */
+  toNumber(scale = 10): number {
+    return parseFloat(djs.toDecimal(
+      djs.transformScale(this._raw, scale),
+      ({ value, currency }) => `${value} ${currency.code}`,
+    ));
   }
 
   isNegative(): boolean {

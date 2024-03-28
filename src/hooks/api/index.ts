@@ -12,14 +12,13 @@ export { useAccount, useAccounts } from '@/hooks/api/useAccounts';
 export { useCommodity, useCommodities } from '@/hooks/api/useCommodities';
 export { useInvestment, useInvestments } from '@/hooks/api/useInvestments';
 export {
-  useSplits,
   useSplitsPagination,
   useSplitsCount,
-  useAccountsMonthlyTotal,
 } from '@/hooks/api/useSplits';
 export { useIncomeStatement } from '@/hooks/api/useIncomeStatement';
 export { useBalanceSheet } from '@/hooks/api/useBalanceSheet';
 export { useAccountsTotals } from '@/hooks/api/useAccountsTotals';
+export { useMonthlyTotals } from '@/hooks/api/useMonthlyTotals';
 export { useMonthlyWorth } from '@/hooks/api/useMonthlyWorth';
 export { usePrices } from '@/hooks/api/usePrices';
 export { useCashFlow } from '@/hooks/api/useCashFlow';

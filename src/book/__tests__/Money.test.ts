@@ -48,6 +48,11 @@ describe('Money', () => {
       money = new Money(100, 'USD', 3);
       expect(money.toNumber()).toEqual(0.1);
     });
+
+    it('edge case', () => {
+      money = new Money(9.770491996380624e+27, 'EUR', 24);
+      expect(money.toNumber(4)).toEqual(9770.4919);
+    });
   });
 
   describe('currency', () => {

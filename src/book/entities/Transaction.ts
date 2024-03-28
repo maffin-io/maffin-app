@@ -121,18 +121,8 @@ export async function updateCache(
     queryKey: [...Transaction.CACHE_KEY, { name: 'start' }],
   });
 
-  entity.splits.forEach(split => {
-    queryClient.invalidateQueries({
-      queryKey: [...Split.CACHE_KEY, split.accountId],
-    });
-  });
-
   queryClient.invalidateQueries({
-    queryKey: [...Split.CACHE_KEY, { aggregation: 'total' }],
-  });
-
-  queryClient.invalidateQueries({
-    queryKey: [...Split.CACHE_KEY, { aggregation: 'monthly-total' }],
+    queryKey: [...Split.CACHE_KEY],
   });
 }
 

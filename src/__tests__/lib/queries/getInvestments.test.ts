@@ -169,12 +169,11 @@ describe('getInvestments', () => {
   });
 
   describe('getInvestments', () => {
-    it('returns multiple investments', async () => {
-      jest.spyOn(getPrices, 'default')
-        .mockResolvedValueOnce(new PriceDBMap([price1]))
-        .mockResolvedValueOnce(new PriceDBMap([price2]));
+    let account1: Account;
+    let account2: Account;
 
-      const account1 = Account.create({
+    beforeEach(() => {
+      account1 = Account.create({
         name: 'TICKER1',
         type: 'INVESTMENT',
         fk_commodity: {
@@ -183,7 +182,7 @@ describe('getInvestments', () => {
         },
         parent: jest.fn(),
       });
-      const account2 = Account.create({
+      account2 = Account.create({
         name: 'TICKER2',
         type: 'INVESTMENT',
         fk_commodity: {
@@ -193,14 +192,44 @@ describe('getInvestments', () => {
         parent: jest.fn(),
       });
 
+      jest.spyOn(Split, 'find').mockResolvedValue([
+        { guid: 'split1', accountId: account1.guid } as Split,
+        { guid: 'split2', accountId: account2.guid } as Split,
+      ]);
+    });
+
+    it('returns multiple investments', async () => {
+      jest.spyOn(getPrices, 'default')
+        .mockResolvedValueOnce(new PriceDBMap([price1]))
+        .mockResolvedValueOnce(new PriceDBMap([price2]));
+
       await getInvestments(
         [account1, account2],
         eur,
-        [
-          { guid: 'split1', accountId: account1.guid } as Split,
-          { guid: 'split2', accountId: account2.guid } as Split,
-        ],
       );
+
+      expect(Split.find).toBeCalledWith({
+        where: {
+          fk_account: {
+            type: 'INVESTMENT',
+          },
+        },
+        relations: {
+          fk_transaction: {
+            splits: {
+              fk_account: true,
+            },
+          },
+          fk_account: true,
+        },
+        order: {
+          fk_transaction: {
+            date: 'DESC',
+            enterDate: 'DESC',
+          },
+          quantityNum: 'ASC',
+        },
+      });
 
       expect(InvestmentAccount).toHaveBeenNthCalledWith(
         1,

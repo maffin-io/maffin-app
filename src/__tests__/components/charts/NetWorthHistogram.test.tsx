@@ -123,6 +123,7 @@ describe('NetWorthHistogram', () => {
             tooltip: {
               backgroundColor: '#323b44',
               callbacks: {
+                title: expect.any(Function),
                 label: expect.any(Function),
                 labelColor: expect.any(Function),
               },
@@ -141,7 +142,6 @@ describe('NetWorthHistogram', () => {
                 displayFormats: {
                   month: 'MMM-yy',
                 },
-                tooltipFormat: 'MMMM yyyy',
                 unit: 'month',
               },
               type: 'time',
@@ -165,6 +165,7 @@ describe('NetWorthHistogram', () => {
     );
 
     const { plugins } = (Bar as jest.Mock).mock.calls[0][0].options;
+    expect(plugins.tooltip.callbacks.title([{ dataIndex: 0 }])).toEqual('Aug 31, 2022');
     expect(plugins.tooltip.callbacks.label({ dataset: { label: 'label' }, raw: 100 })).toEqual('label: €100.00');
     expect(plugins.tooltip.callbacks.labelColor(
       { dataset: { backgroundColor: '#111' } },
@@ -264,6 +265,7 @@ describe('NetWorthHistogram', () => {
             tooltip: {
               backgroundColor: '#323b44',
               callbacks: {
+                title: expect.any(Function),
                 label: expect.any(Function),
                 labelColor: expect.any(Function),
               },
@@ -282,7 +284,6 @@ describe('NetWorthHistogram', () => {
                 displayFormats: {
                   month: 'MMM-yy',
                 },
-                tooltipFormat: 'MMMM yyyy',
                 unit: 'month',
               },
               type: 'time',
