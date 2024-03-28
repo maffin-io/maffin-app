@@ -68,6 +68,13 @@ describe('DateRangeInput', () => {
         },
         configs: {
           shortcuts: {
+            ytd: {
+              text: 'Year to date',
+              period: {
+                start: DateTime.now().startOf('year').toJSDate(),
+                end: DateTime.now().toJSDate(),
+              },
+            },
             t3: {
               text: 'Last 3 months',
               period: {
