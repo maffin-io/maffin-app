@@ -27,6 +27,13 @@ export default function DateRangeInput(): JSX.Element {
         end: now.toJSDate(),
       },
     },
+    ytd: {
+      text: 'Year to date',
+      period: {
+        start: now.startOf('year').toJSDate(),
+        end: now.toJSDate(),
+      },
+    },
   };
 
   Array.from(
