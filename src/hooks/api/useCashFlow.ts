@@ -44,12 +44,25 @@ export function useCashFlow(
               JOIN accounts AS main_account ON main_account.guid = '${account}'
               WHERE commodities.guid = main_account.commodity_guid
             ) AS mnemonic,
-            SUM(((cast(account_split.quantity_num as REAL) / account_split.quantity_denom) / (cast(account_split.value_num as REAL) / account_split.value_denom)) * (cast(splits.value_num as REAL) / splits.value_denom)) as total
+            SUM(
+              CASE
+                WHEN splits.guid = credit_split.guid THEN
+                  -1 * cast(account_split.quantity_num AS REAL) / account_split.quantity_denom
+                ELSE
+                  CASE
+                    WHEN account_split.guid = credit_split.guid THEN
+                      (cast(account_split.quantity_num AS REAL) / account_split.quantity_denom) / (cast(account_split.value_num AS REAL) / account_split.value_denom) * (cast(splits.value_num AS REAL) / splits.value_denom)
+                    ELSE
+                      0
+                  END
+              END
+            ) AS total
 
           FROM transactions AS tx
           JOIN splits ON splits.tx_guid = tx.guid
           JOIN accounts ON splits.account_guid = accounts.guid
           JOIN splits AS account_split ON account_split.tx_guid = tx.guid AND account_split.account_guid = '${account}'
+          JOIN splits AS credit_split ON credit_split.tx_guid = tx.guid AND credit_split.value_num < 0
 
           WHERE tx.guid IN (
             SELECT DISTINCT tx_guid
@@ -60,6 +73,7 @@ export function useCashFlow(
           AND tx.post_date BETWEEN '${((interval as Interval).start as DateTime).toSQLDate()}' AND '${((interval as Interval).end as DateTime).toSQLDate()}'
 
           GROUP BY splits.account_guid, accounts.name, accounts.account_type, mnemonic
+          HAVING total != 0
         `) as { guid: string, type: string, name: string, total: number, mnemonic: string }[];
 
         return rows.map(r => ({
