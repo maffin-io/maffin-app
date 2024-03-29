@@ -116,6 +116,7 @@ describe('InvestmentAccount', () => {
         changePct: -1,
         currency: 'EUR',
         price: 2000,
+        date: DateTime.now(),
       });
     });
 
@@ -169,6 +170,7 @@ describe('InvestmentAccount', () => {
         changePct: -1,
         currency: 'USD',
         price: 2000,
+        date: DateTime.now(),
       });
     });
 
@@ -197,6 +199,7 @@ describe('InvestmentAccount', () => {
         changePct: -50,
         changeAbs: -1000,
         currency: 'EUR',
+        date: DateTime.now(),
       });
 
       expect(investment.quoteInfo).toEqual({
@@ -204,6 +207,7 @@ describe('InvestmentAccount', () => {
         changePct: -50,
         changeAbs: -1000,
         currency: 'EUR',
+        date: DateTime.now(),
       });
     });
 
@@ -228,6 +232,44 @@ describe('InvestmentAccount', () => {
       expect(
         () => new InvestmentAccount(account, account.splits, 'EUR', priceMap),
       ).toThrow('No price found for TICKER');
+    });
+
+    it('sets price for date passed in processSplits', async () => {
+      const priceMap = new PriceDBMap([
+        Price.create({
+          fk_commodity: commodityAccount,
+          fk_currency: eur,
+          date: DateTime.now().minus({ month: 1 }),
+          source: '',
+          valueNum: 20,
+          valueDenom: 100,
+        }),
+        Price.create({
+          fk_commodity: commodityAccount,
+          fk_currency: eur,
+          date: DateTime.now(),
+          source: '',
+          valueNum: 10,
+          valueDenom: 100,
+        }),
+      ]);
+
+      const account = await Account.findOneOrFail({
+        where: { type: 'INVESTMENT' },
+        relations: {
+          splits: true,
+        },
+      });
+
+      const investment = new InvestmentAccount(account, account.splits, 'EUR', priceMap);
+
+      expect(investment.quoteInfo.price).toEqual(0.1);
+      expect(investment.quoteInfo.date).toEqual(DateTime.now());
+
+      investment.processSplits(DateTime.now().minus({ month: 1 }));
+
+      expect(investment.quoteInfo.price).toEqual(0.2);
+      expect(investment.quoteInfo.date).toEqual(DateTime.now().minus({ month: 1 }));
     });
   });
 

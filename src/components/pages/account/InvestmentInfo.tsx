@@ -1,14 +1,12 @@
 import React from 'react';
 import classNames from 'classnames';
 import dynamic from 'next/dynamic';
-import { DateTime } from 'luxon';
 import { BiTrendingDown, BiTrendingUp } from 'react-icons/bi';
 
 import type { Account } from '@/book/entities';
-import { useInvestment, usePrices } from '@/hooks/api';
+import { useInvestment } from '@/hooks/api';
 import Loading from '@/components/Loading';
 import StatisticsWidget from '@/components/StatisticsWidget';
-import { useInterval } from '@/hooks/state';
 import { toFixed } from '@/helpers/number';
 import Money from '@/book/Money';
 
@@ -21,19 +19,11 @@ export type InvestmentInfoProps = {
 export default function InvestmentInfo({
   account,
 }: InvestmentInfoProps): JSX.Element {
-  const { data: interval } = useInterval();
   const { data: investment } = useInvestment(account.guid);
-  let { data: prices } = usePrices({ from: account.commodity });
 
-  if (!investment || !prices) {
+  if (!investment) {
     return <Loading />;
   }
-
-  prices = prices || [];
-  const latestPrice = prices.getInvestmentPrice(
-    investment.account.commodity.mnemonic,
-    interval.end as DateTime,
-  );
 
   return (
     <div className="grid grid-cols-12 items-stretch">
@@ -76,9 +66,9 @@ export default function InvestmentInfo({
                 { disabled: investment.isClosed },
               )
             }
-            stats={new Money(latestPrice.value, investment.currency).format()}
+            stats={new Money(investment.quoteInfo.price, investment.currency).format()}
             description={
-              `on ${latestPrice.date.toLocaleString()}`
+              `on ${investment.quoteInfo.date.toLocaleString()}`
             }
           />
           <StatisticsWidget

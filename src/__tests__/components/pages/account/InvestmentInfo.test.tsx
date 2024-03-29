@@ -10,7 +10,6 @@ import type { Account, Commodity } from '@/book/entities';
 import { Price } from '@/book/entities';
 import Money from '@/book/Money';
 import * as apiHook from '@/hooks/api';
-import * as stateHooks from '@/hooks/state';
 import { PriceDBMap } from '@/book/prices';
 import type { InvestmentAccount } from '@/book/models';
 
@@ -27,11 +26,6 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
-jest.mock('@/hooks/state', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/state'),
-}));
-
 jest.mock('@/components/Loading', () => jest.fn(
   () => <div data-testid="Loading" />,
 ));
@@ -43,7 +37,6 @@ describe('InvestmentInfo', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({ data: undefined } as UseQueryResult<InvestmentAccount>);
-    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
 
     jest.spyOn(Price, 'create').mockImplementation();
 
@@ -84,22 +77,6 @@ describe('InvestmentInfo', () => {
       guid: 'guid',
       commodity: ticker,
     } as Account;
-    jest.spyOn(apiHook, 'usePrices').mockReturnValue({
-      data: new PriceDBMap([
-        {
-          date: DateTime.fromISO('2022-12-01'),
-          value: 10,
-          currency: eur,
-          commodity: ticker,
-        } as Price,
-        {
-          date: DateTime.fromISO('2023-01-01'),
-          value: 15,
-          currency: eur,
-          commodity: ticker,
-        } as Price,
-      ]),
-    } as UseQueryResult<PriceDBMap>);
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
       data: {
         cost: new Money(100, 'EUR'),
@@ -113,6 +90,10 @@ describe('InvestmentInfo', () => {
         account,
         currency: 'EUR',
         realizedDividends: new Money(20, 'EUR'),
+        quoteInfo: {
+          price: 15,
+          date: DateTime.fromISO('2023-01-01'),
+        },
       },
     } as UseQueryResult<InvestmentAccount>);
 
@@ -182,22 +163,6 @@ describe('InvestmentInfo', () => {
       guid: 'guid',
       commodity: ticker,
     } as Account;
-    jest.spyOn(apiHook, 'usePrices').mockReturnValue({
-      data: new PriceDBMap([
-        {
-          date: DateTime.fromISO('2023-01-01'),
-          value: 10,
-          currency: eur,
-          commodity: ticker,
-        } as Price,
-        {
-          date: DateTime.fromISO('2023-02-01'),
-          value: 15,
-          currency: eur,
-          commodity: ticker,
-        } as Price,
-      ]),
-    } as UseQueryResult<PriceDBMap>);
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
       data: {
         cost: new Money(100, 'EUR'),
@@ -211,6 +176,10 @@ describe('InvestmentInfo', () => {
         account,
         currency: 'EUR',
         realizedDividends: new Money(20, 'USD'),
+        quoteInfo: {
+          price: 15,
+          date: DateTime.fromISO('2023-01-01'),
+        },
       },
     } as UseQueryResult<InvestmentAccount>);
 
