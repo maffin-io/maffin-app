@@ -46,14 +46,6 @@ export default class InvestmentAccount {
       throw new Error(`No price found for ${this.account.commodity.mnemonic}`);
     }
     this.currency = price.currency.mnemonic;
-    this.setTodayQuoteInfo(
-      price.quoteInfo || {
-        changePct: 0,
-        changeAbs: 0,
-        price: price.value,
-        currency: this.currency,
-      },
-    );
 
     this.processSplits();
   }
@@ -164,7 +156,19 @@ export default class InvestmentAccount {
     return this.quantity.toNumber() === 0;
   }
 
-  processSplits(date?: DateTime): void {
+  processSplits(date: DateTime = DateTime.now()): void {
+    const price = this._priceDBMap.getInvestmentPrice(this.account.commodity.mnemonic, date);
+    this.setTodayQuoteInfo(
+      {
+        changePct: 0,
+        changeAbs: 0,
+        price: price.value,
+        currency: this.currency,
+        ...price.quoteInfo,
+        date: price.date,
+      },
+    );
+
     this._avgPrice = 0;
     this._avgPriceInCurrency = 0;
     this.quantity = new Money(0, this.account.commodity.mnemonic);
@@ -174,7 +178,7 @@ export default class InvestmentAccount {
     this.dividends.splice(0, this.dividends.length);
 
     [...this.splits].reverse().filter(
-      split => split.transaction.date <= (date || DateTime.now()),
+      split => split.transaction.date <= (date),
     ).forEach((split) => {
       const numSplits = split.transaction.splits.length;
 
