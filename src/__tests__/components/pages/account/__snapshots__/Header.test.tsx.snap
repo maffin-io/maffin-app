@@ -24,12 +24,8 @@ exports[`Header renders as expected with account 1`] = `
           class=""
         >
           <div
-            data-testid="FormButton"
-          >
-            <div
-              data-testid="TransactionForm"
-            />
-          </div>
+            data-testid="AddTxDropdown"
+          />
         </div>
         <div
           data-testid="FormButton"
@@ -84,12 +80,8 @@ exports[`Header shows parent link 1`] = `
           class=""
         >
           <div
-            data-testid="FormButton"
-          >
-            <div
-              data-testid="TransactionForm"
-            />
-          </div>
+            data-testid="AddTxDropdown"
+          />
         </div>
         <div
           data-testid="FormButton"

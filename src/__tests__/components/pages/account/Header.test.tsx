@@ -3,12 +3,13 @@ import {
   render,
   screen,
 } from '@testing-library/react';
+import { DateTime } from 'luxon';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import { Header } from '@/components/pages/account';
 import FormButton from '@/components/buttons/FormButton';
 import AccountForm from '@/components/forms/account/AccountForm';
-import TransactionForm from '@/components/forms/transaction/TransactionForm';
+import AddTxDropdown from '@/components/buttons/AddTxDropdown';
 import { Account, Split } from '@/book/entities';
 import * as apiHook from '@/hooks/api';
 
@@ -34,8 +35,8 @@ jest.mock('@/components/forms/account/AccountForm', () => jest.fn(
   () => <div data-testid="AccountForm" />,
 ));
 
-jest.mock('@/components/forms/transaction/TransactionForm', () => jest.fn(
-  () => <div data-testid="TransactionForm" />,
+jest.mock('@/components/buttons/AddTxDropdown', () => jest.fn(
+  () => <div data-testid="AddTxDropdown" />,
 ));
 
 describe('Header', () => {
@@ -66,36 +67,16 @@ describe('Header', () => {
 
     const { container } = render(<Header account={account} />);
 
-    await screen.findAllByTestId('FormButton');
-    expect(FormButton).toHaveBeenNthCalledWith(
-      1,
-      expect.objectContaining({
-        id: 'add-tx',
-        modalTitle: 'Add transaction to undefined',
-      }),
-      {},
-    );
-    expect(TransactionForm).toBeCalledWith(
+    expect(AddTxDropdown).toBeCalledWith(
       {
-        defaultValues: {
-          date: '2023-01-01',
-          description: '',
-          fk_currency: {
-            mnemonic: 'EUR',
-          },
-          splits: [
-            { guid: 'createdSplit' },
-            {
-              action: '',
-              guid: expect.any(String),
-            },
-          ],
-        },
+        account,
+        latestDate: DateTime.now(),
       },
       {},
     );
+    await screen.findAllByTestId('FormButton');
     expect(FormButton).toHaveBeenNthCalledWith(
-      2,
+      1,
       expect.objectContaining({
         id: 'edit-account',
         modalTitle: 'Edit account',
@@ -116,7 +97,7 @@ describe('Header', () => {
       {},
     );
     expect(FormButton).toHaveBeenNthCalledWith(
-      3,
+      2,
       expect.objectContaining({
         className: 'btn btn-danger',
         'data-tooltip-id': 'delete-help',
