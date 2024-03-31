@@ -1,19 +1,19 @@
 import React from 'react';
 import classNames from 'classnames';
-import { BiEdit, BiXCircle, BiPlusCircle } from 'react-icons/bi';
+import { BiEdit, BiXCircle } from 'react-icons/bi';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/navigation';
 
 import { Tooltip } from '@/components/tooltips';
 import FormButton from '@/components/buttons/FormButton';
 import AccountForm from '@/components/forms/account/AccountForm';
-import TransactionForm from '@/components/forms/transaction/TransactionForm';
+import AddTxDropdown from '@/components/buttons/AddTxDropdown';
 import {
   isInvestment,
   isAsset,
   isLiability,
 } from '@/book/helpers/accountType';
-import { Account, Split } from '@/book/entities';
+import { Account } from '@/book/entities';
 import { useAccount, useSplitsPagination } from '@/hooks/api';
 import Link from 'next/link';
 
@@ -72,35 +72,8 @@ export default function Header({
             },
           )}
         >
-          <div
-            className={classNames(
-              '',
-              {
-                hidden: account.placeholder,
-              },
-            )}
-          >
-            <FormButton
-              id="add-tx"
-              modalTitle={`Add transaction to ${account?.name}`}
-              buttonContent={(
-                <>
-                  <BiPlusCircle className="mr-1" />
-                  Add transaction
-                </>
-              )}
-            >
-              <TransactionForm
-                defaultValues={
-                  {
-                    date: (latestDate || DateTime.now()).toISODate() as string,
-                    description: '',
-                    splits: [Split.create({ fk_account: account }), new Split()],
-                    fk_currency: account.commodity,
-                  }
-                }
-              />
-            </FormButton>
+          <div className={classNames({ hidden: account.placeholder })}>
+            <AddTxDropdown account={account} latestDate={latestDate || DateTime.now()} />
           </div>
           <FormButton
             id="edit-account"
