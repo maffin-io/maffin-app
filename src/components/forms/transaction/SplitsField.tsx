@@ -59,7 +59,12 @@ export default function SplitsField({
           </div>
         )
       }
-      <label className="inline-block mt-5 mb-2">Records</label>
+      {
+        fields.slice(firstSplitIndex).length > 0
+        && (
+          <label className="inline-block mt-5 mb-2">Records</label>
+        )
+      }
       {
         fields.slice(firstSplitIndex).map((item, index) => {
           index += firstSplitIndex;
@@ -95,17 +100,19 @@ export default function SplitsField({
       {
         !disabled
         && (
-          <button
-            className="link m-3"
-            type="button"
-            onClick={() => (
-              append(Split.create({
-                value: 0,
-                quantity: 0,
-              }))
-            )}
-          >
-            Add split
+          <>
+            <button
+              className="link m-3 mr-0"
+              type="button"
+              onClick={() => (
+                append(Split.create({
+                  value: 0,
+                  quantity: 0,
+                }))
+              )}
+            >
+              Add split
+            </button>
             <span
               className="badge default ml-0.5"
               data-tooltip-id="add-split-help"
@@ -124,7 +131,7 @@ export default function SplitsField({
                 Asset account and send 70 to Groceries and 30 to Restaurant.
               </p>
             </Tooltip>
-          </button>
+          </>
         )
       }
     </>

@@ -3,13 +3,13 @@ import { DateTime } from 'luxon';
 import { useForm } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 import { IsNull } from 'typeorm';
-import { Tooltip } from 'react-tooltip';
 import classNames from 'classnames';
 
 import {
   Split,
   Transaction,
 } from '@/book/entities';
+import { Tooltip } from '@/components/tooltips';
 import SplitsField from './SplitsField';
 import type { FormValues } from './types';
 

@@ -200,6 +200,7 @@ describe('MainSplit', () => {
                   commodity: ticker,
                 } as Account,
               } as Split,
+              {},
             ],
           } as FormValues}
         />,
@@ -214,6 +215,61 @@ describe('MainSplit', () => {
 
       await waitFor(() => expect(q0).toHaveValue(10));
       await waitFor(() => expect(v0).toHaveValue(5000));
+    });
+
+    /**
+     * This test is to make sure we support split events for investments. A Split event
+     * consists on a transaction with only a single split where the quantity increases/decreases
+     * but value is 0. This means we increase/decrease the number of titles at cost 0.
+     */
+    it('doesnt set value field when only one split', async () => {
+      const user = userEvent.setup();
+      const ticker = {
+        guid: 'ticker',
+        mnemonic: 'TICKER',
+        namespace: 'OTHER',
+      } as Commodity;
+      jest.spyOn(apiHook, 'usePrices')
+        .mockReturnValue({
+          data: new PriceDBMap([{
+            fk_commodity: ticker,
+            commodity: ticker,
+            fk_currency: eur,
+            currency: eur,
+            value: 500,
+          } as Price]),
+        } as UseQueryResult<PriceDBMap>);
+
+      render(
+        <FormWrapper
+          defaults={{
+            fk_currency: eur,
+            splits: [
+              {
+                value: 0,
+                quantity: 0,
+                fk_account: {
+                  name: 'path1',
+                  guid: 'account_guid_1',
+                  path: 'path1',
+                  type: 'ASSET',
+                  commodity: ticker,
+                } as Account,
+              } as Split,
+            ],
+          } as FormValues}
+        />,
+      );
+
+      const q0 = screen.getByRole('spinbutton', { name: 'splits.0.quantity' });
+      const v0 = screen.getByRole('spinbutton', { name: 'splits.0.value' });
+
+      expect(q0).toBeEnabled();
+      expect(v0).toBeEnabled();
+      await user.type(q0, '10');
+
+      await waitFor(() => expect(q0).toHaveValue(10));
+      await waitFor(() => expect(v0).toHaveValue(0));
     });
 
     it('recalculates when date changes', async () => {
@@ -295,6 +351,7 @@ function FormWrapper(
           } as Commodity,
         } as Account,
       },
+      {},
     ],
     fk_currency: { guid: 'eur', mnemonic: 'EUR', namespace: 'CURRENCY' },
   };

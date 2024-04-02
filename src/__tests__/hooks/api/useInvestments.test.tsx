@@ -7,12 +7,14 @@ import type { UseQueryResult } from '@tanstack/react-query';
 import { useInvestment, useInvestments } from '@/hooks/api/useInvestments';
 import { InvestmentAccount } from '@/book/models';
 import * as queries from '@/lib/queries/getInvestments';
+import * as useSplitsHook from '@/hooks/api/useSplits';
 import * as useAccountsHook from '@/hooks/api/useAccounts';
 import * as useMainCurrencyHook from '@/hooks/api/useMainCurrency';
 import * as stateHooks from '@/hooks/state';
-import type { Account, Commodity } from '@/book/entities';
+import { Account, Commodity, Split } from '@/book/entities';
 
 jest.mock('@/lib/queries/getInvestments');
+jest.mock('@/hooks/api/useSplits');
 jest.mock('@/hooks/api/useAccounts');
 jest.mock('@/hooks/api/useMainCurrency');
 
@@ -30,9 +32,13 @@ describe('useInvestments', () => {
     jest.spyOn(useAccountsHook, 'useAccounts').mockReturnValue({
       data: undefined,
     } as UseQueryResult<Account[]>);
+    jest.spyOn(useSplitsHook, 'useSplits').mockReturnValue({
+      data: undefined,
+    } as UseQueryResult<Split[]>);
     jest.spyOn(useMainCurrencyHook, 'useMainCurrency').mockReturnValue({
       data: undefined,
     } as UseQueryResult<Commodity>);
+
     jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
   });
 
@@ -42,10 +48,13 @@ describe('useInvestments', () => {
   });
 
   it('is pending when no accounts', async () => {
-    const mainCurrency = { guid: 'c_guid' };
     jest.spyOn(useMainCurrencyHook, 'useMainCurrency').mockReturnValue({
-      data: mainCurrency,
+      data: { guid: 'c_guid' },
     } as UseQueryResult<Commodity>);
+    jest.spyOn(useSplitsHook, 'useSplits').mockReturnValue({
+      data: [{ guid: 'split_guid' }],
+      dataUpdatedAt: 2,
+    } as UseQueryResult<Split[]>);
 
     const { result } = renderHook(() => useInvestments(), { wrapper });
 
@@ -54,15 +63,18 @@ describe('useInvestments', () => {
     const queryCache = QUERY_CLIENT.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
     expect(queryCache[0].queryKey).toEqual(
-      ['api', 'investments'],
+      ['api', 'investments', { splitsUpdatedAt: 2 }],
     );
     expect(queries.getInvestments).not.toBeCalled();
   });
 
-  it('is pending when no mainCurrency', async () => {
-    const account = { guid: 'guid' };
+  it('is pending when no splits', async () => {
+    jest.spyOn(useMainCurrencyHook, 'useMainCurrency').mockReturnValue({
+      data: { guid: 'c_guid' },
+    } as UseQueryResult<Commodity>);
     jest.spyOn(useAccountsHook, 'useAccounts').mockReturnValue({
-      data: [account],
+      data: [{ guid: 'guid' }],
+      dataUpdatedAt: 1,
     } as UseQueryResult<Account[]>);
 
     const { result } = renderHook(() => useInvestments(), { wrapper });
@@ -72,7 +84,29 @@ describe('useInvestments', () => {
     const queryCache = QUERY_CLIENT.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
     expect(queryCache[0].queryKey).toEqual(
-      ['api', 'investments'],
+      ['api', 'investments', { accountsUpdatedAt: 1 }],
+    );
+    expect(queries.getInvestments).not.toBeCalled();
+  });
+
+  it('is pending when no mainCurrency', async () => {
+    jest.spyOn(useAccountsHook, 'useAccounts').mockReturnValue({
+      data: [{ guid: 'guid' }],
+      dataUpdatedAt: 1,
+    } as UseQueryResult<Account[]>);
+    jest.spyOn(useSplitsHook, 'useSplits').mockReturnValue({
+      data: [{ guid: 'split_guid' }],
+      dataUpdatedAt: 2,
+    } as UseQueryResult<Split[]>);
+
+    const { result } = renderHook(() => useInvestments(), { wrapper });
+
+    await waitFor(() => expect(result.current.status).toEqual('pending'));
+
+    const queryCache = QUERY_CLIENT.getQueryCache().getAll();
+    expect(queryCache).toHaveLength(1);
+    expect(queryCache[0].queryKey).toEqual(
+      ['api', 'investments', { accountsUpdatedAt: 1, splitsUpdatedAt: 2 }],
     );
     expect(queries.getInvestments).not.toBeCalled();
   });
@@ -82,12 +116,19 @@ describe('useInvestments', () => {
     const account2 = { guid: 'guid', type: 'ASSET' };
     jest.spyOn(useAccountsHook, 'useAccounts').mockReturnValue({
       data: [account1, account2],
+      dataUpdatedAt: 1,
     } as UseQueryResult<Account[]>);
 
     const investments = [
       { account: account1, processSplits: jest.fn() as Function } as InvestmentAccount,
     ];
     jest.spyOn(queries, 'getInvestments').mockResolvedValue(investments);
+
+    const splits = [{ guid: 'split_guid' }];
+    jest.spyOn(useSplitsHook, 'useSplits').mockReturnValue({
+      data: splits,
+      dataUpdatedAt: 2,
+    } as UseQueryResult<Split[]>);
 
     const mainCurrency = { guid: 'c_guid' };
     jest.spyOn(useMainCurrencyHook, 'useMainCurrency').mockReturnValue({
@@ -103,20 +144,25 @@ describe('useInvestments', () => {
     const queryCache = QUERY_CLIENT.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
     expect(queryCache[0].queryKey).toEqual(
-      ['api', 'investments'],
+      ['api', 'investments', { accountsUpdatedAt: 1, splitsUpdatedAt: 2 }],
     );
 
     expect(useMainCurrencyHook.useMainCurrency).toBeCalledWith();
     expect(useAccountsHook.useAccounts).toBeCalledWith();
-    expect(queries.getInvestments).toBeCalledWith([account1], mainCurrency);
+    expect(useSplitsHook.useSplits).toBeCalledWith({ type: 'INVESTMENT' });
+    expect(queries.getInvestments).toBeCalledWith([account1], splits, mainCurrency);
   });
 });
 
 describe('useInvestment', () => {
   beforeEach(() => {
-    const mainCurrency = { guid: 'c_guid' };
+    jest.spyOn(useSplitsHook, 'useSplits').mockReturnValue({
+      data: [{ guid: 'split_guid' }],
+      dataUpdatedAt: 2,
+    } as UseQueryResult<Split[]>);
+
     jest.spyOn(useMainCurrencyHook, 'useMainCurrency').mockReturnValue({
-      data: mainCurrency,
+      data: { guid: 'c_guid' },
     } as UseQueryResult<Commodity>);
   });
 
@@ -130,6 +176,7 @@ describe('useInvestment', () => {
     const account2 = { guid: 'guid', type: 'ASSET' };
     jest.spyOn(useAccountsHook, 'useAccounts').mockReturnValue({
       data: [account1, account2],
+      dataUpdatedAt: 1,
     } as UseQueryResult<Account[]>);
 
     const investments = [
@@ -144,7 +191,9 @@ describe('useInvestment', () => {
 
     const queryCache = QUERY_CLIENT.getQueryCache().getAll();
     expect(queryCache).toHaveLength(1);
-    expect(queryCache[0].queryKey).toEqual(['api', 'investments']);
+    expect(queryCache[0].queryKey).toEqual(
+      ['api', 'investments', { accountsUpdatedAt: 1, splitsUpdatedAt: 2 }],
+    );
 
     expect(result.current.data?.processSplits).toBeCalledWith(TEST_INTERVAL.end);
   });

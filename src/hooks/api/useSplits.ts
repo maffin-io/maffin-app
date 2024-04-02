@@ -1,10 +1,57 @@
 import { useQuery } from '@tanstack/react-query';
-import { Between } from 'typeorm';
+import { Between, FindOptionsWhere } from 'typeorm';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import { Split } from '@/book/entities';
 import { useInterval } from '@/hooks/state';
+import type { Account } from '@/book/entities';
 import fetcher from './fetcher';
+
+/**
+ * This query is a generic way to retrieve splits. It's quite unoptimised because
+ * it is used by useInvestment/s queries and they need A LOT of nested information
+ * like full transation with all splits, the account, etc. We probably should separate
+ * in two queries in the future.
+ */
+export function useSplits(
+  findOptions: FindOptionsWhere<Account>,
+): UseQueryResult<Split[]> {
+  const queryKey = [...Split.CACHE_KEY, findOptions];
+  const result = useQuery({
+    queryKey,
+    queryFn: fetcher(
+      () => Split.find({
+        where: {
+          fk_account: {
+            ...findOptions,
+          },
+        },
+        relations: {
+          fk_transaction: {
+            splits: {
+              fk_account: true,
+            },
+          },
+          fk_account: true,
+        },
+        order: {
+          fk_transaction: {
+            date: 'DESC',
+            enterDate: 'DESC',
+          },
+          // This is so debit is always before credit
+          // so we avoid negative amounts when display
+          // partial totals
+          quantityNum: 'ASC',
+        },
+      }),
+      queryKey,
+    ),
+    networkMode: 'always',
+  });
+
+  return result;
+}
 
 /**
  * This query is specialised to be used on listing transactions for a given account.

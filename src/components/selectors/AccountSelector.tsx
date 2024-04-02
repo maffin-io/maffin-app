@@ -12,6 +12,7 @@ export interface AccountSelectorProps extends SelectProps<Account, false, GroupB
   ignoreAccounts?: string[],
   ignorePlaceholders?: boolean,
   onlyPlaceholders?: boolean,
+  onlyTypes?: string[],
   ignoreHidden?: boolean,
   showRoot?: boolean,
 }
@@ -21,6 +22,7 @@ export default function AccountSelector(
     ignoreAccounts = [],
     ignorePlaceholders = false,
     onlyPlaceholders = false,
+    onlyTypes,
     ignoreHidden = true,
     showRoot = false,
     id = 'accountSelector',
@@ -45,6 +47,10 @@ export default function AccountSelector(
 
   if (ignoreHidden) {
     options = options.filter(account => !account.hidden);
+  }
+
+  if (onlyTypes) {
+    options = options.filter(account => onlyTypes.includes(account.type));
   }
 
   return (

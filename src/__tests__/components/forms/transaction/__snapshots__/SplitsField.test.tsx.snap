@@ -132,7 +132,7 @@ exports[`SplitsField renders with default values 1`] = `
                     class="selector__placeholder css-1jqq78o-placeholder"
                     id="react-select-2-placeholder"
                   >
-                    &lt;account&gt;
+                    &lt;Choose an account&gt;
                   </div>
                   <div
                     class="!text-inherit selector__input-container css-qbdosj-Input"
@@ -240,17 +240,17 @@ exports[`SplitsField renders with default values 1`] = `
       class="invalid-feedback"
     />
     <button
-      class="link m-3"
+      class="link m-3 mr-0"
       type="button"
     >
       Add split
-      <span
-        class="badge default ml-0.5"
-        data-tooltip-id="add-split-help"
-      >
-        ?
-      </span>
     </button>
+    <span
+      class="badge default ml-0.5"
+      data-tooltip-id="add-split-help"
+    >
+      ?
+    </span>
   </form>
 </div>
 `;

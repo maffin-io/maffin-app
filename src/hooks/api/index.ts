@@ -12,6 +12,7 @@ export { useAccount, useAccounts } from '@/hooks/api/useAccounts';
 export { useCommodity, useCommodities } from '@/hooks/api/useCommodities';
 export { useInvestment, useInvestments } from '@/hooks/api/useInvestments';
 export {
+  useSplits,
   useSplitsPagination,
   useSplitsCount,
 } from '@/hooks/api/useSplits';

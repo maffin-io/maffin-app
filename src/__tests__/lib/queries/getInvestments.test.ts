@@ -171,6 +171,7 @@ describe('getInvestments', () => {
   describe('getInvestments', () => {
     let account1: Account;
     let account2: Account;
+    let splits: Split[];
 
     beforeEach(() => {
       account1 = Account.create({
@@ -192,10 +193,10 @@ describe('getInvestments', () => {
         parent: jest.fn(),
       });
 
-      jest.spyOn(Split, 'find').mockResolvedValue([
+      splits = [
         { guid: 'split1', accountId: account1.guid } as Split,
         { guid: 'split2', accountId: account2.guid } as Split,
-      ]);
+      ];
     });
 
     it('returns multiple investments', async () => {
@@ -205,36 +206,14 @@ describe('getInvestments', () => {
 
       await getInvestments(
         [account1, account2],
+        splits,
         eur,
       );
-
-      expect(Split.find).toBeCalledWith({
-        where: {
-          fk_account: {
-            type: 'INVESTMENT',
-          },
-        },
-        relations: {
-          fk_transaction: {
-            splits: {
-              fk_account: true,
-            },
-          },
-          fk_account: true,
-        },
-        order: {
-          fk_transaction: {
-            date: 'DESC',
-            enterDate: 'DESC',
-          },
-          quantityNum: 'ASC',
-        },
-      });
 
       expect(InvestmentAccount).toHaveBeenNthCalledWith(
         1,
         account1,
-        [{ accountId: account1.guid, guid: 'split1' }],
+        [splits[0]],
         'EUR',
         new PriceDBMap([price1]),
       );
@@ -242,7 +221,7 @@ describe('getInvestments', () => {
       expect(InvestmentAccount).toHaveBeenNthCalledWith(
         2,
         account2,
-        [{ accountId: account2.guid, guid: 'split2' }],
+        [splits[1]],
         'EUR',
         new PriceDBMap([price2]),
       );

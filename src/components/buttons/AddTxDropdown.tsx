@@ -1,6 +1,11 @@
 import React from 'react';
 import { DateTime } from 'luxon';
-import { BiPlusCircle, BiShareAlt } from 'react-icons/bi';
+import {
+  BiDroplet,
+  BiMoney,
+  BiPlusCircle,
+  BiShareAlt,
+} from 'react-icons/bi';
 
 import FormButton from '@/components/buttons/FormButton';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
@@ -50,6 +55,87 @@ export default function AddTxDropdown({
             />
           </FormButton>
         </li>
+        {
+          account.type === 'INVESTMENT'
+          && (
+            <>
+              <li className="text-sm hover:bg-light-100 dark:hover:bg-dark-700">
+                <FormButton
+                  id="add-dividend"
+                  className="flex items-center text-left px-3 py-2 w-full text-cyan-700 hover:text-cyan-600 whitespace-nowrap"
+                  modalTitle={`Add dividend to ${account.name}`}
+                  buttonContent={(
+                    <>
+                      <BiMoney className="mr-1" />
+                      Dividend
+                    </>
+                  )}
+                >
+                  <TransactionForm
+                    defaultValues={
+                      {
+                        date: (latestDate || DateTime.now()).toISODate() as string,
+                        description: `Dividend ${account.name}`,
+                        fk_currency: account.commodity,
+                        splits: [
+                          Split.create({
+                            fk_account: account,
+                            valueNum: 0,
+                            valueDenom: 1,
+                            quantityNum: 0,
+                            quantityDenom: 1,
+                          }),
+                          Split.create({
+                            fk_account: {
+                              type: 'INCOME',
+                            },
+                          }),
+                          Split.create({
+                            fk_account: {
+                              type: 'ASSET',
+                            },
+                          }),
+                        ],
+                      }
+                    }
+                  />
+                </FormButton>
+              </li>
+              <li className="text-sm hover:bg-light-100 dark:hover:bg-dark-700">
+                <FormButton
+                  id="add-split"
+                  className="flex items-center text-left px-3 py-2 w-full text-cyan-700 hover:text-cyan-600 whitespace-nowrap"
+                  modalTitle={`Add split event to ${account.name}`}
+                  buttonContent={(
+                    <>
+                      <BiDroplet className="mr-1" />
+                      Split
+                    </>
+                  )}
+                >
+                  <TransactionForm
+                    defaultValues={
+                      {
+                        date: (latestDate || DateTime.now()).toISODate() as string,
+                        description: `Split ${account.name}`,
+                        fk_currency: account.commodity,
+                        splits: [
+                          Split.create({
+                            fk_account: account,
+                            valueNum: 0,
+                            valueDenom: 1,
+                            quantityNum: 0,
+                            quantityDenom: 1,
+                          }),
+                        ],
+                      }
+                    }
+                  />
+                </FormButton>
+              </li>
+            </>
+          )
+        }
       </ul>
     </div>
   );
