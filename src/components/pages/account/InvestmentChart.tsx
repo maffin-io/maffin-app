@@ -1,9 +1,7 @@
 import React from 'react';
 import { Chart, ChartOptions, Filler } from 'chart.js';
-import { DateTime } from 'luxon';
 import type { ChartDataset } from 'chart.js';
 
-import { Price } from '@/book/entities';
 import Line from '@/components/charts/Line';
 import { moneyToString } from '@/helpers/number';
 import type { Account } from '@/book/entities';
@@ -38,9 +36,11 @@ export default function InvestmentChart({
     );
   }
 
-  const prices = pricesMap.prices || [];
-  const currency = (prices.length && prices[0].currency.mnemonic) || '';
+  const currency = pricesMap.getInvestmentPrice(
+    investment.account.commodity.mnemonic,
+  ).currency.mnemonic;
 
+  const prices = pricesMap.prices || [];
   const pricesData: { x: number, y: number }[] = [];
   prices.forEach(price => {
     pricesData.push({
