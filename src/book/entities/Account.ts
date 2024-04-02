@@ -13,7 +13,6 @@ import {
 import type { QueryClient } from '@tanstack/react-query';
 
 import {
-  isInvestment,
   getAllowedSubAccounts,
   ASSET_ACCOUNTS,
   LIABILITY_ACCOUNTS,
@@ -90,7 +89,6 @@ export default class Account extends BaseEntity {
 
   @ManyToOne('Commodity', { eager: true, cascade: true })
   @JoinColumn({ name: 'commodity_guid' })
-  @CheckInvestmentCommodity()
   @CheckIECommodity()
   @v.ValidateIf(o => o.type !== 'ROOT')
   @v.IsNotEmpty({ message: 'commodity is required' })
@@ -179,34 +177,6 @@ function CheckAccountType(validationOptions?: v.ValidationOptions) {
           const allowedTypes = getAllowedSubAccounts(account.parent.type);
 
           return `only ${allowedTypes} types can be selected with ${account.parent.type} account as parent`;
-        },
-      },
-    });
-  };
-}
-
-/**
- * Checks that investment accounts commodity is not a currency
- */
-function CheckInvestmentCommodity(validationOptions?: v.ValidationOptions) {
-  return function f(object: Account, propertyName: string) {
-    v.registerDecorator({
-      name: 'checkInvestmentCommodity',
-      target: object.constructor,
-      propertyName,
-      options: validationOptions,
-      validator: {
-        validate(fk_commodity: Commodity, args: v.ValidationArguments) {
-          const account = args.object as Account;
-          if (isInvestment(account)) {
-            return fk_commodity.namespace !== 'CURRENCY';
-          }
-
-          return true;
-        },
-
-        defaultMessage() {
-          return 'investment accounts cant have a currency as their commodity';
         },
       },
     });

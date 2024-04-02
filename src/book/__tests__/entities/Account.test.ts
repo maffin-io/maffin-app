@@ -152,17 +152,6 @@ describe('Account', () => {
       await expect(account.save()).rejects.toThrow('checkAccountType');
     });
 
-    it('fails if currency assigned to investment account', async () => {
-      account = Account.create({
-        name: 'name',
-        type: 'INVESTMENT',
-        parent: root,
-        fk_commodity: eur,
-      });
-
-      await expect(account.save()).rejects.toThrow('checkInvestmentCommodity');
-    });
-
     it.each([
       'INCOME',
       'EXPENSE',

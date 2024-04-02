@@ -114,10 +114,10 @@ describe('InvestmentInfo', () => {
       1,
       {
         className: 'col-span-6',
-        title: 'Closest price',
-        statsTextClass: 'table-caption badge default',
-        stats: '€15.00',
-        description: 'on 1/1/2023',
+        title: 'Value',
+        statsTextClass: 'amount-positive',
+        stats: '€150.00',
+        description: 'from €100.00 invested',
       },
       {},
     );
@@ -125,10 +125,10 @@ describe('InvestmentInfo', () => {
       2,
       {
         className: 'col-span-6',
-        title: 'Value',
-        statsTextClass: 'amount-positive',
-        stats: '€150.00',
-        description: 'from €100.00 invested',
+        title: 'Closest price',
+        statsTextClass: 'table-caption badge default',
+        stats: '€15.00',
+        description: 'on 1/1/2023',
       },
       {},
     );
@@ -198,5 +198,38 @@ describe('InvestmentInfo', () => {
       },
       {},
     );
+  });
+
+  it('renders as expected when commodity is currency', async () => {
+    const account = {
+      guid: 'guid',
+      commodity: eur,
+    } as Account;
+
+    jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
+      data: {
+        cost: new Money(100, 'EUR'),
+        value: new Money(150, 'EUR'),
+        unrealizedProfitAbs: new Money(50, 'EUR'),
+        unrealizedProfitPct: 50,
+        realizedProfit: new Money(10, 'EUR'),
+        realizedProfitPct: 5,
+        avgPrice: 10,
+        quantity: new Money(150, 'EUR'),
+        account,
+        currency: 'EUR',
+        realizedDividends: new Money(20, 'EUR'),
+        quoteInfo: {
+          price: 1,
+          date: DateTime.now(),
+        },
+      },
+    } as UseQueryResult<InvestmentAccount>);
+
+    const { container } = render(
+      <InvestmentInfo account={account} />,
+    );
+
+    expect(container).toMatchSnapshot();
   });
 });

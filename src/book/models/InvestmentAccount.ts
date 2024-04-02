@@ -42,9 +42,6 @@ export default class InvestmentAccount {
       this.account.commodity.mnemonic,
       DateTime.now(),
     );
-    if (price.guid === 'missing_price') {
-      throw new Error(`No price found for ${this.account.commodity.mnemonic}`);
-    }
     this.currency = price.currency.mnemonic;
 
     this.processSplits();
@@ -182,17 +179,17 @@ export default class InvestmentAccount {
     ).forEach((split) => {
       const numSplits = split.transaction.splits.length;
 
-      if (InvestmentAccount.isBuy(numSplits, split)) {
+      if (InvestmentAccount.isBuy(split)) {
         this._buy(split);
         return;
       }
 
-      if (InvestmentAccount.isSell(numSplits, split)) {
+      if (InvestmentAccount.isSell(split)) {
         this._sell(split);
         return;
       }
 
-      if (InvestmentAccount.isSplit(numSplits, split)) {
+      if (InvestmentAccount.isSplit(split)) {
         this._split(split);
         return;
       }
@@ -205,7 +202,7 @@ export default class InvestmentAccount {
       // Dividends happen in the asset + income account but we add a 0
       // valued split to link it with the stock account (in gnucash you have to do this
       // manually)
-      if (numSplits > 2 && split.value === 0 && split.quantity === 0) {
+      if (InvestmentAccount.isDividend(split)) {
         this._dividend(split);
         return;
       }
@@ -214,16 +211,24 @@ export default class InvestmentAccount {
     });
   }
 
-  static isBuy(numSplits: number, split: Split): boolean {
+  static isBuy(split: Split): boolean {
+    const numSplits = split.transaction.splits.length;
     return numSplits > 1 && split.value > 0 && split.quantity > 0;
   }
 
-  static isSell(numSplits: number, split: Split): boolean {
+  static isSell(split: Split): boolean {
+    const numSplits = split.transaction.splits.length;
     return numSplits > 1 && split.value < 0 && split.quantity < 0;
   }
 
-  static isSplit(numSplits: number, split: Split): boolean {
+  static isSplit(split: Split): boolean {
+    const numSplits = split.transaction.splits.length;
     return numSplits === 1 && split.value === 0 && split.quantity > 0;
+  }
+
+  static isDividend(split: Split): boolean {
+    const numSplits = split.transaction.splits.length;
+    return numSplits > 2 && split.value === 0 && split.quantity === 0;
   }
 
   /**

@@ -211,29 +211,6 @@ describe('InvestmentAccount', () => {
       });
     });
 
-    it('fails if no prices in pricemap', async () => {
-      const priceMap = new PriceDBMap([
-        Price.create({
-          fk_commodity: eur,
-          fk_currency: eur,
-          date: DateTime.now(),
-          source: 'maffin::{"price":2000,"changePct":-1,"changeAbs":-1,"currency":"EUR"}',
-          valueNum: 10,
-          valueDenom: 100,
-        }),
-      ]);
-
-      const account = await Account.findOneOrFail({
-        where: { type: 'INVESTMENT' },
-        relations: {
-          splits: true,
-        },
-      });
-      expect(
-        () => new InvestmentAccount(account, account.splits, 'EUR', priceMap),
-      ).toThrow('No price found for TICKER');
-    });
-
     it('sets price for date passed in processSplits', async () => {
       const priceMap = new PriceDBMap([
         Price.create({

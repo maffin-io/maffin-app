@@ -28,61 +28,99 @@ export default function InvestmentInfo({
   return (
     <div className="grid grid-cols-12 items-stretch">
       <div className="col-span-4">
-        <div className="card text-lg">
-          <span
-            className={
-              classNames(
-                'badge default text-xl font-semibold mx-1',
-                { disabled: investment.isClosed },
-              )
-            }
-          >
-            {`${investment.quantity.toNumber()} titles`}
-          </span>
-          <span>at an average price of</span>
-          <span
-            className={
-              classNames(
-                'badge default text-xl font-semibold mx-1',
-                { disabled: investment.isClosed },
-              )
-            }
-          >
-            {
-              new Money(
-                investment.isClosed ? 0 : investment.avgPrice,
-                investment.currency,
-              ).format()
-            }
-          </span>
-        </div>
+        {
+          (
+            investment.account.commodity.namespace !== 'CURRENCY'
+            && (
+              <div className="card text-lg">
+                <span
+                  className={
+                    classNames(
+                      'badge default text-xl font-semibold mx-1',
+                      { disabled: investment.isClosed },
+                    )
+                  }
+                >
+                  {`${investment.quantity.toNumber()} titles`}
+                </span>
+                <span>at an average price of</span>
+                <span
+                  className={
+                    classNames(
+                      'badge default text-xl font-semibold mx-1',
+                      { disabled: investment.isClosed },
+                    )
+                  }
+                >
+                  {
+                    new Money(
+                      investment.isClosed ? 0 : investment.avgPrice,
+                      investment.currency,
+                    ).format()
+                  }
+                </span>
+              </div>
+            )
+          ) || (
+            <div className="card text-lg">
+              <span
+                className={
+                  classNames(
+                    'badge default text-xl font-semibold mx-1',
+                    { disabled: investment.isClosed },
+                  )
+                }
+              >
+                {`${investment.value.format()}`}
+              </span>
+              <span>from a total investment of</span>
+              <span
+                className={
+                  classNames(
+                    'badge default text-xl font-semibold mx-1',
+                    { disabled: investment.isClosed },
+                  )
+                }
+              >
+                {investment.cost.format()}
+              </span>
+            </div>
+          )
+        }
         <div className="grid grid-cols-12">
-          <StatisticsWidget
-            className="col-span-6"
-            title="Closest price"
-            statsTextClass={
-              classNames(
-                'table-caption badge default',
-                { disabled: investment.isClosed },
-              )
-            }
-            stats={new Money(investment.quoteInfo.price, investment.currency).format()}
-            description={
-              `on ${investment.quoteInfo.date.toLocaleString()}`
-            }
-          />
-          <StatisticsWidget
-            className="col-span-6"
-            title="Value"
-            stats={`${investment.value.format()}`}
-            statsTextClass={classNames({
-              'amount-positive': investment.unrealizedProfitPct >= 0,
-              'amount-negative': investment.unrealizedProfitPct < 0,
-            })}
-            description={
-              `from ${investment.cost.format()} invested`
-            }
-          />
+          {
+            investment.account.commodity.namespace !== 'CURRENCY'
+            && (
+              <>
+                <StatisticsWidget
+                  className="col-span-6"
+                  title="Value"
+                  stats={`${investment.value.format()}`}
+                  statsTextClass={classNames({
+                    'amount-positive': investment.unrealizedProfitPct >= 0,
+                    'amount-negative': investment.unrealizedProfitPct < 0,
+                  })}
+                  description={
+                    `from ${investment.cost.format()} invested`
+                  }
+                />
+                <StatisticsWidget
+                  className="col-span-6"
+                  title="Closest price"
+                  statsTextClass={
+                    classNames(
+                      'table-caption badge default',
+                      { disabled: investment.isClosed },
+                    )
+                  }
+                  stats={new Money(investment.quoteInfo.price, investment.currency).format()}
+                  description={
+                    `on ${investment.quoteInfo.date.toLocaleString()}`
+                  }
+                />
+              </>
+            )
+          }
           <StatisticsWidget
             className="col-span-6"
             statsTextClass={classNames({
