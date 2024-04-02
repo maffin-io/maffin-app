@@ -1,5 +1,52 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`InvestmentInfo renders as expected when commodity is currency 1`] = `
+<div>
+  <div
+    class="grid grid-cols-12 items-stretch"
+  >
+    <div
+      class="col-span-4"
+    >
+      <div
+        class="card text-lg"
+      >
+        <span
+          class="badge default text-xl font-semibold mx-1"
+        >
+          €150.00
+        </span>
+        <span>
+          from a total investment of
+        </span>
+        <span
+          class="badge default text-xl font-semibold mx-1"
+        >
+          €100.00
+        </span>
+      </div>
+      <div
+        class="grid grid-cols-12"
+      >
+        <div
+          data-testid="StatisticsWidget"
+        />
+        <div
+          data-testid="StatisticsWidget"
+        />
+      </div>
+    </div>
+    <div
+      class="card col-span-8"
+    >
+      <div
+        data-testid="InvestmentChart"
+      />
+    </div>
+  </div>
+</div>
+`;
+
 exports[`InvestmentInfo renders as expected with data 1`] = `
 <div>
   <div

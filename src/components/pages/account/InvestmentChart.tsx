@@ -1,6 +1,7 @@
 import React from 'react';
-import { Chart, Filler } from 'chart.js';
+import { Chart, ChartOptions, Filler } from 'chart.js';
 import { DateTime } from 'luxon';
+import type { ChartDataset } from 'chart.js';
 
 import { Price } from '@/book/entities';
 import Line from '@/components/charts/Line';
@@ -10,6 +11,7 @@ import { useInvestment, usePrices } from '@/hooks/api';
 import { useInterval } from '@/hooks/state';
 import Loading from '@/components/Loading';
 import { intervalToDates } from '@/helpers/dates';
+import { InvestmentAccount } from '@/book/models';
 
 Chart.register(Filler);
 
@@ -50,61 +52,161 @@ export default function InvestmentChart({
   const numStocksData: { x: number, y: number }[] = [];
   const valueData: { x: number, y: number }[] = [];
   const dates = intervalToDates(interval);
+  const isCurrencyInvestment = investment.account.commodity.namespace === 'CURRENCY';
 
-  dates.forEach(x => {
-    investment.processSplits(x);
-    numStocksData.push({
-      x: x.startOf('month').toMillis(),
-      y: investment.quantity.toNumber(),
+  investment.splits
+    .filter(s => interval.contains(s.transaction.date) && !InvestmentAccount.isDividend(s))
+    .forEach(s => {
+      investment.processSplits(s.transaction.date);
+      numStocksData.push({
+        x: s.transaction.date.toMillis(),
+        y: !isCurrencyInvestment ? investment.quantity.toNumber() : investment.cost.toNumber(),
+      });
+
+      const price = pricesMap.getInvestmentPrice(
+        investment.account.commodity.mnemonic,
+        s.transaction.date,
+      );
+
+      if (price) {
+        valueData.push({
+          x: s.transaction.date.toMillis(),
+          y: investment.quantity.toNumber() * price.value,
+        });
+      }
     });
 
-    const price = findClosestPrice(x, prices || []);
-    if (price) {
-      valueData.push({
+  dates.forEach(x => {
+    const alreadyExists = numStocksData.find(d => d.x === x.toMillis());
+
+    if (!alreadyExists) {
+      investment.processSplits(x);
+      numStocksData.push({
         x: x.toMillis(),
-        y: investment.quantity.toNumber() * price.value,
+        y: !isCurrencyInvestment ? investment.quantity.toNumber() : investment.cost.toNumber(),
       });
+
+      const price = pricesMap.getInvestmentPrice(investment.account.commodity.mnemonic, x);
+      if (price) {
+        valueData.push({
+          x: x.toMillis(),
+          y: investment.quantity.toNumber() * price.value,
+        });
+      }
     }
   });
+
+  const datasets: ChartDataset<'line'>[] = [
+    {
+      label: !isCurrencyInvestment ? 'Num. stocks' : 'Contributed',
+      data: numStocksData.sort((a, b) => a.x - b.x),
+      showLine: false,
+      pointStyle: 'rectRot',
+      pointRadius: 5,
+      pointHoverRadius: 5,
+      yAxisID: 'yStocks',
+      borderColor: 'rgba(124, 58, 237, 1)',
+      backgroundColor: 'rgba(124, 58, 237, 1)',
+      order: 0,
+    },
+    {
+      label: 'Value',
+      data: valueData.sort((a, b) => a.x - b.x),
+      yAxisID: 'yValue',
+      fill: false,
+      pointRadius: 5,
+      pointHoverRadius: 5,
+      borderColor: 'rgba(22, 163, 74)',
+      backgroundColor: 'rgba(22, 163, 74)',
+      order: 2,
+    },
+  ];
+
+  const scales: ChartOptions<'line'>['scales'] = {
+    x: {
+      offset: true,
+      type: 'time',
+      time: {
+        unit: 'month',
+        tooltipFormat: 'dd MMMM yyyy',
+        displayFormats: {
+          month: 'MMM-yy',
+        },
+      },
+      grid: {
+        offset: false,
+      },
+      border: {
+        display: false,
+      },
+      min: interval.start?.toISODate(),
+      max: interval.end?.toISODate(),
+    },
+    yStocks: {
+      offset: true,
+      beginAtZero: true,
+      stackWeight: 2,
+      stack: 'investment',
+      border: {
+        display: false,
+      },
+      ticks: {
+        color: 'rgba(124, 58, 237, 1)',
+        callback: (value) => moneyToString(
+          value as number,
+          investment.account.commodity.mnemonic,
+        ),
+      },
+    },
+    yValue: {
+      offset: true,
+      stackWeight: 4,
+      stack: 'investment',
+      border: {
+        display: false,
+      },
+      ticks: {
+        color: 'rgba(22, 163, 74)',
+        maxTicksLimit: 10,
+        callback: (value) => moneyToString(value as number, currency),
+      },
+    },
+  };
+
+  if (!isCurrencyInvestment) {
+    datasets.push({
+      label: 'Price',
+      data: pricesData,
+      yAxisID: 'yPrice',
+      pointStyle: 'circle',
+      tension: 0.4,
+      cubicInterpolationMode: 'monotone',
+      fill: false,
+      borderColor: 'rgba(234, 88, 12, 1)',
+      backgroundColor: 'rgba(234, 88, 12, 1)',
+      order: 1,
+    });
+
+    scales.yPrice = {
+      offset: true,
+      stackWeight: 4,
+      stack: 'investment',
+      border: {
+        display: false,
+      },
+      ticks: {
+        color: 'rgba(234, 88, 12, 0.7)',
+        maxTicksLimit: 10,
+        callback: (value) => moneyToString(value as number, currency),
+      },
+    };
+  }
 
   return (
     <Line
       data={{
         labels: dates.map(d => d.startOf('month')),
-        datasets: [
-          {
-            label: 'Num. stocks',
-            data: numStocksData,
-            yAxisID: 'yStocks',
-            // @ts-ignore
-            type: 'bar',
-            borderColor: 'rgba(124, 58, 237, 1)',
-            backgroundColor: 'rgba(124, 58, 237, 1)',
-            order: 0,
-          },
-          {
-            label: 'Price',
-            data: pricesData,
-            yAxisID: 'yPrice',
-            pointStyle: 'circle',
-            tension: 0.4,
-            cubicInterpolationMode: 'monotone',
-            fill: false,
-            borderColor: 'rgba(234, 88, 12, 1)',
-            backgroundColor: 'rgba(234, 88, 12, 1)',
-            order: 1,
-          },
-          {
-            label: 'Value',
-            data: valueData,
-            yAxisID: 'yValue',
-            fill: false,
-            pointRadius: 5,
-            borderColor: 'rgba(22, 163, 74)',
-            backgroundColor: 'rgba(22, 163, 74)',
-            order: 2,
-          },
-        ],
+        datasets,
       }}
       options={{
         maintainAspectRatio: false,
@@ -123,15 +225,8 @@ export default function InvestmentChart({
           tooltip: {
             backgroundColor: '#323b44',
             callbacks: {
-              title: (tooltipItems) => {
-                if (tooltipItems[0].datasetIndex === 0) {
-                  return dates[tooltipItems[0].dataIndex].toFormat('DD');
-                }
-
-                return undefined;
-              },
               label: (item) => {
-                if (item.datasetIndex === 0) {
+                if (item.datasetIndex === 1) {
                   return `${moneyToString(Number(item.parsed.y), investment.account.commodity.mnemonic)}`;
                 }
 
@@ -140,77 +235,8 @@ export default function InvestmentChart({
             },
           },
         },
-        scales: {
-          x: {
-            type: 'time',
-            time: {
-              unit: 'month',
-              tooltipFormat: 'dd MMMM yyyy',
-              displayFormats: {
-                month: 'MMM-yy',
-              },
-            },
-            grid: {
-              offset: false,
-            },
-            border: {
-              display: false,
-            },
-            min: interval.start?.toISODate(),
-            max: interval.end?.toISODate(),
-          },
-          yStocks: {
-            offset: true,
-            beginAtZero: true,
-            stackWeight: 2,
-            stack: 'investment',
-            grid: {
-              display: false,
-            },
-            border: {
-              display: false,
-            },
-            ticks: {
-              color: 'rgba(124, 58, 237, 1)',
-              callback: (value) => moneyToString(
-                value as number,
-                investment.account.commodity.mnemonic,
-              ),
-            },
-          },
-          yPrice: {
-            offset: true,
-            stackWeight: 4,
-            stack: 'investment',
-            border: {
-              display: false,
-            },
-            ticks: {
-              color: 'rgba(234, 88, 12, 0.7)',
-              maxTicksLimit: 10,
-              callback: (value) => moneyToString(value as number, currency),
-            },
-          },
-          yValue: {
-            offset: true,
-            stackWeight: 4,
-            stack: 'investment',
-            border: {
-              display: false,
-            },
-            ticks: {
-              color: 'rgba(22, 163, 74)',
-              maxTicksLimit: 10,
-              callback: (value) => moneyToString(value as number, currency),
-            },
-          },
-        },
+        scales,
       }}
     />
   );
-}
-
-function findClosestPrice(date: DateTime, prices: Price[]): Price {
-  const possible = prices.filter(price => price.date <= date);
-  return possible[possible.length - 1];
 }
