@@ -332,4 +332,47 @@ describe('AccountSelector', () => {
       {},
     );
   });
+
+  it('filters by type', async () => {
+    const options = [
+      {
+        guid: 'guid1',
+        path: 'path1',
+        type: 'TYPE1',
+        commodity: {
+          mnemonic: 'USD',
+        } as Commodity,
+      } as Account,
+      {
+        guid: 'guid2',
+        path: 'path2',
+        type: 'TYPE2',
+        commodity: {
+          mnemonic: 'USD',
+        } as Commodity,
+      } as Account,
+    ];
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+      {
+        data: [
+          options[0],
+          options[1],
+        ],
+      } as UseQueryResult<Account[]>,
+    );
+
+    render(
+      <AccountSelector
+        onlyTypes={['TYPE1']}
+      />,
+    );
+
+    await screen.findByTestId('Selector');
+    expect(Selector).toHaveBeenCalledWith(
+      expect.objectContaining({
+        options: [options[0]],
+      }),
+      {},
+    );
+  });
 });

@@ -26,6 +26,8 @@ export default function MainSplit({
   const date = form.watch('date');
   const txCurrency = form.watch('fk_currency');
   const quantity = form.watch('splits.0.quantity');
+  const splits = form.watch('splits');
+
   const { data: prices } = usePrices({ from: account?.commodity });
   const [exchangeRate, setExchangeRate] = React.useState(
     Price.create({ valueNum: 1, valueDenom: 1, fk_currency: txCurrency }),
@@ -52,11 +54,11 @@ export default function MainSplit({
   }, [txCurrency, date, form.formState.isDirty, account, prices]);
 
   React.useEffect(() => {
-    if (form.formState.isDirty) {
+    if (form.formState.isDirty && splits.length > 1) {
       form.setValue('splits.0.value', toFixed(quantity * exchangeRate.value, 3));
       form.trigger('splits');
     }
-  }, [quantity, exchangeRate, form]);
+  }, [quantity, exchangeRate, splits.length, form]);
 
   return (
     <div className="flex w-1/2">

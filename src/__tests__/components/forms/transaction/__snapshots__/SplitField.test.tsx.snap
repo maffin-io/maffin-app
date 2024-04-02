@@ -55,7 +55,7 @@ exports[`SplitField renders with empty data 1`] = `
                 class="selector__placeholder css-1jqq78o-placeholder"
                 id="react-select-2-placeholder"
               >
-                &lt;account&gt;
+                &lt;Choose an account&gt;
               </div>
               <div
                 class="!text-inherit selector__input-container css-qbdosj-Input"

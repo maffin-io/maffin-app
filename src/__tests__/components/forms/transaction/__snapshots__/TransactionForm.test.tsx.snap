@@ -173,7 +173,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                       class="selector__placeholder css-1jqq78o-placeholder"
                       id="react-select-2-placeholder"
                     >
-                      &lt;account&gt;
+                      &lt;Choose an account&gt;
                     </div>
                     <div
                       class="!text-inherit selector__input-container css-qbdosj-Input"
@@ -281,17 +281,17 @@ exports[`TransactionForm renders as expected with action add 1`] = `
         class="invalid-feedback"
       />
       <button
-        class="link m-3"
+        class="link m-3 mr-0"
         type="button"
       >
         Add split
-        <span
-          class="badge default ml-0.5"
-          data-tooltip-id="add-split-help"
-        >
-          ?
-        </span>
       </button>
+      <span
+        class="badge default ml-0.5"
+        data-tooltip-id="add-split-help"
+      >
+        ?
+      </span>
     </fieldset>
     <input
       hidden=""
@@ -495,7 +495,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                       class="selector__placeholder css-1jqq78o-placeholder"
                       id="react-select-5-placeholder"
                     >
-                      &lt;account&gt;
+                      &lt;Choose an account&gt;
                     </div>
                     <div
                       class="!text-inherit selector__input-container css-1h01tm3-Input"
@@ -890,7 +890,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                       class="selector__placeholder css-1jqq78o-placeholder"
                       id="react-select-4-placeholder"
                     >
-                      &lt;account&gt;
+                      &lt;Choose an account&gt;
                     </div>
                     <div
                       class="!text-inherit selector__input-container css-qbdosj-Input"
@@ -1000,17 +1000,17 @@ exports[`TransactionForm renders as expected with action update 1`] = `
         class="invalid-feedback"
       />
       <button
-        class="link m-3"
+        class="link m-3 mr-0"
         type="button"
       >
         Add split
-        <span
-          class="badge default ml-0.5"
-          data-tooltip-id="add-split-help"
-        >
-          ?
-        </span>
       </button>
+      <span
+        class="badge default ml-0.5"
+        data-tooltip-id="add-split-help"
+      >
+        ?
+      </span>
     </fieldset>
     <input
       hidden=""

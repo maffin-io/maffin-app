@@ -128,6 +128,59 @@ describe('SplitField', () => {
     expect(screen.getByRole('spinbutton', { name: 'splits.1.quantity' })).toHaveValue(50);
   });
 
+  it('filters account selection when default type is passed', async () => {
+    const user = userEvent.setup();
+    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
+      {
+        data: [
+          {
+            guid: 'account_guid_3',
+            path: 'path3',
+            type: 'EXPENSE',
+            commodity: {
+              guid: 'sgd',
+              mnemonic: 'SGD',
+              namespace: 'CURRENCY',
+            },
+          } as Account,
+          {
+            guid: 'account_guid_4',
+            path: 'path4',
+            type: 'INCOME',
+            commodity: {
+              guid: 'sgd',
+              mnemonic: 'SGD',
+              namespace: 'CURRENCY',
+            },
+          } as Account,
+        ],
+      } as UseQueryResult<Account[]>,
+    );
+
+    render(
+      <FormWrapper
+        action="add"
+        defaults={{
+          fk_currency: { mnemonic: 'SGD' } as Commodity,
+          splits: [
+            {},
+            {
+              quantity: 50,
+              value: 100,
+              fk_account: {
+                type: 'INCOME',
+              } as Account,
+            },
+          ],
+        } as FormValues}
+      />,
+    );
+
+    await user.click(screen.getByLabelText('splits.1.account'));
+    expect(screen.queryByText('path3')).toBeNull();
+    screen.getByText('path4');
+  });
+
   describe('txCurrency on account selection', () => {
     beforeEach(() => {
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(

@@ -11,6 +11,7 @@ import { AccountSelector } from '@/components/selectors';
 import { currencyToSymbol } from '@/helpers/currency';
 import { usePrices } from '@/hooks/api';
 import { Account, Price } from '@/book/entities';
+import { getAllowedSubAccounts } from '@/book/helpers/accountType';
 import type { FormValues } from './types';
 
 export type SplitFieldProps = {
@@ -34,7 +35,7 @@ export default function SplitField({
     Price.create({ valueNum: 1, valueDenom: 1, fk_currency: txCurrency }),
   );
 
-  const showValueField = account && account.commodity.guid !== txCurrency?.guid;
+  const showValueField = account?.commodity && account.commodity.guid !== txCurrency?.guid;
   const value = form.watch(`splits.${index}.value`);
 
   React.useEffect(() => {
@@ -46,7 +47,7 @@ export default function SplitField({
     ) {
       let rate = null;
       const d = DateTime.fromISO(date);
-      if (account.commodity.guid !== txCurrency.guid && txCurrency.namespace === 'CURRENCY') {
+      if (showValueField && txCurrency.namespace === 'CURRENCY') {
         rate = account.commodity.namespace !== 'CURRENCY'
           ? prices.getInvestmentPrice(account.commodity.mnemonic, d)
           : prices.getPrice(account.commodity.mnemonic, txCurrency.mnemonic, d);
@@ -56,7 +57,7 @@ export default function SplitField({
         setExchangeRate(Price.create({ valueNum: 1, valueDenom: 1 }));
       }
     }
-  }, [account, txCurrency, date, disabled, action, index, prices]);
+  }, [account, showValueField, txCurrency, date, action, prices]);
 
   React.useEffect(() => {
     if (value && action === 'add') {
@@ -80,8 +81,9 @@ export default function SplitField({
                 id={`splits.${index}.account`}
                 isClearable={false}
                 isDisabled={disabled}
-                placeholder="<account>"
+                placeholder={account?.type ? `<Choose a ${account.type} account>` : '<Choose an account>'}
                 ignorePlaceholders
+                onlyTypes={account?.type ? getAllowedSubAccounts(account.type) : undefined}
                 onChange={async (a: SingleValue<Account>) => {
                   field.onChange(a);
                   const mainCurrency = await getMainCurrency();

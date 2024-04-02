@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { DateTime, Interval } from 'luxon';
-import type { DefinedUseQueryResult, UseQueryResult } from '@tanstack/react-query';
+import { DateTime } from 'luxon';
+import type { UseQueryResult } from '@tanstack/react-query';
 
 import { InvestmentInfo } from '@/components/pages/account';
 import InvestmentChart from '@/components/pages/account/InvestmentChart';

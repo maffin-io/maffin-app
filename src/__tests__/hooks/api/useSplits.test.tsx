@@ -8,6 +8,7 @@ import {
 } from '@tanstack/react-query';
 
 import {
+  useSplits,
   useSplitsCount,
   useSplitsPagination,
 } from '@/hooks/api';
@@ -52,6 +53,30 @@ describe('useSplits', () => {
   afterEach(() => {
     jest.clearAllMocks();
     QUERY_CLIENT.removeQueries();
+  });
+
+  describe('useSplits', () => {
+    beforeEach(() => {
+      jest.spyOn(Split, 'find').mockResolvedValue([{ guid: 'split_guid' } as Split]);
+    });
+
+    it('forwards find options', async () => {
+      const { result } = renderHook(
+        () => useSplits({ type: 'INVESTMENT' }),
+        { wrapper },
+      );
+
+      await waitFor(() => expect(result.current.status).toEqual('success'));
+      expect(result.current.data).toEqual([
+        { guid: 'split_guid' },
+      ]);
+
+      const queryCache = QUERY_CLIENT.getQueryCache().getAll();
+      expect(queryCache).toHaveLength(1);
+      expect(queryCache[0].queryKey).toEqual(
+        ['api', 'splits', { type: 'INVESTMENT' }],
+      );
+    });
   });
 
   describe('pagination', () => {
