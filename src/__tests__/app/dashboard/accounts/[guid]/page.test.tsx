@@ -76,7 +76,7 @@ describe('AccountPage', () => {
     const account = {
       guid: 'guid',
       path: 'path',
-      type: 'TYPE',
+      type: 'EXPENSE',
       parentId: 'parent',
       commodity: {
         mnemonic: 'EUR',

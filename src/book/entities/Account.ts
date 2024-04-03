@@ -134,11 +134,12 @@ export default class Account extends BaseEntity {
   }
 
   async remove(options?: SaveOptions): Promise<this> {
+    const account = await super.remove(options);
+
     if (this.queryClient) {
       updateCache({ queryClient: this.queryClient });
     }
 
-    const account = await super.remove(options);
     return account;
   }
 }

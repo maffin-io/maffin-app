@@ -150,4 +150,30 @@ describe('CommodityForm', () => {
       cusip: null,
     });
   });
+
+  it('deletes commodity', async () => {
+    const user = userEvent.setup();
+    const mockSave = jest.fn();
+    const eur = await Commodity.create({
+      mnemonic: 'EUR',
+      fullname: 'Euro',
+      namespace: 'CURRENCY',
+    }).save();
+
+    render(
+      <CommodityForm
+        action="delete"
+        defaultValues={{ ...eur }}
+        onSave={mockSave}
+      />,
+    );
+
+    const deleteButton = await screen.findByText('delete');
+
+    expect(deleteButton).not.toBeDisabled();
+    await user.click(deleteButton);
+    const commodities = await Commodity.find();
+
+    expect(commodities).toHaveLength(0);
+  });
 });
