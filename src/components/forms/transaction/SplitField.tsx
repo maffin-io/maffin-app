@@ -27,7 +27,6 @@ export default function SplitField({
   action = 'add',
   disabled = false,
 }: SplitFieldProps): JSX.Element {
-  const splits = form.watch('splits');
   const account = form.watch(`splits.${index}.fk_account`) as Account;
   const txCurrency = form.watch('fk_currency');
   const date = form.watch('date');
@@ -145,6 +144,7 @@ export default function SplitField({
             step="0.001"
             disabled={disabled}
             onChange={(e) => {
+              const splits = form.getValues('splits');
               if (!showValueField && splits.length > 1) {
                 const quantity = Number(e.target.value);
                 form.setValue(`splits.${index}.value`, toFixed(quantity * exchangeRate.value, 3));
