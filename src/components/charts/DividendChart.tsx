@@ -4,16 +4,24 @@ import type { ChartData } from 'chart.js';
 
 import Money from '@/book/Money';
 import Bar from '@/components/charts/Bar';
-import * as API from '@/hooks/api';
+import { useMainCurrency, useInvestments } from '@/hooks/api';
 import { moneyToString } from '@/helpers/number';
 import type { InvestmentAccount } from '@/book/models';
 
-export default function DividendChart(): JSX.Element {
-  const [selectedYear, setSelectedYear] = React.useState(DateTime.now().year);
-  let { data: investments } = API.useInvestments();
-  investments = investments || [];
+export type DividendChartProps = {
+  accounts: string[],
+};
 
-  const { data: currency } = API.useMainCurrency();
+export default function DividendChart({
+  accounts,
+}: DividendChartProps): JSX.Element {
+  const [selectedYear, setSelectedYear] = React.useState(DateTime.now().year);
+
+  const { data: investments = [] } = useInvestments(
+    data => data.filter(d => accounts.includes(d.account.guid)),
+  );
+
+  const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
 
   const [yearData, monthlyData] = buildData(investments, selectedYear);

@@ -223,7 +223,7 @@ export default class InvestmentAccount {
 
   static isSplit(split: Split): boolean {
     const numSplits = split.transaction.splits.length;
-    return numSplits === 1 && split.value === 0 && split.quantity > 0;
+    return numSplits === 1 && split.value === 0 && split.quantity !== 0;
   }
 
   static isDividend(split: Split): boolean {

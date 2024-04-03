@@ -6,7 +6,7 @@ import Money from '@/book/Money';
 import { Account } from '@/book/entities';
 import { QuoteInfo } from '@/book/types';
 import { InvestmentAccount } from '@/book/models';
-import WeightsChart from '@/components/pages/investments/WeightsChart';
+import { WeightsChart } from '@/components/charts';
 import Tree from '@/components/charts/Tree';
 import * as apiHook from '@/hooks/api';
 import type { Commodity } from '@/book/entities';
@@ -31,7 +31,7 @@ describe('WeightsChart', () => {
   });
 
   it('creates treemap with no data', () => {
-    render(<WeightsChart totalValue={new Money(0, 'EUR')} />);
+    render(<WeightsChart accounts={[]} totalValue={new Money(0, 'EUR')} />);
 
     expect(Tree).toHaveBeenCalledWith(
       {
@@ -82,6 +82,7 @@ describe('WeightsChart', () => {
             } as QuoteInfo,
             valueInCurrency: new Money(100, 'EUR'),
             account: {
+              guid: 'guid1',
               name: 'i1',
             } as Account,
           } as InvestmentAccount,
@@ -91,6 +92,7 @@ describe('WeightsChart', () => {
             } as QuoteInfo,
             valueInCurrency: new Money(300, 'EUR'),
             account: {
+              guid: 'guid2',
               name: 'i2',
             } as Account,
           } as InvestmentAccount,
@@ -100,6 +102,7 @@ describe('WeightsChart', () => {
             } as QuoteInfo,
             valueInCurrency: new Money(200, 'EUR'),
             account: {
+              guid: 'guid3',
               name: 'i3',
             } as Account,
           } as InvestmentAccount,
@@ -107,7 +110,7 @@ describe('WeightsChart', () => {
       } as UseQueryResult<InvestmentAccount[]>,
     );
 
-    render(<WeightsChart totalValue={new Money(600, 'EUR')} />);
+    render(<WeightsChart accounts={['guid1', 'guid2', 'guid3']} totalValue={new Money(600, 'EUR')} />);
 
     expect(Tree).toBeCalledWith(
       expect.objectContaining({

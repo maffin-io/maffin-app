@@ -6,7 +6,7 @@ import type { UseQueryResult } from '@tanstack/react-query';
 import Money from '@/book/Money';
 import { InvestmentAccount } from '@/book/models';
 import Bar from '@/components/charts/Bar';
-import { DividendChart } from '@/components/pages/investments';
+import { DividendChart } from '@/components/charts';
 import * as apiHook from '@/hooks/api';
 import type { Commodity } from '@/book/entities';
 
@@ -36,7 +36,7 @@ describe('DividendChart', () => {
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
 
     render(
-      <DividendChart />,
+      <DividendChart accounts={[]} />,
     );
 
     expect(Bar).toBeCalledTimes(2);
@@ -161,6 +161,7 @@ describe('DividendChart', () => {
           {
             mainCurrency: 'EUR',
             account: {
+              guid: 'guid1',
               name: 'Account1',
             },
             dividends: [
@@ -176,6 +177,7 @@ describe('DividendChart', () => {
           } as InvestmentAccount,
           {
             account: {
+              guid: 'guid1',
               name: 'Account2',
             },
             dividends: [
@@ -193,7 +195,7 @@ describe('DividendChart', () => {
       } as UseQueryResult<InvestmentAccount[]>,
     );
 
-    const { container } = render(<DividendChart />);
+    const { container } = render(<DividendChart accounts={['guid1', 'guid2']} />);
 
     expect(Bar).toHaveBeenNthCalledWith(
       1,
@@ -239,6 +241,7 @@ describe('DividendChart', () => {
           {
             mainCurrency: 'EUR',
             account: {
+              guid: 'guid1',
               name: 'Account1',
             },
             dividends: [
@@ -256,7 +259,7 @@ describe('DividendChart', () => {
       } as UseQueryResult<InvestmentAccount[]>,
     );
 
-    render(<DividendChart />);
+    render(<DividendChart accounts={['guid1']} />);
 
     act(() => {
       (Bar as jest.Mock).mock.calls[0][0].options.onClick(
@@ -308,6 +311,7 @@ describe('DividendChart', () => {
           {
             mainCurrency: 'EUR',
             account: {
+              guid: 'guid1',
               name: 'Account1',
             },
             dividends: [
@@ -325,7 +329,7 @@ describe('DividendChart', () => {
       } as UseQueryResult<InvestmentAccount[]>,
     );
 
-    render(<DividendChart />);
+    render(<DividendChart accounts={['guid1']} />);
 
     expect(Bar).toHaveBeenNthCalledWith(
       2,

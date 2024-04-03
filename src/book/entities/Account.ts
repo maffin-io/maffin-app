@@ -221,7 +221,12 @@ function CheckIECommodity(validationOptions?: v.ValidationOptions) {
 
 /**
  * Checks if an account can be a placeholder. Accounts can be Placeholders
- * if they don't have any transactions associated.
+ * if:
+ *
+ *  - they don't have any transactions associated.
+ *  - if an account has children, they must be a placeholder
+ *  - accounts that are investments and have a placeholder investment as parent can't
+ *    be placeholders
  */
 function CheckPlaceholder(validationOptions?: v.ValidationOptions) {
   return function f(object: Account, propertyName: string) {
@@ -243,10 +248,27 @@ function CheckPlaceholder(validationOptions?: v.ValidationOptions) {
             }
           }
 
+          if (account.childrenIds?.length > 0 && !account.placeholder) {
+            return false;
+          }
+
+          if (account.parent?.type === 'INVESTMENT' && account.placeholder) {
+            return false;
+          }
+
           return true;
         },
 
-        defaultMessage() {
+        defaultMessage(args: v.ValidationArguments) {
+          const account = args.object as Account;
+          if (account.childrenIds?.length > 0 && !account.placeholder) {
+            return 'Accounts with children must be parents';
+          }
+
+          if (account.parent?.type === 'INVESTMENT' && account.placeholder) {
+            return 'The parent is an INVESTMENT. This account can\'t be a parent';
+          }
+
           return 'Placeholder accounts cannot have transactions';
         },
       },

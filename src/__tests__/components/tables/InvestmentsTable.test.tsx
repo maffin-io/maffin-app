@@ -20,7 +20,7 @@ describe('InvestmentsTable', () => {
   it('creates empty Table with expected params', async () => {
     jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as UseQueryResult<InvestmentAccount[]>);
 
-    render(<InvestmentsTable />);
+    render(<InvestmentsTable accounts={[]} />);
 
     await screen.findByTestId('Table');
     expect(Table).toHaveBeenLastCalledWith(
@@ -87,14 +87,14 @@ describe('InvestmentsTable', () => {
       {
         data: [
           {
-            account: { name: 'Investment' },
+            account: { guid: 'guid1', name: 'Investment' },
             isClosed: true,
           } as InvestmentAccount,
         ],
       } as UseQueryResult<InvestmentAccount[]>,
     );
 
-    render(<InvestmentsTable />);
+    render(<InvestmentsTable accounts={['guid1']} />);
 
     await screen.findByTestId('Table');
     expect(Table).toHaveBeenLastCalledWith(

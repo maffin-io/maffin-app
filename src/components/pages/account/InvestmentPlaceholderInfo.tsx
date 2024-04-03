@@ -1,22 +1,30 @@
-'use client';
-
 import React from 'react';
 import classNames from 'classnames';
 
 import {
   WeightsChart,
   DividendChart,
-} from '@/components/pages/investments';
+} from '@/components/charts';
 import { InvestmentsTable } from '@/components/tables';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import { toFixed } from '@/helpers/number';
 import Loading from '@/components/Loading';
 import Money from '@/book/Money';
-import * as API from '@/hooks/api';
+import { useMainCurrency, useInvestments } from '@/hooks/api';
+import type { Account } from '@/book/entities';
 
-export default function InvestmentsPage(): JSX.Element {
-  const { data: investments, isPending } = API.useInvestments();
-  const { data: currency } = API.useMainCurrency();
+export type InvestmentPlaceholderInfoProps = {
+  account: Account;
+};
+
+export default function InvestmentPlaceholderInfo({
+  account,
+}: InvestmentPlaceholderInfoProps): JSX.Element {
+  const { data: investments, isPending } = useInvestments(
+    data => data.filter(d => account.childrenIds.includes(d.account.guid)),
+  );
+
+  const { data: currency } = useMainCurrency();
   const mainCurrency = currency?.mnemonic || 'EUR';
 
   if (isPending) {
@@ -67,15 +75,9 @@ export default function InvestmentsPage(): JSX.Element {
 
   return (
     <>
-      <div className="header">
-        <span className="title">
-          Your Investments
-        </span>
-      </div>
-
       <div className="grid grid-cols-12 mt-4">
         <div className="col-span-4 mt-2">
-          <WeightsChart totalValue={totalValue} />
+          <WeightsChart accounts={account.childrenIds} totalValue={totalValue} />
         </div>
 
         <div className="col-span-8 ml-4">
@@ -122,13 +124,13 @@ export default function InvestmentsPage(): JSX.Element {
             </div>
           </div>
           <div className="card">
-            <DividendChart />
+            <DividendChart accounts={account.childrenIds} />
           </div>
         </div>
       </div>
 
       <div className="py-4">
-        <InvestmentsTable />
+        <InvestmentsTable accounts={account.childrenIds} />
       </div>
     </>
   );
