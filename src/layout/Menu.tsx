@@ -4,7 +4,6 @@ import {
   BiBook,
   BiCog,
   BiHomeAlt,
-  BiLineChart,
 } from 'react-icons/bi';
 
 import React from 'react';
@@ -29,11 +28,6 @@ const MENU_ITEMS: ItemType[] = [
     label: 'Home',
     icon: <BiHomeAlt className="text-xl" />,
     url: '/dashboard/accounts',
-  },
-  {
-    label: 'Investments',
-    icon: <BiLineChart className="text-xl" />,
-    url: '/dashboard/investments',
   },
 ];
 

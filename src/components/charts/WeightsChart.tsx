@@ -3,19 +3,22 @@ import React from 'react';
 import Tree from '@/components/charts/Tree';
 import Money from '@/book/Money';
 import { toFixed, moneyToString } from '@/helpers/number';
-import * as API from '@/hooks/api';
+import { useMainCurrency, useInvestments } from '@/hooks/api';
 
 export type WeightsChartProps = {
+  accounts: string[],
   totalValue: Money,
 };
 
 export default function WeightsChart({
+  accounts,
   totalValue,
 }: WeightsChartProps): JSX.Element {
-  let { data: investments } = API.useInvestments();
-  investments = investments || [];
+  const { data: investments = [] } = useInvestments(
+    data => data.filter(d => accounts.includes(d.account.guid)),
+  );
 
-  const { data: currency } = API.useMainCurrency();
+  const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
 
   const data: { [ticker: string]: {

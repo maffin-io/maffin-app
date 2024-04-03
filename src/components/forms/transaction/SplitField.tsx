@@ -144,7 +144,8 @@ export default function SplitField({
             step="0.001"
             disabled={disabled}
             onChange={(e) => {
-              if (account.commodity.guid === txCurrency.guid) {
+              const splits = form.getValues('splits');
+              if (!showValueField && splits.length > 1) {
                 const quantity = Number(e.target.value);
                 form.setValue(`splits.${index}.value`, toFixed(quantity * exchangeRate.value, 3));
               }

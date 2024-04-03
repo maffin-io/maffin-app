@@ -2,16 +2,16 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import type { UseQueryResult } from '@tanstack/react-query';
 
-import { Commodity } from '@/book/entities';
-import InvestmentsPage from '@/app/dashboard/investments/page';
+import { Account, Commodity } from '@/book/entities';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import {
   WeightsChart,
   DividendChart,
-} from '@/components/pages/investments';
+} from '@/components/charts';
 import { InvestmentsTable } from '@/components/tables';
 import Money from '@/book/Money';
 import { InvestmentAccount } from '@/book/models';
+import { InvestmentPlaceholderInfo } from '@/components/pages/account';
 import * as apiHook from '@/hooks/api';
 
 jest.mock('@/hooks/api', () => ({
@@ -19,7 +19,7 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
-jest.mock('@/components/pages/investments/WeightsChart', () => jest.fn(
+jest.mock('@/components/charts/WeightsChart', () => jest.fn(
   () => <div data-testid="WeightsChart" />,
 ));
 const WeightsChartMock = WeightsChart as jest.MockedFunction<typeof WeightsChart>;
@@ -28,7 +28,7 @@ jest.mock('@/components/StatisticsWidget', () => jest.fn(
   () => <div data-testid="StatisticsWidget" />,
 ));
 
-jest.mock('@/components/pages/investments/DividendChart', () => jest.fn(
+jest.mock('@/components/charts/DividendChart', () => jest.fn(
   () => <div data-testid="DividendChart" />,
 ));
 
@@ -40,7 +40,7 @@ jest.mock('@/components/Loading', () => jest.fn(
   () => <div data-testid="Loading" />,
 ));
 
-describe('InvestmentsPage', () => {
+describe('InvestmentPlaceholderInfo', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: undefined } as UseQueryResult<InvestmentAccount[]>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
@@ -52,14 +52,14 @@ describe('InvestmentsPage', () => {
 
   it('shows loading when loading data', async () => {
     jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ isPending: true } as UseQueryResult<InvestmentAccount[]>);
-    render(<InvestmentsPage />);
+    render(<InvestmentPlaceholderInfo account={{ guid: 'guid' } as Account} />);
 
     await screen.findByTestId('Loading');
   });
 
-  it('renders while loading data', async () => {
+  it('renders with no investments', async () => {
     jest.spyOn(apiHook, 'useInvestments').mockReturnValue({ data: [] as InvestmentAccount[] } as UseQueryResult<InvestmentAccount[]>);
-    render(<InvestmentsPage />);
+    render(<InvestmentPlaceholderInfo account={{ guid: 'guid' } as Account} />);
     await screen.findByText('You have no investments yet!');
   });
 
@@ -71,7 +71,7 @@ describe('InvestmentsPage', () => {
     } as Commodity;
 
     const investment1 = {
-      account: { name: 'Investment' },
+      account: { guid: 'guid1', name: 'Investment' },
       quantity: new Money(10, 'TICKER'),
       valueInCurrency: new Money(5, 'EUR'),
       costInCurrency: new Money(4, 'EUR'),
@@ -82,11 +82,12 @@ describe('InvestmentsPage', () => {
     jest.spyOn(apiHook, 'useInvestments').mockReturnValueOnce({ data: [investment1] } as UseQueryResult<InvestmentAccount[]>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: mainCurrency } as UseQueryResult<Commodity>);
 
-    const { container } = render(<InvestmentsPage />);
+    const { container } = render(<InvestmentPlaceholderInfo account={{ childrenIds: ['guid1'] } as Account} />);
 
     await screen.findByTestId('InvestmentsTable');
     expect(WeightsChart).toHaveBeenCalledWith(
       {
+        accounts: [investment1.account.guid],
         totalValue: expect.any(Money),
       },
       {},
@@ -126,11 +127,15 @@ describe('InvestmentsPage', () => {
       {},
     );
     expect(DividendChart).toHaveBeenLastCalledWith(
-      {},
+      {
+        accounts: [investment1.account.guid],
+      },
       {},
     );
     expect(InvestmentsTable).toHaveBeenLastCalledWith(
-      {},
+      {
+        accounts: [investment1.account.guid],
+      },
       {},
     );
     expect(container).toMatchSnapshot();
@@ -144,7 +149,7 @@ describe('InvestmentsPage', () => {
     } as Commodity;
 
     const investment1 = {
-      account: { name: 'Investment' },
+      account: { guid: 'guid1', name: 'Investment' },
       quantity: new Money(10, 'TICKER'),
       valueInCurrency: new Money(5, 'USD'),
       costInCurrency: new Money(4, 'USD'),
@@ -155,15 +160,9 @@ describe('InvestmentsPage', () => {
     jest.spyOn(apiHook, 'useInvestments').mockReturnValueOnce({ data: [investment1] } as UseQueryResult<InvestmentAccount[]>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: mainCurrency } as UseQueryResult<Commodity>);
 
-    const { container } = render(<InvestmentsPage />);
+    render(<InvestmentPlaceholderInfo account={{ childrenIds: ['guid1'] } as Account} />);
 
     await screen.findByTestId('InvestmentsTable');
-    expect(WeightsChart).toHaveBeenLastCalledWith(
-      {
-        totalValue: expect.any(Money),
-      },
-      {},
-    );
     expect(WeightsChartMock.mock.calls[0][0].totalValue.toString()).toEqual('5.00 USD');
     expect(StatisticsWidget).toBeCalledTimes(3);
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
@@ -198,14 +197,5 @@ describe('InvestmentsPage', () => {
       },
       {},
     );
-    expect(DividendChart).toHaveBeenLastCalledWith(
-      {},
-      {},
-    );
-    expect(InvestmentsTable).toHaveBeenLastCalledWith(
-      {},
-      {},
-    );
-    expect(container).toMatchSnapshot();
   });
 });

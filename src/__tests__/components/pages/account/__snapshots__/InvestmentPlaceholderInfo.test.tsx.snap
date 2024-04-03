@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`InvestmentPlaceholderInfo renders with data 1`] = `
+<div>
+  <div
+    class="grid grid-cols-12 mt-4"
+  >
+    <div
+      class="col-span-4 mt-2"
+    >
+      <div
+        data-testid="WeightsChart"
+      />
+    </div>
+    <div
+      class="col-span-8 ml-4"
+    >
+      <div
+        class="grid grid-cols-12"
+      >
+        <div
+          class="col-span-4"
+        >
+          <div
+            data-testid="StatisticsWidget"
+          />
+        </div>
+        <div
+          class="col-span-4"
+        >
+          <div
+            data-testid="StatisticsWidget"
+          />
+        </div>
+        <div
+          class="col-span-4"
+        >
+          <div
+            data-testid="StatisticsWidget"
+          />
+        </div>
+      </div>
+      <div
+        class="card"
+      >
+        <div
+          data-testid="DividendChart"
+        />
+      </div>
+    </div>
+  </div>
+  <div
+    class="py-4"
+  >
+    <div
+      data-testid="InvestmentsTable"
+    />
+  </div>
+</div>
+`;

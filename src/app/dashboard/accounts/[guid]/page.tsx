@@ -7,6 +7,7 @@ import {
   InvestmentInfo,
   AssetInfo,
   IEInfo,
+  InvestmentPlaceholderInfo,
 } from '@/components/pages/account';
 import { TransactionsTable } from '@/components/tables';
 import { useAccount } from '@/hooks/api';
@@ -39,7 +40,9 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
   }
 
   let infoComponent: JSX.Element;
-  if (isInvestment(account)) {
+  if (isInvestment(account) && account.placeholder) {
+    infoComponent = <InvestmentPlaceholderInfo account={account} />;
+  } else if (isInvestment(account)) {
     infoComponent = <InvestmentInfo account={account} />;
   } else if (isAsset(account) || isLiability(account)) {
     infoComponent = <AssetInfo account={account} />;

@@ -149,7 +149,7 @@ describe('useInvestments', () => {
 
     expect(useMainCurrencyHook.useMainCurrency).toBeCalledWith();
     expect(useAccountsHook.useAccounts).toBeCalledWith();
-    expect(useSplitsHook.useSplits).toBeCalledWith({ type: 'INVESTMENT' });
+    expect(useSplitsHook.useSplits).toBeCalledWith({ placeholder: false, type: 'INVESTMENT' });
     expect(queries.getInvestments).toBeCalledWith([account1], splits, mainCurrency);
   });
 });

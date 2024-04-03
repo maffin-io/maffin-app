@@ -209,6 +209,7 @@ describe('InvestmentInfo', () => {
     jest.spyOn(apiHook, 'useInvestment').mockReturnValue({
       data: {
         cost: new Money(100, 'EUR'),
+        totalBought: new Money(100, 'EUR'),
         value: new Money(150, 'EUR'),
         unrealizedProfitAbs: new Money(50, 'EUR'),
         unrealizedProfitPct: 50,

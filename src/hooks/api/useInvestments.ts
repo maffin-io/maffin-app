@@ -39,7 +39,10 @@ export function useInvestments<TData = InvestmentAccount[]>(
   const { data: interval } = useInterval();
 
   const { data: accounts, dataUpdatedAt: accountsUpdatedAt } = useAccounts();
-  const { data: splits, dataUpdatedAt: splitsUpdatedAt } = useSplits({ type: 'INVESTMENT' });
+  const { data: splits, dataUpdatedAt: splitsUpdatedAt } = useSplits({
+    type: 'INVESTMENT',
+    placeholder: false,
+  });
   const { data: mainCurrency } = useMainCurrency();
 
   const queryKey = [
@@ -53,7 +56,7 @@ export function useInvestments<TData = InvestmentAccount[]>(
     queryKey,
     queryFn: fetcher(
       () => getInvestments(
-        (accounts as Account[]).filter(a => a.type === 'INVESTMENT'),
+        (accounts as Account[]).filter(a => a.type === 'INVESTMENT' && !a.placeholder),
         splits as Split[],
         mainCurrency as Commodity,
       ),

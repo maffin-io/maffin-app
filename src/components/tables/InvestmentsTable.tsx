@@ -7,13 +7,19 @@ import { toFixed, moneyToString } from '@/helpers/number';
 import Table from '@/components/tables/Table';
 import type { InvestmentAccount } from '@/book/models';
 import { currencyToSymbol } from '@/book/helpers';
-import * as API from '@/hooks/api';
+import { useInvestments } from '@/hooks/api';
 
-export default function InvestmentsTable(): JSX.Element {
-  let { data: investments } = API.useInvestments();
-  investments = (investments || []).filter(
-    investment => !investment.isClosed,
+export type InvestmentsTableProps = {
+  accounts: string[],
+};
+
+export default function InvestmentsTable({
+  accounts,
+}: InvestmentsTableProps): JSX.Element {
+  let { data: investments = [] } = useInvestments(
+    data => data.filter(d => accounts.includes(d.account.guid)),
   );
+  investments = investments.filter(investment => !investment.isClosed);
 
   let currency = '';
   if (investments.length) {
