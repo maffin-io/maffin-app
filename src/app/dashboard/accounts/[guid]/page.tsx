@@ -46,8 +46,10 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
     infoComponent = <InvestmentInfo account={account} />;
   } else if (isAsset(account) || isLiability(account)) {
     infoComponent = <AssetInfo account={account} />;
-  } else {
+  } else if (account.type === 'EXPENSE' || account.type === 'INCOME') {
     infoComponent = <IEInfo account={account} />;
+  } else {
+    infoComponent = <span />;
   }
 
   return (

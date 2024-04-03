@@ -5,7 +5,7 @@ import {
 } from '@testing-library/react';
 import type { UseQueryResult } from '@tanstack/react-query';
 
-import { Commodity, Price } from '@/book/entities';
+import { Account, Commodity, Price } from '@/book/entities';
 import CommodityPage from '@/app/dashboard/commodities/[guid]/page';
 import { PricesChart } from '@/components/pages/commodity';
 import { PricesTable } from '@/components/tables';
@@ -52,6 +52,7 @@ describe('CommodityPage', () => {
   beforeEach(() => {
     jest.spyOn(apiHook, 'useCommodity').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
     jest.spyOn(apiHook, 'usePrices').mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
+    jest.spyOn(Account, 'findOneBy').mockResolvedValue(null);
   });
 
   afterEach(() => {
@@ -86,6 +87,7 @@ describe('CommodityPage', () => {
   });
 
   it('renders as expected with commodity', async () => {
+    jest.spyOn(Account, 'findOneBy').mockResolvedValue({} as Account);
     jest.spyOn(apiHook, 'useCommodity').mockReturnValue(
       { data: { guid: 'guid', mnemonic: 'EUR' } as Commodity } as UseQueryResult<Commodity>,
     );
@@ -140,6 +142,7 @@ describe('CommodityPage', () => {
       },
       {},
     );
+
     expect(FormButton).toHaveBeenNthCalledWith(
       2,
       expect.objectContaining({
@@ -159,6 +162,28 @@ describe('CommodityPage', () => {
       },
       {},
     );
+
+    expect(FormButton).lastCalledWith(
+      expect.objectContaining({
+        modalTitle: 'Confirm you want to remove this commodity',
+        id: 'delete-commodity',
+        className: 'btn btn-danger',
+        disabled: true,
+      }),
+      {},
+    );
+    expect(CommodityForm).lastCalledWith(
+      {
+        action: 'delete',
+        defaultValues: {
+          guid: 'guid',
+          mnemonic: 'EUR',
+        },
+        onSave: expect.any(Function),
+      },
+      {},
+    );
+
     expect(PricesTable).toHaveBeenNthCalledWith(
       1,
       {
@@ -196,6 +221,26 @@ describe('CommodityPage', () => {
       {},
     );
     expect(container).toMatchSnapshot();
+  });
+
+  it('enables delete button when no account associated', async () => {
+    jest.spyOn(apiHook, 'useCommodity').mockReturnValue(
+      { data: { guid: 'guid', mnemonic: 'EUR' } as Commodity } as UseQueryResult<Commodity>,
+    );
+
+    render(<CommodityPage params={{ guid: 'guid' }} />);
+
+    await screen.findByText('EUR');
+
+    expect(FormButton).lastCalledWith(
+      expect.objectContaining({
+        modalTitle: 'Confirm you want to remove this commodity',
+        id: 'delete-commodity',
+        className: 'btn btn-danger',
+        disabled: false,
+      }),
+      {},
+    );
   });
 
   it('calls PriceButton with fk_currency when not CURRENCY', async () => {

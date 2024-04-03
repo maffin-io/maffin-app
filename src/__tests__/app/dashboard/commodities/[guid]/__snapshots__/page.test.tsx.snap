@@ -30,6 +30,13 @@ exports[`CommodityPage renders as expected with commodity 1`] = `
             data-testid="CommodityForm"
           />
         </div>
+        <div
+          data-testid="FormButton"
+        >
+          <div
+            data-testid="CommodityForm"
+          />
+        </div>
       </div>
     </div>
   </div>

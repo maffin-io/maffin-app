@@ -75,22 +75,23 @@ export default class Commodity extends BaseEntity {
   }
 
   async save(options?: SaveOptions): Promise<this> {
-    const account = await super.save(options);
+    const commodity = await super.save(options);
 
     if (this.queryClient) {
       updateCache({ queryClient: this.queryClient });
     }
 
-    return account;
+    return commodity;
   }
 
   async remove(options?: SaveOptions): Promise<this> {
+    const commodity = await super.remove(options);
+
     if (this.queryClient) {
       updateCache({ queryClient: this.queryClient });
     }
 
-    const account = await super.remove(options);
-    return account;
+    return commodity;
   }
 }
 

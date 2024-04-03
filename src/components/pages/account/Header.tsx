@@ -8,14 +8,10 @@ import { Tooltip } from '@/components/tooltips';
 import FormButton from '@/components/buttons/FormButton';
 import AccountForm from '@/components/forms/account/AccountForm';
 import AddTxDropdown from '@/components/buttons/AddTxDropdown';
-import {
-  isInvestment,
-  isAsset,
-  isLiability,
-} from '@/book/helpers/accountType';
 import { Account } from '@/book/entities';
 import { useAccount, useSplitsPagination } from '@/hooks/api';
 import Link from 'next/link';
+import { accountColorCode } from '@/helpers/classNames';
 
 export type HeaderProps = {
   account: Account,
@@ -51,15 +47,7 @@ export default function Header({
   return (
     <div className="header">
       <span className="title">
-        <span
-          className={classNames('text-xl font-medium badge', {
-            success: account.type === 'INCOME',
-            danger: account.type === 'EXPENSE',
-            info: isAsset(account),
-            warning: isLiability(account),
-            misc: isInvestment(account),
-          })}
-        >
+        <span className={accountColorCode(account, 'text-xl font-medium badge')}>
           {title}
         </span>
       </span>

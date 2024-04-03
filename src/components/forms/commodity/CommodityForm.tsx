@@ -111,6 +111,8 @@ async function onSubmit(
 
   if (action === 'add' || action === 'update') {
     await commodity.save();
+  } else if (action === 'delete') {
+    await commodity.remove();
   }
 
   onSave(commodity);
