@@ -150,7 +150,7 @@ describe('useMonthlyWorth', () => {
         TEST_INTERVAL.end as DateTime,
       ),
     );
-    expect(result.current.data?.[0].type_asset.toString()).toEqual('1000.00 EUR');
+    expect(result.current.data?.[0].type_asset.toString()).toEqual('1000 EUR');
 
     expect(aggregations.aggregateMonthlyWorth).toBeCalledTimes(1);
     expect(aggregations.aggregateMonthlyWorth).toBeCalledWith(
@@ -168,10 +168,10 @@ describe('useMonthlyWorth', () => {
     );
     expect(
       (aggregations.aggregateMonthlyWorth as jest.Mock).mock.calls[0][2][0].type_asset.toString(),
-    ).toEqual('500.00 EUR');
+    ).toEqual('500 EUR');
     expect(
       (aggregations.aggregateMonthlyWorth as jest.Mock).mock.calls[0][2][1].type_asset.toString(),
-    ).toEqual('200.00 EUR');
+    ).toEqual('200 EUR');
 
     expect(aggregations.aggregateChildrenTotals).toBeCalledTimes(3);
     expect(aggregations.aggregateChildrenTotals).toHaveBeenNthCalledWith(

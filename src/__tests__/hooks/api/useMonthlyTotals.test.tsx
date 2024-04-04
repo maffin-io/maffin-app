@@ -120,7 +120,7 @@ describe('useMonthlyTotals', () => {
     expect(useAccountsHook.useAccounts).toBeCalledWith();
     expect(usePricesHook.usePrices).toBeCalledWith({});
     expect(queries.getMonthlyTotals).toBeCalledWith([], interval);
-    expect(result.current.data?.[0].type_asset.toString()).toEqual('400.00 EUR');
+    expect(result.current.data?.[0].type_asset.toString()).toEqual('400 EUR');
 
     expect(aggregations.aggregateChildrenTotals).toBeCalledTimes(2);
     expect(aggregations.aggregateChildrenTotals).nthCalledWith(

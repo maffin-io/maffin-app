@@ -82,7 +82,7 @@ export default function InvestmentInfo({
                   )
                 }
               >
-                {investment.totalBought.format()}
+                {investment.cost.format()}
               </span>
             </div>
           )

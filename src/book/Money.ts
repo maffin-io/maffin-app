@@ -3,7 +3,7 @@ import * as currencies from '@dinero.js/currencies';
 import type { Currency as DineroCurrency } from 'dinero.js';
 import * as djs from 'dinero.js';
 
-import { toAmountWithScale, moneyToString } from '@/helpers/number';
+import { toAmountWithScale, moneyToString, toFixed } from '@/helpers/number';
 import type { PriceDBMap } from './prices';
 import type { Commodity } from './entities';
 
@@ -53,10 +53,10 @@ export default class Money {
    * Represents the money object as a string with the currency standardizing
    * the scale to 2 as a default. If the scale is passed then it uses that.
    */
-  toString(scale = 2): string {
+  toString(scale = 4): string {
     return djs.toDecimal(
       djs.transformScale(this._raw, scale),
-      ({ value, currency }) => `${value} ${currency.code}`,
+      ({ value, currency }) => `${toFixed(Number(value))} ${currency.code}`,
     );
   }
 
@@ -66,10 +66,10 @@ export default class Money {
    *
    * The result is a localized string with the currency as a symbol
    */
-  format(scale = 2): string {
+  format(scale = 4): string {
     return djs.toDecimal(
       djs.transformScale(this._raw, scale),
-      ({ value, currency }) => moneyToString(Number(value), currency.code),
+      ({ value, currency }) => moneyToString(toFixed(Number(value)), currency.code),
     );
   }
 

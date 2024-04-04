@@ -98,7 +98,7 @@ describe('useBalanceSheet', () => {
         DateTime.fromISO('2023-01-01'),
       ),
     );
-    expect(result.current.data?.type_asset.toString()).toEqual('0.00 EUR');
+    expect(result.current.data?.type_asset.toString()).toEqual('0 EUR');
     expect(aggregations.aggregateChildrenTotals).toBeCalledWith(
       ['type_asset', 'type_liability'],
       [],

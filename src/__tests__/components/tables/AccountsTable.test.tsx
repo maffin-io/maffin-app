@@ -154,8 +154,8 @@ describe('AccountsTable', () => {
       {},
     );
 
-    expect((Table as jest.Mock).mock.calls[0][0].data[0].total.toString()).toEqual('300.00 EUR');
-    expect((Table as jest.Mock).mock.calls[0][0].data[1].total.toString()).toEqual('100.00 EUR');
+    expect((Table as jest.Mock).mock.calls[0][0].data[0].total.toString()).toEqual('300 EUR');
+    expect((Table as jest.Mock).mock.calls[0][0].data[1].total.toString()).toEqual('100 EUR');
   });
 
   it('creates table with expected params when EXPENSE', async () => {
@@ -219,7 +219,7 @@ describe('AccountsTable', () => {
       {},
     );
 
-    expect((Table as jest.Mock).mock.calls[0][0].data[0].total.toString()).toEqual('200.00 EUR');
+    expect((Table as jest.Mock).mock.calls[0][0].data[0].total.toString()).toEqual('200 EUR');
   });
 
   it('ignores hidden accounts', async () => {
