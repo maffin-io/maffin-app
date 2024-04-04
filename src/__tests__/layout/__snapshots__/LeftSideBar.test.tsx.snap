@@ -118,7 +118,7 @@ exports[`LeftSidebar renders as expected 1`] = `
         >
           <a
             class="flex items-center text-inherit hover:text-inherit h-full px-8 py-4"
-            href="https://blog.maffin.io/docs"
+            href="https://docs.maffin.io"
           >
             <span
               class="mr-8 "

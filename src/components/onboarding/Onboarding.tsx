@@ -309,7 +309,7 @@ export default function Onboarding({
                 <p>
                   Check out
                   {' '}
-                  <Link href="https://blog.maffin.io/docs" target="_blank">
+                  <Link href="https://docs.maffin.io" target="_blank">
                     our docs
                   </Link>
                   {' '}
