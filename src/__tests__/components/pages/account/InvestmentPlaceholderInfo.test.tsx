@@ -92,7 +92,7 @@ describe('InvestmentPlaceholderInfo', () => {
       },
       {},
     );
-    expect(WeightsChartMock.mock.calls[0][0].totalValue.toString()).toEqual('5.00 EUR');
+    expect(WeightsChartMock.mock.calls[0][0].totalValue.toString()).toEqual('5 EUR');
     expect(StatisticsWidget).toBeCalledTimes(3);
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       1,
@@ -163,7 +163,7 @@ describe('InvestmentPlaceholderInfo', () => {
     render(<InvestmentPlaceholderInfo account={{ childrenIds: ['guid1'] } as Account} />);
 
     await screen.findByTestId('InvestmentsTable');
-    expect(WeightsChartMock.mock.calls[0][0].totalValue.toString()).toEqual('5.00 USD');
+    expect(WeightsChartMock.mock.calls[0][0].totalValue.toString()).toEqual('5 USD');
     expect(StatisticsWidget).toBeCalledTimes(3);
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       1,

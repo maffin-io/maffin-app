@@ -130,7 +130,7 @@ describe('useCashFlow', () => {
         name: account2.name,
         type: account2.type,
         total: expect.objectContaining({
-          readable: '150.00 EUR',
+          readable: '150 EUR',
         }),
       },
     ]);
@@ -198,8 +198,8 @@ describe('useCashFlow', () => {
    * account2 it creates a row with -55 USD referencing account1
    */
   it.each([
-    ['guid1', 'Expense', '50.00 EUR'],
-    ['guid2', 'Bank1', '-55.00 USD'],
+    ['guid1', 'Expense', '50 EUR'],
+    ['guid2', 'Bank1', '-55 USD'],
   ])('works with different commodities for %s account', async (guid, expectedName, expectedAmount) => {
     const usd = await Commodity.create({ mnemonic: 'USD', namespace: 'CURRENCY' }).save();
     account2.fk_commodity = usd;
@@ -311,7 +311,7 @@ describe('useCashFlow', () => {
     expect(result.current.data?.[0]).toMatchObject({
       name: account1.name,
       total: expect.objectContaining({
-        readable: '-163.00 USD',
+        readable: '-163 USD',
       }),
     });
   });
@@ -376,14 +376,14 @@ describe('useCashFlow', () => {
     expect(result.current.data?.[0]).toMatchObject({
       name: account2.name,
       total: expect.objectContaining({
-        readable: '75.00 EUR',
+        readable: '75 EUR',
       }),
     });
 
     expect(result.current.data?.[1]).toMatchObject({
       name: account3.name,
       total: expect.objectContaining({
-        readable: '25.00 EUR',
+        readable: '25 EUR',
       }),
     });
   });
@@ -454,14 +454,14 @@ describe('useCashFlow', () => {
     expect(result.current.data?.[0]).toMatchObject({
       name: account2.name,
       total: expect.objectContaining({
-        readable: '81.00 USD',
+        readable: '81 USD',
       }),
     });
 
     expect(result.current.data?.[1]).toMatchObject({
       name: account3.name,
       total: expect.objectContaining({
-        readable: '27.00 USD',
+        readable: '27 USD',
       }),
     });
   });
@@ -529,7 +529,7 @@ describe('useCashFlow', () => {
     expect(result.current.data?.[0]).toMatchObject({
       name: account1.name,
       total: expect.objectContaining({
-        readable: '-700.00 EUR',
+        readable: '-700 EUR',
       }),
     });
   });
@@ -588,7 +588,7 @@ describe('useCashFlow', () => {
     expect(result.current.data?.[0]).toMatchObject({
       name: account2.name,
       total: expect.objectContaining({
-        readable: '100.00 EUR',
+        readable: '100 EUR',
       }),
     });
   });

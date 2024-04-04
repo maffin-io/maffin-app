@@ -53,10 +53,10 @@ export default class Money {
    * Represents the money object as a string with the currency standardizing
    * the scale to 2 as a default. If the scale is passed then it uses that.
    */
-  toString(scale = 2): string {
+  toString(scale = 4): string {
     return djs.toDecimal(
       djs.transformScale(this._raw, scale),
-      ({ value, currency }) => `${value} ${currency.code}`,
+      ({ value, currency }) => `${toFixed(Number(value))} ${currency.code}`,
     );
   }
 

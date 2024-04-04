@@ -81,20 +81,15 @@ describe('accountsTotalAggregations', () => {
         ['a1', 'a2'],
         accounts,
         monthlyTotals,
-        [
-          DateTime.now().minus({ month: 2 }),
-          DateTime.now().minus({ month: 1 }),
-          DateTime.now(),
-        ],
       );
 
-      expect(aggregated[0].a1.toString()).toEqual('100.00 EUR');
-      expect(aggregated[1].a1.toString()).toEqual('300.00 EUR');
-      expect(aggregated[2].a1.toString()).toEqual('600.00 EUR');
+      expect(aggregated[0].a1.toString()).toEqual('100 EUR');
+      expect(aggregated[1].a1.toString()).toEqual('300 EUR');
+      expect(aggregated[2].a1.toString()).toEqual('600 EUR');
 
-      expect(aggregated[0].a2.toString()).toEqual('200.00 EUR');
-      expect(aggregated[1].a2.toString()).toEqual('400.00 EUR');
-      expect(aggregated[2].a2.toString()).toEqual('800.00 EUR');
+      expect(aggregated[0].a2.toString()).toEqual('200 EUR');
+      expect(aggregated[1].a2.toString()).toEqual('400 EUR');
+      expect(aggregated[2].a2.toString()).toEqual('800 EUR');
     });
 
     /**
@@ -120,11 +115,11 @@ describe('accountsTotalAggregations', () => {
         monthlyTotals,
       );
 
-      expect(aggregated[0].a1.toString()).toEqual('100.00 EUR');
-      expect(aggregated[1].a1.toString()).toEqual('300.00 EUR');
+      expect(aggregated[0].a1.toString()).toEqual('100 EUR');
+      expect(aggregated[1].a1.toString()).toEqual('300 EUR');
 
-      expect(aggregated[0].a2.toString()).toEqual('200.00 EUR');
-      expect(aggregated[1].a2.toString()).toEqual('400.00 EUR');
+      expect(aggregated[0].a2.toString()).toEqual('200 EUR');
+      expect(aggregated[1].a2.toString()).toEqual('400 EUR');
     });
   });
 
@@ -138,10 +133,10 @@ describe('accountsTotalAggregations', () => {
         {},
       );
 
-      expect(totals.type_asset.toString()).toEqual('0.00 EUR');
-      expect(totals.type_liability.toString()).toEqual('0.00 EUR');
-      expect(totals.type_income.toString()).toEqual('0.00 EUR');
-      expect(totals.type_expense.toString()).toEqual('0.00 EUR');
+      expect(totals.type_asset.toString()).toEqual('0 EUR');
+      expect(totals.type_liability.toString()).toEqual('0 EUR');
+      expect(totals.type_income.toString()).toEqual('0 EUR');
+      expect(totals.type_expense.toString()).toEqual('0 EUR');
     });
 
     it('aggregates children with same currency', () => {
@@ -176,9 +171,9 @@ describe('accountsTotalAggregations', () => {
         totals,
       );
 
-      expect(aggregatedTotals.type_expense.toString()).toEqual('700.00 EUR');
-      expect(aggregatedTotals.a5.toString()).toEqual('500.00 EUR');
-      expect(aggregatedTotals.a6.toString()).toEqual('200.00 EUR');
+      expect(aggregatedTotals.type_expense.toString()).toEqual('700 EUR');
+      expect(aggregatedTotals.a5.toString()).toEqual('500 EUR');
+      expect(aggregatedTotals.a6.toString()).toEqual('200 EUR');
 
       // Check that we don't modify original totals
       expect(Object.keys(totals)).toHaveLength(2);
@@ -231,9 +226,9 @@ describe('accountsTotalAggregations', () => {
       );
 
       // 500 + 200 * 0.8
-      expect(totals.type_expense.toString()).toEqual('680.00 EUR');
-      expect(totals.a5.toString()).toEqual('500.00 EUR');
-      expect(totals.a6.toString()).toEqual('200.00 USD');
+      expect(totals.type_expense.toString()).toEqual('680 EUR');
+      expect(totals.a5.toString()).toEqual('500 EUR');
+      expect(totals.a6.toString()).toEqual('200 USD');
     });
 
     it('aggregates children with different currency and specific date', () => {
@@ -289,9 +284,9 @@ describe('accountsTotalAggregations', () => {
       );
 
       // 500 + 200 * 0.8
-      expect(totals.type_expense.toString()).toEqual('660.00 EUR');
-      expect(totals.a5.toString()).toEqual('500.00 EUR');
-      expect(totals.a6.toString()).toEqual('200.00 USD');
+      expect(totals.type_expense.toString()).toEqual('660 EUR');
+      expect(totals.a5.toString()).toEqual('500 EUR');
+      expect(totals.a6.toString()).toEqual('200 USD');
     });
 
     it('aggregates children that are stocks', () => {
@@ -365,9 +360,9 @@ describe('accountsTotalAggregations', () => {
       );
 
       // 2 * 100 + 5 * 50 * 0.9
-      expect(totals.type_asset.toString()).toEqual('425.00 EUR');
-      expect(totals.a5.toString()).toEqual('2.00 TICKER1');
-      expect(totals.a6.toString()).toEqual('5.00 TICKER2');
+      expect(totals.type_asset.toString()).toEqual('425 EUR');
+      expect(totals.a5.toString()).toEqual('2 TICKER1');
+      expect(totals.a6.toString()).toEqual('5 TICKER2');
     });
 
     it('works with children without totals', () => {
@@ -391,8 +386,8 @@ describe('accountsTotalAggregations', () => {
         {},
       );
 
-      expect(totals.type_asset.toString()).toEqual('0.00 EUR');
-      expect(totals.a5.toString()).toEqual('0.00 EUR');
+      expect(totals.type_asset.toString()).toEqual('0 EUR');
+      expect(totals.a5.toString()).toEqual('0 EUR');
     });
   });
 });

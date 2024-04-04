@@ -96,17 +96,17 @@ describe('InvestmentAccount', () => {
       expect(investment.mainCurrency).toEqual('EUR');
       expect(investment.currency).toEqual('EUR');
 
-      expect(investment.quantity.toString()).toEqual('0.00 TICKER');
-      expect(investment.cost.toString()).toEqual('0.00 EUR');
-      expect(investment.costInCurrency.toString()).toEqual('0.00 EUR');
-      expect(investment.value.toString()).toEqual('0.00 EUR');
-      expect(investment.valueInCurrency.toString()).toEqual('0.00 EUR');
+      expect(investment.quantity.toString()).toEqual('0 TICKER');
+      expect(investment.cost.toString()).toEqual('0 EUR');
+      expect(investment.costInCurrency.toString()).toEqual('0 EUR');
+      expect(investment.value.toString()).toEqual('0 EUR');
+      expect(investment.valueInCurrency.toString()).toEqual('0 EUR');
       expect(investment.avgPrice).toEqual(0);
 
-      expect(investment.realizedProfit.toString()).toEqual('0.00 EUR');
-      expect(investment.realizedProfitInCurrency.toString()).toEqual('0.00 EUR');
-      expect(investment.realizedDividends.toString()).toEqual('0.00 EUR');
-      expect(investment.realizedDividendsInCurrency.toString()).toEqual('0.00 EUR');
+      expect(investment.realizedProfit.toString()).toEqual('0 EUR');
+      expect(investment.realizedProfitInCurrency.toString()).toEqual('0 EUR');
+      expect(investment.realizedDividends.toString()).toEqual('0 EUR');
+      expect(investment.realizedDividendsInCurrency.toString()).toEqual('0 EUR');
       expect(investment.isClosed).toBe(true);
 
       expect(investment.dividends).toHaveLength(0);
@@ -151,17 +151,17 @@ describe('InvestmentAccount', () => {
       expect(investment.mainCurrency).toEqual('EUR');
       expect(investment.currency).toEqual('USD');
 
-      expect(investment.quantity.toString()).toEqual('0.00 TICKER');
-      expect(investment.cost.toString()).toEqual('0.00 USD');
-      expect(investment.costInCurrency.toString()).toEqual('0.00 EUR');
-      expect(investment.value.toString()).toEqual('0.00 USD');
-      expect(investment.valueInCurrency.toString()).toEqual('0.00 EUR');
+      expect(investment.quantity.toString()).toEqual('0 TICKER');
+      expect(investment.cost.toString()).toEqual('0 USD');
+      expect(investment.costInCurrency.toString()).toEqual('0 EUR');
+      expect(investment.value.toString()).toEqual('0 USD');
+      expect(investment.valueInCurrency.toString()).toEqual('0 EUR');
       expect(investment.avgPrice).toEqual(0);
 
-      expect(investment.realizedProfit.toString()).toEqual('0.00 USD');
-      expect(investment.realizedProfitInCurrency.toString()).toEqual('0.00 EUR');
-      expect(investment.realizedDividends.toString()).toEqual('0.00 USD');
-      expect(investment.realizedDividendsInCurrency.toString()).toEqual('0.00 EUR');
+      expect(investment.realizedProfit.toString()).toEqual('0 USD');
+      expect(investment.realizedProfitInCurrency.toString()).toEqual('0 EUR');
+      expect(investment.realizedDividends.toString()).toEqual('0 USD');
+      expect(investment.realizedDividendsInCurrency.toString()).toEqual('0 EUR');
 
       expect(investment.dividends).toHaveLength(0);
 
@@ -389,11 +389,11 @@ describe('InvestmentAccount', () => {
         );
 
         expect(instance.quantity.toString()).toEqual('122.85 TICKER');
-        expect(instance.cost.toString()).toEqual(`1000.00 ${currency}`);
+        expect(instance.cost.toString()).toEqual(`1000 ${currency}`);
         expect(instance.costInCurrency.toString()).toEqual(`${instance.cost.convert(mainCurrency, currencyPrice.value)}`);
         expect(instance.avgPrice).toEqual(8.14);
 
-        expect(instance.value.toString()).toEqual(`1228.50 ${currency}`);
+        expect(instance.value.toString()).toEqual(`1228.5 ${currency}`);
         expect(instance.valueInCurrency.toString()).toEqual(`${instance.value.convert(mainCurrency, todayCurrencyPrice.value)}`);
       });
 
@@ -455,13 +455,13 @@ describe('InvestmentAccount', () => {
         );
 
         expect(instance.quantity.toString()).toEqual('368.55 TICKER');
-        expect(instance.cost.toString()).toEqual(`2700.00 ${currency}`);
+        expect(instance.cost.toString()).toEqual(`2700 ${currency}`);
         const expectedCostInCurrency = new Money(
           1000 * currencyPrice.value + 1700 * currencyPrice2.value,
           mainCurrency,
         );
         expect(instance.costInCurrency.toString()).toEqual(expectedCostInCurrency.toString());
-        expect(instance.value.toString()).toEqual(`3685.50 ${currency}`);
+        expect(instance.value.toString()).toEqual(`3685.5 ${currency}`);
         expect(instance.valueInCurrency.toString()).toEqual(
           `${instance.value.convert(mainCurrency, todayCurrencyPrice.value)}`,
         );
@@ -518,13 +518,13 @@ describe('InvestmentAccount', () => {
           new PriceDBMap([stockPrice, currencyPrice]),
         );
 
-        expect(instance.quantity.toString()).toEqual('0.00 TICKER');
-        expect(instance.realizedProfit.toString()).toEqual(`0.00 ${currency}`);
-        expect(instance.realizedProfitInCurrency.toString()).toEqual(`0.00 ${mainCurrency}`);
-        expect(instance.cost.toString()).toEqual(`0.00 ${currency}`);
-        expect(instance.costInCurrency.toString()).toEqual(`0.00 ${mainCurrency}`);
-        expect(instance.value.toString()).toEqual(`0.00 ${currency}`);
-        expect(instance.valueInCurrency.toString()).toEqual(`0.00 ${mainCurrency}`);
+        expect(instance.quantity.toString()).toEqual('0 TICKER');
+        expect(instance.realizedProfit.toString()).toEqual(`0 ${currency}`);
+        expect(instance.realizedProfitInCurrency.toString()).toEqual(`0 ${mainCurrency}`);
+        expect(instance.cost.toString()).toEqual(`0 ${currency}`);
+        expect(instance.costInCurrency.toString()).toEqual(`0 ${mainCurrency}`);
+        expect(instance.value.toString()).toEqual(`0 ${currency}`);
+        expect(instance.valueInCurrency.toString()).toEqual(`0 ${mainCurrency}`);
       });
 
       it('sells with gains', async () => {
@@ -576,8 +576,8 @@ describe('InvestmentAccount', () => {
           new PriceDBMap([stockPrice, currencyPrice]),
         );
 
-        expect(instance.quantity.toString()).toEqual('0.00 TICKER');
-        expect(instance.realizedProfit.toString()).toEqual(`1000.00 ${currency}`);
+        expect(instance.quantity.toString()).toEqual('0 TICKER');
+        expect(instance.realizedProfit.toString()).toEqual(`1000 ${currency}`);
         const expectedRealizedProfitInCurrency = new Money(
           1000 * currencyPrice.value,
           mainCurrency,
@@ -585,10 +585,10 @@ describe('InvestmentAccount', () => {
         expect(instance.realizedProfitInCurrency.toString()).toEqual(
           expectedRealizedProfitInCurrency.toString(),
         );
-        expect(instance.cost.toString()).toEqual(`0.00 ${currency}`);
-        expect(instance.costInCurrency.toString()).toEqual(`0.00 ${mainCurrency}`);
-        expect(instance.value.toString()).toEqual(`0.00 ${currency}`);
-        expect(instance.valueInCurrency.toString()).toEqual(`0.00 ${mainCurrency}`);
+        expect(instance.cost.toString()).toEqual(`0 ${currency}`);
+        expect(instance.costInCurrency.toString()).toEqual(`0 ${mainCurrency}`);
+        expect(instance.value.toString()).toEqual(`0 ${currency}`);
+        expect(instance.valueInCurrency.toString()).toEqual(`0 ${mainCurrency}`);
       });
 
       it('sells with losses', async () => {
@@ -639,8 +639,8 @@ describe('InvestmentAccount', () => {
           new PriceDBMap([stockPrice, currencyPrice]),
         );
 
-        expect(instance.quantity.toString()).toEqual('0.00 TICKER');
-        expect(instance.realizedProfit.toString()).toEqual(`-500.00 ${currency}`);
+        expect(instance.quantity.toString()).toEqual('0 TICKER');
+        expect(instance.realizedProfit.toString()).toEqual(`-500 ${currency}`);
         const expectedRealizedProfitInCurrency = new Money(
           -500 * currencyPrice.value,
           mainCurrency,
@@ -648,10 +648,10 @@ describe('InvestmentAccount', () => {
         expect(instance.realizedProfitInCurrency.toString()).toEqual(
           expectedRealizedProfitInCurrency.toString(),
         );
-        expect(instance.cost.toString()).toEqual(`0.00 ${currency}`);
-        expect(instance.costInCurrency.toString()).toEqual(`0.00 ${mainCurrency}`);
-        expect(instance.value.toString()).toEqual(`0.00 ${currency}`);
-        expect(instance.valueInCurrency.toString()).toEqual(`0.00 ${mainCurrency}`);
+        expect(instance.cost.toString()).toEqual(`0 ${currency}`);
+        expect(instance.costInCurrency.toString()).toEqual(`0 ${mainCurrency}`);
+        expect(instance.value.toString()).toEqual(`0 ${currency}`);
+        expect(instance.valueInCurrency.toString()).toEqual(`0 ${mainCurrency}`);
       });
 
       it('sells partially with gains', async () => {
@@ -703,12 +703,12 @@ describe('InvestmentAccount', () => {
         );
 
         expect(instance.quantity.toString()).toEqual('61.42 TICKER');
-        expect(instance.realizedProfit.toString()).toEqual(`500.00 ${currency}`);
+        expect(instance.realizedProfit.toString()).toEqual(`500 ${currency}`);
         const expectedRealizedProfitInCurrency = new Money(500 * currencyPrice.value, mainCurrency);
         expect(instance.realizedProfitInCurrency.toString()).toEqual(
           expectedRealizedProfitInCurrency.toString(),
         );
-        expect(instance.cost.toString()).toEqual(`500.00 ${currency}`);
+        expect(instance.cost.toString()).toEqual(`500 ${currency}`);
         const expectedCostInCurrency = new Money(500 * currencyPrice.value, mainCurrency);
         expect(instance.costInCurrency.toString()).toEqual(expectedCostInCurrency.toString());
         expect(instance.value.toString()).toEqual(`614.25 ${currency}`);
@@ -765,7 +765,7 @@ describe('InvestmentAccount', () => {
         );
 
         expect(instance.quantity.toString()).toEqual('61.42 TICKER');
-        expect(instance.realizedProfit.toString()).toEqual(`-250.00 ${currency}`);
+        expect(instance.realizedProfit.toString()).toEqual(`-250 ${currency}`);
         const expectedRealizedProfitInCurrency = new Money(
           -250 * currencyPrice.value,
           mainCurrency,
@@ -773,7 +773,7 @@ describe('InvestmentAccount', () => {
         expect(instance.realizedProfitInCurrency.toString()).toEqual(
           expectedRealizedProfitInCurrency.toString(),
         );
-        expect(instance.cost.toString()).toEqual(`500.00 ${currency}`);
+        expect(instance.cost.toString()).toEqual(`500 ${currency}`);
         const expectedCostInCurrency = new Money(500 * currencyPrice.value, mainCurrency);
         expect(instance.costInCurrency.toString()).toEqual(expectedCostInCurrency.toString());
         expect(instance.value.toString()).toEqual(`614.25 ${currency}`);
@@ -825,12 +825,12 @@ describe('InvestmentAccount', () => {
         );
 
         expect(instance.quantity.toString()).toEqual('143.85 TICKER');
-        expect(instance.cost.toString()).toEqual(`1000.00 ${currency}`); // cost stays the same
+        expect(instance.cost.toString()).toEqual(`1000 ${currency}`); // cost stays the same
         const expectedCostInCurrency = new Money(1000 * currencyPrice.value, mainCurrency);
         expect(instance.costInCurrency.toString()).toEqual(expectedCostInCurrency.toString());
         expect(instance.avgPrice).toEqual(6.9517); // avgPrice is recomputed
-        expect(instance.value.toString()).toEqual(`1438.50 ${currency}`); // value increases
-        const expectedValueInCurrency = new Money(1438.50 * todayCurrencyPrice.value, mainCurrency);
+        expect(instance.value.toString()).toEqual(`1438.5 ${currency}`); // value increases
+        const expectedValueInCurrency = new Money(1438.5 * todayCurrencyPrice.value, mainCurrency);
         expect(instance.valueInCurrency.toString()).toEqual(expectedValueInCurrency.toString());
       });
     });
@@ -885,12 +885,12 @@ describe('InvestmentAccount', () => {
         );
 
         expect(instance.quantity.toString()).toEqual('143.85 TICKER');
-        expect(instance.cost.toString()).toEqual(`1000.00 ${currency}`); // cost stays the same
+        expect(instance.cost.toString()).toEqual(`1000 ${currency}`); // cost stays the same
         const expectedCostInCurrency = new Money(1000 * currencyPrice.value, mainCurrency);
         expect(instance.costInCurrency.toString()).toEqual(expectedCostInCurrency.toString());
         expect(instance.avgPrice).toEqual(6.9517); // avgPrice is recomputed
-        expect(instance.value.toString()).toEqual(`1438.50 ${currency}`); // value increases
-        const expectedValueInCurrency = new Money(1438.50 * todayCurrencyPrice.value, mainCurrency);
+        expect(instance.value.toString()).toEqual(`1438.5 ${currency}`); // value increases
+        const expectedValueInCurrency = new Money(1438.5 * todayCurrencyPrice.value, mainCurrency);
         expect(instance.valueInCurrency.toString()).toEqual(expectedValueInCurrency.toString());
       });
     });
@@ -967,8 +967,8 @@ describe('InvestmentAccount', () => {
           new PriceDBMap([stockPrice, currencyPrice]),
         );
 
-        expect(instance.realizedProfit.toString()).toEqual(`0.00 ${currency}`);
-        expect(instance.realizedProfitInCurrency.toString()).toEqual(`0.00 ${mainCurrency}`);
+        expect(instance.realizedProfit.toString()).toEqual(`0 ${currency}`);
+        expect(instance.realizedProfitInCurrency.toString()).toEqual(`0 ${mainCurrency}`);
         expect(instance.realizedDividends.toString()).toEqual(`89.67 ${currency}`);
         const expected = new Money(89.67, mainCurrency);
         expect(instance.realizedDividendsInCurrency.toString()).toEqual(expected.toString());
@@ -1064,7 +1064,7 @@ describe('InvestmentAccount', () => {
         );
 
         expect(instance.realizedDividends.toString()).toEqual('176.12 SGD');
-        expect(instance.realizedDividendsInCurrency.toString()).toEqual('170.00 EUR');
+        expect(instance.realizedDividendsInCurrency.toString()).toEqual('170 EUR');
       });
 
       it('works when transaction is not in main currency using income split', async () => {
@@ -1149,7 +1149,7 @@ describe('InvestmentAccount', () => {
         expect(instance.realizedDividends.toString()).toEqual(`89.67 ${stockCurrency.mnemonic}`);
         expect(instance.realizedDividendsInCurrency.toString()).toEqual(
           stockCurrency.mnemonic === 'USD'
-            ? '88.37 EUR'
+            ? '88.38 EUR'
             : '89.67 EUR',
         );
       });

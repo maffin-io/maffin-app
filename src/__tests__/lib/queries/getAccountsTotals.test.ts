@@ -126,8 +126,8 @@ describe('getAccountsTotals', () => {
       TEST_INTERVAL,
     );
 
-    expect(totals.abcdef.toString()).toEqual('-300.00 EUR');
-    expect(totals.ghijk.toString()).toEqual('300.00 EUR');
+    expect(totals.abcdef.toString()).toEqual('-300 EUR');
+    expect(totals.ghijk.toString()).toEqual('300 EUR');
   });
 
   it('filters by date', async () => {
@@ -179,7 +179,7 @@ describe('getAccountsTotals', () => {
       TEST_INTERVAL,
     );
 
-    expect(totals.abcdef.toString()).toEqual('-100.00 EUR');
-    expect(totals.ghijk.toString()).toEqual('100.00 EUR');
+    expect(totals.abcdef.toString()).toEqual('-100 EUR');
+    expect(totals.ghijk.toString()).toEqual('100 EUR');
   });
 });

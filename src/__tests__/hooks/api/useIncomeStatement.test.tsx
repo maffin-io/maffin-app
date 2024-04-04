@@ -96,7 +96,7 @@ describe('useIncomeStatement', () => {
 
     expect(useAccountsHook.useAccounts).toBeCalledWith();
     expect(queries.getAccountsTotals).toBeCalledWith([], TEST_INTERVAL);
-    expect(result.current.data?.type_income.toString()).toEqual('0.00 EUR');
+    expect(result.current.data?.type_income.toString()).toEqual('0 EUR');
     expect(aggregations.aggregateChildrenTotals).toBeCalledWith(
       ['type_income', 'type_expense'],
       [],

@@ -11,11 +11,11 @@ describe('Money', () => {
 
   describe('initialisation', () => {
     it('initializes with int', () => {
-      expect(new Money(100, 'EUR').toString()).toEqual('100.00 EUR');
+      expect(new Money(100, 'EUR').toString()).toEqual('100 EUR');
     });
 
     it('initializes with float', () => {
-      expect(new Money(1.235566134, 'EUR').toString()).toEqual('1.23 EUR');
+      expect(new Money(1.235566134, 'EUR').toString()).toEqual('1.24 EUR');
     });
 
     it('initializes with custom scale', () => {
@@ -36,6 +36,11 @@ describe('Money', () => {
     it('works with commodities', () => {
       money = new Money(100.10, 'GOOGL');
       expect(money.format()).toEqual('100.1 GOOGL');
+    });
+
+    it('rounds', () => {
+      money = new Money(100.9999, 'GOOGL');
+      expect(money.format()).toEqual('101 GOOGL');
     });
   });
 
@@ -76,14 +81,14 @@ describe('Money', () => {
     it('adds as expected', () => {
       const b = new Money(100, 'EUR');
       const result = money.add(b);
-      expect(result.toString()).toEqual('200.00 EUR');
+      expect(result.toString()).toEqual('200 EUR');
     });
 
     it('adds big decimals', () => {
       const b = new Money(7590.297130000002, 'EUR');
       const c = new Money(3015.95, 'EUR');
 
-      expect(b.add(c).toString()).toEqual('10606.24 EUR');
+      expect(b.add(c).toString()).toEqual('10606.25 EUR');
     });
   });
 
@@ -91,54 +96,54 @@ describe('Money', () => {
     it('subtracts as expected', () => {
       const b = new Money(50, 'EUR');
       const result = money.subtract(b);
-      expect(result.toString()).toEqual('50.00 EUR');
+      expect(result.toString()).toEqual('50 EUR');
     });
 
     it('goes to 0', () => {
       const b = new Money(100, 'EUR');
       const result = money.subtract(b);
-      expect(result.toString()).toEqual('0.00 EUR');
+      expect(result.toString()).toEqual('0 EUR');
     });
 
     it('subtracts into negative', () => {
       const b = new Money(200, 'EUR');
       const result = money.subtract(b);
-      expect(result.toString()).toEqual('-100.00 EUR');
+      expect(result.toString()).toEqual('-100 EUR');
     });
   });
 
   describe('multiply', () => {
     it('multiplies as expected', () => {
       const result = money.multiply(2);
-      expect(result.toString()).toEqual('200.00 EUR');
+      expect(result.toString()).toEqual('200 EUR');
     });
 
     it('multiplies negative numbers as expected', () => {
       const result = money.multiply(-2);
-      expect(result.toString()).toEqual('-200.00 EUR');
+      expect(result.toString()).toEqual('-200 EUR');
     });
 
     it('multiplies decimals', () => {
       const result = money.multiply(1.5);
-      expect(result.toString()).toEqual('150.00 EUR');
+      expect(result.toString()).toEqual('150 EUR');
     });
 
     it('multiplies negative decimals', () => {
       money = new Money(-122.86, 'EUR');
       const result = money.multiply(8.14);
-      expect(result.toString()).toEqual('-1000.09 EUR');
+      expect(result.toString()).toEqual('-1000.08 EUR');
     });
 
     it('multiplies long decimals', () => {
       money = new Money(122.8501, 'EUR');
       const result = money.multiply(8.140001514040282);
-      expect(result.toString()).toEqual('1000.00 EUR');
+      expect(result.toString()).toEqual('1000 EUR');
     });
 
     it('multiplies long negative decimals', () => {
       money = new Money(-122.8501, 'EUR');
       const result = money.multiply(8.140001514040282);
-      expect(result.toString()).toEqual('-1000.00 EUR');
+      expect(result.toString()).toEqual('-1000 EUR');
     });
   });
 
@@ -161,34 +166,34 @@ describe('Money', () => {
 
   describe('convert', () => {
     it('converts with different currency', () => {
-      money = new Money(100, 'USD'); // This represents 1 USD
-      expect(money.convert('EUR', 0.94).toString()).toEqual('94.00 EUR');
+      money = new Money(100, 'USD');
+      expect(money.convert('EUR', 0.94).toString()).toEqual('94 EUR');
     });
 
     it('converts with different currency long number', () => {
-      money = new Money(18546718, 'USD'); // This represents 185467.18 USD
+      money = new Money(18546718, 'USD');
       expect(money.convert('EUR', 0.94).toString()).toEqual('17433914.92 EUR');
     });
 
     it('converts with multiple decimals', () => {
-      money = new Money(11816, 'USD'); // This represents 185467.18 USD
-      expect(money.convert('EUR', 0.8499).toString()).toEqual('10042.41 EUR');
+      money = new Money(11816, 'USD');
+      expect(money.convert('EUR', 0.8499).toString()).toEqual('10042.42 EUR');
     });
 
     it('converts with same currency', () => {
-      expect(money.convert('EUR', 0.94).toString()).toEqual('94.00 EUR');
+      expect(money.convert('EUR', 0.94).toString()).toEqual('94 EUR');
     });
   });
 
   describe('abs', () => {
     it('returns abs for positive', () => {
       money = new Money(100, 'EUR');
-      expect(money.abs().toString()).toEqual('100.00 EUR');
+      expect(money.abs().toString()).toEqual('100 EUR');
     });
 
     it('returns abs for negative', () => {
       money = new Money(-100, 'EUR');
-      expect(money.abs().toString()).toEqual('100.00 EUR');
+      expect(money.abs().toString()).toEqual('100 EUR');
     });
   });
 });
@@ -237,7 +242,7 @@ describe('convert', () => {
       prices,
     );
 
-    expect(money.toString()).toEqual('1000.00 EUR');
+    expect(money.toString()).toEqual('1000 EUR');
   });
 
   it('converts as expected when investment with different currency', () => {
@@ -262,6 +267,6 @@ describe('convert', () => {
       prices,
     );
 
-    expect(money.toString()).toEqual('987.00 EUR');
+    expect(money.toString()).toEqual('987 EUR');
   });
 });

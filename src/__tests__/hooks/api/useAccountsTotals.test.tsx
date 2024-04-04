@@ -57,8 +57,8 @@ describe('useAccountsTotals', () => {
 
     const { result } = renderHook(() => useAccountsTotals());
 
-    expect(result.current.data?.type_asset.toString()).toEqual('10.00 EUR');
-    expect(result.current.data?.type_expense.toString()).toEqual('20.00 EUR');
+    expect(result.current.data?.type_asset.toString()).toEqual('10 EUR');
+    expect(result.current.data?.type_expense.toString()).toEqual('20 EUR');
 
     expect(balanceSheetHook.useBalanceSheet).toBeCalledWith(TEST_INTERVAL.end, undefined);
     expect(incomeStatementHook.useIncomeStatement).toBeCalledWith(TEST_INTERVAL, undefined);
