@@ -46,7 +46,7 @@ const BOTTOM_MENU: ItemType[] = [
   {
     label: 'Docs',
     icon: <BiBook className="text-xl" />,
-    url: 'https://blog.maffin.io/docs',
+    url: 'https://docs.maffin.io',
     target: '_blank',
   },
 ];
