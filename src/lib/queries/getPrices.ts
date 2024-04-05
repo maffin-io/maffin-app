@@ -47,5 +47,5 @@ export default async function getPrices({
   return new PriceDBMap([
     ...prices,
     ...reversePrices,
-  ]);
+  ].sort((a, b) => a.date.diff(b.date).toMillis()));
 }

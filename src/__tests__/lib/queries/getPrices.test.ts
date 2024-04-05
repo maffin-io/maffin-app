@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon';
+
 import { Commodity, Price } from '@/book/entities';
 import { getPrices } from '@/lib/queries';
 
@@ -11,12 +13,14 @@ describe('getPrices', () => {
     price1.fk_commodity = { mnemonic: 'EUR' } as Commodity;
     price1.fk_currency = { mnemonic: 'USD' } as Commodity;
     price1.value = 1;
+    price1.date = DateTime.fromISO('2023-01-01');
 
     price2 = new Price();
     price2.guid = '2';
     price2.fk_commodity = { mnemonic: 'USD' } as Commodity;
     price2.fk_currency = { mnemonic: 'EUR' } as Commodity;
     price2.value = 2;
+    price2.date = DateTime.fromISO('2023-01-02');
 
     jest.spyOn(Price, 'find')
       .mockResolvedValue([price1]);
@@ -154,5 +158,38 @@ describe('getPrices', () => {
         },
       },
     );
+  });
+
+  it('sorts prices by date', async () => {
+    price1 = new Price();
+    price1.guid = '1';
+    price1.fk_commodity = { mnemonic: 'EUR' } as Commodity;
+    price1.fk_currency = { mnemonic: 'USD' } as Commodity;
+    price1.date = DateTime.fromISO('2023-01-01');
+
+    price2 = new Price();
+    price2.guid = '2';
+    price2.fk_commodity = { mnemonic: 'USD' } as Commodity;
+    price2.fk_currency = { mnemonic: 'EUR' } as Commodity;
+    price2.value = 2;
+    price2.date = DateTime.fromISO('2023-01-03');
+
+    const price3 = new Price();
+    price3.guid = '3';
+    price3.fk_commodity = { mnemonic: 'USD' } as Commodity;
+    price3.fk_currency = { mnemonic: 'EUR' } as Commodity;
+    price3.value = 3;
+    price3.date = DateTime.fromISO('2023-01-02');
+
+    jest.spyOn(Price, 'find')
+      .mockResolvedValueOnce([price1, price2])
+      .mockResolvedValueOnce([price3]);
+
+    const prices = await getPrices({
+      from: { guid: 'guid1', namespace: 'CURRENCY' } as Commodity,
+      to: { guid: 'guid2', namespace: 'CURRENCY' } as Commodity,
+    });
+
+    expect(prices.prices).toEqual([price1, price3, price2]);
   });
 });
