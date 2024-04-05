@@ -34,7 +34,7 @@ exports[`UpgradeTooltip renders as expected 1`] = `
     <div
       class="text-center"
     >
-      Auto saving to persistent storage only available for premium users.
+      message
     </div>
     <a
       class="btn btn-cta hover:text-white hover:-translate-y-0 table mx-auto my-4"

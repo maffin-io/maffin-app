@@ -4,10 +4,18 @@ import { BiCrown } from 'react-icons/bi';
 
 import Tooltip from './Tooltip';
 
-export default function UpgradeTooltip(): JSX.Element {
+export type UpgradeTooltipProps = {
+  id: string,
+  message: string;
+};
+
+export default function UpgradeTooltip({
+  id,
+  message,
+}: UpgradeTooltipProps): JSX.Element {
   return (
     <Tooltip
-      id="upgrade-tooltip"
+      id={id}
       className="max-w-80"
       clickable
     >
@@ -16,7 +24,7 @@ export default function UpgradeTooltip(): JSX.Element {
         Premium
       </h2>
       <div className="text-center">
-        Auto saving to persistent storage only available for premium users.
+        {message}
       </div>
       <Link
         href="https://maffin.io"

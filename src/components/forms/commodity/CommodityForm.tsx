@@ -3,7 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
 import classNames from 'classnames';
 
-import { Commodity } from '@/book/entities';
+import { Commodity, Price } from '@/book/entities';
 import { NamespaceSelector } from '@/components/selectors';
 
 const resolver = classValidatorResolver(Commodity, { validator: { stopAtFirstError: true } });
@@ -112,6 +112,10 @@ async function onSubmit(
   if (action === 'add' || action === 'update') {
     await commodity.save();
   } else if (action === 'delete') {
+    await Promise.all([
+      Price.delete({ fk_commodity: { guid: commodity.guid } }),
+      Price.delete({ fk_currency: { guid: commodity.guid } }),
+    ]);
     await commodity.remove();
   }
 

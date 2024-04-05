@@ -39,6 +39,7 @@ export default class PriceDBMap {
     });
 
     if (from === to) {
+      missingPrice.guid = 'same_symbol';
       return missingPrice;
     }
 

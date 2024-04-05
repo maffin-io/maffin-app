@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 import { DataSource } from 'typeorm';
 
 import CommodityForm from '@/components/forms/commodity/CommodityForm';
-import { Commodity } from '@/book/entities';
+import { Commodity, Price } from '@/book/entities';
 
 describe('CommodityForm', () => {
   let datasource: DataSource;
@@ -151,7 +151,9 @@ describe('CommodityForm', () => {
     });
   });
 
-  it('deletes commodity', async () => {
+  it('deletes commodity and related prices', async () => {
+    jest.spyOn(Price, 'delete').mockImplementation();
+
     const user = userEvent.setup();
     const mockSave = jest.fn();
     const eur = await Commodity.create({
@@ -175,5 +177,7 @@ describe('CommodityForm', () => {
     const commodities = await Commodity.find();
 
     expect(commodities).toHaveLength(0);
+    expect(Price.delete).toBeCalledWith({ fk_commodity: { guid: eur.guid } });
+    expect(Price.delete).toBeCalledWith({ fk_currency: { guid: eur.guid } });
   });
 });
