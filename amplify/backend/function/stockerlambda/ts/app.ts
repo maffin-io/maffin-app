@@ -43,7 +43,11 @@ app.get('/api/prices', async (req, res) => {
   const result: { [ticker: string]: Price } = {};
 
   async function callAndSave(ticker: string) {
-    result[ticker] = await yahoo.getPrice(ticker);
+    try {
+      result[ticker] = await yahoo.getPrice(ticker);
+    } catch (e) {
+      console.warn(`A price retrieval failed: ${e}`);
+    }
   }
 
   const promises: Promise<void>[] = [];

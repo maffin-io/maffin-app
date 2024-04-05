@@ -2,21 +2,18 @@
 
 import React from 'react';
 import {
-  BiLineChart,
-  BiMoney,
-  BiSolidGhost,
   BiPlusCircle,
 } from 'react-icons/bi';
 
 import { useCommodities } from '@/hooks/api';
-import Link from 'next/link';
 import Loading from '@/components/Loading';
 import FormButton from '@/components/buttons/FormButton';
 import CommodityForm from '@/components/forms/commodity/CommodityForm';
+import { insertTodayPrices } from '@/lib/Stocker';
+import CommodityCard from '@/components/CommodityCard';
 
 export default function CommoditiesPage(): JSX.Element {
-  let { data: commodities } = useCommodities();
-  const { isLoading } = useCommodities();
+  const { data: commodities = [], isLoading } = useCommodities();
 
   if (isLoading) {
     return (
@@ -27,8 +24,6 @@ export default function CommoditiesPage(): JSX.Element {
       </div>
     );
   }
-
-  commodities = commodities || [];
 
   const currencies = commodities.filter(c => c.namespace === 'CURRENCY');
   const financial = commodities.filter(c => ['STOCK', 'FUND'].includes(c.namespace));
@@ -51,7 +46,7 @@ export default function CommoditiesPage(): JSX.Element {
               </>
             )}
           >
-            <CommodityForm />
+            <CommodityForm onSave={() => insertTodayPrices()} />
           </FormButton>
         </div>
       </div>
@@ -61,18 +56,7 @@ export default function CommoditiesPage(): JSX.Element {
         </span>
       </div>
       <div className="grid grid-cols-12">
-        {currencies.map(commodity => (
-          <Link
-            key={commodity.guid}
-            href={`/dashboard/commodities/${commodity.guid}`}
-            className="card col-span-1 cursor-pointer hover:shadow-lg text-slate-400 dark:hover:text-white"
-          >
-            <div className="flex items-center">
-              <BiMoney className="mr-1" />
-              {commodity.mnemonic}
-            </div>
-          </Link>
-        ))}
+        {currencies.map(commodity => <CommodityCard key={commodity.guid} guid={commodity.guid} />)}
       </div>
       {
         financial.length > 0
@@ -84,18 +68,9 @@ export default function CommoditiesPage(): JSX.Element {
               </span>
             </div>
             <div className="grid grid-cols-12">
-              {financial.map(commodity => (
-                <Link
-                  key={commodity.guid}
-                  href={`/dashboard/commodities/${commodity.guid}`}
-                  className="card col-span-2 cursor-pointer hover:shadow-lg text-slate-400 dark:hover:text-white"
-                >
-                  <div className="flex items-center">
-                    <BiLineChart className="mr-1" />
-                    {commodity.mnemonic}
-                  </div>
-                </Link>
-              ))}
+              {financial.map(
+                commodity => <CommodityCard key={commodity.guid} guid={commodity.guid} />,
+              )}
             </div>
           </>
         )
@@ -110,18 +85,7 @@ export default function CommoditiesPage(): JSX.Element {
               </span>
             </div>
             <div className="grid grid-cols-12">
-              {other.map(commodity => (
-                <Link
-                  key={commodity.guid}
-                  href={`/dashboard/commodities/${commodity.guid}`}
-                  className="card col-span-2 cursor-pointer hover:shadow-lg text-slate-400 dark:hover:text-white"
-                >
-                  <div className="flex items-center">
-                    <BiSolidGhost className="mr-1" />
-                    {commodity.mnemonic}
-                  </div>
-                </Link>
-              ))}
+              {other.map(commodity => <CommodityCard key={commodity.guid} guid={commodity.guid} />)}
             </div>
           </>
         )

@@ -20,6 +20,10 @@ jest.mock('@/components/Loading', () => jest.fn(
   () => <div data-testid="Loading" />,
 ));
 
+jest.mock('@/components/CommodityCard', () => jest.fn(
+  () => <div data-testid="CommodityCard" />,
+));
+
 jest.mock('@/components/buttons/FormButton', () => jest.fn(
   (props: React.PropsWithChildren) => (
     <div data-testid="FormButton">
@@ -84,7 +88,9 @@ describe('CommoditiesPage', () => {
       {},
     );
     expect(CommodityForm).toBeCalledWith(
-      {},
+      {
+        onSave: expect.any(Function),
+      },
       {},
     );
     expect(container).toMatchSnapshot();

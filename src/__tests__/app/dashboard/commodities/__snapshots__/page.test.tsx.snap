@@ -34,33 +34,9 @@ exports[`CommoditiesPage renders as expected 1`] = `
   <div
     class="grid grid-cols-12"
   >
-    <a
-      class="card col-span-1 cursor-pointer hover:shadow-lg text-slate-400 dark:hover:text-white"
-      href="/dashboard/commodities/eur"
-    >
-      <div
-        class="flex items-center"
-      >
-        <svg
-          class="mr-1"
-          fill="currentColor"
-          height="1em"
-          stroke="currentColor"
-          stroke-width="0"
-          viewBox="0 0 24 24"
-          width="1em"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M21 4H3a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1zm-1 11a3 3 0 0 0-3 3H7a3 3 0 0 0-3-3V9a3 3 0 0 0 3-3h10a3 3 0 0 0 3 3v6z"
-          />
-          <path
-            d="M12 8c-2.206 0-4 1.794-4 4s1.794 4 4 4 4-1.794 4-4-1.794-4-4-4zm0 6c-1.103 0-2-.897-2-2s.897-2 2-2 2 .897 2 2-.897 2-2 2z"
-          />
-        </svg>
-        EUR
-      </div>
-    </a>
+    <div
+      data-testid="CommodityCard"
+    />
   </div>
   <div
     class="header"
@@ -74,33 +50,9 @@ exports[`CommoditiesPage renders as expected 1`] = `
   <div
     class="grid grid-cols-12"
   >
-    <a
-      class="card col-span-2 cursor-pointer hover:shadow-lg text-slate-400 dark:hover:text-white"
-      href="/dashboard/commodities/googl"
-    >
-      <div
-        class="flex items-center"
-      >
-        <svg
-          class="mr-1"
-          fill="currentColor"
-          height="1em"
-          stroke="currentColor"
-          stroke-width="0"
-          viewBox="0 0 24 24"
-          width="1em"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M3 3v17a1 1 0 0 0 1 1h17v-2H5V3H3z"
-          />
-          <path
-            d="M15.293 14.707a.999.999 0 0 0 1.414 0l5-5-1.414-1.414L16 12.586l-2.293-2.293a.999.999 0 0 0-1.414 0l-5 5 1.414 1.414L13 12.414l2.293 2.293z"
-          />
-        </svg>
-        GOOGL
-      </div>
-    </a>
+    <div
+      data-testid="CommodityCard"
+    />
   </div>
   <div
     class="header"
@@ -114,30 +66,9 @@ exports[`CommoditiesPage renders as expected 1`] = `
   <div
     class="grid grid-cols-12"
   >
-    <a
-      class="card col-span-2 cursor-pointer hover:shadow-lg text-slate-400 dark:hover:text-white"
-      href="/dashboard/commodities/loy"
-    >
-      <div
-        class="flex items-center"
-      >
-        <svg
-          class="mr-1"
-          fill="currentColor"
-          height="1em"
-          stroke="currentColor"
-          stroke-width="0"
-          viewBox="0 0 24 24"
-          width="1em"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M3 11v8h.051c.245 1.692 1.69 3 3.449 3 1.174 0 2.074-.417 2.672-1.174a3.99 3.99 0 0 0 5.668-.014c.601.762 1.504 1.188 2.66 1.188 1.93 0 3.5-1.57 3.5-3.5V11c0-4.962-4.037-9-9-9s-9 4.038-9 9zm6 1c-1.103 0-2-.897-2-2s.897-2 2-2 2 .897 2 2-.897 2-2 2zm6-4c1.103 0 2 .897 2 2s-.897 2-2 2-2-.897-2-2 .897-2 2-2z"
-          />
-        </svg>
-        EX_LOYALTY
-      </div>
-    </a>
+    <div
+      data-testid="CommodityCard"
+    />
   </div>
 </div>
 `;

@@ -127,8 +127,8 @@ describe('PriceDBMap', () => {
       expect(instance.getPrice('from', 'to').guid).toEqual('missing_price');
     });
 
-    it('returns missing_price when from === to', () => {
-      expect(instance.getPrice('from', 'to').guid).toEqual('missing_price');
+    it('returns same_symbol when from === to', () => {
+      expect(instance.getPrice('from', 'from').guid).toEqual('same_symbol');
     });
 
     it('returns price with matching date', () => {

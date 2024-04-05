@@ -11,7 +11,7 @@ describe('UpgradeTooltip', () => {
         <span data-tooltip-id="upgrade-tooltip">
           upgrade
         </span>
-        <UpgradeTooltip />
+        <UpgradeTooltip id="upgrade-tooltip" message="message" />
       </>,
     );
 

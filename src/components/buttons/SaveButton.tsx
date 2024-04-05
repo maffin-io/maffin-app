@@ -40,7 +40,7 @@ export default function SaveButton(): JSX.Element {
           },
         )}
         disabled={isSaving || !IS_PAID_PLAN || !isOnline}
-        data-tooltip-id="upgrade-tooltip"
+        data-tooltip-id="storage-upgrade-tooltip"
         onClick={async () => {
           await save();
         }}
@@ -73,7 +73,12 @@ export default function SaveButton(): JSX.Element {
       </button>
       {
         !IS_PAID_PLAN
-        && <UpgradeTooltip />
+        && (
+          <UpgradeTooltip
+            id="storage-upgrade-tooltip"
+            message="Auto saving to persistent storage only available for premium users."
+          />
+        )
       }
     </>
   );
