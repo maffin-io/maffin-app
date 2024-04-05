@@ -44,9 +44,9 @@ const BOTTOM_MENU: ItemType[] = [
     ],
   },
   {
-    label: 'Docs',
+    label: 'Help',
     icon: <BiBook className="text-xl" />,
-    url: 'https://docs.maffin.io',
+    url: 'http://docs.maffin.io',
     target: '_blank',
   },
 ];
