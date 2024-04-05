@@ -6,7 +6,7 @@
 <p align="center">
   🌍 <a href="https://maffin.io" target="_blank">Landing page</a>&nbsp;&nbsp;
   🍭 <a href="https://demo.maffin.io" target="_blank">Our demo</a>&nbsp;&nbsp;
-  📖 <a href="https://blog.maffin.io/docs" target="_blank">Documentation</a>&nbsp;&nbsp;
+  📖 <a href="http://docs.maffin.io/docs" target="_blank">Help center</a>&nbsp;&nbsp;
   📰 <a href="https://blog.maffin.io" target="_blank">Blog</a>
 </p>
 

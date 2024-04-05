@@ -118,7 +118,7 @@ exports[`LeftSidebar renders as expected 1`] = `
         >
           <a
             class="flex items-center text-inherit hover:text-inherit h-full px-8 py-4"
-            href="https://docs.maffin.io"
+            href="http://docs.maffin.io"
           >
             <span
               class="mr-8 "
@@ -144,7 +144,7 @@ exports[`LeftSidebar renders as expected 1`] = `
             <span
               class="hidden group-hover:inline-block ml-1"
             >
-              Docs
+              Help
             </span>
           </a>
           <span />
