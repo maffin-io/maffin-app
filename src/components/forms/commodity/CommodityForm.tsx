@@ -8,16 +8,22 @@ import { NamespaceSelector } from '@/components/selectors';
 
 const resolver = classValidatorResolver(Commodity, { validator: { stopAtFirstError: true } });
 
-export type CommodityFormProps = {
-  action?: 'add' | 'update' | 'delete',
+export type CommodityFormProps =
+| {
+  action?: 'add',
   onSave?: Function,
   defaultValues?: Partial<Commodity>,
+}
+| {
+  action: 'update' | 'delete',
+  onSave?: Function,
+  defaultValues: Commodity,
 };
 
 export default function CommodityForm({
   action = 'add',
-  defaultValues,
   onSave = () => {},
+  defaultValues,
 }: CommodityFormProps): JSX.Element {
   const form = useForm<Commodity>({
     defaultValues,
