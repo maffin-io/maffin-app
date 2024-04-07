@@ -11,11 +11,18 @@ import { FormValues } from './types';
 
 const resolver = classValidatorResolver(Price, { validator: { stopAtFirstError: true } });
 
-export type PriceFormProps = {
-  action?: 'add' | 'update' | 'delete',
+export type PriceFormProps =
+| {
+  action?: 'add',
   onSave?: Function,
   defaultValues?: Partial<FormValues>,
   hideDefaults?: boolean,
+}
+| {
+  action: 'update' | 'delete',
+  onSave?: Function,
+  defaultValues: Partial<FormValues>,
+  hideDefaults?: never,
 };
 
 export default function PriceForm({

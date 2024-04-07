@@ -24,17 +24,18 @@ import type { FormValues } from '@/components/forms/account/types';
 
 const resolver = classValidatorResolver(Account, { validator: { stopAtFirstError: true } });
 
-export type AccountFormProps = {
-  action?: 'add' | 'update' | 'delete',
+export type AccountFormProps =
+| {
+  action?: 'add',
   onSave?: Function,
   defaultValues?: Partial<FormValues>,
   hideDefaults?: boolean,
-};
-
-export type SplitFieldData = {
-  amount: number,
-  toAccount: Account,
-  exchangeRate?: number,
+}
+| {
+  action: 'update' | 'delete',
+  onSave?: Function,
+  defaultValues?: Partial<FormValues>,
+  hideDefaults?: never,
 };
 
 export default function AccountForm({

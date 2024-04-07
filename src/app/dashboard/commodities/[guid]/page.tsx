@@ -107,9 +107,7 @@ export default function CommodityPage({ params }: CommodityPageProps): JSX.Eleme
               buttonContent={<BiEdit />}
             >
               <CommodityForm
-                defaultValues={{
-                  ...commodity,
-                }}
+                defaultValues={commodity}
                 action="update"
               />
             </FormButton>
@@ -122,9 +120,7 @@ export default function CommodityPage({ params }: CommodityPageProps): JSX.Eleme
               data-tooltip-id="delete-help"
             >
               <CommodityForm
-                defaultValues={{
-                  ...commodity,
-                }}
+                defaultValues={commodity}
                 action="delete"
                 onSave={
                   () => { router.replace('/dashboard/commodities'); }
