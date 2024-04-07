@@ -10,30 +10,67 @@ import {
   Transaction,
 } from '@/book/entities';
 import { Tooltip } from '@/components/tooltips';
+import Loading from '@/components/Loading';
+import { useTransaction } from '@/hooks/api';
 import SplitsField from './SplitsField';
 import type { FormValues } from './types';
 
 const resolver = classValidatorResolver(Transaction, { validator: { stopAtFirstError: true } });
 
-export type TransactionFormProps = {
-  action?: 'add' | 'update' | 'delete',
+export type TransactionFormProps =
+| {
+  action?: 'add',
+  guid?: never,
   onSave?: Function,
   defaultValues?: Partial<FormValues>,
+}
+| {
+  action: 'update' | 'delete',
+  guid: string,
+  onSave?: Function,
+  defaultValues?: never,
 };
 
 export default function TransactionForm({
   action = 'add',
   onSave = () => {},
   defaultValues,
+  guid = '',
 }: TransactionFormProps): JSX.Element {
+  const { data: tx, isLoading } = useTransaction({
+    guid,
+    enabled: !!guid,
+    select: (data: Transaction) => (
+      {
+        ...data,
+        date: data.date.toISODate() as string,
+        fk_currency: data.fk_currency,
+        // This is hacky but if we pass the Split
+        // class to the form, then we have reference errors as when
+        // we update the form, it also updates the defaultValues
+        // which means formState.isDirty is not triggered properly
+        splits: data.splits.map(split => ({
+          ...split,
+          value: split.value,
+          quantity: split.quantity,
+          account: split.fk_account,
+        } as Split)),
+      } as FormValues
+    ),
+  });
+
   const form = useForm<FormValues>({
-    defaultValues,
+    defaultValues: defaultValues || tx,
     mode: 'onChange',
     resolver,
   });
 
   const { errors } = form.formState;
   const disabled = action === 'delete';
+
+  if (guid && isLoading) {
+    return <Loading />;
+  }
 
   return (
     <form onSubmit={form.handleSubmit((data) => onSubmit(data, action, onSave))}>

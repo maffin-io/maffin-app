@@ -9,7 +9,6 @@ import Link from 'next/link';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { BiEdit, BiXCircle } from 'react-icons/bi';
 import { DateTime } from 'luxon';
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
 import FormButton from '@/components/buttons/FormButton';
 import { Tooltip } from '@/components/tooltips';
@@ -19,12 +18,14 @@ import Money from '@/book/Money';
 import {
   Account,
   Split,
-  Transaction,
 } from '@/book/entities';
-import { useAccounts, useSplitsCount, useSplitsPagination } from '@/hooks/api';
-import type { Commodity } from '@/book/entities';
+import {
+  useAccounts,
+  useSplitsCount,
+  useSplitsPagination,
+  useTransaction,
+} from '@/hooks/api';
 import { accountColorCode } from '@/helpers/classNames';
-import fetcher from '@/hooks/api/fetcher';
 
 export type TransactionsTableProps = {
   account: Account,
@@ -111,25 +112,8 @@ const columns: ColumnDef<Split>[] = [
   },
 ];
 
-function useTransaction(guid: string): UseQueryResult<Transaction> {
-  const queryKey = [...Transaction.CACHE_KEY, guid];
-  return useQuery({
-    queryKey,
-    queryFn: fetcher(
-      () => Transaction.findOne({
-        where: { guid },
-        relations: {
-          splits: true,
-        },
-      }),
-      queryKey,
-    ),
-    networkMode: 'always',
-  });
-}
-
 function DescriptionCell({ row }: CellContext<Split, unknown>): JSX.Element {
-  const { data: tx } = useTransaction(row.original.txId);
+  const { data: tx } = useTransaction({ guid: row.original.txId });
   return (
     <span>
       {tx?.description}
@@ -138,7 +122,7 @@ function DescriptionCell({ row }: CellContext<Split, unknown>): JSX.Element {
 }
 
 function FromToAccountCell({ row }: CellContext<Split, unknown>): JSX.Element {
-  const { data: tx } = useTransaction(row.original.txId);
+  const { data: tx } = useTransaction({ guid: row.original.txId });
   const { data: accounts } = useAccounts();
 
   const otherSplits = tx?.splits.filter(
@@ -204,37 +188,12 @@ function BalancePartial(
 }
 
 function ActionsCell({ row }: CellContext<Split, unknown>): JSX.Element {
-  const { data: tx } = useTransaction(row.original.txId);
-  const { data: accounts } = useAccounts();
+  const { data: tx } = useTransaction({ guid: row.original.txId });
 
   if (!tx || tx.guid !== row.original.txId) {
     return <span />;
   }
 
-  const originalSplit = tx.splits.find(split => split.guid === row.original.guid) as Split;
-  const defaultValues = {
-    ...tx,
-    date: tx.date.toISODate() as string,
-    fk_currency: tx.fk_currency as Commodity,
-    // This is hacky but if we pass the Split
-    // class to the form, then we have reference errors as when
-    // we update the form, it also updates the defaultValues
-    // which means formState.isDirty is not triggered properly
-    splits: [
-      {
-        ...originalSplit,
-        value: originalSplit.value,
-        quantity: originalSplit.quantity,
-        fk_account: accounts?.find(a => a.guid === originalSplit.accountId) as Account,
-      },
-      ...tx.splits.filter(split => split.guid !== originalSplit.guid).map(split => ({
-        ...split,
-        value: split.value,
-        quantity: split.quantity,
-        fk_account: accounts?.find(a => a.guid === split.accountId) as Account,
-      } as Split)),
-    ] as Split[],
-  };
   return (
     <>
       <FormButton
@@ -245,7 +204,7 @@ function ActionsCell({ row }: CellContext<Split, unknown>): JSX.Element {
       >
         <TransactionForm
           action="update"
-          defaultValues={defaultValues}
+          guid={row.original.txId}
           onSave={() => tx.queryClient?.invalidateQueries({
             queryKey: [...Split.CACHE_KEY, row.original.accountId],
           })}
@@ -259,7 +218,7 @@ function ActionsCell({ row }: CellContext<Split, unknown>): JSX.Element {
       >
         <TransactionForm
           action="delete"
-          defaultValues={defaultValues}
+          guid={row.original.txId}
         />
       </FormButton>
     </>

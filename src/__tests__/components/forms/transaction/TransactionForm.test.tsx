@@ -20,6 +20,7 @@ import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import * as queries from '@/lib/queries';
 import * as apiHook from '@/hooks/api';
 import { PriceDBMap } from '@/book/prices';
+import type { FormValues } from '@/components/forms/transaction/types';
 
 jest.mock('@/lib/queries', () => ({
   __esModule: true,
@@ -98,6 +99,12 @@ describe('TransactionForm', () => {
         ],
       } as UseQueryResult<Account[]>,
     );
+
+    jest.spyOn(apiHook, 'useTransaction').mockReturnValue(
+      {
+        data: undefined,
+      } as UseQueryResult<Transaction>,
+    );
   });
 
   afterEach(async () => {
@@ -105,14 +112,12 @@ describe('TransactionForm', () => {
     await datasource.destroy();
   });
 
-  it.each([
-    'add', 'update', 'delete',
-  ])('renders as expected with action %s', async (action) => {
+  it('renders as expected with action add', async () => {
     const now = DateTime.now().toISODate();
     const { container } = render(
       <TransactionForm
         onSave={() => {}}
-        action={action as 'add' | 'update' | 'delete'}
+        action="add"
         defaultValues={
           {
             date: now as string,
@@ -142,37 +147,93 @@ describe('TransactionForm', () => {
 
   it.each([
     'update', 'delete',
-  ])('does not override with exchangeRate when loaded with defaults for %s', async (action) => {
+  ])('renders as expected with action %s', async (action) => {
+    const now = DateTime.now().toISODate();
+
+    jest.spyOn(apiHook, 'useTransaction').mockReturnValue(
+      {
+        data: {
+          date: now,
+          description: '',
+          splits: [
+            Split.create({
+              valueNum: -100,
+              valueDenom: 1,
+              quantityNum: -100,
+              quantityDenom: 1,
+              fk_account: assetAccount,
+            }),
+            Split.create({
+              valueNum: 100,
+              valueDenom: 1,
+              quantityNum: 100,
+              quantityDenom: 1,
+              fk_account: expenseAccount,
+            }),
+          ],
+          fk_currency: assetAccount.commodity,
+        },
+      } as UseQueryResult<FormValues>,
+    );
+
+    const { container } = render(
+      <TransactionForm
+        onSave={() => {}}
+        action={action as 'update' | 'delete'}
+        guid="tx_guid"
+      />,
+    );
+
+    await waitFor(() => expect(screen.getByLabelText('Date')).toHaveValue(now));
+    screen.getByLabelText('Date');
+    screen.getByLabelText('Description');
+
+    expect(apiHook.useTransaction).toBeCalledWith({
+      guid: 'tx_guid',
+      enabled: true,
+      select: expect.any(Function),
+    });
+    expect(container).toMatchSnapshot();
+  });
+
+  it.each([
+    'update', 'delete',
+  ])('does not override with exchangeRate for %s', async (action) => {
     const now = DateTime.now().toISODate();
     expenseAccount.fk_commodity = sgd;
     await expenseAccount.save();
+
+    jest.spyOn(apiHook, 'useTransaction').mockReturnValue(
+      {
+        data: {
+          date: now,
+          description: '',
+          splits: [
+            Split.create({
+              valueNum: -100,
+              valueDenom: 1,
+              quantityNum: -100,
+              quantityDenom: 1,
+              fk_account: assetAccount,
+            }),
+            Split.create({
+              valueNum: 100,
+              valueDenom: 1,
+              quantityNum: 150,
+              quantityDenom: 1,
+              fk_account: expenseAccount,
+            }),
+          ],
+          fk_currency: assetAccount.commodity,
+        },
+      } as UseQueryResult<FormValues>,
+    );
+
     render(
       <TransactionForm
         onSave={() => {}}
-        action={action as 'add' | 'update' | 'delete'}
-        defaultValues={
-          {
-            date: now as string,
-            description: '',
-            splits: [
-              Split.create({
-                valueNum: -100,
-                valueDenom: 1,
-                quantityNum: -100,
-                quantityDenom: 1,
-                fk_account: assetAccount,
-              }),
-              Split.create({
-                valueNum: 100,
-                valueDenom: 1,
-                quantityNum: 150,
-                quantityDenom: 1,
-                fk_account: expenseAccount,
-              }),
-            ],
-            fk_currency: assetAccount.commodity,
-          }
-        }
+        action={action as 'update' | 'delete'}
+        guid="tx_guid"
       />,
     );
 
@@ -1214,7 +1275,7 @@ describe('TransactionForm', () => {
       const user = userEvent.setup();
       const mockSave = jest.fn();
 
-      await Transaction.create({
+      const tx = await Transaction.create({
         guid: 'tx_guid',
         date: DateTime.fromISO('2023-01-01'),
         description: 'description',
@@ -1237,26 +1298,20 @@ describe('TransactionForm', () => {
         fk_currency: assetAccount.commodity,
       }).save();
 
-      const tx = await Transaction.findOneOrFail({
-        where: { description: 'description' },
-        relations: {
-          splits: {
-            fk_account: true,
+      jest.spyOn(apiHook, 'useTransaction').mockReturnValue(
+        {
+          data: {
+            ...tx,
+            date: tx.date.toISODate(),
           },
-        },
-      });
+        } as UseQueryResult<FormValues>,
+      );
 
       render(
         <TransactionForm
           action="update"
           onSave={mockSave}
-          defaultValues={
-            {
-              ...tx,
-              date: tx.date.toISODate() as string,
-              fk_currency: tx.currency,
-            }
-          }
+          guid={tx.guid}
         />,
       );
 
@@ -1347,18 +1402,20 @@ describe('TransactionForm', () => {
           },
         },
       });
+      jest.spyOn(apiHook, 'useTransaction').mockReturnValue(
+        {
+          data: {
+            ...tx,
+            date: tx.date.toISODate(),
+          },
+        } as UseQueryResult<FormValues>,
+      );
 
       rerender(
         <TransactionForm
           action="update"
           onSave={mockSave}
-          defaultValues={
-            {
-              ...tx,
-              date: tx.date.toISODate() as string,
-              fk_currency: tx.currency as Commodity,
-            }
-          }
+          guid="tx_guid"
         />,
       );
 
@@ -1427,18 +1484,20 @@ describe('TransactionForm', () => {
           },
         },
       });
+      jest.spyOn(apiHook, 'useTransaction').mockReturnValue(
+        {
+          data: {
+            ...tx,
+            date: tx.date.toISODate(),
+          },
+        } as UseQueryResult<FormValues>,
+      );
 
       rerender(
         <TransactionForm
           action="delete"
           onSave={mockSave}
-          defaultValues={
-            {
-              ...tx,
-              date: tx.date.toISODate() as string,
-              fk_currency: tx.currency as Commodity,
-            }
-          }
+          guid="tx_guid"
         />,
       );
 

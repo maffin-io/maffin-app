@@ -489,13 +489,12 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                     />
                   </svg>
                   <div
-                    class="selector__value-container css-1fdsijx-ValueContainer"
+                    class="selector__value-container selector__value-container--has-value css-1fdsijx-ValueContainer"
                   >
                     <div
-                      class="selector__placeholder css-1jqq78o-placeholder"
-                      id="react-select-5-placeholder"
+                      class="!text-inherit selector__single-value selector__single-value--is-disabled css-olqui2-singleValue"
                     >
-                      &lt;Choose an account&gt;
+                      Expenses:random
                     </div>
                     <div
                       class="!text-inherit selector__input-container css-1h01tm3-Input"
@@ -504,7 +503,6 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                       <input
                         aria-activedescendant=""
                         aria-autocomplete="list"
-                        aria-describedby="react-select-5-placeholder"
                         aria-expanded="false"
                         aria-haspopup="true"
                         aria-label="splits.1.account"
@@ -551,9 +549,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
               </div>
               <p
                 class="invalid-feedback"
-              >
-                account is required
-              </p>
+              />
             </div>
             <div
               class="col-span-4"
@@ -571,7 +567,9 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                 />
                 <span
                   class="pr-2"
-                />
+                >
+                  €
+                </span>
               </div>
             </div>
             <div
@@ -618,7 +616,6 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
     >
       <button
         class="btn capitalize btn-danger"
-        disabled=""
         type="submit"
       >
         delete
@@ -884,13 +881,12 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                     />
                   </svg>
                   <div
-                    class="selector__value-container css-1fdsijx-ValueContainer"
+                    class="selector__value-container selector__value-container--has-value css-1fdsijx-ValueContainer"
                   >
                     <div
-                      class="selector__placeholder css-1jqq78o-placeholder"
-                      id="react-select-4-placeholder"
+                      class="!text-inherit selector__single-value css-1dimb5e-singleValue"
                     >
-                      &lt;Choose an account&gt;
+                      Expenses:random
                     </div>
                     <div
                       class="!text-inherit selector__input-container css-qbdosj-Input"
@@ -899,7 +895,6 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                       <input
                         aria-activedescendant=""
                         aria-autocomplete="list"
-                        aria-describedby="react-select-4-placeholder"
                         aria-expanded="false"
                         aria-haspopup="true"
                         aria-label="splits.1.account"
@@ -945,14 +940,12 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                 <input
                   name="splits.1.account"
                   type="hidden"
-                  value=""
+                  value="Expenses:random"
                 />
               </div>
               <p
                 class="invalid-feedback"
-              >
-                account is required
-              </p>
+              />
             </div>
             <div
               class="col-span-4"
@@ -969,7 +962,9 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                 />
                 <span
                   class="pr-2"
-                />
+                >
+                  €
+                </span>
               </div>
             </div>
             <div
@@ -1027,7 +1022,6 @@ exports[`TransactionForm renders as expected with action update 1`] = `
     >
       <button
         class="btn capitalize btn-warn"
-        disabled=""
         type="submit"
       >
         update

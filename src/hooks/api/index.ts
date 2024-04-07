@@ -24,6 +24,7 @@ export { useMonthlyWorth } from '@/hooks/api/useMonthlyWorth';
 export { usePrices } from '@/hooks/api/usePrices';
 export { useCashFlow } from '@/hooks/api/useCashFlow';
 export { useMainCurrency } from '@/hooks/api/useMainCurrency';
+export { useTransaction } from '@/hooks/api/useTransactions';
 
 export function useStartDate(): UseQueryResult<DateTime> {
   return useQuery({
