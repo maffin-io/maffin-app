@@ -68,10 +68,7 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: [
-          options[0],
-          options[1],
-        ],
+        data: options,
       } as UseQueryResult<Account[]>,
     );
 
@@ -107,10 +104,7 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: [
-          options[0],
-          options[1],
-        ],
+        data: options,
       } as UseQueryResult<Account[]>,
     );
 
@@ -150,10 +144,7 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: [
-          options[0],
-          options[1],
-        ],
+        data: options,
       } as UseQueryResult<Account[]>,
     );
 
@@ -189,10 +180,7 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: [
-          options[0],
-          options[1],
-        ],
+        data: options,
       } as UseQueryResult<Account[]>,
     );
 
@@ -229,10 +217,7 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: [
-          options[0],
-          options[1],
-        ],
+        data: options,
       } as UseQueryResult<Account[]>,
     );
 
@@ -271,10 +256,7 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: [
-          options[0],
-          options[1],
-        ],
+        data: options,
       } as UseQueryResult<Account[]>,
     );
 
@@ -313,10 +295,7 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: [
-          options[0],
-          options[1],
-        ],
+        data: options,
       } as UseQueryResult<Account[]>,
     );
 
@@ -354,10 +333,7 @@ describe('AccountSelector', () => {
     ];
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
-        data: [
-          options[0],
-          options[1],
-        ],
+        data: options,
       } as UseQueryResult<Account[]>,
     );
 

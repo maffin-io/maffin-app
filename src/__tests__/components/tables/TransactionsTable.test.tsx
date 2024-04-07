@@ -4,7 +4,6 @@ import {
   render,
   screen,
 } from '@testing-library/react';
-import * as query from '@tanstack/react-query';
 import type { LinkProps } from 'next/link';
 import type { UseQueryResult } from '@tanstack/react-query';
 
@@ -199,12 +198,13 @@ describe('TransactionsTable', () => {
   });
 
   it('renders Description column as expected', async () => {
-    jest.spyOn(query, 'useQuery').mockReturnValue({
+    jest.spyOn(apiHook, 'useTransaction').mockReturnValue({
       data: {
         guid: 'tx_guid',
         description: 'Tx description',
       },
     } as UseQueryResult<Transaction>);
+
     render(<TransactionsTable account={account} />);
 
     await screen.findByTestId('Table');
@@ -220,9 +220,7 @@ describe('TransactionsTable', () => {
       }),
     );
 
-    expect(query.useQuery).toBeCalledWith(expect.objectContaining({
-      queryKey: ['api', 'txs', 'tx_guid'],
-    }));
+    expect(apiHook.useTransaction).toBeCalledWith({ guid: 'tx_guid' });
     expect(container).toMatchSnapshot();
   });
 
@@ -241,7 +239,7 @@ describe('TransactionsTable', () => {
         },
       ],
     } as UseQueryResult<Account[]>);
-    jest.spyOn(query, 'useQuery').mockReturnValue({
+    jest.spyOn(apiHook, 'useTransaction').mockReturnValue({
       data: {
         guid: 'tx_guid',
         splits: [
@@ -251,6 +249,7 @@ describe('TransactionsTable', () => {
         ],
       },
     } as UseQueryResult<Transaction>);
+
     render(<TransactionsTable account={account} />);
 
     await screen.findByTestId('Table');
@@ -266,9 +265,6 @@ describe('TransactionsTable', () => {
       }),
     );
 
-    expect(query.useQuery).toBeCalledWith(expect.objectContaining({
-      queryKey: ['api', 'txs', 'tx_guid'],
-    }));
     expect(container).toMatchSnapshot();
   });
 
@@ -333,19 +329,11 @@ describe('TransactionsTable', () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue({
       data: accounts,
     } as UseQueryResult<Account[]>);
+
     const tx = {
       guid: 'tx_guid',
-      date: DateTime.fromISO('2023-01-01'),
-      splits: [
-        split,
-        {
-          accountId: 'account_guid_2',
-          value: 100,
-          quantity: 100,
-        },
-      ],
     };
-    jest.spyOn(query, 'useQuery').mockReturnValue({
+    jest.spyOn(apiHook, 'useTransaction').mockReturnValue({
       data: tx,
     } as UseQueryResult<Transaction>);
 
@@ -382,16 +370,7 @@ describe('TransactionsTable', () => {
       1,
       {
         action: 'update',
-        defaultValues: {
-          ...tx,
-          date: '2023-01-01',
-          splits: tx.splits.map(s => ({
-            ...s,
-            value: s.value,
-            quantity: s.quantity,
-            fk_account: accounts.find(a => a.guid === s.accountId),
-          })),
-        },
+        guid: 'tx_guid',
         onSave: expect.any(Function),
       },
       {},
@@ -409,16 +388,7 @@ describe('TransactionsTable', () => {
       2,
       {
         action: 'delete',
-        defaultValues: {
-          ...tx,
-          date: '2023-01-01',
-          splits: tx.splits.map(s => ({
-            ...s,
-            value: s.value,
-            quantity: s.quantity,
-            fk_account: accounts.find(a => a.guid === s.accountId),
-          })),
-        },
+        guid: 'tx_guid',
       },
       {},
     );
