@@ -204,7 +204,7 @@ describe('SplitField', () => {
      * see quantity with GOOGL and value with USD respectively. For the bank account we will see EUR
      * for quantity and USD for value.
      */
-    it('sets txCurrency to currency of the account\'s commodity if not a currency', async () => {
+    it('sets txCurrency to currency of the account\'s commodity if an investment', async () => {
       const user = userEvent.setup();
       jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
         {
@@ -212,7 +212,7 @@ describe('SplitField', () => {
             {
               guid: 'account_guid_2',
               path: 'path2',
-              type: 'ASSET',
+              type: 'INVESTMENT',
               commodity: {
                 namespace: 'OTHER',
                 mnemonic: 'TICKER',
@@ -253,9 +253,9 @@ describe('SplitField', () => {
     });
 
     /**
-     * Same as above but now with mainSplit being the one having the non currency commodity
+     * Same as above but now with mainSplit being the investment
      */
-    it('sets txCurrency to currency of main split account\'s commodity if not a currency', async () => {
+    it('sets txCurrency to currency of main split account\'s commodity if an investment', async () => {
       const user = userEvent.setup();
       jest.spyOn(Price, 'findOneByOrFail').mockResolvedValue({
         // @ts-ignore
@@ -278,7 +278,7 @@ describe('SplitField', () => {
                   name: 'path1',
                   guid: 'account_guid_1',
                   path: 'path1',
-                  type: 'ASSET',
+                  type: 'INVESTMENT',
                   commodity: {
                     namespace: 'OTHER',
                     mnemonic: 'TICKER',
@@ -302,6 +302,60 @@ describe('SplitField', () => {
       await user.click(screen.getByText('submit'));
 
       expect(Price.findOneByOrFail).toBeCalledWith({ fk_commodity: { guid: 'ticker_guid' } });
+      expect(mockSubmit).toBeCalledWith(expect.objectContaining({
+        fk_currency: {
+          guid: 'usd',
+          mnemonic: 'USD',
+          namespace: 'CURRENCY',
+        },
+      }));
+
+      // We show the value field so we see the conversion from commodity to currency
+      expect(screen.getByRole('spinbutton', { name: 'splits.1.value' })).toBeVisible();
+    });
+
+    /**
+     * Same as previous but the investment having a currency as commodity
+     */
+    it('sets txCurrency to currency of main split account\'s currency if an investment', async () => {
+      const user = userEvent.setup();
+      const mockSubmit = jest.fn();
+      const usd = {
+        guid: 'usd',
+        mnemonic: 'USD',
+        namespace: 'CURRENCY',
+      };
+
+      render(
+        <FormWrapper
+          defaults={{
+            splits: [
+              {
+                value: 0,
+                quantity: 0,
+                fk_account: {
+                  name: 'path1',
+                  guid: 'account_guid_1',
+                  path: 'path1',
+                  type: 'INVESTMENT',
+                  commodity: usd,
+                } as Account,
+              } as Split,
+              {
+                value: 0,
+                quantity: 0,
+              } as Split,
+            ],
+          }}
+          submit={mockSubmit}
+        />,
+      );
+
+      await user.click(screen.getByLabelText('splits.1.account'));
+      await user.click(screen.getByText('path2'));
+
+      await user.click(screen.getByText('submit'));
+
       expect(mockSubmit).toBeCalledWith(expect.objectContaining({
         fk_currency: {
           guid: 'usd',

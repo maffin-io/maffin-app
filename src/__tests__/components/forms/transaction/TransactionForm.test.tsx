@@ -572,7 +572,7 @@ describe('TransactionForm', () => {
      * that all fields are displayed accordingly with the correct quantities accordingly to
      * exchange rates.
      */
-    it('creates tx with mainSplit commodity not being CURRENCY', async () => {
+    it('creates tx with mainSplit being INVESTMENT', async () => {
       const user = userEvent.setup();
       const ticker = await Commodity.create({
         guid: 'ticker',
@@ -607,9 +607,9 @@ describe('TransactionForm', () => {
       const tickerAccount = await Account.create({
         guid: 'account_guid_3',
         name: 'Asset3',
-        type: 'ASSET',
+        type: 'INVESTMENT',
         fk_commodity: ticker,
-        parent: root,
+        parent: assetAccount,
       }).save();
       tickerAccount.path = 'Assets:Asset3';
 
@@ -718,7 +718,7 @@ describe('TransactionForm', () => {
      * Same as above but the mainSplit is now the asset account and the other split
      * is the one with the non currency commodity
      */
-    it('creates tx with split commodity not being CURRENCY', async () => {
+    it('creates tx with split account being INVESTMENT', async () => {
       const user = userEvent.setup();
       const ticker = await Commodity.create({
         guid: 'ticker',
@@ -753,9 +753,9 @@ describe('TransactionForm', () => {
       const tickerAccount = await Account.create({
         guid: 'account_guid_3',
         name: 'Asset3',
-        type: 'ASSET',
+        type: 'INVESTMENT',
         fk_commodity: ticker,
-        parent: root,
+        parent: assetAccount,
       }).save();
       tickerAccount.path = 'Assets:asset3';
 
@@ -901,9 +901,9 @@ describe('TransactionForm', () => {
       const tickerAccount = await Account.create({
         guid: 'account_guid_3',
         name: 'Asset3',
-        type: 'ASSET',
+        type: 'INVESTMENT',
         fk_commodity: ticker,
-        parent: root,
+        parent: assetAccount,
       }).save();
       tickerAccount.path = 'Assets:Asset3';
 
@@ -1039,7 +1039,7 @@ describe('TransactionForm', () => {
      * Same as above but with the commodity account being the last split as this triggers
      * a change of txCurrency for the two previous splits.
      */
-    it('creates tx with multiple splits with commodity split being last', async () => {
+    it('creates tx with multiple splits with investment split being last', async () => {
       const user = userEvent.setup();
       const ticker = await Commodity.create({
         guid: 'ticker',
@@ -1084,9 +1084,9 @@ describe('TransactionForm', () => {
       const tickerAccount = await Account.create({
         guid: 'account_guid_3',
         name: 'Asset3',
-        type: 'ASSET',
+        type: 'INVESTMENT',
         fk_commodity: ticker,
-        parent: root,
+        parent: assetAccount,
       }).save();
       tickerAccount.path = 'Assets:asset3';
 
