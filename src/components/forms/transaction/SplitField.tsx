@@ -94,17 +94,22 @@ export default function SplitField({
                   const splits = form.getValues('splits');
 
                   if (a) {
-                    const nonCurrencySplit = splits.find(
-                      split => (split.fk_account as Account).commodity.namespace !== 'CURRENCY',
+                    const investmentSplit = splits.find(
+                      split => (split.fk_account as Account).type === 'INVESTMENT',
                     );
 
-                    if (nonCurrencySplit) {
-                      const price = await Price.findOneByOrFail({
-                        fk_commodity: {
-                          guid: (nonCurrencySplit.fk_account as Account).commodity.guid,
-                        },
-                      });
-                      form.setValue('fk_currency', price.currency);
+                    if (investmentSplit) {
+                      const investmentAccount = investmentSplit.fk_account as Account;
+                      let currency = investmentAccount.commodity;
+
+                      if (investmentAccount.commodity.namespace !== 'CURRENCY') {
+                        ({ currency } = await Price.findOneByOrFail({
+                          fk_commodity: {
+                            guid: investmentAccount.commodity.guid,
+                          },
+                        }));
+                      }
+                      form.setValue('fk_currency', currency);
                     } else if (txCurrency.guid !== mainCurrency.guid) {
                       if (a.commodity.guid === mainCurrency?.guid) {
                         form.setValue('fk_currency', mainCurrency);
