@@ -69,23 +69,26 @@ describe('AssetInfo', () => {
     jest.clearAllMocks();
   });
 
-  it('renders as expected when not placeholder', () => {
+  it('renders as expected when not placeholder Asset', () => {
     const { container } = render(
       <AssetInfo account={account} />,
     );
 
     expect(NetWorthHistogram).toBeCalledWith(
       {
+        height: 428,
+        title: 'Net worth',
         assetsGuid: 'guid',
-        assetsLabel: 'Assets',
-        hideAssets: true,
-        hideLiabilities: true,
-        liabilitiesGuid: '',
+        assetsConfig: {
+          label: 'Assets',
+          borderColor: '#06B6D455',
+          type: 'line',
+        },
         showLegend: false,
       },
       {},
     );
-    expect(AssetSankey).toBeCalledWith({ height: 270, account }, {});
+    expect(AssetSankey).toBeCalledWith({ height: 428, account }, {});
     expect(TotalWidget).toBeCalledWith(
       { account },
       {},
@@ -101,6 +104,30 @@ describe('AssetInfo', () => {
     expect(container).toMatchSnapshot();
   });
 
+  it('renders as expected when not placeholder Liability', () => {
+    account.type = 'CREDIT';
+    account.name = 'Liabilities';
+
+    render(
+      <AssetInfo account={account} />,
+    );
+
+    expect(NetWorthHistogram).toBeCalledWith(
+      {
+        height: 428,
+        title: 'Debt',
+        liabilitiesGuid: 'guid',
+        liabilitiesConfig: {
+          label: 'Liabilities',
+          borderColor: '#FF660055',
+          type: 'line',
+        },
+        showLegend: false,
+      },
+      {},
+    );
+  });
+
   it('renders as expected when placeholder', () => {
     account.placeholder = true;
     account.childrenIds = ['1', '2'];
@@ -111,11 +138,14 @@ describe('AssetInfo', () => {
 
     expect(NetWorthHistogram).toBeCalledWith(
       {
+        height: 428,
+        title: 'Net worth',
         assetsGuid: 'guid',
-        assetsLabel: 'Assets',
-        hideAssets: true,
-        hideLiabilities: true,
-        liabilitiesGuid: '',
+        assetsConfig: {
+          label: 'Assets',
+          borderColor: '#06B6D455',
+          type: 'line',
+        },
         showLegend: false,
       },
       {},
