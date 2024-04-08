@@ -135,7 +135,7 @@ describe('getPrice', () => {
   it('queries for previous day when on Sunday', async () => {
     await yh.getPrice('ticker', 1696089600);
 
-    expect(mockAxiosGet).toHaveBeenNthCalledWith(
+    expect(mockAxiosGet).nthCalledWith(
       1,
       'https://query2.finance.yahoo.com/v8/finance/chart/ticker?interval=1d&includePrePost=false&period1=1695945600&period2=1696031999',
     );
@@ -199,5 +199,38 @@ describe('getPrice', () => {
       changeAbs: 0.02,
       currency: 'GBP',
     });
+  });
+
+  it.each([
+    ['PHPSGD=X', 'SGDPHP=X', 1 / 100],
+    ['EURSGD=X', 'EURSGD=X', 100],
+  ])('formats %s to have main currency first', async (ticker, expected, price) => {
+    mockAxiosGet.mockImplementation(() => Promise.resolve({
+      data: {
+        chart: {
+          result: [
+            {
+              meta: {
+                currency: 'USD',
+                chartPreviousClose: 90,
+                regularMarketPrice: 100,
+              },
+            },
+          ],
+          error: null,
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+    }));
+
+    const result = await yh.getPrice(ticker);
+
+    expect(mockAxiosGet).toBeCalledWith(
+      `https://query2.finance.yahoo.com/v8/finance/chart/${expected}?interval=1d&includePrePost=false`,
+    );
+    expect(result).toEqual(expect.objectContaining({
+      price,
+    }));
   });
 });

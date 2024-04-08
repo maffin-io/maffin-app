@@ -14,7 +14,7 @@ export type PricesTableProps = {
   prices: Price[],
 };
 
-export default function TransactionsTable({
+export default function PricesTable({
   prices,
 }: PricesTableProps): JSX.Element {
   return (
@@ -59,7 +59,7 @@ const columns: ColumnDef<Price>[] = [
     accessorFn: (row: Price) => new Money(
       row.value,
       (row.fk_currency as Commodity).mnemonic,
-    ).format(),
+    ).format(6, 6),
   },
   {
     header: 'Actions',

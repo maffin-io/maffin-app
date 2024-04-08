@@ -41,6 +41,7 @@ export function moneyToString(n: number, currency: string): string {
     return n.toLocaleString(navigator.language, {
       style: 'currency',
       currency: currency || 'EUR',
+      maximumFractionDigits: 6,
     });
   } catch {
     return `${n.toLocaleString(navigator.language)} ${currency}`;

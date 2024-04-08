@@ -66,10 +66,10 @@ export default class Money {
    *
    * The result is a localized string with the currency as a symbol
    */
-  format(scale = 4): string {
+  format(scale = 4, decimals = 2): string {
     return djs.toDecimal(
       djs.transformScale(this._raw, scale),
-      ({ value, currency }) => moneyToString(toFixed(Number(value)), currency.code),
+      ({ value, currency }) => moneyToString(toFixed(Number(value), decimals), currency.code),
     );
   }
 
