@@ -20,24 +20,41 @@ C.register(
   LineController,
 );
 
-export type NetWorthHistogramProps = {
+export type NetWorthHistogramProps =
+| {
+  title?: string,
   assetsGuid: string,
-  assetsLabel?: string,
-  hideAssets?: boolean,
+  assetsConfig?: Partial<ChartDataset>,
+  liabilitiesGuid?: never,
+  liabilitiesConfig?: never,
+  showLegend?: boolean,
+  height?: number,
+}
+| {
+  title?: string,
+  assetsGuid?: never,
+  assetsConfig?: never,
   liabilitiesGuid: string,
-  liabilitiesLabel?: string,
-  hideLiabilities?: boolean,
+  liabilitiesConfig?: Partial<ChartDataset>,
+  showLegend?: boolean,
+  height?: number,
+}
+| {
+  title?: string,
+  assetsGuid: string,
+  assetsConfig?: Partial<ChartDataset>,
+  liabilitiesGuid: string,
+  liabilitiesConfig?: Partial<ChartDataset>,
   showLegend?: boolean,
   height?: number,
 };
 
 export default function NetWorthHistogram({
-  assetsGuid,
-  assetsLabel = 'Assets',
-  hideAssets = false,
-  liabilitiesGuid,
-  liabilitiesLabel = 'Liabilities',
-  hideLiabilities = false,
+  title = 'Net worth',
+  assetsGuid = '',
+  assetsConfig = {},
+  liabilitiesGuid = '',
+  liabilitiesConfig = {},
   showLegend = true,
   height = 400,
 }: NetWorthHistogramProps): JSX.Element {
@@ -50,52 +67,54 @@ export default function NetWorthHistogram({
 
   const datasets: ChartDataset<'bar'>[] = [];
 
-  if (!hideAssets) {
+  if (assetsGuid) {
     datasets.push({
-      label: assetsLabel,
-      data: assetSeries || [],
       backgroundColor: '#06B6D4',
       order: 1,
       barPercentage: 0.6,
-    });
+      ...assetsConfig,
+      data: assetSeries || [],
+    } as ChartDataset<'bar'>);
   }
 
-  if (liabilitySeries?.some(n => n !== 0) && !hideLiabilities) {
+  if (liabilitiesGuid) {
     datasets.push({
-      label: liabilitiesLabel,
-      data: liabilitySeries || [],
       backgroundColor: '#FF6600',
       order: 2,
       barPercentage: 0.6,
-    });
+      ...liabilitiesConfig,
+      data: liabilitySeries || [],
+    } as ChartDataset<'bar'>);
   }
 
-  datasets.push({
-    label: 'Net worth',
-    // @ts-ignore
-    type: 'line',
-    data: assetSeries?.map((n, i) => n + (liabilitySeries?.[i] || 0)) || [],
-    backgroundColor: '#0E7490',
-    borderColor: '#0E7490',
-    pointStyle: 'rectRounded',
-    pointRadius: 5,
-    pointHoverRadius: 10,
-    order: 0,
-    datalabels: {
-      display: (ctx) => {
-        if (ctx.dataIndex % 2) {
-          return true;
-        }
+  if (assetsGuid && liabilitiesGuid) {
+    datasets.push({
+      label: 'Net worth',
+      // @ts-ignore
+      type: 'line',
+      data: assetSeries?.map((n, i) => n + (liabilitySeries?.[i] || 0)) || [],
+      backgroundColor: '#0E7490',
+      borderColor: '#0E7490',
+      pointStyle: 'rectRounded',
+      pointRadius: 5,
+      pointHoverRadius: 10,
+      order: 0,
+      datalabels: {
+        display: (ctx) => {
+          if (ctx.dataIndex % 2) {
+            return true;
+          }
 
-        return false;
+          return false;
+        },
+        formatter: (value) => moneyToString(value, unit),
+        align: 'end',
+        backgroundColor: '#0E7490FF',
+        borderRadius: 5,
+        color: '#FFF',
       },
-      formatter: (value) => moneyToString(value, unit),
-      align: 'end',
-      backgroundColor: '#0E7490FF',
-      borderRadius: 5,
-      color: '#FFF',
-    },
-  });
+    });
+  }
 
   const labels = intervalToDates(interval);
   return (
@@ -150,7 +169,7 @@ export default function NetWorthHistogram({
             plugins: {
               title: {
                 display: true,
-                text: 'Net Worth',
+                text: title,
                 align: 'start',
                 padding: {
                   top: 0,

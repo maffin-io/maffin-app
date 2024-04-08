@@ -90,6 +90,7 @@ export default function AssetSankey({
         datasets,
       }}
       options={{
+        maintainAspectRatio: false,
         plugins: {
           title: {
             display: true,

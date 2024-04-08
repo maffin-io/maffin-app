@@ -5,6 +5,7 @@ import type { Account } from '@/book/entities';
 import { AssetSankey, NetWorthHistogram, TotalsPie } from '@/components/charts';
 import { AccountsTable } from '@/components/tables';
 import TotalChange from '@/components/widgets/TotalChange';
+import { isAsset } from '@/book/helpers';
 import TotalWidget from './TotalWidget';
 import SpendWidget from './SpendWidget';
 import EarnWidget from './EarnWidget';
@@ -17,7 +18,7 @@ export default function AssetInfo({
   account,
 }: AssetInfoProps): JSX.Element {
   return (
-    <div className="grid grid-cols-12">
+    <div className="grid grid-cols-12 items-start">
       <div className="col-span-6">
         <div className="grid grid-cols-12 items-start">
           <div
@@ -67,7 +68,7 @@ export default function AssetInfo({
               !account.placeholder
               && (
                 <AssetSankey
-                  height={270}
+                  height={428}
                   account={account}
                 />
               )
@@ -77,14 +78,36 @@ export default function AssetInfo({
       </div>
       <div className="grid grid-cols-12 col-span-6">
         <div className="card col-span-12">
-          <NetWorthHistogram
-            assetsGuid={account.guid}
-            assetsLabel={account.name}
-            hideAssets
-            liabilitiesGuid=""
-            hideLiabilities
-            showLegend={false}
-          />
+          {
+            (
+              isAsset(account)
+              && (
+                <NetWorthHistogram
+                  height={428}
+                  title="Net worth"
+                  assetsGuid={account.guid}
+                  assetsConfig={{
+                    label: account.name,
+                    type: 'line',
+                    borderColor: '#06B6D455',
+                  }}
+                  showLegend={false}
+                />
+              )
+            ) || (
+              <NetWorthHistogram
+                height={428}
+                title="Debt"
+                liabilitiesGuid={account.guid}
+                liabilitiesConfig={{
+                  label: account.name,
+                  type: 'line',
+                  borderColor: '#FF660055',
+                }}
+                showLegend={false}
+              />
+            )
+          }
         </div>
         <div className="col-span-12" />
       </div>

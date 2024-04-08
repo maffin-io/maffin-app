@@ -81,6 +81,7 @@ describe('AssetSankey', () => {
       {
         height: 250,
         options: {
+          maintainAspectRatio: false,
           plugins: {
             title: {
               display: true,

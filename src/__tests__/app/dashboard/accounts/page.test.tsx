@@ -146,7 +146,13 @@ describe('AccountsPage', () => {
     expect(NetWorthHistogram).toHaveBeenLastCalledWith(
       {
         assetsGuid: 'type_asset',
+        assetsConfig: {
+          label: 'Assets',
+        },
         liabilitiesGuid: 'type_liability',
+        liabilitiesConfig: {
+          label: 'Liabilities',
+        },
       },
       {},
     );
@@ -277,7 +283,13 @@ describe('AccountsPage', () => {
     expect(NetWorthHistogram).toHaveBeenLastCalledWith(
       {
         assetsGuid: 'type_asset',
+        assetsConfig: {
+          label: 'Assets',
+        },
         liabilitiesGuid: 'type_liability',
+        liabilitiesConfig: {
+          label: 'Liabilities',
+        },
       },
       {},
     );
