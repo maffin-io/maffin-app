@@ -8,10 +8,8 @@ export class YahooError extends HTTPError {}
 
 const HOST = 'https://query2.finance.yahoo.com';
 
-export async function getPrice(ticker: string, when?: number): Promise<Price> {
-  if (ticker === 'SGDCAD=X') {
-    ticker = 'SGDCAX=X';
-  }
+export async function getPrice(t: string, when?: number): Promise<Price> {
+  const { ticker, transform } = formatTicker(t);
   let url = `${HOST}/v8/finance/chart/${ticker}?interval=1d&includePrePost=false`;
 
   if (when) {
@@ -57,8 +55,8 @@ export async function getPrice(ticker: string, when?: number): Promise<Price> {
   }
 
   const currency = result[0].meta.currency;
-  const price = toStandardUnit(result[0].meta.regularMarketPrice, currency);
-  const previousClose = toStandardUnit(result[0].meta.chartPreviousClose, currency) || price;
+  const price = transform(toStandardUnit(result[0].meta.regularMarketPrice, currency));
+  const previousClose = transform(toStandardUnit(result[0].meta.chartPreviousClose, currency)) || price;
   const change = price - previousClose;
 
   return {
@@ -66,6 +64,30 @@ export async function getPrice(ticker: string, when?: number): Promise<Price> {
     currency: toStandardCurrency(currency),
     changePct: parseFloat(((change / previousClose) * 100).toFixed(2)),
     changeAbs: parseFloat(change.toFixed(2)),
+  };
+}
+
+function formatTicker(ticker: string): { ticker: string, transform: Function } {
+  if (ticker === 'SGDCAD=X') {
+    return {
+      ticker: 'SGDCAX=X',
+      transform: (n: number) => n,
+    }
+  }
+
+  if (
+    /[EUR|USD|SGD]=X$/.test(ticker)
+    && !(/^[EUR|USD|SGD]/.test(ticker))
+  ) {
+    return {
+      ticker: `${ticker.slice(3, 6)}${ticker.slice(0, 3)}=X`,
+      transform: (n: number) => 1/n,
+    }
+  }
+
+  return {
+    ticker,
+    transform: (n: number) => n,
   };
 }
 

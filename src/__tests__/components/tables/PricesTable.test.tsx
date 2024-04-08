@@ -80,6 +80,23 @@ describe('PricesTable', () => {
     ).toEqual('$100.50');
   });
 
+  it('shows up to 6 decimals', async () => {
+    render(<PricesTable prices={[]} />);
+
+    await screen.findByTestId('Table');
+    expect(
+      (Table as jest.Mock).mock.calls[0][0].columns[0].accessorFn({ date: DateTime.fromISO('2023-01-01') }),
+    ).toEqual(1672531200000);
+    expect(
+      (Table as jest.Mock).mock.calls[0][0].columns[1].accessorFn({
+        value: 0.0000581,
+        fk_currency: {
+          mnemonic: 'USD',
+        },
+      }),
+    ).toEqual('$0.000058');
+  });
+
   it('forwards prices as data', async () => {
     const prices = [
       {
