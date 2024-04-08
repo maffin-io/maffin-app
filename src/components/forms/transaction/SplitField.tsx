@@ -69,6 +69,8 @@ export default function SplitField({
     form.trigger('splits');
   }, [value, exchangeRate, form, action, index]);
 
+  const defaultAccount = form.formState.defaultValues?.splits?.[index]?.fk_account as Account;
+
   return (
     <fieldset className="grid grid-cols-13" key={`splits.${index}`}>
       <div className={`col-span-${showValueField ? 7 : 9}`}>
@@ -81,9 +83,11 @@ export default function SplitField({
                 id={`splits.${index}.account`}
                 isClearable={false}
                 isDisabled={disabled}
-                placeholder={account?.type ? `<Choose a ${account.type} account>` : '<Choose an account>'}
+                placeholder={defaultAccount?.type ? `<Choose a ${defaultAccount.type} account>` : '<Choose an account>'}
                 ignorePlaceholders
-                onlyTypes={account?.type ? getAllowedSubAccounts(account.type) : undefined}
+                onlyTypes={
+                  defaultAccount?.type ? getAllowedSubAccounts(defaultAccount.type) : undefined
+                }
                 onChange={async (a: SingleValue<Account>) => {
                   field.onChange(a);
                   const mainCurrency = await getMainCurrency();
