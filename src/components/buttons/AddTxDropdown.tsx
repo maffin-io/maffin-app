@@ -48,7 +48,10 @@ export default function AddTxDropdown({
                 {
                   date: (latestDate || DateTime.now()).toISODate() as string,
                   description: '',
-                  splits: [Split.create({ fk_account: account }), new Split()],
+                  splits: [
+                    Split.create({ fk_account: account }),
+                    {} as Split,
+                  ],
                   fk_currency: account.commodity,
                 }
               }

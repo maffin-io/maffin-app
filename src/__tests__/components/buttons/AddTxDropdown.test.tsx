@@ -66,10 +66,7 @@ describe('AddTxDropdown', () => {
             expect.objectContaining({
               fk_account: account,
             }),
-            {
-              action: '',
-              guid: expect.any(String),
-            },
+            {},
           ],
         },
       },
@@ -119,10 +116,7 @@ describe('AddTxDropdown', () => {
             expect.objectContaining({
               fk_account: account,
             }),
-            {
-              action: '',
-              guid: expect.any(String),
-            },
+            {},
           ],
         },
       },
