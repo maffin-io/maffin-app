@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AssetInfo renders as expected when not placeholder 1`] = `
+exports[`AssetInfo renders as expected when not placeholder Asset 1`] = `
 <div>
   <div
-    class="grid grid-cols-12"
+    class="grid grid-cols-12 items-start"
   >
     <div
       class="col-span-6"
@@ -54,7 +54,7 @@ exports[`AssetInfo renders as expected when not placeholder 1`] = `
 exports[`AssetInfo renders as expected when placeholder 1`] = `
 <div>
   <div
-    class="grid grid-cols-12"
+    class="grid grid-cols-12 items-start"
   >
     <div
       class="col-span-6"

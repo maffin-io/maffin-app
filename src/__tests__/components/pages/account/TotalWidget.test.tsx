@@ -65,4 +65,23 @@ describe('TotalWidgetTest', () => {
       {},
     );
   });
+
+  it('keeps negative for liability', () => {
+    account.type = 'CREDIT';
+    jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({
+      data: { guid: new Money(-100, 'EUR') } as AccountsTotals,
+    });
+
+    render(<TotalWidget account={account} />);
+
+    expect(StatisticsWidget).toBeCalledWith(
+      {
+        className: 'mr-2',
+        description: expect.anything(),
+        stats: '-€100.00',
+        title: 'Total',
+      },
+      {},
+    );
+  });
 });

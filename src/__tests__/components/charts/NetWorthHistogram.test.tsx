@@ -49,34 +49,7 @@ describe('NetWorthHistogram', () => {
       {
         height: 400,
         data: {
-          datasets: [
-            {
-              backgroundColor: '#06B6D4',
-              data: [],
-              label: 'Assets',
-              order: 1,
-              barPercentage: 0.6,
-            },
-            {
-              backgroundColor: '#0E7490',
-              borderColor: '#0E7490',
-              data: [],
-              label: 'Net worth',
-              order: 0,
-              pointHoverRadius: 10,
-              pointRadius: 5,
-              pointStyle: 'rectRounded',
-              type: 'line',
-              datalabels: {
-                align: 'end',
-                backgroundColor: '#0E7490FF',
-                borderRadius: 5,
-                color: '#FFF',
-                display: expect.any(Function),
-                formatter: expect.any(Function),
-              },
-            },
-          ],
+          datasets: [],
           labels: [
             TEST_INTERVAL.start,
             expect.any(DateTime),
@@ -100,7 +73,7 @@ describe('NetWorthHistogram', () => {
             title: {
               align: 'start',
               display: true,
-              text: 'Net Worth',
+              text: 'Net worth',
               font: {
                 size: 18,
               },
@@ -182,8 +155,14 @@ describe('NetWorthHistogram', () => {
 
     render(
       <NetWorthHistogram
-        assetsGuid=""
-        liabilitiesGuid=""
+        assetsGuid="type_asset"
+        assetsConfig={{
+          label: 'Assets',
+        }}
+        liabilitiesGuid="type_liability"
+        liabilitiesConfig={{
+          label: 'Liabilities',
+        }}
       />,
     );
 
@@ -197,6 +176,13 @@ describe('NetWorthHistogram', () => {
               data: [0, 0],
               label: 'Assets',
               order: 1,
+              barPercentage: 0.6,
+            },
+            {
+              backgroundColor: '#FF6600',
+              data: [0, 0],
+              label: 'Liabilities',
+              order: 2,
               barPercentage: 0.6,
             },
             {
@@ -242,7 +228,7 @@ describe('NetWorthHistogram', () => {
             title: {
               align: 'start',
               display: true,
-              text: 'Net Worth',
+              text: 'Net worth',
               font: {
                 size: 18,
               },
@@ -307,13 +293,15 @@ describe('NetWorthHistogram', () => {
     );
   });
 
-  it('hides assets and liabilities', () => {
+  it('displays assets only', () => {
+    jest.spyOn(apiHook, 'useMonthlyWorth').mockReturnValue({ data: [{}, {}] } as UseQueryResult<AccountsTotals[]>);
+
     render(
       <NetWorthHistogram
-        assetsGuid=""
-        hideAssets
-        liabilitiesGuid=""
-        hideLiabilities
+        assetsGuid="type_asset"
+        assetsConfig={{
+          label: 'Assets',
+        }}
       />,
     );
 
@@ -322,7 +310,33 @@ describe('NetWorthHistogram', () => {
         data: expect.objectContaining({
           datasets: [
             expect.objectContaining({
-              label: 'Net worth',
+              label: 'Assets',
+            }),
+          ],
+        }),
+      }),
+      {},
+    );
+  });
+
+  it('displays liabilities only', () => {
+    jest.spyOn(apiHook, 'useMonthlyWorth').mockReturnValue({ data: [{}, {}] } as UseQueryResult<AccountsTotals[]>);
+
+    render(
+      <NetWorthHistogram
+        assetsGuid="type_liability"
+        assetsConfig={{
+          label: 'Liabilities',
+        }}
+      />,
+    );
+
+    expect(Bar).toBeCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          datasets: [
+            expect.objectContaining({
+              label: 'Liabilities',
             }),
           ],
         }),
@@ -366,7 +380,13 @@ describe('NetWorthHistogram', () => {
     render(
       <NetWorthHistogram
         assetsGuid="type_asset"
+        assetsConfig={{
+          label: 'Assets',
+        }}
         liabilitiesGuid="type_liability"
+        liabilitiesConfig={{
+          label: 'Liabilities',
+        }}
       />,
     );
 

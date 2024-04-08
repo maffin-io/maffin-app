@@ -96,7 +96,13 @@ export default function AccountsPage(): JSX.Element {
           <div className="card col-span-8">
             <NetWorthHistogram
               assetsGuid="type_asset"
+              assetsConfig={{
+                label: 'Assets',
+              }}
               liabilitiesGuid="type_liability"
+              liabilitiesConfig={{
+                label: 'Liabilities',
+              }}
             />
           </div>
           <div className="card col-span-4">
