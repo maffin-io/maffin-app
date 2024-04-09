@@ -206,25 +206,6 @@ describe('Account', () => {
       account.placeholder = false;
       await expect(account.save()).rejects.toThrow('checkPlaceholder');
     });
-
-    it('fails if try to create another placeholder within INVESTMENT placeholder', async () => {
-      const account1 = await Account.create({
-        name: 'account1',
-        type: 'INVESTMENT',
-        placeholder: true,
-        parent: account,
-        fk_commodity: eur,
-      }).save();
-
-      account2 = Account.create({
-        name: 'Name',
-        type: 'INVESTMENT',
-        placeholder: true,
-        parent: account1,
-        fk_commodity: eur,
-      });
-      await expect(account2.save()).rejects.toThrow('checkPlaceholder');
-    });
   });
 });
 

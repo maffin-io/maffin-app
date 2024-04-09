@@ -253,10 +253,6 @@ function CheckPlaceholder(validationOptions?: v.ValidationOptions) {
             return false;
           }
 
-          if (account.parent?.type === 'INVESTMENT' && account.placeholder) {
-            return false;
-          }
-
           return true;
         },
 
@@ -264,10 +260,6 @@ function CheckPlaceholder(validationOptions?: v.ValidationOptions) {
           const account = args.object as Account;
           if (account.childrenIds?.length > 0 && !account.placeholder) {
             return 'Accounts with children must be parents';
-          }
-
-          if (account.parent?.type === 'INVESTMENT' && account.placeholder) {
-            return 'The parent is an INVESTMENT. This account can\'t be a parent';
           }
 
           return 'Placeholder accounts cannot have transactions';

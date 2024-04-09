@@ -71,7 +71,7 @@ describe('InvestmentPlaceholderInfo', () => {
     } as Commodity;
 
     const investment1 = {
-      account: { guid: 'guid1', name: 'Investment' },
+      account: { guid: 'guid1', name: 'Investment', path: 'Investments:Investment' },
       quantity: new Money(10, 'TICKER'),
       valueInCurrency: new Money(5, 'EUR'),
       costInCurrency: new Money(4, 'EUR'),
@@ -82,7 +82,7 @@ describe('InvestmentPlaceholderInfo', () => {
     jest.spyOn(apiHook, 'useInvestments').mockReturnValueOnce({ data: [investment1] } as UseQueryResult<InvestmentAccount[]>);
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: mainCurrency } as UseQueryResult<Commodity>);
 
-    const { container } = render(<InvestmentPlaceholderInfo account={{ childrenIds: ['guid1'] } as Account} />);
+    const { container } = render(<InvestmentPlaceholderInfo account={{ path: 'Investments' } as Account} />);
 
     await screen.findByTestId('InvestmentsTable');
     expect(WeightsChart).toHaveBeenCalledWith(
