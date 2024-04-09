@@ -20,9 +20,10 @@ export type InvestmentPlaceholderInfoProps = {
 export default function InvestmentPlaceholderInfo({
   account,
 }: InvestmentPlaceholderInfoProps): JSX.Element {
-  const { data: investments, isPending } = useInvestments(
-    data => data.filter(d => account.childrenIds.includes(d.account.guid)),
+  const { data: investments = [], isPending } = useInvestments(
+    data => data.filter(d => d.account.path.startsWith(account.path)),
   );
+  const accounts = investments.map(i => i.account.guid);
 
   const { data: currency } = useMainCurrency();
   const mainCurrency = currency?.mnemonic || 'EUR';
@@ -37,7 +38,7 @@ export default function InvestmentPlaceholderInfo({
     );
   }
 
-  if (!investments || investments.length === 0) {
+  if (investments.length === 0) {
     return (
       <div className="h-screen">
         <div className="flex text-sm h-3/4 place-content-center place-items-center">
@@ -77,7 +78,7 @@ export default function InvestmentPlaceholderInfo({
     <>
       <div className="grid grid-cols-12 mt-4">
         <div className="col-span-4 mt-2">
-          <WeightsChart accounts={account.childrenIds} totalValue={totalValue} />
+          <WeightsChart accounts={accounts} totalValue={totalValue} />
         </div>
 
         <div className="col-span-8 ml-4">
@@ -124,13 +125,13 @@ export default function InvestmentPlaceholderInfo({
             </div>
           </div>
           <div className="card">
-            <DividendChart accounts={account.childrenIds} />
+            <DividendChart accounts={accounts} />
           </div>
         </div>
       </div>
 
       <div className="py-4">
-        <InvestmentsTable accounts={account.childrenIds} />
+        <InvestmentsTable accounts={accounts} />
       </div>
     </>
   );
