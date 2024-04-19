@@ -8,9 +8,15 @@ import {
   OneToMany,
   SaveOptions,
 } from 'typeorm';
-import * as v from 'class-validator';
+import {
+  IsNotEmpty,
+  ValidateNested,
+  Length,
+  registerDecorator,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import type { QueryClient } from '@tanstack/react-query';
+import type { ValidationArguments, ValidationOptions } from 'class-validator';
 
 import { toFixed } from '@/helpers/number';
 import { isInvestment } from '../helpers/accountType';
@@ -38,7 +44,7 @@ export default class Transaction extends BaseEntity {
 
   @ManyToOne('Commodity', { eager: true })
   @JoinColumn({ name: 'currency_guid' })
-  @v.IsNotEmpty({ message: 'date is required' })
+  @IsNotEmpty({ message: 'date is required' })
     fk_currency!: Commodity | string;
 
   get currency(): Commodity {
@@ -50,7 +56,8 @@ export default class Transaction extends BaseEntity {
     transformer: new DateTimeTransformer(),
     name: 'post_date',
   })
-  @v.IsNotEmpty({ message: 'date is required' })
+  @CheckMaxDate()
+  @IsNotEmpty({ message: 'date is required' })
     date!: DateTime;
 
   @CreateDateColumn({
@@ -66,7 +73,7 @@ export default class Transaction extends BaseEntity {
   @CheckSplitsBalance()
   @CheckDuplicateSplitAccounts()
   @CheckNumSplits()
-  @v.ValidateNested()
+  @ValidateNested()
   @Type(() => Split)
     splits!: Split[];
 
@@ -75,7 +82,7 @@ export default class Transaction extends BaseEntity {
     length: 2048,
     default: '',
   })
-  @v.Length(1, 2048)
+  @Length(1, 2048)
     description!: string;
 
   async save(options?: SaveOptions): Promise<this> {
@@ -132,9 +139,9 @@ Object.defineProperty(Transaction, 'name', { value: 'Transaction' });
 /**
  * Checks that the balance for the splits equals to 0
  */
-function CheckSplitsBalance(validationOptions?: v.ValidationOptions) {
+function CheckSplitsBalance(validationOptions?: ValidationOptions) {
   return function f(object: Transaction, propertyName: string) {
-    v.registerDecorator({
+    registerDecorator({
       name: 'splitsBalance',
       target: object.constructor,
       propertyName,
@@ -154,7 +161,7 @@ function CheckSplitsBalance(validationOptions?: v.ValidationOptions) {
           return true;
         },
 
-        defaultMessage(args: v.ValidationArguments) {
+        defaultMessage(args: ValidationArguments) {
           const tx = args.object as Transaction;
           const total = tx.splits.reduce(
             (acc, split) => acc + (split.value || 0),
@@ -170,9 +177,9 @@ function CheckSplitsBalance(validationOptions?: v.ValidationOptions) {
 /**
  * Checks that there are no splits with repeated account
  */
-function CheckDuplicateSplitAccounts(validationOptions?: v.ValidationOptions) {
+function CheckDuplicateSplitAccounts(validationOptions?: ValidationOptions) {
   return function f(object: Transaction, propertyName: string) {
-    v.registerDecorator({
+    registerDecorator({
       name: 'splitsDuplicateAccounts',
       target: object.constructor,
       propertyName,
@@ -196,6 +203,30 @@ function CheckDuplicateSplitAccounts(validationOptions?: v.ValidationOptions) {
 }
 
 /**
+ * Although class-validator has a MaxDate, we use luxon so it gives problems.
+ * This is to workaround it.
+ */
+function CheckMaxDate(validationOptions?: ValidationOptions) {
+  return function f(object: Transaction, propertyName: string) {
+    registerDecorator({
+      name: 'maxDate',
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(date: string) {
+          return DateTime.now().endOf('day').toMillis() > DateTime.fromISO(date).toMillis();
+        },
+
+        defaultMessage() {
+          return 'You can\'t add transactions in the future';
+        },
+      },
+    });
+  };
+}
+
+/**
  * Checks that the number of splits is the right one
  *
  * Conditions are the following:
@@ -204,9 +235,9 @@ function CheckDuplicateSplitAccounts(validationOptions?: v.ValidationOptions) {
  * - If there's one split only and the account is an investment, it can
  *   be a split event.
  */
-function CheckNumSplits(validationOptions?: v.ValidationOptions) {
+function CheckNumSplits(validationOptions?: ValidationOptions) {
   return function f(object: Transaction, propertyName: string) {
-    v.registerDecorator({
+    registerDecorator({
       name: 'splitsNum',
       target: object.constructor,
       propertyName,
@@ -228,7 +259,7 @@ function CheckNumSplits(validationOptions?: v.ValidationOptions) {
           return false;
         },
 
-        defaultMessage(args: v.ValidationArguments) {
+        defaultMessage(args: ValidationArguments) {
           const tx = args.object as Transaction;
           let minSplits = 2;
 

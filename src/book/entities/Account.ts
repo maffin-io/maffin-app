@@ -1,4 +1,12 @@
-import * as v from 'class-validator';
+import {
+  IsNotEmpty,
+  Matches,
+  Length,
+  IsIn,
+  ValidateIf,
+  IsOptional,
+  registerDecorator,
+} from 'class-validator';
 import {
   Column,
   Entity, JoinColumn,
@@ -11,6 +19,7 @@ import {
   SaveOptions,
 } from 'typeorm';
 import type { QueryClient } from '@tanstack/react-query';
+import type { ValidationArguments, ValidationOptions } from 'class-validator';
 
 import {
   getAllowedSubAccounts,
@@ -54,8 +63,8 @@ export default class Account extends BaseEntity {
     type: 'text',
     length: 2048,
   })
-  @v.Matches(/[a-zA-Z.]+/)
-  @v.Length(1, 2048)
+  @Matches(/[a-zA-Z.]+/)
+  @Length(1, 2048)
     name!: string;
 
   @Column({
@@ -65,15 +74,15 @@ export default class Account extends BaseEntity {
     name: 'account_type',
   })
   @CheckAccountType()
-  @v.IsIn(Account.TYPES)
+  @IsIn(Account.TYPES)
     type!: string;
 
   path!: string;
 
   @TreeParent()
   @JoinColumn({ name: 'parent_guid' })
-  @v.IsNotEmpty({ message: 'parent is required' })
-  @v.ValidateIf(o => o.type !== 'ROOT')
+  @IsNotEmpty({ message: 'parent is required' })
+  @ValidateIf(o => o.type !== 'ROOT')
   // Seems TreeParent doesn't let us create referencing the guid of the account
   // and needs the whole object...
     parent!: Account;
@@ -90,8 +99,8 @@ export default class Account extends BaseEntity {
   @ManyToOne('Commodity', { eager: true, cascade: true })
   @JoinColumn({ name: 'commodity_guid' })
   @CheckIECommodity()
-  @v.ValidateIf(o => o.type !== 'ROOT')
-  @v.IsNotEmpty({ message: 'commodity is required' })
+  @ValidateIf(o => o.type !== 'ROOT')
+  @IsNotEmpty({ message: 'commodity is required' })
     fk_commodity!: Commodity | string;
 
   get commodity(): Commodity {
@@ -106,8 +115,8 @@ export default class Account extends BaseEntity {
     length: 2048,
     nullable: true,
   })
-  @v.IsOptional()
-  @v.Length(4, 2048)
+  @IsOptional()
+  @Length(4, 2048)
     description?: string;
 
   @Column({
@@ -156,15 +165,15 @@ Object.defineProperty(Account, 'name', { value: 'Account' });
 /**
  * Checks allowed types for parent account given the current account's type
  */
-function CheckAccountType(validationOptions?: v.ValidationOptions) {
+function CheckAccountType(validationOptions?: ValidationOptions) {
   return function f(object: Account, propertyName: string) {
-    v.registerDecorator({
+    registerDecorator({
       name: 'checkAccountType',
       target: object.constructor,
       propertyName,
       options: validationOptions,
       validator: {
-        validate(type: string, args: v.ValidationArguments) {
+        validate(type: string, args: ValidationArguments) {
           const account = args.object as Account;
           if (account.parent) {
             return getAllowedSubAccounts(account.parent.type).includes(type);
@@ -173,7 +182,7 @@ function CheckAccountType(validationOptions?: v.ValidationOptions) {
           return true;
         },
 
-        defaultMessage(args: v.ValidationArguments) {
+        defaultMessage(args: ValidationArguments) {
           const account = args.object as Account;
           const allowedTypes = getAllowedSubAccounts(account.parent.type);
 
@@ -190,15 +199,15 @@ function CheckAccountType(validationOptions?: v.ValidationOptions) {
  * This is a way to check that we always keep the same currency for income/expense
  * account as we only support them in the main currency.
  */
-function CheckIECommodity(validationOptions?: v.ValidationOptions) {
+function CheckIECommodity(validationOptions?: ValidationOptions) {
   return function f(object: Account, propertyName: string) {
-    v.registerDecorator({
+    registerDecorator({
       name: 'checkIECommodity',
       target: object.constructor,
       propertyName,
       options: validationOptions,
       validator: {
-        validate(fk_commodity: Commodity, args: v.ValidationArguments) {
+        validate(fk_commodity: Commodity, args: ValidationArguments) {
           const account = args.object as Account;
           if (
             account.parent
@@ -211,7 +220,7 @@ function CheckIECommodity(validationOptions?: v.ValidationOptions) {
           return true;
         },
 
-        defaultMessage(args: v.ValidationArguments) {
+        defaultMessage(args: ValidationArguments) {
           const account = args.object as Account;
           return `Income and Expense accounts must have ${(account.parent.fk_commodity as Commodity).mnemonic} as their commodity`;
         },
@@ -229,15 +238,15 @@ function CheckIECommodity(validationOptions?: v.ValidationOptions) {
  *  - accounts that are investments and have a placeholder investment as parent can't
  *    be placeholders
  */
-function CheckPlaceholder(validationOptions?: v.ValidationOptions) {
+function CheckPlaceholder(validationOptions?: ValidationOptions) {
   return function f(object: Account, propertyName: string) {
-    v.registerDecorator({
+    registerDecorator({
       name: 'checkPlaceholder',
       target: object.constructor,
       propertyName,
       options: validationOptions,
       validator: {
-        async validate(_: string, args: v.ValidationArguments) {
+        async validate(_: string, args: ValidationArguments) {
           const account = args.object as Account;
           if (account.guid) {
             const [, numSplits] = await Split.findAndCount({
@@ -256,7 +265,7 @@ function CheckPlaceholder(validationOptions?: v.ValidationOptions) {
           return true;
         },
 
-        defaultMessage(args: v.ValidationArguments) {
+        defaultMessage(args: ValidationArguments) {
           const account = args.object as Account;
           if (account.childrenIds?.length > 0 && !account.placeholder) {
             return 'Accounts with children must be parents';

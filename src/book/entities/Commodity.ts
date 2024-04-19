@@ -1,4 +1,10 @@
-import * as v from 'class-validator';
+import {
+  IsString,
+  Length,
+  Matches,
+  IsOptional,
+  registerDecorator,
+} from 'class-validator';
 import {
   Column,
   Entity,
@@ -6,6 +12,7 @@ import {
   SaveOptions,
 } from 'typeorm';
 import type { QueryClient } from '@tanstack/react-query';
+import type { ValidationArguments, ValidationOptions } from 'class-validator';
 
 import BaseEntity from './BaseEntity';
 
@@ -34,8 +41,8 @@ export default class Commodity extends BaseEntity {
     type: 'text',
     length: 2048,
   })
-  @v.IsString()
-  @v.Length(2, 2048)
+  @IsString()
+  @Length(2, 2048)
     namespace!: string;
 
   @Column({
@@ -43,8 +50,8 @@ export default class Commodity extends BaseEntity {
     length: 2048,
   })
   @CheckCurrencyCode()
-  @v.Matches(/[a-zA-Z0-9]+/)
-  @v.Length(2, 2048)
+  @Matches(/[a-zA-Z0-9]+/)
+  @Length(2, 2048)
     mnemonic!: string;
 
   @Column({
@@ -52,8 +59,8 @@ export default class Commodity extends BaseEntity {
     length: 2048,
     default: '',
   })
-  @v.IsString()
-  @v.IsOptional()
+  @IsString()
+  @IsOptional()
     fullname?: string;
 
   // We use this field as a way to identify the quote
@@ -66,8 +73,8 @@ export default class Commodity extends BaseEntity {
     nullable: true,
     name: 'cusip',
   })
-  @v.IsOptional()
-  @v.IsString()
+  @IsOptional()
+  @IsString()
     cusip?: string;
 
   get stockerId(): string {
@@ -107,15 +114,15 @@ Object.defineProperty(Commodity, 'name', { value: 'Commodity' });
 /**
  * If CURRENCY is selected as namespace, it checks that the code is 3 chars long
  */
-function CheckCurrencyCode(validationOptions?: v.ValidationOptions) {
+function CheckCurrencyCode(validationOptions?: ValidationOptions) {
   return function f(object: Commodity, propertyName: string) {
-    v.registerDecorator({
+    registerDecorator({
       name: 'checkCurrencyCode',
       target: object.constructor,
       propertyName,
       options: validationOptions,
       validator: {
-        validate(mnemonic: string, args: v.ValidationArguments) {
+        validate(mnemonic: string, args: ValidationArguments) {
           const account = args.object as Commodity;
           if (account.namespace === 'CURRENCY') {
             return mnemonic.length === 3;

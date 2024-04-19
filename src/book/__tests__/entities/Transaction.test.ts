@@ -242,6 +242,20 @@ describe('Transaction', () => {
 
       await expect(tx.save()).rejects.toThrow('splitsDuplicateAccounts');
     });
+
+    it('fails when date in the future', async () => {
+      const split1 = new Split();
+      split1.fk_account = account;
+
+      const tx = Transaction.create({
+        description: 'description',
+        fk_currency: eur,
+        date: DateTime.fromISO('2024-01-01'),
+        splits: [split1],
+      });
+
+      await expect(tx.save()).rejects.toThrow('maxDate');
+    });
   });
 });
 
