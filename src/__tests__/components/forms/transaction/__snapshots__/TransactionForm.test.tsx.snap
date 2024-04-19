@@ -15,6 +15,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
       <input
         class="block w-full m-0"
         id="dateInput"
+        max="2023-01-01"
         name="date"
         type="date"
       />
@@ -333,6 +334,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
         class="block w-full m-0"
         disabled=""
         id="dateInput"
+        max="2023-01-01"
         name="date"
         type="date"
       />
@@ -640,6 +642,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
       <input
         class="block w-full m-0"
         id="dateInput"
+        max="2023-01-01"
         name="date"
         type="date"
       />

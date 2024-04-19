@@ -82,6 +82,7 @@ export default function TransactionForm({
           className="block w-full m-0"
           {...form.register('date')}
           type="date"
+          max={DateTime.now().toISODate()}
         />
         <p className="invalid-feedback">{errors.date?.message}</p>
       </fieldset>

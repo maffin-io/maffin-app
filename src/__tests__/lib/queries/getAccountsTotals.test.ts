@@ -154,7 +154,7 @@ describe('getAccountsTotals', () => {
     }).save();
     await Transaction.create({
       description: 'description',
-      date: TEST_INTERVAL.end?.plus({ month: 1 }),
+      date: TEST_INTERVAL.start?.minus({ month: 1 }),
       fk_currency: eur,
       splits: [
         Split.create({

@@ -1,4 +1,8 @@
-import * as v from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  registerDecorator,
+} from 'class-validator';
 import {
   Column,
   Relation,
@@ -8,6 +12,7 @@ import {
   RelationId,
   PrimaryColumn,
 } from 'typeorm';
+import type { ValidationArguments, ValidationOptions } from 'class-validator';
 
 import type Account from './Account';
 import type Transaction from './Transaction';
@@ -50,7 +55,7 @@ export default class Split extends BaseEntity {
   @ManyToOne('Account')
   @JoinColumn({ name: 'account_guid' })
   @CheckValueSymbol()
-  @v.IsNotEmpty({ message: 'account is required' })
+  @IsNotEmpty({ message: 'account is required' })
     fk_account!: Relation<Account> | string;
 
   @RelationId((split: Split) => split.fk_account)
@@ -71,28 +76,28 @@ export default class Split extends BaseEntity {
     type: 'integer',
     name: 'value_num',
   })
-  @v.IsNumber()
+  @IsNumber()
     valueNum!: number;
 
   @Column({
     type: 'integer',
     name: 'value_denom',
   })
-  @v.IsNumber()
+  @IsNumber()
     valueDenom!: number;
 
   @Column({
     type: 'integer',
     name: 'quantity_num',
   })
-  @v.IsNumber()
+  @IsNumber()
     quantityNum!: number;
 
   @Column({
     type: 'integer',
     name: 'quantity_denom',
   })
-  @v.IsNumber()
+  @IsNumber()
     quantityDenom!: number;
 
   /**
@@ -166,15 +171,15 @@ Object.defineProperty(Split, 'name', { value: 'Split' });
 /**
  * Checks that Income and Expense accounts have the right symbol
  */
-function CheckValueSymbol(validationOptions?: v.ValidationOptions) {
+function CheckValueSymbol(validationOptions?: ValidationOptions) {
   return function f(object: Split, propertyName: string) {
-    v.registerDecorator({
+    registerDecorator({
       name: 'valueSymbol',
       target: object.constructor,
       propertyName,
       options: validationOptions,
       validator: {
-        validate(account: Account, args: v.ValidationArguments) {
+        validate(account: Account, args: ValidationArguments) {
           const split = args.object as Split;
           if (account.type === 'INCOME') {
             return split.value < 0;
@@ -187,7 +192,7 @@ function CheckValueSymbol(validationOptions?: v.ValidationOptions) {
           return true;
         },
 
-        defaultMessage(args: v.ValidationArguments) {
+        defaultMessage(args: ValidationArguments) {
           const split = args.object as Split;
 
           if (split.account.type === 'INCOME') {
