@@ -26,13 +26,15 @@ export default function LatestTransactions(): JSX.Element {
         (
           txs.length
           && txs.map((tx, index) => {
-            const selectedSplit = getAssetSplit(tx) || getLiabilitySplit(tx);
+            const selectedSplit = getAssetSplit(tx)
+              || getLiabilitySplit(tx)
+              || getFallbackSplit(tx);
             return (
               <div key={index} className="text-sm py-3">
                 <span className="flex items-center">
                   <div className="mr-2">
                     {
-                      (selectedSplit?.quantity || 0) > 0
+                      (selectedSplit.quantity || 0) > 0
                         ? <BiUpArrowAlt className="text-xl amount-positive" />
                         : <BiDownArrowAlt className="text-xl amount-negative" />
                     }
@@ -47,25 +49,25 @@ export default function LatestTransactions(): JSX.Element {
                     <div className="flex items-center">
                       <span
                         className={classNames('', {
-                          'amount-positive': (selectedSplit?.quantity || 0) > 0,
-                          'amount-negative': (selectedSplit?.quantity || 0) < 0,
+                          'amount-positive': (selectedSplit.quantity || 0) > 0,
+                          'amount-negative': (selectedSplit.quantity || 0) < 0,
                         })}
                       >
                         {moneyToString(
-                          selectedSplit?.quantity || 0,
-                          selectedSplit?.account.commodity.mnemonic || '',
+                          selectedSplit.quantity || 0,
+                          selectedSplit.account.commodity.mnemonic || '',
                         )}
                       </span>
                       <Link
                         className={
                           accountColorCode(
-                            selectedSplit?.account,
+                            selectedSplit.account,
                             'ml-auto text-xs badge hover:text-slate-300',
                           )
                         }
-                        href={`/dashboard/accounts/${selectedSplit?.account?.guid}`}
+                        href={`/dashboard/accounts/${selectedSplit.account.guid}`}
                       >
-                        {selectedSplit?.account?.name || '???'}
+                        {selectedSplit.account.name}
                       </Link>
                     </div>
                   </div>
@@ -85,4 +87,13 @@ function getAssetSplit(tx: Transaction): Split | undefined {
 
 function getLiabilitySplit(tx: Transaction): Split | undefined {
   return tx.splits.find(split => isLiability(split.account));
+}
+
+/**
+ * Usually a transaction will always have an asset or a liability split. However,
+ * when an investment has a split event, it only has a single split. For those cases,
+ * we just return that.
+ */
+function getFallbackSplit(tx: Transaction): Split {
+  return tx.splits[0];
 }
