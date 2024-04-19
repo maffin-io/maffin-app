@@ -51,6 +51,19 @@ describe('DemoBookStorage', () => {
       );
       expect(content).toEqual(pako.ungzip(rawBook));
     });
+
+    it('returns empty data when in free.maffin.io', async () => {
+      Object.defineProperty(window, 'location', {
+        value: {
+          host: 'free.maffin.io',
+        },
+        writable: true,
+      });
+      const content = await instance.get();
+
+      expect(content).toEqual(new Uint8Array([]));
+      window.location.host = 'localhost';
+    });
   });
 
   describe('save', () => {

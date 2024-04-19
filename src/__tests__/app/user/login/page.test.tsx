@@ -5,7 +5,6 @@ import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.
 import * as auth0 from '@auth0/auth0-react';
 
 import LoginPage from '@/app/user/login/page';
-import * as helpers_env from '@/helpers/env';
 import * as errors from '@/helpers/errors';
 
 jest.mock('next/navigation');
@@ -17,13 +16,6 @@ jest.mock('@auth0/auth0-react', () => ({
 jest.mock('@/lib/Stocker', () => ({
   __esModule: true,
   ...jest.requireActual('@/lib/Stocker'),
-}));
-
-jest.mock('@/helpers/env', () => ({
-  __esModule: true,
-  get IS_DEMO_PLAN() {
-    return false;
-  },
 }));
 
 jest.mock('@/helpers/errors', () => ({
@@ -40,7 +32,6 @@ describe('LoginPage', () => {
       push: mockRouterPush as AppRouterInstance['push'],
     } as AppRouterInstance));
 
-    jest.spyOn(helpers_env, 'IS_DEMO_PLAN', 'get').mockReturnValue(false);
     jest.spyOn(auth0, 'useAuth0').mockReturnValue({
       isAuthenticated: false,
     } as auth0.Auth0ContextInterface<auth0.User>);
@@ -50,13 +41,6 @@ describe('LoginPage', () => {
     jest.spyOn(auth0, 'useAuth0').mockReturnValue({
       isAuthenticated: true,
     } as auth0.Auth0ContextInterface<auth0.User>);
-    render(<LoginPage />);
-
-    expect(mockRouterPush).toHaveBeenCalledWith('/dashboard/accounts');
-  });
-
-  it('sends to dashboard when staging', async () => {
-    jest.spyOn(helpers_env, 'IS_DEMO_PLAN', 'get').mockReturnValue(true);
     render(<LoginPage />);
 
     expect(mockRouterPush).toHaveBeenCalledWith('/dashboard/accounts');

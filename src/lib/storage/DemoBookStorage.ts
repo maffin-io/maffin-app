@@ -10,6 +10,10 @@ export default class DemoBookStorage implements BookStorage {
   }
 
   async get(): Promise<Uint8Array> {
+    if (window.location.host === 'free.maffin.io') {
+      return new Uint8Array([]);
+    }
+
     const response = await fetch(
       `/books/${this.fileName}.sqlite.gz`,
       {

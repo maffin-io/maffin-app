@@ -2,8 +2,6 @@ import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import type { User, Auth0ContextInterface } from '@auth0/auth0-react';
 
-import { IS_DEMO_PLAN } from '@/helpers/env';
-
 const emptyUser: User = {
   name: '',
   email: '',
@@ -39,10 +37,8 @@ export default function useSession(): SessionReturn {
   return {
     ...auth0,
     accessToken,
-    isAuthenticated: IS_DEMO_PLAN ? true : auth0.isAuthenticated,
-    isLoading: IS_DEMO_PLAN ? false : auth0.isLoading,
-    user: IS_DEMO_PLAN
-      ? { name: 'Maffin', email: 'iomaffin@gmail.com', picture: '' }
-      : auth0.user || emptyUser,
+    isAuthenticated: auth0.isAuthenticated,
+    isLoading: auth0.isLoading,
+    user: auth0.user || emptyUser,
   };
 }
