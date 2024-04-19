@@ -1,5 +1,84 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`LatestTransactions picks fallback split on split event transaction 1`] = `
+<div>
+  <div>
+    <p>
+      Latest transactions
+    </p>
+    <div
+      class="text-sm py-3"
+    >
+      <span
+        class="flex items-center"
+      >
+        <div
+          class="mr-2"
+        >
+          <svg
+            class="text-xl amount-positive"
+            fill="currentColor"
+            height="1em"
+            stroke="currentColor"
+            stroke-width="0"
+            viewBox="0 0 24 24"
+            width="1em"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M11 8.414V18h2V8.414l4.293 4.293 1.414-1.414L12 4.586l-6.707 6.707 1.414 1.414z"
+            />
+          </svg>
+        </div>
+        <div
+          class="w-full"
+        >
+          <span
+            class="inline-flex items-center"
+          >
+            <svg
+              class="mr-1"
+              fill="currentColor"
+              height="1em"
+              stroke="currentColor"
+              stroke-width="0"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"
+              />
+              <path
+                d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"
+              />
+            </svg>
+            01 Jan
+             - 
+            tx 1
+          </span>
+          <div
+            class="flex items-center"
+          >
+            <span
+              class="amount-positive"
+            >
+              €100.00
+            </span>
+            <a
+              class="ml-auto text-xs badge hover:text-slate-300 misc info"
+              href="/dashboard/accounts/account2"
+            >
+              Account 2
+            </a>
+          </div>
+        </div>
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
 exports[`LatestTransactions picks the correct split when investment 1`] = `
 <div>
   <div>

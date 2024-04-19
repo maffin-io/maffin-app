@@ -115,4 +115,36 @@ describe('LatestTransactions', () => {
     screen.getByText('Account 1');
     expect(container).toMatchSnapshot();
   });
+
+  it('picks fallback split on split event transaction', () => {
+    jest.spyOn(apiHook, 'useLatestTxs').mockReturnValue({
+      data: [
+        {
+          description: 'tx 1',
+          date: DateTime.fromISO('2023-01-01'),
+          currency: {
+            mnemonic: 'EUR',
+          },
+          splits: [
+            {
+              account: {
+                guid: 'account2',
+                name: 'Account 2',
+                type: 'INVESTMENT',
+                commodity: {
+                  mnemonic: 'EUR',
+                },
+              },
+              quantity: 100,
+              value: 0,
+            },
+          ],
+        },
+      ],
+    } as UseQueryResult<Transaction[]>);
+    const { container } = render(<LatestTransactions />);
+
+    screen.getByText('Account 2');
+    expect(container).toMatchSnapshot();
+  });
 });
