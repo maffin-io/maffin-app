@@ -43,9 +43,14 @@ describe('Money', () => {
       expect(money.format()).toEqual('101 GOOGL');
     });
 
+    it('rounds with decimals', () => {
+      money = new Money(100.1254, 'USD');
+      expect(money.format(4, 2)).toEqual('$100.13');
+    });
+
     it('extra decimals', () => {
       money = new Money(100.1234, 'USD');
-      expect(money.format(4, 6)).toEqual('$100.1234');
+      expect(money.format(4, 4)).toEqual('$100.1234');
     });
   });
 

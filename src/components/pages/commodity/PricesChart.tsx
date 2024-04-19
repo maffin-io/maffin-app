@@ -42,7 +42,7 @@ export default function PricesChart({
           tooltip: {
             backgroundColor: '#323b44',
             callbacks: {
-              label: (ctx) => `${moneyToString(Number(ctx.parsed.y), currency)}`,
+              label: (ctx) => `${moneyToString(Number(ctx.parsed.y), currency, 6)}`,
             },
           },
         },
