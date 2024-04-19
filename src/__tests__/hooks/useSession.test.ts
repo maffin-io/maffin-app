@@ -2,7 +2,6 @@ import { renderHook } from '@testing-library/react';
 import * as auth0 from '@auth0/auth0-react';
 
 import useSession from '@/hooks/useSession';
-import * as helpers_env from '@/helpers/env';
 
 jest.mock('next/navigation');
 
@@ -13,14 +12,10 @@ jest.mock('@auth0/auth0-react', () => ({
 
 jest.mock('@/helpers/env', () => ({
   __esModule: true,
-  get IS_DEMO_PLAN() {
-    return false;
-  },
 }));
 
 describe('useSession', () => {
   beforeEach(() => {
-    jest.spyOn(helpers_env, 'IS_DEMO_PLAN', 'get').mockReturnValue(false);
     jest.spyOn(auth0, 'useAuth0').mockReturnValue({
       isAuthenticated: false,
     } as auth0.Auth0ContextInterface<auth0.User>);
@@ -52,18 +47,5 @@ describe('useSession', () => {
 
     expect(result.current.accessToken).toEqual('accessToken');
     expect(result.current.user).toEqual(user);
-  });
-
-  it('returns fake user when staging', async () => {
-    jest.spyOn(helpers_env, 'IS_DEMO_PLAN', 'get').mockReturnValue(true);
-    const { result } = renderHook(() => useSession());
-
-    expect(result.current.user).toEqual({
-      email: 'iomaffin@gmail.com',
-      picture: '',
-      name: 'Maffin',
-    });
-    expect(result.current.isAuthenticated).toBe(true);
-    expect(result.current.isLoading).toBe(false);
   });
 });
