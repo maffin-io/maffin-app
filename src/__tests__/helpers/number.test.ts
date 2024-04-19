@@ -56,4 +56,12 @@ describe('moneyToString', () => {
   it('returns as expected when not a currency', () => {
     expect(moneyToString(1234567.89, 'NVDA')).toEqual('1,234,567.89 NVDA');
   });
+
+  it('rounds to specific decimals', () => {
+    expect(moneyToString(1.9876389, 'EUR', 5)).toEqual('€1.98764');
+  });
+
+  it('rounds to specific decimals when not a currency', () => {
+    expect(moneyToString(1.9876389, 'NVDA', 5)).toEqual('1.98764 NVDA');
+  });
 });

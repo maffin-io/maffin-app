@@ -64,12 +64,14 @@ export default class Money {
    * Represents the money object as a string with the currency standardizing
    * the scale to 2 as a default. If the scale is passed then it uses that.
    *
+   * By default it rounds the final number to 2 decimals but can pass a custom one.
+   *
    * The result is a localized string with the currency as a symbol
    */
   format(scale = 4, decimals = 2): string {
     return djs.toDecimal(
       djs.transformScale(this._raw, scale),
-      ({ value, currency }) => moneyToString(toFixed(Number(value), decimals), currency.code),
+      ({ value, currency }) => moneyToString(Number(value), currency.code, decimals),
     );
   }
 

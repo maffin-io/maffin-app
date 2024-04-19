@@ -36,14 +36,16 @@ export function toFixed(n: number, decimals = 2): number {
   return parseFloat(n.toFixed(decimals));
 }
 
-export function moneyToString(n: number, currency: string): string {
+export function moneyToString(n: number, currency: string, decimals = 2): string {
   try {
     return n.toLocaleString(navigator.language, {
       style: 'currency',
       currency: currency || 'EUR',
-      maximumFractionDigits: 6,
+      maximumFractionDigits: decimals,
     });
   } catch {
-    return `${n.toLocaleString(navigator.language)} ${currency}`;
+    return `${n.toLocaleString(navigator.language, {
+      maximumFractionDigits: decimals,
+    })} ${currency}`;
   }
 }
