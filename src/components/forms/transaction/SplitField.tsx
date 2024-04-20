@@ -13,7 +13,15 @@ import { usePrices } from '@/hooks/api';
 import { Account, Price } from '@/book/entities';
 import { priceOps } from '@/book/entities/priceOps';
 import { getAllowedSubAccounts } from '@/book/helpers/accountType';
+import { type TransactionFormContext } from './txFormOps';
 import type { FormValues } from './types';
+
+export const prepareSplitFieldProps = (
+  { action, form, disabled }: TransactionFormContext,
+  index: number,
+): SplitFieldProps => ({
+  action, index, form, disabled,
+});
 
 export type SplitFieldProps = {
   index: number;
