@@ -7,6 +7,7 @@ import Link from 'next/link';
 
 import { Tooltip } from '@/components/tooltips';
 import { Price } from '@/book/entities';
+import { priceOps } from '@/book/entities/priceOps';
 import { toFixed } from '@/helpers/number';
 import { currencyToSymbol } from '@/helpers/currency';
 import { usePrices } from '@/hooks/api';
@@ -34,23 +35,15 @@ export default function MainSplit({
   );
 
   React.useEffect(() => {
-    if (
-      form.formState.isDirty
-      && date
-      && prices
-    ) {
-      let rate = null;
-      const d = DateTime.fromISO(date);
-      if (account.commodity.guid !== txCurrency.guid && txCurrency.namespace === 'CURRENCY') {
-        rate = account.commodity.namespace !== 'CURRENCY'
-          ? prices.getInvestmentPrice(account.commodity.mnemonic, d)
-          : prices.getPrice(account.commodity.mnemonic, txCurrency.mnemonic, d);
-
-        setExchangeRate(rate);
-      } else {
-        setExchangeRate(Price.create({ valueNum: 1, valueDenom: 1 }));
-      }
+    if (!date || !prices || !form.formState.isDirty) {
+      return;
     }
+    const rate = priceOps.getExchangeRate(prices, {
+      date: DateTime.fromISO(date),
+      from: account.commodity,
+      to: txCurrency,
+    });
+    setExchangeRate(rate);
   }, [txCurrency, date, form.formState.isDirty, account, prices]);
 
   React.useEffect(() => {
