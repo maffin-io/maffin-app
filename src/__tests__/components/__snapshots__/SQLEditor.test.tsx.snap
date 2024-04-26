@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SQLEditor renders as expected 1`] = `
+<div>
+  <div
+    class="card"
+  >
+    <textarea
+      class="rounded-md p-2 w-full"
+      id="sql-editor"
+      name="SQL"
+      rows="10"
+    />
+    <p
+      class="my-3"
+    >
+      <button
+        class="btn btn-primary"
+        type="button"
+      >
+        <svg
+          class="mr-1"
+          fill="currentColor"
+          height="1em"
+          stroke="currentColor"
+          stroke-width="0"
+          viewBox="0 0 24 24"
+          width="1em"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M7 6v12l10-6z"
+          />
+        </svg>
+        Run
+      </button>
+    </p>
+  </div>
+  <div
+    class="card overflow-x-auto !bg-inherit"
+  >
+    <div
+      data-testid="Table"
+    />
+  </div>
+</div>
+`;

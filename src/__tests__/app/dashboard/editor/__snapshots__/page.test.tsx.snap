@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EditorPage renders as expected 1`] = `
+<div>
+  <div
+    class="grid grid-cols-12 items-start"
+  >
+    <div
+      class="col-span-9"
+    >
+      <div
+        data-testid="SQLEditor"
+      />
+    </div>
+    <div
+      class="col-span-3 card"
+    >
+      <h2>
+        Tables
+      </h2>
+      <div
+        data-testid="SQLExplorer"
+      />
+    </div>
+  </div>
+</div>
+`;
