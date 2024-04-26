@@ -2,7 +2,8 @@
 
 import {
   BiBook,
-  BiCog,
+  BiCode,
+  BiCoin,
   BiHomeAlt,
 } from 'react-icons/bi';
 
@@ -33,15 +34,14 @@ const MENU_ITEMS: ItemType[] = [
 
 const BOTTOM_MENU: ItemType[] = [
   {
-    label: 'Tools',
-    icon: <BiCog className="text-xl" />,
-    url: '',
-    submenu: [
-      {
-        label: 'Commodities',
-        url: '/dashboard/commodities',
-      },
-    ],
+    label: 'Commodities',
+    icon: <BiCoin className="text-xl" />,
+    url: '/dashboard/commodities',
+  },
+  {
+    label: 'SQL Editor',
+    icon: <BiCode className="text-xl" />,
+    url: '/dashboard/editor',
   },
   {
     label: 'Help',
