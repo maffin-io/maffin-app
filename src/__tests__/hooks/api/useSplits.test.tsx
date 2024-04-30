@@ -1,5 +1,5 @@
 import React from 'react';
-import { Interval } from 'luxon';
+import { DateTime, Interval } from 'luxon';
 import { DataSource } from 'typeorm';
 import { renderHook, waitFor } from '@testing-library/react';
 import {
@@ -95,7 +95,7 @@ describe('useSplits', () => {
       tx1 = await Transaction.create({
         // inside the interval
         date: TEST_INTERVAL.start?.plus({ month: 1 }),
-        description: 'description',
+        description: 'description1',
         fk_currency: eur,
         splits: [
           await Split.create({
@@ -117,8 +117,8 @@ describe('useSplits', () => {
 
       tx2 = await Transaction.create({
         // outside the interval
-        date: TEST_INTERVAL.start?.minus({ month: 1 }),
-        description: 'description',
+        date: TEST_INTERVAL.start?.plus({ month: 2 }),
+        description: 'description2',
         fk_currency: eur,
         splits: [
           await Split.create({
@@ -146,7 +146,44 @@ describe('useSplits', () => {
     });
 
     describe('useSplitsPagination', () => {
-      it('calls query as expected', async () => {
+      it('returns pageSize instances', async () => {
+        const { result } = renderHook(
+          () => useSplitsPagination('guid', { pageIndex: 0, pageSize: 1 }),
+          { wrapper },
+        );
+
+        await waitFor(() => expect(result.current.status).toEqual('success'));
+        expect(result.current.data).toMatchObject([
+          expect.objectContaining({
+            guid: tx2.splits[0].guid,
+            balance: 100, // balance contains splits inserted previously so 50 + 50
+          }),
+        ]);
+
+        const queryCache = QUERY_CLIENT.getQueryCache().getAll();
+        expect(queryCache).toHaveLength(1);
+        expect(queryCache[0].queryKey).toEqual(
+          [
+            'api', 'splits', 'guid', 'page',
+            {
+              interval: TEST_INTERVAL.toISODate(),
+              pageIndex: 0,
+              pageSize: 1,
+              search: '',
+            },
+          ],
+        );
+      });
+
+      it('filters by interval', async () => {
+        const interval = Interval.fromDateTimes(
+          (TEST_INTERVAL.start as DateTime),
+          (TEST_INTERVAL.start as DateTime).plus({ month: 1 }),
+        );
+        jest.spyOn(stateHooks, 'useInterval').mockReturnValue({
+          data: interval,
+        } as DefinedUseQueryResult<Interval>);
+
         const { result } = renderHook(
           () => useSplitsPagination('guid', { pageIndex: 0, pageSize: 1 }),
           { wrapper },
@@ -156,14 +193,22 @@ describe('useSplits', () => {
         expect(result.current.data).toMatchObject([
           expect.objectContaining({
             guid: tx1.splits[0].guid,
-            balance: 100, // balance contains splits inserted previously so 50 + 50
+            balance: 50, // this is the first split so balance is 50
           }),
         ]);
 
         const queryCache = QUERY_CLIENT.getQueryCache().getAll();
         expect(queryCache).toHaveLength(1);
         expect(queryCache[0].queryKey).toEqual(
-          ['api', 'splits', 'guid', 'page', { interval: TEST_INTERVAL.toISODate(), pageIndex: 0, pageSize: 1 }],
+          [
+            'api', 'splits', 'guid', 'page',
+            {
+              interval: interval.toISODate(),
+              pageIndex: 0,
+              pageSize: 1,
+              search: '',
+            },
+          ],
         );
       });
 
@@ -189,15 +234,71 @@ describe('useSplits', () => {
         const queryCache = QUERY_CLIENT.getQueryCache().getAll();
         expect(queryCache).toHaveLength(1);
         expect(queryCache[0].queryKey).toEqual(
-          ['api', 'splits', 'guid', 'page', { interval: TEST_INTERVAL.toISODate(), pageIndex: 0, pageSize: 1 }],
+          [
+            'api', 'splits', 'guid', 'page',
+            {
+              interval: TEST_INTERVAL.toISODate(),
+              pageIndex: 0,
+              pageSize: 1,
+              search: '',
+            },
+          ],
+        );
+      });
+
+      it('filters with search term', async () => {
+        const { result } = renderHook(
+          () => useSplitsPagination('guid', { pageIndex: 0, pageSize: 2 }, 'description1'),
+          { wrapper },
+        );
+
+        await waitFor(() => expect(result.current.status).toEqual('success'));
+        expect(result.current.data).toMatchObject([
+          expect.objectContaining({
+            guid: tx1.splits[0].guid,
+            balance: 50,
+          }),
+        ]);
+
+        const queryCache = QUERY_CLIENT.getQueryCache().getAll();
+        expect(queryCache).toHaveLength(1);
+        expect(queryCache[0].queryKey).toEqual(
+          [
+            'api', 'splits', 'guid', 'page',
+            {
+              interval: TEST_INTERVAL.toISODate(),
+              pageIndex: 0,
+              pageSize: 2,
+              search: 'description1',
+            },
+          ],
         );
       });
     });
 
     describe('useSplitsCount', () => {
-      it('calls query as expected', async () => {
+      it('filters by interval', async () => {
         const { result } = renderHook(
           () => useSplitsCount('guid'),
+          { wrapper },
+        );
+
+        await waitFor(() => expect(result.current.status).toEqual('success'));
+        expect(result.current.data).toEqual(2);
+
+        const queryCache = QUERY_CLIENT.getQueryCache().getAll();
+        expect(queryCache).toHaveLength(1);
+        expect(queryCache[0].queryKey).toEqual(
+          [
+            'api', 'splits', 'guid', 'count',
+            { interval: TEST_INTERVAL.toISODate(), search: '' },
+          ],
+        );
+      });
+
+      it('filters with search term', async () => {
+        const { result } = renderHook(
+          () => useSplitsCount('guid', 'description2'),
           { wrapper },
         );
 
@@ -207,7 +308,10 @@ describe('useSplits', () => {
         const queryCache = QUERY_CLIENT.getQueryCache().getAll();
         expect(queryCache).toHaveLength(1);
         expect(queryCache[0].queryKey).toEqual(
-          ['api', 'splits', 'guid', 'count', { interval: TEST_INTERVAL.toISODate() }],
+          [
+            'api', 'splits', 'guid', 'count',
+            { interval: TEST_INTERVAL.toISODate(), search: 'description2' },
+          ],
         );
       });
     });

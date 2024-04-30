@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Between, FindOptionsWhere } from 'typeorm';
+import { Between, FindOptionsWhere, Like } from 'typeorm';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import { Split } from '@/book/entities';
@@ -60,6 +60,7 @@ export function useSplits(
 export function useSplitsPagination(
   account: string,
   pagination: { pageSize: number, pageIndex: number } = { pageSize: 10, pageIndex: 0 },
+  search = '',
 ): UseQueryResult<Split[]> {
   const { data: interval } = useInterval();
 
@@ -67,7 +68,7 @@ export function useSplitsPagination(
     ...Split.CACHE_KEY,
     account,
     'page',
-    { ...pagination, interval: interval.toISODate() },
+    { ...pagination, search, interval: interval.toISODate() },
   ];
   const result = useQuery({
     queryKey,
@@ -91,6 +92,7 @@ export function useSplitsPagination(
           .where('splits.account_guid = :account_guid', { account_guid: account })
           .andWhere('tx.post_date >= :start', { start: interval.start?.toSQLDate() })
           .andWhere('tx.post_date <= :end', { end: interval.end?.toSQLDate() })
+          .andWhere('tx.description LIKE :search', { search: `%${search}%` })
           .orderBy('tx.post_date', 'DESC')
           .addOrderBy('tx.enter_date', 'DESC')
           .addOrderBy('splits.quantity_num', 'ASC')
@@ -111,10 +113,16 @@ export function useSplitsPagination(
  */
 export function useSplitsCount(
   account: string,
+  search = '',
 ): UseQueryResult<number> {
   const { data: interval } = useInterval();
 
-  const queryKey = [...Split.CACHE_KEY, account, 'count', { interval: interval.toISODate() }];
+  const queryKey = [
+    ...Split.CACHE_KEY,
+    account,
+    'count',
+    { search, interval: interval.toISODate() },
+  ];
   const result = useQuery({
     queryKey,
     queryFn: fetcher(
@@ -123,6 +131,7 @@ export function useSplitsCount(
           fk_account: { guid: account },
           fk_transaction: {
             date: Between(interval.start, interval.end),
+            description: Like(`%${search}%`),
           },
         },
       }),
