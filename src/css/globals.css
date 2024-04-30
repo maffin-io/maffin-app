@@ -21,7 +21,7 @@
     @apply text-cyan-700 hover:text-cyan-600;
   }
 
-  form input, form select, .input {
+  form input, form select, .input, input {
     @apply bg-light-100 dark:bg-dark-800 rounded-md border-none my-3 p-2 focus:outline-none;
   }
 

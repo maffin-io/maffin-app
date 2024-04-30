@@ -3,7 +3,9 @@ import { DateTime } from 'luxon';
 import {
   render,
   screen,
+  waitFor,
 } from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
 import type { LinkProps } from 'next/link';
 import type { UseQueryResult } from '@tanstack/react-query';
 
@@ -153,8 +155,8 @@ describe('TransactionsTable', () => {
       },
       {},
     );
-    expect(apiHook.useSplitsCount).toBeCalledWith('account_guid_1');
-    expect(apiHook.useSplitsPagination).toBeCalledWith('account_guid_1', { pageIndex: 0, pageSize: 10 });
+    expect(apiHook.useSplitsCount).toBeCalledWith('account_guid_1', '');
+    expect(apiHook.useSplitsPagination).toBeCalledWith('account_guid_1', { pageIndex: 0, pageSize: 10 }, '');
   });
 
   it('creates Table with expected params', async () => {
@@ -171,6 +173,22 @@ describe('TransactionsTable', () => {
       pageCount: 1,
       data: [split],
     }), {});
+  });
+
+  it('filters with search text', async () => {
+    render(
+      <TransactionsTable
+        account={account}
+      />,
+    );
+
+    const searchBox = screen.getByRole('textbox');
+    await userEvent.type(searchBox, 'search-text');
+
+    await waitFor(() => expect(apiHook.useSplitsCount).toBeCalledWith('account_guid_1', 'search-text'));
+    expect(
+      apiHook.useSplitsPagination,
+    ).toBeCalledWith('account_guid_1', { pageIndex: 0, pageSize: 10 }, 'search-text');
   });
 
   it('renders Date column as expected', async () => {

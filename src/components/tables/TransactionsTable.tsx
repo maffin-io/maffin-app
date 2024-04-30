@@ -13,6 +13,7 @@ import { DateTime } from 'luxon';
 import FormButton from '@/components/buttons/FormButton';
 import { Tooltip } from '@/components/tooltips';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
+import SearchBox from '@/components/SearchBox';
 import Table from '@/components/tables/Table';
 import Money from '@/book/Money';
 import {
@@ -34,12 +35,17 @@ export type TransactionsTableProps = {
 export default function TransactionsTable({
   account,
 }: TransactionsTableProps): JSX.Element {
+  const [search, setSearch] = React.useState('');
   const [{ pageIndex, pageSize }, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
-  const { data: splitsCount } = useSplitsCount(account.guid);
-  const { data: splits } = useSplitsPagination(account.guid, { pageSize, pageIndex });
+  const { data: splitsCount } = useSplitsCount(account.guid, search);
+  const { data: splits } = useSplitsPagination(
+    account.guid,
+    { pageSize, pageIndex },
+    search,
+  );
 
   columns[3].cell = AmountPartial(account);
   columns[4].cell = BalancePartial(account);
@@ -53,18 +59,21 @@ export default function TransactionsTable({
   );
 
   return (
-    <Table<Split>
-      id="transactions-table"
-      columns={columns}
-      data={splits || []}
-      showPagination
-      onPaginationChange={setPagination}
-      pageCount={Math.ceil((splitsCount || 0) / pageSize)}
-      state={{
-        pagination,
-      }}
-      manualPagination
-    />
+    <>
+      <SearchBox onChange={setSearch} />
+      <Table<Split>
+        id="transactions-table"
+        columns={columns}
+        data={splits || []}
+        showPagination
+        onPaginationChange={setPagination}
+        pageCount={Math.ceil((splitsCount || 0) / pageSize)}
+        state={{
+          pagination,
+        }}
+        manualPagination
+      />
+    </>
   );
 }
 
