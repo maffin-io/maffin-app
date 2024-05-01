@@ -203,7 +203,7 @@ export default function Onboarding({
           content: (
             <div className="text-left leading-relaxed">
               <p className="mb-2">
-                See that now your bank account appears in the accounts tree.
+                Your bank account is now part of the accounts tree.
                 If you added an opening balance, you will see that your
                 total net worth has changed.
               </p>
@@ -279,11 +279,12 @@ export default function Onboarding({
           content: (
             <div className="text-left leading-relaxed">
               <p className="mb-2">
-                We save the data automatically for you whenever you do changes.
+                For paid users, the data is saved automatically in your
+                Google Drive whenever you do changes.
               </p>
               <p className="mb-2">
-                The data is uploaded to your Google Drive, under the maffin.io folder. Make
-                sure you take good care of that file!
+                For non paid users, data will have to be exported and imported every time
+                you enter.
               </p>
               <div className="flex justify-end">
                 <button
@@ -318,10 +319,6 @@ export default function Onboarding({
                 <div className="flex py-3 justify-center">
                   <Image src={maffinLogo} alt="logo" height="65" />
                 </div>
-                <p className="badge rounded-md warning mt-3">
-                  You own your data which means you have to be careful. Do not
-                  delete the maffin.io folder from your Google drive!
-                </p>
               </span>
               <div className="flex justify-center mt-5">
                 <button
