@@ -195,7 +195,7 @@ describe('Onboarding', () => {
     await waitFor(() => expect(result.current.data).toHaveLength(12));
 
     // STEP 6: Show accounts tree again
-    await screen.findByText('See that now your bank account', { exact: false });
+    await screen.findByText('Your bank account is now part', { exact: false });
     await user.click(screen.getByText('Next'));
 
     // STEP 7: Adds a transaction between bank account and groceries account
@@ -232,7 +232,7 @@ describe('Onboarding', () => {
     }));
 
     // STEP 8: Shows about the Save button
-    await screen.findByText('We save the data automatically', { exact: false });
+    await screen.findByText('For paid users', { exact: false });
     await user.click(screen.getByText('Next'));
 
     // STEP 9: Final disclaimer
