@@ -46,12 +46,14 @@ export function useCashFlow(
             ) AS mnemonic,
             SUM(
               CASE
-                WHEN splits.guid = credit_split.guid THEN
+                WHEN splits.guid = asset_split.guid THEN
                   -1 * cast(account_split.quantity_num AS REAL) / account_split.quantity_denom
                 ELSE
                   CASE
-                    WHEN account_split.guid = credit_split.guid THEN
-                      (cast(account_split.quantity_num AS REAL) / account_split.quantity_denom) / (cast(account_split.value_num AS REAL) / account_split.value_denom) * (cast(splits.value_num AS REAL) / splits.value_denom)
+                    WHEN account_split.guid = asset_split.guid THEN
+                      (cast(splits.value_num AS REAL) / splits.value_denom)
+                      * (cast(account_split.quantity_num AS REAL) / account_split.quantity_denom)
+                      / (cast(account_split.value_num AS REAL) / account_split.value_denom)
                     ELSE
                       0
                   END
@@ -62,7 +64,9 @@ export function useCashFlow(
           JOIN splits ON splits.tx_guid = tx.guid
           JOIN accounts ON splits.account_guid = accounts.guid
           JOIN splits AS account_split ON account_split.tx_guid = tx.guid AND account_split.account_guid = '${account}'
-          JOIN splits AS credit_split ON credit_split.tx_guid = tx.guid AND credit_split.value_num < 0
+
+          JOIN splits AS asset_split ON asset_split.tx_guid = tx.guid
+          JOIN accounts AS asset_account ON asset_account.guid = asset_split.account_guid AND asset_account.account_type IN ('ASSET', 'BANK', 'CASH', 'FIXED', 'RECEIVABLE')
 
           WHERE tx.guid IN (
             SELECT DISTINCT tx_guid
@@ -72,7 +76,7 @@ export function useCashFlow(
           AND accounts.guid != '${account}'
           AND tx.post_date BETWEEN '${((interval as Interval).start as DateTime).toSQLDate()}' AND '${((interval as Interval).end as DateTime).toSQLDate()}'
 
-          GROUP BY splits.account_guid, accounts.name, accounts.account_type, mnemonic
+          GROUP BY accounts.guid, accounts.name, accounts.account_type, mnemonic
           HAVING total != 0
         `) as { guid: string, type: string, name: string, total: number, mnemonic: string }[];
 

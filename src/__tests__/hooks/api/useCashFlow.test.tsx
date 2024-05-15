@@ -328,7 +328,7 @@ describe('useCashFlow', () => {
    *
    * This case is simple as we want two rows same as the splits.
    */
-  it('works with 3 splits in same currency', async () => {
+  it('works with 3 outflow splits in same currency', async () => {
     const account3 = await Account.create({
       guid: 'guid3',
       name: 'Expense2',
@@ -389,7 +389,86 @@ describe('useCashFlow', () => {
   });
 
   /**
-   * The above case is simple however, when
+   * Same as the test before but with receiving money into the ASSET
+   * account instead of withdrawing
+   *
+   * As an example, say we have a tx with the following:
+   *  - 100 in account1
+   *  - -75 in account2
+   *  - -25 in account3
+   *
+   * This case is simple as we want two rows same as the splits.
+   */
+  it('works with 3 inflow splits in same currency', async () => {
+    const account3 = await Account.create({
+      guid: 'guid3',
+      name: 'Income1',
+      fk_commodity: eur,
+      parent: root,
+      type: 'INCOME',
+    }).save();
+
+    const account4 = await Account.create({
+      guid: 'guid4',
+      name: 'Income2',
+      fk_commodity: eur,
+      parent: root,
+      type: 'INCOME',
+    }).save();
+
+    await Transaction.create({
+      fk_currency: eur,
+      description: 'tx1',
+      date: DateTime.now(),
+      splits: [
+        Split.create({
+          fk_account: account1,
+          valueNum: 100,
+          valueDenom: 1,
+          quantityNum: 100,
+          quantityDenom: 1,
+        }),
+        Split.create({
+          fk_account: account3,
+          valueNum: -75,
+          valueDenom: 1,
+          quantityNum: -75,
+          quantityDenom: 1,
+        }),
+        Split.create({
+          fk_account: account4,
+          valueNum: -25,
+          valueDenom: 1,
+          quantityNum: -25,
+          quantityDenom: 1,
+        }),
+      ],
+    }).save();
+
+    const { result } = renderHook(
+      () => useCashFlow(account1.guid),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.status).toEqual('success'));
+
+    expect(result.current.data?.[0]).toMatchObject({
+      name: account3.name,
+      total: expect.objectContaining({
+        readable: '-75 EUR',
+      }),
+    });
+
+    expect(result.current.data?.[1]).toMatchObject({
+      name: account4.name,
+      total: expect.objectContaining({
+        readable: '-25 EUR',
+      }),
+    });
+  });
+
+  /**
+   * The above case are simple however, when
    * the accounts have different currencies, this gets a bit more complicated:
    *
    * - -108 USD/-100 EUR in account1
@@ -542,10 +621,18 @@ describe('useCashFlow', () => {
   it('ignores 0s', async () => {
     const account3 = await Account.create({
       guid: 'guid3',
-      name: 'Bank3',
+      name: 'Investment',
+      fk_commodity: eur,
+      parent: account1,
+      type: 'INVESTMENT',
+    }).save();
+
+    const account4 = await Account.create({
+      guid: 'guid4',
+      name: 'Dividends',
       fk_commodity: eur,
       parent: root,
-      type: 'ASSET',
+      type: 'INCOME',
     }).save();
 
     await Transaction.create({
@@ -555,13 +642,6 @@ describe('useCashFlow', () => {
       splits: [
         Split.create({
           fk_account: account1,
-          valueNum: 0,
-          valueDenom: 1,
-          quantityNum: 0,
-          quantityDenom: 1,
-        }),
-        Split.create({
-          fk_account: account2,
           valueNum: 100,
           valueDenom: 1,
           quantityNum: 100,
@@ -569,6 +649,13 @@ describe('useCashFlow', () => {
         }),
         Split.create({
           fk_account: account3,
+          valueNum: 0,
+          valueDenom: 1,
+          quantityNum: 0,
+          quantityDenom: 1,
+        }),
+        Split.create({
+          fk_account: account4,
           valueNum: -100,
           valueDenom: 1,
           quantityNum: -100,
@@ -578,7 +665,7 @@ describe('useCashFlow', () => {
     }).save();
 
     const { result } = renderHook(
-      () => useCashFlow(account3.guid),
+      () => useCashFlow(account1.guid),
       { wrapper },
     );
 
@@ -586,9 +673,9 @@ describe('useCashFlow', () => {
 
     expect(result.current.data).toHaveLength(1);
     expect(result.current.data?.[0]).toMatchObject({
-      name: account2.name,
+      name: account4.name,
       total: expect.objectContaining({
-        readable: '100 EUR',
+        readable: '-100 EUR',
       }),
     });
   });
