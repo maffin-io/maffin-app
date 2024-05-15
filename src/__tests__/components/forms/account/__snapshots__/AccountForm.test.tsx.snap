@@ -456,6 +456,25 @@ exports[`AccountForm renders as expected with add 1`] = `
         class="invalid-feedback"
       />
     </fieldset>
+    <fieldset
+      class="text-sm my-5"
+    >
+      <label
+        class="inline-block mb-2"
+        for="descriptionInput"
+      >
+        Description
+      </label>
+      <input
+        class="block w-full m-0"
+        id="descriptionInput"
+        name="description"
+        type="text"
+      />
+      <p
+        class="invalid-feedback"
+      />
+    </fieldset>
     <input
       hidden=""
       name="guid"
@@ -929,6 +948,26 @@ exports[`AccountForm renders as expected with delete 1`] = `
         class="invalid-feedback"
       />
     </fieldset>
+    <fieldset
+      class="text-sm my-5"
+    >
+      <label
+        class="inline-block mb-2"
+        for="descriptionInput"
+      >
+        Description
+      </label>
+      <input
+        class="block w-full m-0"
+        disabled=""
+        id="descriptionInput"
+        name="description"
+        type="text"
+      />
+      <p
+        class="invalid-feedback"
+      />
+    </fieldset>
     <input
       hidden=""
       name="guid"
@@ -1397,6 +1436,25 @@ exports[`AccountForm renders as expected with update 1`] = `
           </div>
         </div>
       </div>
+      <p
+        class="invalid-feedback"
+      />
+    </fieldset>
+    <fieldset
+      class="text-sm my-5"
+    >
+      <label
+        class="inline-block mb-2"
+        for="descriptionInput"
+      >
+        Description
+      </label>
+      <input
+        class="block w-full m-0"
+        id="descriptionInput"
+        name="description"
+        type="text"
+      />
       <p
         class="invalid-feedback"
       />

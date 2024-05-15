@@ -116,7 +116,6 @@ export default class Account extends BaseEntity {
     nullable: true,
   })
   @IsOptional()
-  @Length(4, 2048)
     description?: string;
 
   @Column({

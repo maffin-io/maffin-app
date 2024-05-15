@@ -298,6 +298,18 @@ export default function AccountForm({
         />
       </fieldset>
 
+      <fieldset className="text-sm my-5">
+        <label htmlFor="descriptionInput" className="inline-block mb-2">Description</label>
+        <input
+          id="descriptionInput"
+          disabled={disabled}
+          className="block w-full m-0"
+          {...form.register('description')}
+          type="text"
+        />
+        <p className="invalid-feedback">{errors.description?.message}</p>
+      </fieldset>
+
       <input
         {...form.register(
           'guid',
