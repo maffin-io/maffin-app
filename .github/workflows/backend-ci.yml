@@ -1,6 +1,11 @@
 name: Backend CI
 
-on: [push, workflow_call]
+on:
+  push:
+    branches: [master]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_call:
 
 jobs:
   build:
