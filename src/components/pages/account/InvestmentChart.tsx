@@ -229,7 +229,7 @@ export default function InvestmentChart({
                 if (item.datasetIndex === 0) {
                   return `${moneyToString(Number(item.parsed.y), investment.account.commodity.mnemonic)}`;
                 }
-                
+
                 return `${moneyToString(Number(item.parsed.y), currency)}`;
               },
             },
