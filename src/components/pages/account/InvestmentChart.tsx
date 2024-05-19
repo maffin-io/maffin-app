@@ -226,11 +226,11 @@ export default function InvestmentChart({
             backgroundColor: '#323b44',
             callbacks: {
               label: (item) => {
-                if (item.datasetIndex === 1) {
-                  return `${moneyToString(Number(item.parsed.y), currency)}`;
+                if (item.datasetIndex === 0) {
+                  return `${moneyToString(Number(item.parsed.y), investment.account.commodity.mnemonic)}`;
                 }
-
-                return `${moneyToString(Number(item.parsed.y), investment.account.commodity.mnemonic)}`;
+                
+                return `${moneyToString(Number(item.parsed.y), currency)}`;
               },
             },
           },
