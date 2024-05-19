@@ -75,11 +75,3 @@ exports[`AccountsTable renders Name column as expected when expandable and not e
   </div>
 </div>
 `;
-
-exports[`AccountsTable renders Total column as expected 1`] = `
-<div>
-  <span>
-    €10.00
-  </span>
-</div>
-`;

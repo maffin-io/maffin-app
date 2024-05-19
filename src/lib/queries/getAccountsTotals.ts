@@ -33,7 +33,10 @@ export default async function getAccountsTotals(
   const totals: { [guid: string]: Money } = {};
 
   rows.forEach(row => {
-    totals[row.accountId] = new Money(row.total, accountsMap[row.accountId].commodity.mnemonic);
+    totals[row.accountId] = new Money(
+      accountsMap[row.accountId].type === 'INCOME' ? Math.abs(row.total) : row.total,
+      accountsMap[row.accountId].commodity.mnemonic,
+    );
   });
 
   return totals;

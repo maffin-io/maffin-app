@@ -5,7 +5,6 @@ import Money from '@/book/Money';
 import type { Account } from '@/book/entities';
 import StatisticsWidget from '@/components/StatisticsWidget';
 import TotalChange from '@/components/widgets/TotalChange';
-import { isLiability } from '@/book/helpers';
 
 export type TotalWidgetProps = {
   account: Account,
@@ -21,7 +20,7 @@ export default function TotalWidget({
     <StatisticsWidget
       className="mr-2"
       title="Total"
-      stats={isLiability(account) ? total0.format() : total0.abs().format()}
+      stats={total0.format()}
       description={<TotalChange account={account} />}
     />
   );

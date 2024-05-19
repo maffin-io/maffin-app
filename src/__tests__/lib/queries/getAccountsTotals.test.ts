@@ -16,6 +16,7 @@ describe('getAccountsTotals', () => {
   let root: Account;
   let assetAccount: Account;
   let expensesAccount: Account;
+  let incomeAccount: Account;
 
   beforeEach(async () => {
     datasource = new DataSource({
@@ -39,7 +40,7 @@ describe('getAccountsTotals', () => {
     }).save();
 
     assetAccount = await Account.create({
-      guid: 'abcdef',
+      guid: 'guid1',
       name: 'Assets',
       type: 'ASSET',
       fk_commodity: eur,
@@ -48,13 +49,22 @@ describe('getAccountsTotals', () => {
     await assetAccount.reload();
 
     expensesAccount = await Account.create({
-      guid: 'ghijk',
+      guid: 'guid2',
       name: 'Expenses',
       type: 'EXPENSE',
       fk_commodity: eur,
       parent: root,
     }).save();
     await expensesAccount.reload();
+
+    incomeAccount = await Account.create({
+      guid: 'guid3',
+      name: 'Income',
+      type: 'INCOME',
+      fk_commodity: eur,
+      parent: root,
+    }).save();
+    await incomeAccount.reload();
 
     await root.reload();
   });
@@ -121,13 +131,36 @@ describe('getAccountsTotals', () => {
       ],
     }).save();
 
+    await Transaction.create({
+      description: 'description',
+      date: DateTime.fromISO('2022-08-01'),
+      fk_currency: eur,
+      splits: [
+        Split.create({
+          valueNum: -75,
+          valueDenom: 1,
+          quantityNum: -75,
+          quantityDenom: 1,
+          fk_account: incomeAccount,
+        }),
+        Split.create({
+          valueNum: 75,
+          valueDenom: 1,
+          quantityNum: 75,
+          quantityDenom: 1,
+          fk_account: assetAccount,
+        }),
+      ],
+    }).save();
+
     const totals = await getAccountsTotals(
-      [root, assetAccount, expensesAccount],
+      [root, assetAccount, expensesAccount, incomeAccount],
       TEST_INTERVAL,
     );
 
-    expect(totals.abcdef.toString()).toEqual('-300 EUR');
-    expect(totals.ghijk.toString()).toEqual('300 EUR');
+    expect(totals.guid1.toString()).toEqual('-225 EUR');
+    expect(totals.guid2.toString()).toEqual('300 EUR');
+    expect(totals.guid3.toString()).toEqual('75 EUR');
   });
 
   it('filters by date', async () => {
@@ -179,7 +212,7 @@ describe('getAccountsTotals', () => {
       TEST_INTERVAL,
     );
 
-    expect(totals.abcdef.toString()).toEqual('-100 EUR');
-    expect(totals.ghijk.toString()).toEqual('100 EUR');
+    expect(totals.guid1.toString()).toEqual('-100 EUR');
+    expect(totals.guid2.toString()).toEqual('100 EUR');
   });
 });

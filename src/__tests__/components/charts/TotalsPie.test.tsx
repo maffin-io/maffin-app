@@ -142,7 +142,7 @@ describe('TotalsPie', () => {
           datasets: [
             {
               backgroundColor: ['#111', '#222'],
-              data: [1500, 150],
+              data: [1500, -150],
             },
           ],
           labels: ['Assets', 'Liabilities'],

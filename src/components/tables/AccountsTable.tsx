@@ -129,12 +129,12 @@ const columns: ColumnDef<AccountsTableRow>[] = [
     ),
   },
   {
-    accessorFn: (row: AccountsTableRow) => row.total.abs().toNumber(),
+    accessorFn: (row: AccountsTableRow) => row.total.toNumber(),
     id: 'total',
     header: '',
     cell: ({ row }) => (
       <span>
-        {row.original.total.abs().format()}
+        {row.original.total.format()}
       </span>
     ),
   },

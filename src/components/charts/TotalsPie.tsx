@@ -64,7 +64,7 @@ export default function TotalsPie({
           datasets: [
             {
               backgroundColor,
-              data: data.map(d => Math.abs(d.toNumber())),
+              data: data.map(d => d.toNumber()),
             },
           ],
         }}
@@ -100,7 +100,7 @@ export default function TotalsPie({
       <div className="-mt-12">
         <p className="flex justify-center">{title}</p>
         <p className="flex justify-center text-xl">
-          {total.abs().format()}
+          {total.format()}
         </p>
       </div>
     </>
