@@ -66,8 +66,7 @@ describe('TotalWidgetTest', () => {
     );
   });
 
-  it('keeps negative for liability', () => {
-    account.type = 'CREDIT';
+  it('keeps negative values', () => {
     jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({
       data: { guid: new Money(-100, 'EUR') } as AccountsTotals,
     });

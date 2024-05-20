@@ -324,7 +324,10 @@ describe('AccountsTable', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('renders Total column as expected', async () => {
+  it.each([
+    ['ASSET', new Money(10, 'EUR'), '€10.00'],
+    ['ASSET', new Money(-10, 'EUR'), '-€10.00'],
+  ])('renders Total column for %s with correct symbol', async (type, money, expected) => {
     render(<AccountsTable guids={['a1']} />);
 
     await screen.findByTestId('Table');
@@ -333,29 +336,28 @@ describe('AccountsTable', () => {
 
     expect(
       // @ts-ignore
-      totalCol.accessorFn({ total: new Money(10, 'EUR') }),
-    ).toEqual(10);
+      totalCol.accessorFn({ total: money }),
+    ).toEqual(money.toNumber());
 
     expect(totalCol.cell).not.toBeUndefined();
-    const { container } = render(
+    render(
       // @ts-ignore
       totalCol.cell({
         row: {
           original: {
             account: {
-              guid: 'assets',
-              name: 'Assets',
-              type: 'ASSET',
+              guid: 'account',
+              name: 'Account',
+              type,
               childrenIds: ['a1'],
             } as Account,
-            total: new Money(10, 'EUR'),
+            total: money,
             children: [],
           },
         },
       }),
     );
 
-    await screen.findByText('€10.00');
-    expect(container).toMatchSnapshot();
+    await screen.findByText(expected);
   });
 });
