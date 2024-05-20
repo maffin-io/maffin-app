@@ -419,6 +419,10 @@ describe('InvestmentChart', () => {
       },
       {},
     );
+
+    const { plugins } = (Line as jest.Mock).mock.calls[0][0].options;
+    expect(plugins.tooltip.callbacks.label({ datasetIndex: 1, parsed: { y: 100 } })).toEqual('€100.00');
+    expect(plugins.tooltip.callbacks.label({ datasetIndex: 0, parsed: { y: 100 } })).toEqual('100 GOOGL');
   });
 
   it('builds chart with expected data with robo advisor', () => {
