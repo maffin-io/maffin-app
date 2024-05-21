@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DBImportButton disables button when datasource not available 1`] = `
+<div>
+  <button
+    class=""
+    disabled=""
+    id="db-import-button"
+    type="button"
+  >
+    <div
+      class="card hover:text-cyan-600 dark:hover:text-white hover:shadow-xl"
+    >
+      <span
+        class="float-right badge default -mt-2 -mr-2"
+        data-tooltip-id="db-import-help"
+      >
+        ?
+      </span>
+      <div
+        class="flex items-center"
+      >
+        <img
+          alt=""
+          class="m-0"
+          data-nimg="1"
+          decoding="async"
+          height="65"
+          loading="lazy"
+          src="/_next/image?url=%2Fimg.jpg&w=256&q=75"
+          srcset="/_next/image?url=%2Fimg.jpg&w=96&q=75 1x, /_next/image?url=%2Fimg.jpg&w=256&q=75 2x"
+          style="color: transparent;"
+          width="65"
+        />
+        <span
+          class="inline-block align-middle"
+        >
+          Maffin DB
+        </span>
+      </div>
+    </div>
+  </button>
+  <input
+    aria-label="importInput"
+    class="hidden"
+    type="file"
+  />
+</div>
+`;

@@ -23,7 +23,7 @@
     "@dinero.js/currencies": "^2.0.0-alpha.14",
     "@fontsource/inter": "^5.0.17",
     "@hookform/resolvers": "^3.3.4",
-    "@tanstack/react-query": "^5.28.9",
+    "@tanstack/react-query": "^5.28.14",
     "@tanstack/react-query-devtools": "^5.25.6",
     "@tanstack/react-table": "^8.15.3",
     "@testing-library/jest-dom": "^6.4.2",
@@ -120,10 +120,10 @@
     "@types/jest": "^29.5.5",
     "@types/lodash.debounce": "^4.0.9",
     "@types/luxon": "^3.4.2",
-    "@types/node": "^20.12.2",
+    "@types/node": "^20.12.4",
     "@types/pako": "^2.0.3",
-    "@types/react": "18.2.72",
-    "@types/react-dom": "^18.2.23",
+    "@types/react": "18.2.74",
+    "@types/react-dom": "^18.2.24",
     "@types/react-modal": "^3.16.3",
     "@types/react-router-dom": "^5.3.3",
     "@types/react-table": "^7.7.20",
@@ -146,7 +146,7 @@
     "prettier-plugin-tailwindcss": "^0.5.13",
     "snapshot-diff": "^0.10.0",
     "tailwindcss": "^3.4.3",
-    "typescript": "^5.4.3",
+    "typescript": "^5.4.4",
     "webpack-filter-warnings-plugin": "^1.2.1"
   }
 }
