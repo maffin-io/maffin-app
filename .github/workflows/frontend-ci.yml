@@ -32,3 +32,14 @@ jobs:
 
       - name: Test
         run: yarn maffin:test --coverage
+
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        with:
+          args: >
+            -Dsonar.organization=maffin-io
+            -Dsonar.projectKey=maffin-io_maffin-app
+            -Dsonar.sources=./src/
+            -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
