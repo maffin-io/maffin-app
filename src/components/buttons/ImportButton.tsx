@@ -1,7 +1,8 @@
 import React from 'react';
+import Modal from 'react-modal';
 import { BiImport } from 'react-icons/bi';
 
-import { DataSourceContext } from '@/hooks';
+import DBImportButton from './import/DBImportButton';
 
 export interface ImportButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
@@ -13,48 +14,37 @@ export default function ImportButton({
   onImport,
   ...props
 }: ImportButtonProps): JSX.Element {
-  const { isLoaded, importBook } = React.useContext(DataSourceContext);
-  const fileImportInput = React.useRef<HTMLInputElement>(null);
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   return (
     <>
+      {/* @ts-ignore */}
+      <Modal
+        isOpen={isModalOpen}
+        overlayClassName="overlay"
+        className="modal bg-light-100 dark:bg-dark-800"
+      >
+        <button
+          type="button"
+          className="float-right"
+          onClick={() => setIsModalOpen(false)}
+        >
+          X
+        </button>
+        <div>
+          <DBImportButton onImport={() => setIsModalOpen(false)} />
+        </div>
+      </Modal>
       <button
         id="import-button"
         type="button"
-        disabled={!isLoaded}
         className={className}
-        onClick={() => fileImportInput.current !== null && fileImportInput.current.click()}
+        onClick={() => setIsModalOpen(!isModalOpen)}
         {...props}
       >
         <BiImport className="inline-block align-middle mr-1" />
         <span className="inline-block align-middle">Import</span>
       </button>
-      <input
-        aria-label="importInput"
-        className="hidden"
-        type="file"
-        ref={fileImportInput}
-        onChange={(e) => i(e, importBook, onImport)}
-      />
     </>
   );
-}
-
-function i(
-  event: React.ChangeEvent<HTMLInputElement>,
-  importBook: Function,
-  onImport?: Function,
-) {
-  if (event.target.files !== null && event.target.files[0] !== null) {
-    const fileReader = new FileReader();
-    fileReader.onload = async (loadEvent) => {
-      if (loadEvent.target !== null && loadEvent.target.result !== null) {
-        const rawBook = new Uint8Array(loadEvent.target.result as ArrayBuffer);
-        await importBook(rawBook);
-        onImport?.();
-      }
-    };
-
-    fileReader.readAsArrayBuffer(event.target.files[0]);
-  }
 }

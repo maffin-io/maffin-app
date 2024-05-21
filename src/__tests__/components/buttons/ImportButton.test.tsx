@@ -2,64 +2,74 @@ import React from 'react';
 import {
   render,
   screen,
+  fireEvent,
 } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import Modal from 'react-modal';
 
 import ImportButton from '@/components/buttons/ImportButton';
-import { DataSourceContext } from '@/hooks';
-import type { DataSourceContextType } from '@/hooks';
+
+jest.mock('react-modal', () => jest.fn(
+  (props: React.PropsWithChildren) => (
+    <div data-testid="Modal">
+      {props.children}
+    </div>
+  ),
+));
+
+jest.mock('@/components/buttons/import/DBImportButton', () => jest.fn(
+  () => <div data-testid="DBImportButton" />,
+));
 
 describe('ImportButton', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('loads while unavailable datasource', async () => {
-    const { container } = render(
-      <DataSourceContext.Provider value={{ isLoaded: false } as DataSourceContextType}>
-        <ImportButton />
-      </DataSourceContext.Provider>,
+  it('renders hidden modal on mount', async () => {
+    const { container } = render(<ImportButton />);
+
+    expect(Modal).toBeCalledWith(
+      expect.objectContaining({
+        isOpen: false,
+      }),
+      {},
     );
 
-    const e = await screen.findByRole('button', { name: 'Import' });
-    expect(e).toBeDisabled();
     expect(container).toMatchSnapshot();
   });
 
-  it('renders as expected when datasource ready', async () => {
-    render(
-      <DataSourceContext.Provider value={{ isLoaded: true } as DataSourceContextType}>
-        <ImportButton />
-      </DataSourceContext.Provider>,
-    );
+  it('opens modal when clicking the button', async () => {
+    render(<ImportButton />);
 
-    const e = await screen.findByRole('button', { name: 'Import' });
-    expect(e).not.toBeDisabled();
+    const button = await screen.findByRole('button', { name: 'Import' });
+    fireEvent.click(button);
+
+    const modal = await screen.findByTestId('Modal');
+    expect(Modal).toBeCalledWith(
+      expect.objectContaining({
+        isOpen: true,
+      }),
+      {},
+    );
+    expect(modal).toMatchSnapshot();
   });
 
-  it('uploads and imports data into datasource', async () => {
-    const mockOnImport = jest.fn();
-    const mockImportBook = jest.fn();
-    const file = new File(['hello'], 'hello.png', { type: 'image/png' });
-    const user = userEvent.setup();
+  it('closes modal when clicking the X button', async () => {
+    render(<ImportButton />);
 
-    render(
-      <DataSourceContext.Provider
-        value={{
-          isLoaded: true,
-          importBook: mockImportBook as Function,
-        } as DataSourceContextType}
-      >
-        <ImportButton onImport={mockOnImport} />
-      </DataSourceContext.Provider>,
+    const button = await screen.findByRole('button', { name: 'Import' });
+    fireEvent.click(button);
+
+    await screen.findByTestId('Modal');
+
+    const xButton = screen.getByRole('button', { name: 'X' });
+    fireEvent.click(xButton);
+
+    expect(Modal).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        isOpen: false,
+      }),
+      {},
     );
-
-    const importButton = await screen.findByRole('button', { name: 'Import' });
-    await user.click(importButton);
-
-    await userEvent.upload(screen.getByLabelText('importInput'), file);
-
-    expect(mockImportBook).toBeCalledWith(new Uint8Array([104, 101, 108, 108, 111]));
-    expect(mockOnImport).toBeCalled();
   });
 });

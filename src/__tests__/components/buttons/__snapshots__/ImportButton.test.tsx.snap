@@ -1,10 +1,42 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ImportButton loads while unavailable datasource 1`] = `
+exports[`ImportButton opens modal when clicking the button 1`] = `
+<div
+  data-testid="Modal"
+>
+  <button
+    class="float-right"
+    type="button"
+  >
+    X
+  </button>
+  <div>
+    <div
+      data-testid="DBImportButton"
+    />
+  </div>
+</div>
+`;
+
+exports[`ImportButton renders hidden modal on mount 1`] = `
 <div>
+  <div
+    data-testid="Modal"
+  >
+    <button
+      class="float-right"
+      type="button"
+    >
+      X
+    </button>
+    <div>
+      <div
+        data-testid="DBImportButton"
+      />
+    </div>
+  </div>
   <button
     class="btn btn-primary"
-    disabled=""
     id="import-button"
     type="button"
   >
@@ -31,10 +63,5 @@ exports[`ImportButton loads while unavailable datasource 1`] = `
       Import
     </span>
   </button>
-  <input
-    aria-label="importInput"
-    class="hidden"
-    type="file"
-  />
 </div>
 `;
