@@ -40,6 +40,7 @@ jobs:
             -Dsonar.organization=maffin-io
             -Dsonar.projectKey=maffin-io_maffin-app
             -Dsonar.sources=./src/
+            -Dsonar.exclusions=./src/__tests__/,./src/book/__tests__/
             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
