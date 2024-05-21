@@ -19,6 +19,11 @@ const config = {
       branches: 85.5,
     },
   },
+  coverageReporters: [
+    'text',
+    'text-summary',
+    'lcov'
+  ],
   testEnvironment: 'jest-environment-jsdom',
   testPathIgnorePatterns: [
     '/node_modules',
