@@ -60,7 +60,7 @@
     "react-tooltip": "^5.26.3",
     "reflect-metadata": "^0.2.2",
     "sharp": "^0.33.3",
-    "sql.js": "^1.10.2",
+    "sql.js": "^1.10.3",
     "typeorm": "^0.3.20",
     "winston-react": "^1.0.0-RC.0"
   },
