@@ -1,15 +1,20 @@
-<img align="left" src="https://github.com/maffin-io/maffin-app/blob/master/src/assets/images/maffin_logo_sm.png" width="70" height="65">
-
-
-# Maffin
-
-<p align="center">
+<div align="center">
+  <a href="http://maffin.io/">
+    <img src="https://github.com/maffin-io/maffin-app/blob/master/src/assets/images/maffin_logo_sm.png" width="200" height="200">
+  </a>
+  
   🌍 <a href="https://maffin.io" target="_blank">Landing page</a>&nbsp;&nbsp;
   🍭 <a href="https://demo.maffin.io" target="_blank">Our demo</a>&nbsp;&nbsp;
   📖 <a href="http://docs.maffin.io/docs" target="_blank">Help center</a>&nbsp;&nbsp;
   📰 <a href="https://blog.maffin.io" target="_blank">Blog</a>&nbsp;&nbsp;
-  👾 <a href="https://discord.gg/xeT2z4c35V" target="_blank">Discord</a>
-</p>
+</div>
+
+---
+
+[![Build](https://img.shields.io/github/actions/workflow/status/maffin-io/maffin-app/frontend-ci.yml?label=Build&logo=github)](https://github.com/maffin-io/maffin-app/actions/workflows/frontend-ci.yml)
+[![Sonar Coverage](https://img.shields.io/sonar/coverage/maffin-io_maffin-app?logo=sonarcloud&server=https://sonarcloud.io&label=Coverage)](https://sonarcloud.io/summary/new_code?id=maffin-io_maffin-app)
+[![Chat](https://img.shields.io/discord/1222940742335463566?logo=discord&label=Chat)](https://discord.gg/xeT2z4c35V)
+
 
 Maffin is an **accounting software** focused on particulars or small businesses. It allows you to track income, expenses, investments and other types of assets while showing your financials in nice dashboards and reports.
 
