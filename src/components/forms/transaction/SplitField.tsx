@@ -11,8 +11,17 @@ import { AccountSelector } from '@/components/selectors';
 import { currencyToSymbol } from '@/helpers/currency';
 import { usePrices } from '@/hooks/api';
 import { Account, Price } from '@/book/entities';
+import { priceOps } from '@/book/entities/priceOps';
 import { getAllowedSubAccounts } from '@/book/helpers/accountType';
+import { type TransactionFormContext } from './txFormOps';
 import type { FormValues } from './types';
+
+export const prepareSplitFieldProps = (
+  { action, form, disabled }: TransactionFormContext,
+  index: number,
+): SplitFieldProps => ({
+  action, index, form, disabled,
+});
 
 export type SplitFieldProps = {
   index: number;
@@ -39,25 +48,18 @@ export default function SplitField({
   const value = form.watch(`splits.${index}.value`);
 
   React.useEffect(() => {
-    if (
-      account
-      && date
-      && action === 'add'
-      && prices
-    ) {
-      let rate = null;
-      const d = DateTime.fromISO(date);
-      if (showValueField && txCurrency.namespace === 'CURRENCY') {
-        rate = account.commodity.namespace !== 'CURRENCY'
-          ? prices.getInvestmentPrice(account.commodity.mnemonic, d)
-          : prices.getPrice(account.commodity.mnemonic, txCurrency.mnemonic, d);
-
-        setExchangeRate(rate);
-      } else {
-        setExchangeRate(Price.create({ valueNum: 1, valueDenom: 1 }));
-      }
+    if (!account || !date || !prices) {
+      return;
     }
-  }, [account, showValueField, txCurrency, date, action, prices]);
+    if (action === 'add') {
+      const rate = priceOps.getExchangeRate(prices, {
+        date: DateTime.fromISO(date),
+        from: account.commodity,
+        to: txCurrency,
+      });
+      setExchangeRate(rate);
+    }
+  }, [account, txCurrency, date, action, prices]);
 
   React.useEffect(() => {
     if (value && action === 'add') {
