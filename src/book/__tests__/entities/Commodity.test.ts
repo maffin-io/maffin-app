@@ -49,16 +49,16 @@ describe('Commodity', () => {
       ]);
     });
 
-    it('calculates stockerId as expected', () => {
+    it('calculates exchangeId as expected', () => {
       instance = Commodity.create({
         namespace: 'namespace',
         mnemonic: 'mnemonic',
       });
 
-      expect(instance.stockerId).toEqual('mnemonic');
+      expect(instance.exchangeId).toEqual('mnemonic');
 
       instance.cusip = 'cusip';
-      expect(instance.stockerId).toEqual('cusip');
+      expect(instance.exchangeId).toEqual('cusip');
     });
 
     it('cannot create same commodity', async () => {

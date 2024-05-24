@@ -1,11 +1,11 @@
 'use server';
 
-import getPrices from '@/lib/yahoo';
-import type { Price as PriceInfo } from '@/lib/yahoo';
+import getPrices from '@/lib/external/yahoo';
+import type { Price } from '@/lib/external/yahoo';
 
 export default async function getTodayPrices(
   tickers: string[],
-): Promise<{ [ticker: string]: PriceInfo }> {
+): Promise<{ [ticker: string]: Price }> {
   const result = await getPrices(tickers);
   return result;
 }

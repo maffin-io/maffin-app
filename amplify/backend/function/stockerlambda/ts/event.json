@@ -1,7 +1,0 @@
-{
-  "httpMethod": "GET",
-  "path": "/api/prices/live",
-  "queryStringParameters": {
-    "ids": "IAG.MC,AIR.PA"
-  }
-}

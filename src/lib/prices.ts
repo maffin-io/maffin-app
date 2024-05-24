@@ -4,10 +4,10 @@ import { Commodity, Price } from '@/book/entities';
 import { getMainCurrency } from '@/lib/queries';
 import { toAmountWithScale } from '@/helpers/number';
 import { IS_PAID_PLAN } from '@/helpers/env';
-import getTodayPrices from '@/app/actions/getTodayPrices';
+import { getTodayPrices } from '@/app/actions';
 
 /**
- * Connect to Stocker API and retrieve current prices for
+ * Connect to external API and retrieve current prices for
  * all currency pairs and commodities.
  */
 export async function insertTodayPrices(): Promise<void> {
@@ -82,7 +82,7 @@ export async function insertTodayPrices(): Promise<void> {
     }
 
     const end = performance.now();
-    console.log(`/stocker/api/prices: ${end - start}ms`);
+    console.log(`/external/api/prices: ${end - start}ms`);
   }
 }
 

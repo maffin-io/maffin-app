@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import * as yh from '../yahoo';
+import getPrices from '@/lib/external/yahoo';
 
 jest.mock('axios');
 
@@ -32,18 +32,30 @@ describe('getPrice', () => {
     jest.clearAllMocks();
   });
 
-  it('calls api with expected params', async () => {
-    const result = await yh.getPrice('ticker', 1684139670);
+  it('calls yahoo with expected params', async () => {
+    const result = await getPrices(['ticker1', 'ticker2']);
 
-    expect(mockAxiosGet).toHaveBeenNthCalledWith(
+    expect(mockAxiosGet).nthCalledWith(
       1,
-      'https://query2.finance.yahoo.com/v8/finance/chart/ticker?interval=1d&includePrePost=false&period1=1684108800&period2=1684195199',
+      'https://query2.finance.yahoo.com/v8/finance/chart/ticker1?interval=1d&includePrePost=false',
+    );
+    expect(mockAxiosGet).nthCalledWith(
+      2,
+      'https://query2.finance.yahoo.com/v8/finance/chart/ticker2?interval=1d&includePrePost=false',
     );
     expect(result).toEqual({
-      currency: 'USD',
-      price: 1.89,
-      changePct: 5.59,
-      changeAbs: 0.1,
+      ticker1: {
+        currency: 'USD',
+        price: 1.89,
+        changePct: 5.59,
+        changeAbs: 0.1,
+      },
+      ticker2: {
+        currency: 'USD',
+        price: 1.89,
+        changePct: 5.59,
+        changeAbs: 0.1,
+      },
     });
   });
 
@@ -56,9 +68,7 @@ describe('getPrice', () => {
       },
     });
 
-    await expect(yh.getPrice('ticker', 1684139670)).rejects.toThrow(
-      'ticker failed: message',
-    );
+    expect(await getPrices(['ticker'])).toEqual({});
   });
 
   it('fails when unknown ticker', async () => {
@@ -75,9 +85,7 @@ describe('getPrice', () => {
       status: 404,
     }));
 
-    await expect(yh.getPrice('ticker', 1684139670)).rejects.toThrow(
-      'ticker \'ticker\' not found',
-    );
+    expect(await getPrices(['ticker'])).toEqual({});
   });
 
   it('fails when unknown error', async () => {
@@ -94,9 +102,7 @@ describe('getPrice', () => {
       status: 404,
     }));
 
-    await expect(yh.getPrice('ticker', 1684139670)).rejects.toThrow(
-      'error message',
-    );
+    expect(await getPrices(['ticker'])).toEqual({});
   });
 
   /**
@@ -122,52 +128,15 @@ describe('getPrice', () => {
       status: 404,
     }));
 
-    const resp = await yh.getPrice('ticker');
+    const resp = await getPrices(['ticker']);
 
     expect(resp).toEqual({
-      price: 212.5,
-      changePct: 0,
-      changeAbs: 0,
-      currency: 'EUR',
-    });
-  });
-
-  it('queries for previous day when on Sunday', async () => {
-    await yh.getPrice('ticker', 1696089600);
-
-    expect(mockAxiosGet).nthCalledWith(
-      1,
-      'https://query2.finance.yahoo.com/v8/finance/chart/ticker?interval=1d&includePrePost=false&period1=1695945600&period2=1696031999',
-    );
-  });
-
-  it('returns price *100 from http request call when GBp', async () => {
-    mockAxiosGet.mockImplementation(() => Promise.resolve({
-      data: {
-        chart: {
-          result: [
-            {
-              meta: {
-                currency: 'GBp',
-                chartPreviousClose: 210,
-                regularMarketPrice: 212.5,
-              },
-            },
-          ],
-          error: null,
-        },
+      ticker: {
+        price: 212.5,
+        changePct: 0,
+        changeAbs: 0,
+        currency: 'EUR',
       },
-      status: 200,
-      statusText: 'OK',
-    }));
-
-    const resp = await yh.getPrice('ticker');
-
-    expect(resp).toEqual({
-      price: 2.125,
-      changePct: 1.19,
-      changeAbs: 0.02,
-      currency: 'GBP',
     });
   });
 
@@ -191,13 +160,15 @@ describe('getPrice', () => {
       statusText: 'OK',
     }));
 
-    const resp = await yh.getPrice('ticker');
+    const resp = await getPrices(['ticker']);
 
     expect(resp).toEqual({
-      price: 2.125,
-      changePct: 1.19,
-      changeAbs: 0.02,
-      currency: 'GBP',
+      ticker: {
+        price: 2.125,
+        changePct: 1.19,
+        changeAbs: 0.02,
+        currency: 'GBP',
+      },
     });
   });
 
@@ -224,13 +195,15 @@ describe('getPrice', () => {
       statusText: 'OK',
     }));
 
-    const result = await yh.getPrice(ticker);
+    const result = await getPrices([ticker]);
 
     expect(mockAxiosGet).toBeCalledWith(
       `https://query2.finance.yahoo.com/v8/finance/chart/${expected}?interval=1d&includePrePost=false`,
     );
-    expect(result).toEqual(expect.objectContaining({
-      price,
-    }));
+    expect(result).toEqual({
+      [ticker]: expect.objectContaining({
+        price,
+      }),
+    });
   });
 });
