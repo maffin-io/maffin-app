@@ -68,7 +68,7 @@ export default class Price extends BaseEntity {
   })
     valueDenom!: number;
 
-  // Used to store price data from stocker
+  // Used to store price data from external exchange
   // if the price entry is created by maffin
   @Column({
     type: 'text',

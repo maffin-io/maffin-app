@@ -77,7 +77,7 @@ export default class Commodity extends BaseEntity {
   @IsString()
     cusip?: string;
 
-  get stockerId(): string {
+  get exchangeId(): string {
     return this.cusip || this.mnemonic;
   }
 
