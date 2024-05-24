@@ -9,7 +9,7 @@ import { useCommodities } from '@/hooks/api';
 import Loading from '@/components/Loading';
 import FormButton from '@/components/buttons/FormButton';
 import CommodityForm from '@/components/forms/commodity/CommodityForm';
-import { insertTodayPrices } from '@/lib/Stocker';
+import { insertTodayPrices } from '@/lib/prices';
 import CommodityCard from '@/components/CommodityCard';
 
 export default function CommoditiesPage(): JSX.Element {

@@ -1,16 +1,10 @@
-import { Amplify, API } from 'aws-amplify';
 import { DateTime } from 'luxon';
 
 import { Commodity, Price } from '@/book/entities';
 import { getMainCurrency } from '@/lib/queries';
 import { toAmountWithScale } from '@/helpers/number';
 import { IS_PAID_PLAN } from '@/helpers/env';
-
-import awsExports from '../aws-exports';
-
-Amplify.configure(awsExports);
-
-const API_NAME = 'stocker';
+import getTodayPrices from '@/app/actions/getTodayPrices';
 
 /**
  * Connect to Stocker API and retrieve current prices for
@@ -40,12 +34,7 @@ export async function insertTodayPrices(): Promise<void> {
       ...commodityTickers,
     ];
 
-    const options = {
-      queryStringParameters: {
-        ids: Array.from(new Set(tickers)).toString(),
-      },
-    };
-    const resp = await API.get(API_NAME, '/api/prices', options) as { [key: string]:LiveSummary; };
+    const resp = await getTodayPrices(Array.from(new Set(tickers)));
 
     const now = DateTime.now().startOf('day');
 
