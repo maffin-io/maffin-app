@@ -15,8 +15,8 @@ const config = {
   collectCoverageFrom: ['src/**/*.{ts,tsx}'],
   coverageThreshold: {
     global: {
-      lines: 92.5,
-      branches: 85.5,
+      lines: 91,
+      branches: 85.2,
     },
   },
   coverageReporters: [

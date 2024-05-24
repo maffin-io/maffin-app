@@ -13,11 +13,6 @@ jest.mock('@auth0/auth0-react', () => ({
   ...jest.requireActual('@auth0/auth0-react'),
 }));
 
-jest.mock('@/lib/Stocker', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/lib/Stocker'),
-}));
-
 jest.mock('@/helpers/errors', () => ({
   __esModule: true,
   ...jest.requireActual('@/helpers/errors'),

@@ -4,7 +4,7 @@ import initSqlJs from 'sql.js';
 import { Settings } from 'luxon';
 import pako from 'pako';
 
-import { insertTodayPrices } from '@/lib/Stocker';
+import { insertTodayPrices } from '@/lib/prices';
 import useBookStorage from '@/hooks/useBookStorage';
 import { migrate as migrateFromGnucash } from '@/lib/gnucash';
 import {
