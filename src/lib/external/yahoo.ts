@@ -45,25 +45,12 @@ export default async function getPrices(
     return {};
   }
 
-  console.log(result);
   return result;
 }
 
-export async function getPrice(t: string, when?: number): Promise<Price> {
+async function getPrice(t: string): Promise<Price> {
   const { ticker, transform } = formatTicker(t);
-  let url = `${HOST}/v8/finance/chart/${ticker}?interval=1d&includePrePost=false`;
-
-  if (when) {
-    let date = DateTime.fromSeconds(when, { zone: 'utc' });
-    // Yahoo api returns an error when we query price for Sunday
-    if (date.weekday === 6) {
-      date = date.minus({ days: 1 });
-    }
-    const end = date.endOf('day');
-    const start = end.startOf('day');
-
-    url = `${url}&period1=${Math.floor(start.toSeconds())}&period2=${Math.floor(end.toSeconds())}`;
-  }
+  const url = `${HOST}/v8/finance/chart/${ticker}?interval=1d&includePrePost=false`;
 
   let resp: AxiosResponse;
   try {

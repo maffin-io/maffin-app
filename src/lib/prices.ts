@@ -4,7 +4,7 @@ import { Commodity, Price } from '@/book/entities';
 import { getMainCurrency } from '@/lib/queries';
 import { toAmountWithScale } from '@/helpers/number';
 import { IS_PAID_PLAN } from '@/helpers/env';
-import getTodayPrices from '@/app/actions/getTodayPrices';
+import { getTodayPrices } from '@/app/actions';
 
 /**
  * Connect to Stocker API and retrieve current prices for
