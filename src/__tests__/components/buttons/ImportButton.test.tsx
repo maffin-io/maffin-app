@@ -20,6 +20,10 @@ jest.mock('@/components/buttons/import/DBImportButton', () => jest.fn(
   () => <div data-testid="DBImportButton" />,
 ));
 
+jest.mock('@/components/buttons/import/PlaidImportButton', () => jest.fn(
+  () => <div data-testid="PlaidImportButton" />,
+));
+
 describe('ImportButton', () => {
   afterEach(() => {
     jest.clearAllMocks();

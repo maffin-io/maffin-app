@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 import { BiImport } from 'react-icons/bi';
 
 import DBImportButton from './import/DBImportButton';
+import PlaidImportButton from './import/PlaidImportButton';
 
 export interface ImportButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
@@ -31,8 +32,9 @@ export default function ImportButton({
         >
           X
         </button>
-        <div>
+        <div className="grid grid-cols-2 justify-center mt-5">
           <DBImportButton onImport={() => setIsModalOpen(false)} />
+          <PlaidImportButton onImport={() => setIsModalOpen(false)} />
         </div>
       </Modal>
       <button
