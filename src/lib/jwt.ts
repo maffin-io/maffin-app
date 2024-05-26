@@ -2,11 +2,9 @@ import jwt from 'jsonwebtoken';
 import { JwksClient } from 'jwks-rsa';
 import type { JwtHeader, JwtPayload, SigningKeyCallback } from 'jsonwebtoken';
 
-import { CONFIG } from '@/helpers/env';
-
 function getKey(header: JwtHeader, callback: SigningKeyCallback) {
   const client = new JwksClient({
-    jwksUri: `https://${CONFIG.auth0.domain}/.well-known/jwks.json`,
+    jwksUri: `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/.well-known/jwks.json`,
   });
 
   client.getSigningKey(header.kid, (_, key) => {
