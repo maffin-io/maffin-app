@@ -7,18 +7,17 @@ import {
 } from '@auth0/auth0-react';
 
 import { Actions } from '@/app/actions';
-import { CONFIG } from '@/helpers/env';
 
 export default function Provider({
   children,
 }: React.PropsWithChildren): JSX.Element {
   return (
     <Auth0Provider
-      domain={CONFIG.auth0.domain}
-      clientId={CONFIG.auth0.clientId}
+      domain={process.env.NEXT_PUBLIC_AUTH0_DOMAIN as string}
+      clientId={process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID as string}
       authorizationParams={{
         redirect_uri: (typeof window !== 'undefined' && window.location.origin) || '',
-        scope: CONFIG.auth0.scopes,
+        scope: process.env.NEXT_PUBLIC_AUTH0_SCOPES,
         connection: 'maffin-gcp',
         audience: 'https://maffin',
       }}

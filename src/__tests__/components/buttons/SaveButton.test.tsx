@@ -14,6 +14,7 @@ import * as helpers_env from '@/helpers/env';
 import * as stateHooks from '@/hooks/state';
 
 jest.mock('@tanstack/react-query');
+jest.mock('@/lib/prices');
 
 jest.mock('@/helpers/env', () => ({
   __esModule: true,
