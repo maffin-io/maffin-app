@@ -34,7 +34,7 @@ export async function insertTodayPrices(): Promise<void> {
       ...commodityTickers,
     ];
 
-    const resp = await getTodayPrices(Array.from(new Set(tickers)));
+    const resp = await getTodayPrices({ tickers: Array.from(new Set(tickers)) });
 
     const now = DateTime.now().startOf('day');
 

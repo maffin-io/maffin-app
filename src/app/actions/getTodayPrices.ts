@@ -3,9 +3,13 @@
 import getPrices from '@/lib/external/yahoo';
 import type { Price } from '@/lib/external/yahoo';
 
-export default async function getTodayPrices(
+export default async function getTodayPrices({
+  tickers,
+  accessToken,
+}: {
   tickers: string[],
-): Promise<{ [ticker: string]: Price }> {
+  accessToken: string,
+}): Promise<{ [ticker: string]: Price }> {
   const result = await getPrices(tickers);
   return result;
 }

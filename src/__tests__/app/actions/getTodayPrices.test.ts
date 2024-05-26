@@ -18,7 +18,9 @@ describe('getTodayPrices', () => {
     };
     jest.spyOn(yahoo, 'default').mockResolvedValue(yahooPrices);
 
-    const prices = await getTodayPrices(['A']);
+    const prices = await getTodayPrices({
+      tickers: ['A'],
+    });
 
     expect(prices).toEqual(yahooPrices);
     expect(yahoo.default).toBeCalledWith(['A']);
