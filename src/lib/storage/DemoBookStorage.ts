@@ -1,4 +1,5 @@
 import pako from 'pako';
+import { Settings } from 'luxon';
 
 import BookStorage from '@/lib/storage/BookStorage';
 
@@ -10,10 +11,13 @@ export default class DemoBookStorage implements BookStorage {
   }
 
   async get(): Promise<Uint8Array> {
-    if (window.location.host === 'free.maffin.io') {
+    if (!(window.location.host === 'demo.maffin.io')) {
       return new Uint8Array([]);
     }
 
+    // When we show demo data, we set modify DateTime.now
+    // so it shows the stored data
+    Settings.now = () => 1703980800000; // 2023-12-31
     const response = await fetch(
       `/books/${this.fileName}.sqlite.gz`,
       {

@@ -10,17 +10,15 @@ import * as query from '@tanstack/react-query';
 import SaveButton from '@/components/buttons/SaveButton';
 import { DataSourceContext } from '@/hooks';
 import type { DataSourceContextType } from '@/hooks';
-import * as helpers_env from '@/helpers/env';
 import * as stateHooks from '@/hooks/state';
+import * as sessionHook from '@/hooks/useSession';
 
 jest.mock('@tanstack/react-query');
 jest.mock('@/lib/prices');
 
-jest.mock('@/helpers/env', () => ({
+jest.mock('@/hooks/useSession', () => ({
   __esModule: true,
-  get IS_PAID_PLAN() {
-    return true;
-  },
+  ...jest.requireActual('@/hooks/useSession'),
 }));
 
 jest.mock('@/hooks/state', () => ({
@@ -32,6 +30,7 @@ describe('SaveButton', () => {
   beforeEach(() => {
     jest.spyOn(query, 'useQuery').mockReturnValue({ data: false } as query.UseQueryResult<boolean>);
     jest.spyOn(stateHooks, 'useOnline').mockReturnValue({ isOnline: true });
+    jest.spyOn(sessionHook, 'default').mockReturnValue({ isPremium: true } as sessionHook.SessionReturn);
   });
 
   it('loads while unavailable datasource', async () => {
@@ -103,7 +102,7 @@ describe('SaveButton', () => {
   });
 
   it('is disabled when not PAID_PLAN', async () => {
-    jest.spyOn(helpers_env, 'IS_PAID_PLAN', 'get').mockReturnValue(false);
+    jest.spyOn(sessionHook, 'default').mockReturnValue({ isPremium: false } as sessionHook.SessionReturn);
     render(
       <DataSourceContext.Provider value={{ isLoaded: true } as DataSourceContextType}>
         <SaveButton />

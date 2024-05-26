@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-import { verify } from '@/lib/jwt';
+import { isPremium, verify } from '@/lib/jwt';
 
 describe('verify', () => {
   beforeEach(() => {
@@ -26,5 +26,23 @@ describe('verify', () => {
     );
 
     await expect(verify('token')).rejects.toThrow('fail');
+  });
+});
+
+describe('isPremium', () => {
+  it('returns true when premium', async () => {
+    jest.spyOn(jwt, 'decode').mockReturnValue({
+      'https://maffin/roles': ['premium'],
+    });
+
+    expect(await isPremium('token')).toBe(true);
+  });
+
+  it('returns false when not premium', async () => {
+    jest.spyOn(jwt, 'decode').mockReturnValue({
+      'https://maffin/roles': [],
+    });
+
+    expect(await isPremium('token')).toBe(false);
   });
 });

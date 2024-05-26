@@ -4,7 +4,7 @@ import useBookStorage from '@/hooks/useBookStorage';
 import * as gapiHooks from '@/hooks/useGapiClient';
 import BookStorage from '@/lib/storage/GDriveBookStorage';
 import DemoBookStorage from '@/lib/storage/DemoBookStorage';
-import * as helpers_env from '@/helpers/env';
+import * as sessionHook from '@/hooks/useSession';
 
 jest.mock('@/hooks/useGapiClient', () => ({
   __esModule: true,
@@ -13,20 +13,15 @@ jest.mock('@/hooks/useGapiClient', () => ({
 
 jest.mock('@/lib/storage/GDriveBookStorage');
 
-jest.mock('@/helpers/env', () => ({
+jest.mock('@/hooks/useSession', () => ({
   __esModule: true,
-  get IS_DEMO_PLAN() {
-    return false;
-  },
-  get IS_PAID_PLAN() {
-    return false;
-  },
+  ...jest.requireActual('@/hooks/useSession'),
 }));
 
 describe('useBookStorage', () => {
   beforeEach(() => {
     jest.spyOn(gapiHooks, 'default').mockReturnValue([false]);
-    jest.spyOn(helpers_env, 'IS_PAID_PLAN', 'get').mockReturnValue(true);
+    jest.spyOn(sessionHook, 'default').mockReturnValue({ isPremium: true } as sessionHook.SessionReturn);
   });
 
   afterEach(() => {
@@ -53,9 +48,8 @@ describe('useBookStorage', () => {
     });
   });
 
-  it('returns DemoStorage when IS_DEMO_PLAN', async () => {
-    jest.spyOn(helpers_env, 'IS_PAID_PLAN', 'get').mockReturnValue(false);
-    jest.spyOn(helpers_env, 'IS_DEMO_PLAN', 'get').mockReturnValue(true);
+  it('returns DemoStorage when not premium', async () => {
+    jest.spyOn(sessionHook, 'default').mockReturnValue({ isPremium: false } as sessionHook.SessionReturn);
     window.gapi = {
       client: {} as typeof gapi.client,
     } as typeof gapi;

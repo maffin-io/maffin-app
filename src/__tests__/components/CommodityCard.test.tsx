@@ -6,6 +6,7 @@ import * as apiHooks from '@/hooks/api';
 import { PriceDBMap } from '@/book/prices';
 import type { Commodity, Price } from '@/book/entities';
 import CommodityCard from '@/components/CommodityCard';
+import * as sessionHook from '@/hooks/useSession';
 
 jest.mock('@/hooks/api');
 
@@ -13,16 +14,15 @@ jest.mock('@/components/Loading', () => jest.fn(
   () => <div data-testid="Loading" />,
 ));
 
-jest.mock('@/helpers/env', () => ({
+jest.mock('@/hooks/useSession', () => ({
   __esModule: true,
-  get IS_PAID_PLAN() {
-    return true;
-  },
+  ...jest.requireActual('@/hooks/useSession'),
 }));
 
 describe('CommodityCard', () => {
   let eur: Commodity;
   beforeEach(() => {
+    jest.spyOn(sessionHook, 'default').mockReturnValue({ isPremium: true } as sessionHook.SessionReturn);
     jest.spyOn(apiHooks, 'useCommodity').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
     jest.spyOn(apiHooks, 'usePrices').mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
 
