@@ -9,14 +9,9 @@ import { Toaster } from 'react-hot-toast';
 
 import '@/css/globals.css';
 import Auth0Provider from '@/lib/auth0-provider';
-import { IS_DEMO_PLAN } from '@/helpers/env';
 
 if (process.env.NODE_ENV === 'development') {
   Settings.throwOnInvalid = true;
-}
-
-if (IS_DEMO_PLAN) {
-  Settings.now = () => 1703980800000; // 2023-12-31
 }
 
 const queryClient = new QueryClient({

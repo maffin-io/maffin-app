@@ -9,7 +9,7 @@ import {
 import { Tooltip, UpgradeTooltip } from '@/components/tooltips';
 import { useCommodity, useMainCurrency, usePrices } from '@/hooks/api';
 import Loading from '@/components/Loading';
-import { IS_PAID_PLAN } from '@/helpers/env';
+import useSession from '@/hooks/useSession';
 
 export type CommodityCardProps = {
   guid: string;
@@ -21,6 +21,7 @@ export default function CommodityCard({
   const { data: commodity } = useCommodity(guid);
   const { data: mainCurrency } = useMainCurrency();
   const { data: prices } = usePrices({ from: commodity });
+  const { isPremium } = useSession();
 
   if (!commodity || !prices) {
     return <Loading />;
@@ -132,7 +133,7 @@ export default function CommodityCard({
       {
         !priceAvailable
         && (
-          IS_PAID_PLAN
+          isPremium
             ? (
               <Tooltip
                 id={`missing-price-${guid}`}

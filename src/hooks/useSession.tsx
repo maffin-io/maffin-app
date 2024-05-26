@@ -2,6 +2,8 @@ import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import type { User, Auth0ContextInterface } from '@auth0/auth0-react';
 
+import { isPremium as jwtIsPremium } from '@/lib/jwt';
+
 const emptyUser: User = {
   name: '',
   email: '',
@@ -10,6 +12,7 @@ const emptyUser: User = {
 
 export type SessionReturn = {
   accessToken: string,
+  isPremium: boolean,
 } & Auth0ContextInterface<User>;
 
 /**
@@ -17,28 +20,50 @@ export type SessionReturn = {
  */
 export default function useSession(): SessionReturn {
   const auth0 = useAuth0();
-  const [accessToken, setAccessToken] = React.useState('');
+  const [googleAccessToken, setGoogleAccessToken] = React.useState('');
+  const [isPremium, setIsPremium] = React.useState(false);
 
   /**
-   * Note that we have the accessToken attribute
+   * Note that we have the google accessToken attribute
    * in the user profile because we have a custom action
    * in Auth0 that adds it from user_metadata.
    */
   React.useEffect(() => {
     async function load(u: User) {
-      setAccessToken(u.accessToken);
+      setGoogleAccessToken(u.accessToken);
     }
 
     if (auth0.user && auth0.isAuthenticated) {
       load(auth0.user);
     }
-  }, [auth0.user, auth0.isAuthenticated, setAccessToken]);
+  }, [auth0.user, auth0.isAuthenticated, setGoogleAccessToken]);
+
+  /**
+   * This is only for UI purposes and shouldn't be used as
+   * a way to secure access to private resources as it is client side.
+   *
+   * The server resources are protected server side by verifying the
+   * token server side.
+   */
+  React.useEffect(() => {
+    async function load() {
+      const accessToken = await auth0.getAccessTokenSilently();
+      if (await jwtIsPremium(accessToken)) {
+        setIsPremium(true);
+      }
+    }
+
+    if (auth0.isAuthenticated) {
+      load();
+    }
+  }, [auth0]);
 
   return {
     ...auth0,
-    accessToken,
+    accessToken: googleAccessToken,
     isAuthenticated: auth0.isAuthenticated,
     isLoading: auth0.isLoading,
+    isPremium,
     user: auth0.user || emptyUser,
   };
 }

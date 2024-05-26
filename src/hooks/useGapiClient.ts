@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { IS_PAID_PLAN } from '@/helpers/env';
 import useSession from './useSession';
 
 const isBrowser = typeof window !== 'undefined';
@@ -48,10 +47,6 @@ export default function useGapiClient() {
       window.gapi.client.setToken({ access_token: accessToken });
     }
   }, [isLoaded, accessToken]);
-
-  if (!IS_PAID_PLAN) {
-    return [true];
-  }
 
   return [!!(isLoaded && accessToken)];
 }

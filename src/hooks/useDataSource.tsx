@@ -16,7 +16,6 @@ import {
   Transaction,
 } from '@/book/entities';
 import { MIGRATIONS } from '@/book/migrations';
-import { IS_DEMO_PLAN } from '@/helpers/env';
 import { useQueryClient } from '@tanstack/react-query';
 import type BookStorage from '@/lib/storage/BookStorage';
 import { MaffinError, StorageError } from '@/helpers/errors';
@@ -121,7 +120,7 @@ async function save(storage: BookStorage) {
 }
 
 async function importBook(storage: BookStorage, rawData: Uint8Array) {
-  if (IS_DEMO_PLAN) {
+  if (process.env.NEXT_PUBLIC_ENV !== 'master') {
     Settings.now = () => Date.now();
   }
   let parsedData;

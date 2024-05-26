@@ -13,10 +13,24 @@ jest.mock('@/lib/jwt', () => ({
 }));
 
 describe('getTodayPrices', () => {
+  beforeEach(() => {
+    jest.spyOn(jwt, 'verify').mockImplementation();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('throws error when token not verified', async () => {
+    jest.spyOn(jwt, 'verify').mockImplementation(() => { throw new Error('fail'); });
+
+    await expect(() => getTodayPrices({
+      tickers: ['A'],
+    })).rejects.toThrow('fail');
+  });
+
   it('returns empty when not premium user', async () => {
-    jest.spyOn(jwt, 'verify').mockResolvedValue({
-      'https://maffin/roles': [],
-    });
+    jest.spyOn(jwt, 'isPremium').mockResolvedValue(false);
     jest.spyOn(yahoo, 'default').mockImplementation();
 
     const prices = await getTodayPrices({
@@ -28,9 +42,7 @@ describe('getTodayPrices', () => {
   });
 
   it('calls getPrices when premium user', async () => {
-    jest.spyOn(jwt, 'verify').mockResolvedValue({
-      'https://maffin/roles': ['premium'],
-    });
+    jest.spyOn(jwt, 'isPremium').mockResolvedValue(true);
 
     const yahooPrices = {
       A: {

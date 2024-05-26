@@ -2,7 +2,7 @@
 
 import getPrices from '@/lib/external/yahoo';
 import type { Price } from '@/lib/external/yahoo';
-import { verify } from '@/lib/jwt';
+import { isPremium, verify } from '@/lib/jwt';
 
 /**
  * Action to retrieve prices from an external API.
@@ -17,8 +17,8 @@ export default async function getTodayPrices({
   tickers: string[],
   accessToken: string,
 }): Promise<{ [ticker: string]: Price }> {
-  const token = await verify(accessToken);
-  if (!token['https://maffin/roles'].includes('premium')) {
+  await verify(accessToken);
+  if (!await isPremium(accessToken)) {
     return {};
   }
 
