@@ -8,8 +8,8 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 
 import '@/css/globals.css';
-import { Auth0Provider } from '@/lib/auth0-provider';
-import { CONFIG, IS_DEMO_PLAN } from '@/helpers/env';
+import Auth0Provider from '@/lib/auth0-provider';
+import { IS_DEMO_PLAN } from '@/helpers/env';
 
 if (process.env.NODE_ENV === 'development') {
   Settings.throwOnInvalid = true;
@@ -44,15 +44,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
-        <Auth0Provider
-          domain={CONFIG.auth0.domain}
-          clientId={CONFIG.auth0.clientId}
-          authorizationParams={{
-            redirect_uri: (typeof window !== 'undefined' && window.location.origin) || '',
-            scope: CONFIG.auth0.scopes,
-            connection: 'maffin-gcp',
-          }}
-        >
+        <Auth0Provider>
           <QueryClientProvider client={queryClient}>
             <ReactQueryDevtools initialIsOpen={false} />
             {children}

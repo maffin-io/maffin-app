@@ -32,6 +32,7 @@ const config = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^uuid$': 'uuid',
+    "^jose": 'jose',
   },
 }
 

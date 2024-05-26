@@ -4,6 +4,7 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 import crypto from 'crypto';
+import { TextEncoder, TextDecoder } from 'util';
 
 import { DateTime, Interval, Settings } from 'luxon';
 import { QueryClient } from '@tanstack/react-query';
@@ -79,3 +80,5 @@ Object.defineProperty(
     }),
   },
 );
+
+Object.assign(global, { TextDecoder, TextEncoder });
