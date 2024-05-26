@@ -37,7 +37,7 @@ describe('Auth0Provider', () => {
     expect(auth0.Auth0Provider).toBeCalledWith(
       {
         authorizationParams: {
-          audience: 'https://premium',
+          audience: 'https://maffin',
           connection: 'maffin-gcp',
           redirect_uri: 'http://localhost',
           scope: 'profile email',

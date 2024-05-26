@@ -20,7 +20,7 @@ export default function Provider({
         redirect_uri: (typeof window !== 'undefined' && window.location.origin) || '',
         scope: CONFIG.auth0.scopes,
         connection: 'maffin-gcp',
-        audience: 'https://premium',
+        audience: 'https://maffin',
       }}
     >
       <AccessTokenActionProvider>{children}</AccessTokenActionProvider>
