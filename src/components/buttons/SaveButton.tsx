@@ -4,9 +4,9 @@ import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames';
 
 import { DataSourceContext } from '@/hooks';
-import { IS_PAID_PLAN } from '@/helpers/env';
 import { useOnline } from '@/hooks/state';
 import { UpgradeTooltip } from '@/components/tooltips';
+import useSession from '@/hooks/useSession';
 
 export default function SaveButton(): JSX.Element {
   const { data: isSaving } = useQuery({
@@ -16,6 +16,7 @@ export default function SaveButton(): JSX.Element {
   });
   const { isLoaded, save } = React.useContext(DataSourceContext);
   const { isOnline } = useOnline();
+  const { isPremium } = useSession();
 
   if (!isLoaded) {
     return (
@@ -39,7 +40,7 @@ export default function SaveButton(): JSX.Element {
             'btn-danger': !isOnline,
           },
         )}
-        disabled={isSaving || !IS_PAID_PLAN || !isOnline}
+        disabled={isSaving || !isPremium || !isOnline}
         data-tooltip-id="storage-upgrade-tooltip"
         onClick={async () => {
           await save();
@@ -72,7 +73,7 @@ export default function SaveButton(): JSX.Element {
         }
       </button>
       {
-        !IS_PAID_PLAN
+        !isPremium
         && (
           <UpgradeTooltip
             id="storage-upgrade-tooltip"

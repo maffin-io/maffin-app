@@ -2,18 +2,10 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 
 import useGapiClient from '@/hooks/useGapiClient';
 import * as sessionHook from '@/hooks/useSession';
-import * as helpers_env from '@/helpers/env';
 
 jest.mock('@/hooks/useSession', () => ({
   __esModule: true,
   ...jest.requireActual('@/hooks/useSession'),
-}));
-
-jest.mock('@/helpers/env', () => ({
-  __esModule: true,
-  get IS_PAID_PLAN() {
-    return true;
-  },
 }));
 
 describe('useGapiClient', () => {
@@ -21,7 +13,6 @@ describe('useGapiClient', () => {
     // @ts-ignore
     window.gapi = null;
 
-    jest.spyOn(helpers_env, 'IS_PAID_PLAN', 'get').mockReturnValue(true);
     jest.spyOn(sessionHook, 'default').mockReturnValue({
       accessToken: '',
     } as sessionHook.SessionReturn);
@@ -63,13 +54,6 @@ describe('useGapiClient', () => {
 
     // eslint-disable-next-line testing-library/no-node-access
     expect(document.body.getElementsByTagName('script').length).toEqual(1);
-  });
-
-  it('returns true when not PAID_PLAN', () => {
-    jest.spyOn(helpers_env, 'IS_PAID_PLAN', 'get').mockReturnValue(false);
-    const { result } = renderHook(() => useGapiClient());
-
-    expect(result.current).toEqual([true]);
   });
 
   it('returns false when script onload not finished', () => {

@@ -7,6 +7,7 @@ frontend:
     build:
       commands:
         - rm -rf .next/
+        - cp .env.$USER_BRANCH .env
         - NEXT_PUBLIC_ENV=$USER_BRANCH yarn maffin:build
   artifacts:
     baseDirectory: .next

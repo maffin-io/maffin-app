@@ -33,6 +33,13 @@ describe('DemoBookStorage', () => {
           arrayBuffer: () => Promise.resolve(rawBook.buffer),
         })) as jest.Mock,
       );
+      Object.defineProperty(window, 'location', {
+        value: {
+          host: 'demo.maffin.io',
+        },
+        writable: true,
+      });
+
       await instance.initStorage();
     });
 
@@ -52,10 +59,10 @@ describe('DemoBookStorage', () => {
       expect(content).toEqual(pako.ungzip(rawBook));
     });
 
-    it('returns empty data when in free.maffin.io', async () => {
+    it('returns empty data when domain not demo.maffin.io', async () => {
       Object.defineProperty(window, 'location', {
         value: {
-          host: 'free.maffin.io',
+          host: 'app.maffin.io',
         },
         writable: true,
       });

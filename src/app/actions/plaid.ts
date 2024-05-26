@@ -29,7 +29,7 @@ export async function createLinkToken(userId: string) {
     },
     client_name: 'Maffin',
     products: [Products.Transactions],
-    country_codes: [CountryCode.Es],
+    country_codes: Object.values(CountryCode),
     language: 'en',
   });
 

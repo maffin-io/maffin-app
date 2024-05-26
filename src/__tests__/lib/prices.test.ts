@@ -5,7 +5,6 @@ import { insertTodayPrices } from '@/lib/prices';
 import { Commodity, Price } from '@/book/entities';
 import * as queries from '@/lib/queries';
 import * as actions from '@/app/actions';
-import * as helpers_env from '@/helpers/env';
 
 jest.mock('@/lib/queries', () => ({
   __esModule: true,
@@ -15,13 +14,6 @@ jest.mock('@/lib/queries', () => ({
 jest.mock('@/app/actions', () => ({
   __esModule: true,
   ...jest.requireActual('@/app/actions'),
-}));
-
-jest.mock('@/helpers/env', () => ({
-  __esModule: true,
-  get IS_PAID_PLAN() {
-    return true;
-  },
 }));
 
 describe('prices', () => {
@@ -35,7 +27,6 @@ describe('prices', () => {
         namespace: 'CURRENCY',
       } as Commodity;
 
-      jest.spyOn(helpers_env, 'IS_PAID_PLAN', 'get').mockReturnValue(true);
       jest.spyOn(queries, 'getMainCurrency').mockResolvedValue(eur);
       jest.spyOn(actions, 'getTodayPrices').mockResolvedValue({});
       jest.spyOn(Commodity, 'find').mockResolvedValue([]);
@@ -48,17 +39,31 @@ describe('prices', () => {
       jest.clearAllMocks();
     });
 
-    it('does not call when IS_PAID_PLAN is false', async () => {
-      jest.spyOn(helpers_env, 'IS_PAID_PLAN', 'get').mockReturnValue(false);
-      await insertTodayPrices();
-      expect(Commodity.find).not.toBeCalled();
-      expect(actions.getTodayPrices).not.toBeCalled();
-    });
-
     it('works with just main currency', async () => {
       await insertTodayPrices();
 
-      expect(actions.getTodayPrices).toBeCalledWith([]);
+      expect(actions.getTodayPrices).toBeCalledWith({ tickers: [] });
+      expect(Price.upsert).toBeCalledWith(
+        [],
+        { conflictPaths: ['fk_commodity', 'fk_currency', 'date'] },
+      );
+    });
+
+    /**
+     * Empty response can happen either because user has no permissions or something
+     * failed in the server
+     */
+    it('works when empty response', async () => {
+      const usd = {
+        guid: 'usd',
+        mnemonic: 'USD',
+        namespace: 'CURRENCY',
+      } as Commodity;
+
+      jest.spyOn(Commodity, 'findBy').mockResolvedValue([eur, usd]);
+      await insertTodayPrices();
+
+      expect(actions.getTodayPrices).toBeCalledWith({ tickers: ['USDEUR=X'] });
       expect(Price.upsert).toBeCalledWith(
         [],
         { conflictPaths: ['fk_commodity', 'fk_currency', 'date'] },
@@ -89,7 +94,7 @@ describe('prices', () => {
 
       await insertTodayPrices();
 
-      expect(actions.getTodayPrices).toBeCalledWith(['USDEUR=X', 'GOOGL', 'IE00']);
+      expect(actions.getTodayPrices).toBeCalledWith({ tickers: ['USDEUR=X', 'GOOGL', 'IE00'] });
     });
 
     it('creates and upserts prices', async () => {
