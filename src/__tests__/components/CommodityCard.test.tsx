@@ -22,7 +22,9 @@ jest.mock('@/hooks/useSession', () => ({
 describe('CommodityCard', () => {
   let eur: Commodity;
   beforeEach(() => {
-    jest.spyOn(sessionHook, 'default').mockReturnValue({ isPremium: true } as sessionHook.SessionReturn);
+    jest.spyOn(sessionHook, 'default').mockReturnValue({
+      roles: { isPremium: true },
+    } as sessionHook.SessionReturn);
     jest.spyOn(apiHooks, 'useCommodity').mockReturnValue({ data: undefined } as UseQueryResult<Commodity>);
     jest.spyOn(apiHooks, 'usePrices').mockReturnValue({ data: undefined } as UseQueryResult<PriceDBMap>);
 

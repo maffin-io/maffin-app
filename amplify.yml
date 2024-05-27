@@ -8,6 +8,7 @@ frontend:
       commands:
         - rm -rf .next/
         - cp .env.$USER_BRANCH .env
+        - echo "PLAID_SECRET=$PLAID_SECRET" >> .env
         - NEXT_PUBLIC_ENV=$USER_BRANCH yarn maffin:build
   artifacts:
     baseDirectory: .next

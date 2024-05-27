@@ -21,7 +21,7 @@ export default function CommodityCard({
   const { data: commodity } = useCommodity(guid);
   const { data: mainCurrency } = useMainCurrency();
   const { data: prices } = usePrices({ from: commodity });
-  const { isPremium } = useSession();
+  const { roles } = useSession();
 
   if (!commodity || !prices) {
     return <Loading />;
@@ -133,7 +133,7 @@ export default function CommodityCard({
       {
         !priceAvailable
         && (
-          isPremium
+          roles.isPremium
             ? (
               <Tooltip
                 id={`missing-price-${guid}`}

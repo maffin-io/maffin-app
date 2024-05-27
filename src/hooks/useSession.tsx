@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import type { User, Auth0ContextInterface } from '@auth0/auth0-react';
 
-import { isPremium as jwtIsPremium } from '@/lib/jwt';
+import { getRoles } from '@/lib/jwt';
 
 const emptyUser: User = {
   name: '',
@@ -12,7 +12,10 @@ const emptyUser: User = {
 
 export type SessionReturn = {
   accessToken: string,
-  isPremium: boolean,
+  roles: {
+    isPremium: boolean,
+    isBeta: boolean,
+  },
 } & Auth0ContextInterface<User>;
 
 /**
@@ -21,7 +24,10 @@ export type SessionReturn = {
 export default function useSession(): SessionReturn {
   const auth0 = useAuth0();
   const [googleAccessToken, setGoogleAccessToken] = React.useState('');
-  const [isPremium, setIsPremium] = React.useState(false);
+  const [roles, setRoles] = React.useState({
+    isPremium: false,
+    isBeta: false,
+  });
 
   /**
    * Note that we have the google accessToken attribute
@@ -48,9 +54,7 @@ export default function useSession(): SessionReturn {
   React.useEffect(() => {
     async function load() {
       const accessToken = await auth0.getAccessTokenSilently();
-      if (await jwtIsPremium(accessToken)) {
-        setIsPremium(true);
-      }
+      setRoles(await getRoles(accessToken));
     }
 
     if (auth0.isAuthenticated) {
@@ -63,7 +67,7 @@ export default function useSession(): SessionReturn {
     accessToken: googleAccessToken,
     isAuthenticated: auth0.isAuthenticated,
     isLoading: auth0.isLoading,
-    isPremium,
+    roles,
     user: auth0.user || emptyUser,
   };
 }

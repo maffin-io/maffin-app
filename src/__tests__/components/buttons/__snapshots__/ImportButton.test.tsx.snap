@@ -10,9 +10,14 @@ exports[`ImportButton opens modal when clicking the button 1`] = `
   >
     X
   </button>
-  <div>
+  <div
+    class="grid grid-cols-2 justify-center mt-5"
+  >
     <div
       data-testid="DBImportButton"
+    />
+    <div
+      data-testid="PlaidImportButton"
     />
   </div>
 </div>
@@ -29,9 +34,14 @@ exports[`ImportButton renders hidden modal on mount 1`] = `
     >
       X
     </button>
-    <div>
+    <div
+      class="grid grid-cols-2 justify-center mt-5"
+    >
       <div
         data-testid="DBImportButton"
+      />
+      <div
+        data-testid="PlaidImportButton"
       />
     </div>
   </div>
