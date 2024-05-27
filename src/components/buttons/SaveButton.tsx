@@ -16,7 +16,7 @@ export default function SaveButton(): JSX.Element {
   });
   const { isLoaded, save } = React.useContext(DataSourceContext);
   const { isOnline } = useOnline();
-  const { isPremium } = useSession();
+  const { roles } = useSession();
 
   if (!isLoaded) {
     return (
@@ -40,7 +40,7 @@ export default function SaveButton(): JSX.Element {
             'btn-danger': !isOnline,
           },
         )}
-        disabled={isSaving || !isPremium || !isOnline}
+        disabled={isSaving || !roles.isPremium || !isOnline}
         data-tooltip-id="storage-upgrade-tooltip"
         onClick={async () => {
           await save();
@@ -73,7 +73,7 @@ export default function SaveButton(): JSX.Element {
         }
       </button>
       {
-        !isPremium
+        !roles.isPremium
         && (
           <UpgradeTooltip
             id="storage-upgrade-tooltip"

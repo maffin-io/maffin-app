@@ -15,7 +15,7 @@ type UseBookStorageReturn = {
 export default function useBookStorage(): UseBookStorageReturn {
   const [isGapiLoaded] = useGapiClient();
   const [storage, setStorage] = React.useState<BookStorage | null>(null);
-  const { isPremium } = useSession();
+  const { roles } = useSession();
 
   const [error, setError] = React.useState<Error | null>(null);
   if (error) {
@@ -26,7 +26,7 @@ export default function useBookStorage(): UseBookStorageReturn {
     async function load() {
       let instance: BookStorage = new DemoBookStorage();
 
-      if (isPremium) {
+      if (roles.isPremium) {
         instance = new GDriveBookStorage(window.gapi.client);
       }
 
@@ -41,7 +41,7 @@ export default function useBookStorage(): UseBookStorageReturn {
     if (isGapiLoaded) {
       load();
     }
-  }, [isGapiLoaded, isPremium]);
+  }, [isGapiLoaded, roles.isPremium]);
 
   return { storage };
 }

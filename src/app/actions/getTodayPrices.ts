@@ -2,7 +2,7 @@
 
 import getPrices from '@/lib/external/yahoo';
 import type { Price } from '@/lib/external/yahoo';
-import { isPremium, verify } from '@/lib/jwt';
+import { getRoles, verify } from '@/lib/jwt';
 
 /**
  * Action to retrieve prices from an external API.
@@ -18,7 +18,7 @@ export default async function getTodayPrices({
   accessToken: string,
 }): Promise<{ [ticker: string]: Price }> {
   await verify(accessToken);
-  if (!await isPremium(accessToken)) {
+  if (!(await getRoles(accessToken)).isPremium) {
     return {};
   }
 

@@ -21,7 +21,9 @@ jest.mock('@/hooks/useSession', () => ({
 describe('useBookStorage', () => {
   beforeEach(() => {
     jest.spyOn(gapiHooks, 'default').mockReturnValue([false]);
-    jest.spyOn(sessionHook, 'default').mockReturnValue({ isPremium: true } as sessionHook.SessionReturn);
+    jest.spyOn(sessionHook, 'default').mockReturnValue({
+      roles: { isPremium: true },
+    } as sessionHook.SessionReturn);
   });
 
   afterEach(() => {
@@ -49,7 +51,9 @@ describe('useBookStorage', () => {
   });
 
   it('returns DemoStorage when not premium', async () => {
-    jest.spyOn(sessionHook, 'default').mockReturnValue({ isPremium: false } as sessionHook.SessionReturn);
+    jest.spyOn(sessionHook, 'default').mockReturnValue({
+      roles: { isPremium: false },
+    } as sessionHook.SessionReturn);
     window.gapi = {
       client: {} as typeof gapi.client,
     } as typeof gapi;

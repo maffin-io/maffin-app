@@ -1,5 +1,4 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { DateTime } from 'luxon';
 
 export type Price = {
   price: number,

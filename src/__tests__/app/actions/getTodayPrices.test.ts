@@ -30,7 +30,7 @@ describe('getTodayPrices', () => {
   });
 
   it('returns empty when not premium user', async () => {
-    jest.spyOn(jwt, 'isPremium').mockResolvedValue(false);
+    jest.spyOn(jwt, 'getRoles').mockResolvedValue({ isPremium: false, isBeta: true });
     jest.spyOn(yahoo, 'default').mockImplementation();
 
     const prices = await getTodayPrices({
@@ -42,7 +42,7 @@ describe('getTodayPrices', () => {
   });
 
   it('calls getPrices when premium user', async () => {
-    jest.spyOn(jwt, 'isPremium').mockResolvedValue(true);
+    jest.spyOn(jwt, 'getRoles').mockResolvedValue({ isPremium: true, isBeta: true });
 
     const yahooPrices = {
       A: {

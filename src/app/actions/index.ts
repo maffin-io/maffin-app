@@ -1,4 +1,5 @@
 import getTodayPrices from './getTodayPrices';
+import { createLinkToken } from './plaid';
 
 export class Actions {
   static _accessToken: string;
@@ -23,3 +24,16 @@ const wrappedGetTodayPrices = ({
   })
 );
 export { wrappedGetTodayPrices as getTodayPrices };
+
+const wrapperCreateLinkToken = ({
+  userId,
+}: {
+  userId: string,
+}): ReturnType<typeof createLinkToken> => (
+  createLinkToken({
+    accessToken: Actions.accessToken,
+    userId,
+  })
+);
+export { wrapperCreateLinkToken as createLinkToken };
+export { createAccessToken, getTransactions } from './plaid';

@@ -1,9 +1,15 @@
 import * as plaid from 'plaid';
 import type { AxiosResponse } from 'axios';
 
-import { createLinkToken, createAccessToken, getTransactions } from '@/app/actions/plaid';
+import { createLinkToken, createAccessToken, getTransactions } from '@/app/actions';
+import * as jwt from '@/lib/jwt';
 
 jest.mock('plaid');
+
+jest.mock('@/lib/jwt', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/lib/jwt'),
+}));
 
 describe('createLinkToken', () => {
   beforeEach(() => {
@@ -12,10 +18,34 @@ describe('createLinkToken', () => {
         link_token: 'token',
       },
     } as AxiosResponse);
+    jest.spyOn(jwt, 'verify').mockImplementation();
+    jest.spyOn(jwt, 'getRoles').mockResolvedValue({ isPremium: true, isBeta: true });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('throws error when token not verified', async () => {
+    jest.spyOn(jwt, 'verify').mockImplementation(() => { throw new Error('fail'); });
+
+    await expect(() => createLinkToken({
+      userId: 'user-id',
+    })).rejects.toThrow('fail');
+  });
+
+  it('returns empty when not beta user', async () => {
+    jest.spyOn(jwt, 'getRoles').mockResolvedValue({ isPremium: true, isBeta: false });
+
+    const token = await createLinkToken({
+      userId: 'user-id',
+    });
+
+    expect(token).toEqual('');
   });
 
   it('returns link token', async () => {
-    const token = await createLinkToken('user-id');
+    const token = await createLinkToken({ userId: 'user-id' });
 
     expect(plaid.PlaidApi.prototype.linkTokenCreate).toBeCalledWith({
       client_name: 'Maffin',

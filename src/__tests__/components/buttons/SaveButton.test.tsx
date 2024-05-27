@@ -30,7 +30,9 @@ describe('SaveButton', () => {
   beforeEach(() => {
     jest.spyOn(query, 'useQuery').mockReturnValue({ data: false } as query.UseQueryResult<boolean>);
     jest.spyOn(stateHooks, 'useOnline').mockReturnValue({ isOnline: true });
-    jest.spyOn(sessionHook, 'default').mockReturnValue({ isPremium: true } as sessionHook.SessionReturn);
+    jest.spyOn(sessionHook, 'default').mockReturnValue({
+      roles: { isPremium: true },
+    } as sessionHook.SessionReturn);
   });
 
   it('loads while unavailable datasource', async () => {
@@ -102,7 +104,9 @@ describe('SaveButton', () => {
   });
 
   it('is disabled when not PAID_PLAN', async () => {
-    jest.spyOn(sessionHook, 'default').mockReturnValue({ isPremium: false } as sessionHook.SessionReturn);
+    jest.spyOn(sessionHook, 'default').mockReturnValue({
+      roles: { isPremium: false },
+    } as sessionHook.SessionReturn);
     render(
       <DataSourceContext.Provider value={{ isLoaded: true } as DataSourceContextType}>
         <SaveButton />

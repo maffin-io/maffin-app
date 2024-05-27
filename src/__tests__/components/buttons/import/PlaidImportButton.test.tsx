@@ -4,19 +4,19 @@ import {
   screen,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import * as auth0 from '@auth0/auth0-react';
 import * as plaidLink from 'react-plaid-link';
 import type { AccountBase, TransactionsSyncResponse } from 'plaid';
 
 import ImportButton from '@/components/buttons/import/PlaidImportButton';
 import { DataSourceContext } from '@/hooks';
-import * as actions from '@/app/actions/plaid';
+import * as actions from '@/app/actions';
+import * as sessionHook from '@/hooks/useSession';
 import * as plaidDTO from '@/lib/external/plaid';
 import type { DataSourceContextType } from '@/hooks';
 
-jest.mock('@/app/actions/plaid', () => ({
+jest.mock('@/app/actions', () => ({
   __esModule: true,
-  ...jest.requireActual('@/app/actions/plaid'),
+  ...jest.requireActual('@/app/actions'),
 }));
 
 jest.mock('@/lib/external/plaid', () => ({
@@ -24,33 +24,46 @@ jest.mock('@/lib/external/plaid', () => ({
   ...jest.requireActual('@/lib/external/plaid'),
 }));
 
-jest.mock('@auth0/auth0-react', () => ({
-  __esModule: true,
-  ...jest.requireActual('@auth0/auth0-react'),
-}));
-
 jest.mock('react-plaid-link', () => ({
   __esModule: true,
   ...jest.requireActual('react-plaid-link'),
 }));
 
+jest.mock('@/hooks/useSession', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/hooks/useSession'),
+}));
+
 describe('PlaidImportButton', () => {
   beforeEach(() => {
-    jest.spyOn(auth0, 'useAuth0').mockReturnValue({
-      user: {
-        sub: 'user-id',
-      },
-    } as auth0.Auth0ContextInterface<auth0.User>);
     jest.spyOn(plaidLink, 'usePlaidLink').mockReturnValue({
       ready: true,
       open: jest.fn(),
       exit: jest.fn(),
       error: null,
     });
+    jest.spyOn(sessionHook, 'default').mockReturnValue({
+      user: { sub: 'user-id' },
+      roles: { isBeta: true },
+    } as sessionHook.SessionReturn);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  it('returns empty when not beta user', async () => {
+    jest.spyOn(sessionHook, 'default').mockReturnValue({
+      roles: { isBeta: false },
+    } as sessionHook.SessionReturn);
+
+    const { container } = render(
+      <DataSourceContext.Provider value={{ isLoaded: false } as DataSourceContextType}>
+        <ImportButton />
+      </DataSourceContext.Provider>,
+    );
+
+    expect(container.outerHTML).toEqual('<div><span></span></div>');
   });
 
   it('disables button when datasource not available', async () => {
@@ -98,7 +111,7 @@ describe('PlaidImportButton', () => {
 
     await user.click(importButton);
 
-    expect(actions.createLinkToken).toBeCalledWith('user-id');
+    expect(actions.createLinkToken).toBeCalledWith({ userId: 'user-id' });
     expect(mockOpen).toBeCalled();
     expect(plaidLink.usePlaidLink).nthCalledWith(
       2,

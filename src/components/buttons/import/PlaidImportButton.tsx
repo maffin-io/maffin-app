@@ -1,12 +1,12 @@
 import React from 'react';
 import Image from 'next/image';
-import { useAuth0 } from '@auth0/auth0-react';
 import { usePlaidLink, PlaidLinkOnSuccess } from 'react-plaid-link';
 
+import useSession from '@/hooks/useSession';
 import { Tooltip } from '@/components/tooltips';
 import { DataSourceContext } from '@/hooks';
 import { createEntitiesFromData } from '@/lib/external/plaid';
-import { createLinkToken, createAccessToken, getTransactions } from '@/app/actions/plaid';
+import { createLinkToken, createAccessToken, getTransactions } from '@/app/actions';
 import plaidLogo from '@/assets/images/plaid_logo.png';
 
 export interface ImportButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -30,7 +30,7 @@ export default function PlaidImportButton({
   onImport,
   ...props
 }: Readonly<ImportButtonProps>): JSX.Element {
-  const { user } = useAuth0();
+  const { user, roles } = useSession();
   const [linkToken, setLinkToken] = React.useState('');
   const { isLoaded } = React.useContext(DataSourceContext);
 
@@ -52,13 +52,17 @@ export default function PlaidImportButton({
     }
   }, [open, linkToken]);
 
+  if (!roles.isBeta) {
+    return <span />;
+  }
+
   return (
     <button
       id="plaid-import-button"
       type="button"
       disabled={!(isLoaded)}
       onClick={async () => {
-        const token = await createLinkToken(user?.sub as string);
+        const token = await createLinkToken({ userId: user?.sub as string });
         setLinkToken(token);
       }}
       className={className}
