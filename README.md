@@ -46,3 +46,11 @@ Maffin is implemented using <a href="https://typeorm.io/" target="_blank">TypeOr
 - Run the frontend with `yarn maffin:dev`. This will run using the local demo data.
 
 Happy coding 🥳.
+
+## Contributing
+
+The project is open to contributions. I try to keep some good first time issues to get started. If you want to work on bigger stuff I have some cool ideas that can be discussed further like:
+
+- SQL editor improvements like text to SQL, graphs, etc.
+- AI local chat to talk about your data
+- Import plugin system (i.e. so you can import any CSV, etc.)
