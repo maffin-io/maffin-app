@@ -27,7 +27,7 @@ export async function verify(token: string): Promise<JwtPayload> {
   return verified;
 }
 
-export async function getRoles(token: string): Promise<{ isPremium: boolean, isBeta: boolean }> {
+export function getRoles(token: string): { isPremium: boolean, isBeta: boolean } {
   const decoded = jwt.decode(token) as JwtPayload;
   return {
     isPremium: decoded['https://maffin/roles'].includes('premium'),

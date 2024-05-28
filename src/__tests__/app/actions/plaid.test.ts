@@ -19,7 +19,7 @@ describe('createLinkToken', () => {
       },
     } as AxiosResponse);
     jest.spyOn(jwt, 'verify').mockImplementation();
-    jest.spyOn(jwt, 'getRoles').mockResolvedValue({ isPremium: true, isBeta: true });
+    jest.spyOn(jwt, 'getRoles').mockReturnValue({ isPremium: true, isBeta: true });
   });
 
   afterEach(() => {
@@ -35,7 +35,7 @@ describe('createLinkToken', () => {
   });
 
   it('returns empty when not beta user', async () => {
-    jest.spyOn(jwt, 'getRoles').mockResolvedValue({ isPremium: true, isBeta: false });
+    jest.spyOn(jwt, 'getRoles').mockReturnValue({ isPremium: true, isBeta: false });
 
     const token = await createLinkToken({
       userId: 'user-id',

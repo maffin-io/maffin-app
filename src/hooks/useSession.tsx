@@ -2,8 +2,6 @@ import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import type { User, Auth0ContextInterface } from '@auth0/auth0-react';
 
-import { getRoles } from '@/lib/jwt';
-
 const emptyUser: User = {
   name: '',
   email: '',
@@ -53,8 +51,10 @@ export default function useSession(): SessionReturn {
    */
   React.useEffect(() => {
     async function load() {
-      const accessToken = await auth0.getAccessTokenSilently();
-      setRoles(await getRoles(accessToken));
+      setRoles({
+        isPremium: (auth0.user as User)['https://maffin/roles'].includes('premium'),
+        isBeta: (auth0.user as User)['https://maffin/roles'].includes('beta'),
+      });
     }
 
     if (auth0.isAuthenticated) {

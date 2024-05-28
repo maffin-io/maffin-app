@@ -31,7 +31,7 @@ export async function createLinkToken({
   accessToken: string,
 }): Promise<string> {
   await verify(accessToken);
-  if (!(await getRoles(accessToken)).isBeta) {
+  if (!getRoles(accessToken).isBeta) {
     return '';
   }
 
