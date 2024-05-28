@@ -18,7 +18,7 @@ export default async function getTodayPrices({
   accessToken: string,
 }): Promise<{ [ticker: string]: Price }> {
   await verify(accessToken);
-  if (!(await getRoles(accessToken)).isPremium) {
+  if (!getRoles(accessToken).isPremium) {
     return {};
   }
 

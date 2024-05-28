@@ -35,7 +35,7 @@ describe('getRoles', () => {
       'https://maffin/roles': ['premium', 'beta'],
     });
 
-    expect(await getRoles('token')).toEqual({ isPremium: true, isBeta: true });
+    expect(getRoles('token')).toEqual({ isPremium: true, isBeta: true });
   });
 
   it('returns false', async () => {
@@ -43,6 +43,6 @@ describe('getRoles', () => {
       'https://maffin/roles': [],
     });
 
-    expect(await getRoles('token')).toEqual({ isPremium: false, isBeta: false });
+    expect(getRoles('token')).toEqual({ isPremium: false, isBeta: false });
   });
 });

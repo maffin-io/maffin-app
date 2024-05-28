@@ -2,7 +2,6 @@ import { renderHook, waitFor } from '@testing-library/react';
 import * as auth0 from '@auth0/auth0-react';
 
 import useSession from '@/hooks/useSession';
-import * as jwt from '@/lib/jwt';
 
 jest.mock('next/navigation');
 
@@ -20,9 +19,7 @@ describe('useSession', () => {
   beforeEach(() => {
     jest.spyOn(auth0, 'useAuth0').mockReturnValue({
       isAuthenticated: false,
-      getAccessTokenSilently: jest.fn() as Function,
     } as auth0.Auth0ContextInterface<auth0.User>);
-    jest.spyOn(jwt, 'getRoles').mockResolvedValue({ isPremium: true, isBeta: true });
   });
 
   it('returns emptyUser when no user', async () => {
@@ -42,11 +39,11 @@ describe('useSession', () => {
       email: 'iomaffin@gmail.com',
       name: 'name',
       accessToken: 'accessToken',
+      'https://maffin/roles': ['premium', 'beta'],
     } as auth0.User;
     jest.spyOn(auth0, 'useAuth0').mockReturnValue({
       isAuthenticated: true,
       user,
-      getAccessTokenSilently: jest.fn() as Function,
     } as auth0.Auth0ContextInterface<auth0.User>);
 
     const { result } = renderHook(() => useSession());
