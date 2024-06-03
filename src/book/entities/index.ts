@@ -1,4 +1,5 @@
 export { default as Account } from './Account';
+export { default as BankConfig } from './BankConfig';
 export { default as Commodity } from './Commodity';
 export { default as Price } from './Price';
 export { default as Split } from './Split';

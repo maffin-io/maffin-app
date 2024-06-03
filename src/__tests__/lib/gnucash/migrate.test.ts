@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 import { migrate } from '@/lib/gnucash';
 import {
   Account,
+  BankConfig,
   Commodity,
   Split,
   Transaction,
@@ -17,7 +18,7 @@ describe('importBook', () => {
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Account, Commodity, Split, Transaction],
+      entities: [Account, BankConfig, Commodity, Split, Transaction],
       synchronize: true,
       logging: false,
     });

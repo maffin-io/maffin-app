@@ -14,6 +14,7 @@ import type { UseQueryResult } from '@tanstack/react-query';
 import Onboarding from '@/components/onboarding/Onboarding';
 import {
   Account,
+  BankConfig,
   Commodity,
   Price,
   Split,
@@ -37,7 +38,7 @@ describe('Onboarding', () => {
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Account, Commodity, Price, Split, Transaction],
+      entities: [Account, BankConfig, Commodity, Price, Split, Transaction],
       synchronize: true,
       logging: false,
     });

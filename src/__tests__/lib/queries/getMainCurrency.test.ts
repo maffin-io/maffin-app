@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 
 import {
   Account,
+  BankConfig,
   Commodity,
   Split,
   Transaction,
@@ -18,7 +19,7 @@ describe('getMainCurrency', () => {
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Account, Commodity, Split, Transaction],
+      entities: [Account, BankConfig, Commodity, Split, Transaction],
       synchronize: true,
       logging: false,
     });

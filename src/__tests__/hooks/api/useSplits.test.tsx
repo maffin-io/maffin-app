@@ -14,6 +14,7 @@ import {
 } from '@/hooks/api';
 import {
   Account,
+  BankConfig,
   Commodity,
   Split,
   Transaction,
@@ -37,7 +38,7 @@ describe('useSplits', () => {
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Split, Transaction, Account, Commodity],
+      entities: [Split, Transaction, Account, BankConfig, Commodity],
       synchronize: true,
       logging: false,
     });

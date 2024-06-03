@@ -14,6 +14,7 @@ import { UseQueryResult } from '@tanstack/react-query';
 import { getAllowedSubAccounts } from '@/book/helpers/accountType';
 import {
   Account,
+  BankConfig,
   Commodity,
   Price,
   Split,
@@ -40,7 +41,7 @@ describe('AccountForm', () => {
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Account, Commodity, Price, Split, Transaction],
+      entities: [Account, BankConfig, Commodity, Price, Split, Transaction],
       synchronize: true,
       logging: false,
     });
