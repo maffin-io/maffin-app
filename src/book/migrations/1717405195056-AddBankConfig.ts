@@ -1,6 +1,7 @@
 import {
   MigrationInterface,
   QueryRunner,
+  Table,
   TableForeignKey,
 } from 'typeorm';
 
@@ -10,7 +11,7 @@ import {
 export class AddBankConfig1717405195056 implements MigrationInterface {
   // eslint-disable-next-line class-methods-use-this
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const columnExists = await queryRunner.hasTable('bank_config');
+    const columnExists = await queryRunner.hasColumn('accounts', 'bank_config');
     if (!columnExists) {
       await queryRunner.query(
         'ALTER TABLE "accounts" ADD COLUMN "config_guid" VARCHAR(32)',
@@ -22,6 +23,28 @@ export class AddBankConfig1717405195056 implements MigrationInterface {
           columnNames: ['config_guid'],
           referencedColumnNames: ['guid'],
           referencedTableName: 'bank_config',
+        }),
+      );
+    }
+
+    const tableExists = await queryRunner.hasTable('bank_config');
+    if (!tableExists) {
+      await queryRunner.createTable(
+        new Table({
+          name: 'bank_config',
+          columns: [
+            {
+              name: 'guid',
+              type: 'varchar',
+              length: '32',
+              isPrimary: true,
+            },
+            {
+              name: 'token',
+              type: 'varchar',
+              length: '2048',
+            },
+          ],
         }),
       );
     }
