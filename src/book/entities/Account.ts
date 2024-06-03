@@ -29,6 +29,7 @@ import {
 import type Commodity from './Commodity';
 import Split from './Split';
 import BaseEntity from './BaseEntity';
+import BankConfig from './BankConfig';
 
 /**
  * CREATE TABLE accounts (
@@ -109,6 +110,10 @@ export default class Account extends BaseEntity {
 
   @OneToMany('Split', (split: Split) => split.fk_account)
     splits!: Split[];
+
+  @ManyToOne('BankConfig', (config: BankConfig) => config.accounts)
+  @JoinColumn({ name: 'config_guid' })
+    config!: BankConfig;
 
   @Column({
     type: 'text',

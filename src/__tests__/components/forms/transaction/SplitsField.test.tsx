@@ -11,6 +11,7 @@ import type { UseQueryResult } from '@tanstack/react-query';
 
 import {
   Account,
+  BankConfig,
   Commodity,
   Price,
   Split,
@@ -42,7 +43,7 @@ describe('SplitsField', () => {
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Account, Commodity, Split, Transaction, Price],
+      entities: [Account, BankConfig, Commodity, Split, Transaction, Price],
       synchronize: true,
       logging: false,
     });

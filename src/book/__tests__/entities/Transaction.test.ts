@@ -7,6 +7,7 @@ import {
   Transaction,
   Split,
   Account,
+  BankConfig,
 } from '../../entities';
 
 describe('Transaction', () => {
@@ -20,7 +21,7 @@ describe('Transaction', () => {
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Account, Commodity, Split, Transaction],
+      entities: [Account, BankConfig, Commodity, Split, Transaction],
       synchronize: true,
       logging: false,
     });
@@ -269,7 +270,7 @@ describe('caching', () => {
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Account, Commodity, Split, Transaction],
+      entities: [Account, BankConfig, Commodity, Split, Transaction],
       synchronize: true,
       logging: false,
       extra: {

@@ -4,6 +4,7 @@ import { DataSource } from 'typeorm';
 import { InvestmentAccount } from '@/book/models';
 import {
   Account,
+  BankConfig,
   Commodity,
   Transaction,
   Split,
@@ -24,7 +25,7 @@ describe('InvestmentAccount', () => {
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Account, Commodity, Price, Split, Transaction],
+      entities: [Account, BankConfig, Commodity, Price, Split, Transaction],
       synchronize: true,
       logging: false,
     });

@@ -6,6 +6,7 @@ import {
   Transaction,
   Split,
   Account,
+  BankConfig,
 } from '../../entities';
 
 describe('Book', () => {
@@ -16,7 +17,7 @@ describe('Book', () => {
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Account, Book, Commodity, Split, Transaction],
+      entities: [Account, BankConfig, Book, Commodity, Split, Transaction],
       synchronize: true,
       logging: false,
     });

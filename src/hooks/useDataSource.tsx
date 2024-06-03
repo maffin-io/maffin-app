@@ -9,6 +9,7 @@ import useBookStorage from '@/hooks/useBookStorage';
 import { migrate as migrateFromGnucash } from '@/lib/gnucash';
 import {
   Account,
+  BankConfig,
   Book,
   Commodity,
   Price,
@@ -31,7 +32,7 @@ const DATASOURCE: DataSource = new DataSource({
   type: 'sqljs',
   synchronize: true,
   logging: false,
-  entities: [Account, Book, Commodity, Price, Split, Transaction],
+  entities: [Account, BankConfig, Book, Commodity, Price, Split, Transaction],
   migrations: MIGRATIONS,
 });
 
@@ -63,7 +64,7 @@ export default function useDataSource(): DataSourceContextType {
             type: 'sqljs',
             synchronize: true,
             logging: false,
-            entities: [Account, Book, Commodity, Price, Split, Transaction],
+            entities: [Account, BankConfig, Book, Commodity, Price, Split, Transaction],
             migrations: MIGRATIONS,
             extra: {
               queryClient,

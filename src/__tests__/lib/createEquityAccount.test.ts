@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 import createEquityAccount from '@/lib/createEquityAccount';
 import {
   Account,
+  BankConfig,
   Commodity,
   Split,
   Transaction,
@@ -19,7 +20,7 @@ describe('createEquityAccount', () => {
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Account, Commodity, Split, Transaction],
+      entities: [Account, BankConfig, Commodity, Split, Transaction],
       synchronize: true,
       logging: false,
     });

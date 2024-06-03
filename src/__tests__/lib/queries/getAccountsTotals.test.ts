@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 
 import {
   Account,
+  BankConfig,
   Commodity,
   Price,
   Split,
@@ -22,7 +23,7 @@ describe('getAccountsTotals', () => {
     datasource = new DataSource({
       type: 'sqljs',
       dropSchema: true,
-      entities: [Account, Commodity, Price, Split, Transaction],
+      entities: [Account, BankConfig, Commodity, Price, Split, Transaction],
       synchronize: true,
       logging: false,
     });
