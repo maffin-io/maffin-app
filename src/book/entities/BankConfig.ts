@@ -25,3 +25,6 @@ export default class BankConfig extends BaseEntity {
   )
     accounts!: Account[];
 }
+
+// https://github.com/typeorm/typeorm/issues/4714
+Object.defineProperty(BankConfig, 'name', { value: 'BankConfig' });
