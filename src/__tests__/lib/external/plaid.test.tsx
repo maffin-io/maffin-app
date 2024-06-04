@@ -1,13 +1,49 @@
-import { Account, Commodity } from '@/book/entities';
+import { Account, BankConfig, Commodity } from '@/book/entities';
 import { AccountType, TransactionsSyncResponse } from 'plaid';
 
-import { createEntitiesFromData } from '@/lib/external/plaid';
+import { createAccounts, createConfig } from '@/lib/external/plaid';
 
-describe('createEntitiesFromData', () => {
+describe('createConfig', () => {
+  beforeEach(() => {
+    jest.spyOn(BankConfig, 'findOneBy').mockResolvedValue({
+      guid: 'guid',
+      token: 'token',
+    } as BankConfig);
+  });
+
+  it('fails if config exists', async () => {
+    await expect(createConfig('ins_123')).rejects.toThrow('This institution is already linked');
+  });
+
+  it('creates new config when not existing', async () => {
+    jest.spyOn(BankConfig, 'findOneBy').mockResolvedValue(null);
+    const mockSave = jest.fn((e) => e);
+    jest.spyOn(BankConfig, 'create').mockReturnValue({
+      guid: 'guid',
+      save: mockSave as Function,
+    } as BankConfig);
+
+    await createConfig('ins_123');
+    expect(BankConfig.create).toHaveBeenCalledWith({
+      guid: 'ins_123',
+      token: '',
+    });
+    expect(mockSave).toHaveBeenCalled();
+  });
+});
+
+describe('create accounts', () => {
   let eur: Commodity;
   let assetsRoot: Account;
+  let config: BankConfig;
 
   beforeEach(() => {
+    config = {
+      guid: 'guid',
+      token: 'token',
+      save: jest.fn() as Function,
+    } as BankConfig;
+
     eur = {
       mnemonic: 'EUR',
       namespace: 'CURRENCY',
@@ -30,35 +66,37 @@ describe('createEntitiesFromData', () => {
   });
 
   it('creates account', async () => {
-    await createEntitiesFromData({
-      accounts: [
+    await createAccounts(
+      config,
+      [
         {
-          persistent_account_id: 'guid',
+          account_id: 'guid',
           name: 'Name',
           balances: {
             iso_currency_code: 'EUR',
           },
         },
-      ],
-    } as TransactionsSyncResponse);
+      ] as TransactionsSyncResponse['accounts'],
+    );
 
-    expect(Commodity.findOneBy).toBeCalledWith({
+    expect(Commodity.findOneBy).toHaveBeenCalledWith({
       mnemonic: 'EUR',
       namespace: 'CURRENCY',
     });
-    expect(Account.findOneByOrFail).toBeCalledWith({
+    expect(Account.findOneByOrFail).toHaveBeenCalledWith({
       type: 'ASSET',
       parent: {
         type: 'ROOT',
       },
     });
-    expect(Account.create).toBeCalledWith({
+    expect(Account.create).toHaveBeenCalledWith({
       name: 'Name',
-      guid: 'plaid-guid',
-      description: 'Synced account',
+      guid: 'guid',
+      description: 'Online banking account',
       type: 'BANK',
       fk_commodity: eur,
       parent: assetsRoot,
+      fk_config: config,
     });
   });
 
@@ -66,20 +104,21 @@ describe('createEntitiesFromData', () => {
     [AccountType.Credit, 'CREDIT'],
     [AccountType.Loan, 'LIABILITY'],
   ])('creates account type %s', async (type, expected) => {
-    await createEntitiesFromData({
-      accounts: [
+    await createAccounts(
+      config,
+      [
         {
-          persistent_account_id: 'guid',
+          account_id: 'guid',
           name: 'Name',
           type,
           balances: {
             iso_currency_code: 'EUR',
           },
         },
-      ],
-    } as TransactionsSyncResponse);
+      ] as TransactionsSyncResponse['accounts'],
+    );
 
-    expect(Account.create).toBeCalledWith(expect.objectContaining({
+    expect(Account.create).toHaveBeenCalledWith(expect.objectContaining({
       type: expected,
     }));
   });
@@ -94,20 +133,21 @@ describe('createEntitiesFromData', () => {
       save: () => usd as Partial<Commodity>,
     } as Commodity);
 
-    await createEntitiesFromData({
-      accounts: [
+    await createAccounts(
+      config,
+      [
         {
-          persistent_account_id: 'guid',
+          account_id: 'guid',
           name: 'Name',
           balances: {
             iso_currency_code: 'USD',
           },
         },
-      ],
-    } as TransactionsSyncResponse);
+      ] as TransactionsSyncResponse['accounts'],
+    );
 
-    expect(Commodity.create).toBeCalledWith(usd);
-    expect(Account.create).toBeCalledWith(expect.objectContaining({
+    expect(Commodity.create).toHaveBeenCalledWith(usd);
+    expect(Account.create).toHaveBeenCalledWith(expect.objectContaining({
       fk_commodity: usd,
     }));
   });

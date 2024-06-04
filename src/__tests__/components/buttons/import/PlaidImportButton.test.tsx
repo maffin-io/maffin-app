@@ -12,7 +12,9 @@ import { DataSourceContext } from '@/hooks';
 import * as actions from '@/app/actions';
 import * as sessionHook from '@/hooks/useSession';
 import * as plaidDTO from '@/lib/external/plaid';
+import { MaffinError } from '@/helpers/errors';
 import type { DataSourceContextType } from '@/hooks';
+import type { BankConfig } from '@/book/entities';
 
 jest.mock('@/app/actions', () => ({
   __esModule: true,
@@ -107,13 +109,13 @@ describe('PlaidImportButton', () => {
     );
 
     const importButton = await screen.findByRole('button');
-    expect(mockOpen).not.toBeCalled();
+    expect(mockOpen).not.toHaveBeenCalled();
 
     await user.click(importButton);
 
-    expect(actions.createLinkToken).toBeCalledWith({ userId: 'user-id' });
-    expect(mockOpen).toBeCalled();
-    expect(plaidLink.usePlaidLink).nthCalledWith(
+    expect(actions.createLinkToken).toHaveBeenCalledWith({ userId: 'user-id' });
+    expect(mockOpen).toHaveBeenCalled();
+    expect(plaidLink.usePlaidLink).toHaveBeenNthCalledWith(
       2,
       {
         onSuccess: expect.any(Function),
@@ -131,7 +133,14 @@ describe('PlaidImportButton', () => {
     jest.spyOn(actions, 'getTransactions').mockResolvedValue({
       accounts: [] as AccountBase[],
     } as TransactionsSyncResponse);
-    jest.spyOn(plaidDTO, 'createEntitiesFromData').mockImplementation();
+    jest.spyOn(plaidDTO, 'createAccounts').mockImplementation();
+
+    const config = {
+      guid: 'guid',
+      token: '',
+      save: jest.fn() as Function,
+    } as BankConfig;
+    jest.spyOn(plaidDTO, 'createConfig').mockResolvedValue(config);
 
     render(
       <DataSourceContext.Provider value={{ isLoaded: true } as DataSourceContextType}>
@@ -143,13 +152,41 @@ describe('PlaidImportButton', () => {
     await user.click(importButton);
     const { onSuccess } = (plaidLink.usePlaidLink as jest.Mock).mock.calls[0][0];
 
-    await onSuccess('public_token');
+    await onSuccess('public_token', { institution: { institution_id: 'inst_123' } });
 
-    expect(actions.createAccessToken).toBeCalledWith('public_token');
-    expect(actions.getTransactions).toBeCalledWith('access_token');
-    expect(plaidDTO.createEntitiesFromData).toBeCalledWith({
-      accounts: [],
-    });
-    expect(mockOnImport).toBeCalled();
+    expect(plaidDTO.createConfig).toHaveBeenCalledWith('inst_123');
+    expect(actions.createAccessToken).toHaveBeenCalledWith('public_token');
+    expect(actions.getTransactions).toHaveBeenCalledWith('access_token');
+    expect(plaidDTO.createAccounts).toHaveBeenCalledWith(config, []);
+    expect(mockOnImport).toHaveBeenCalled();
+  });
+
+  it('shows error on entity creation', async () => {
+    const user = userEvent.setup();
+    const mockOnImport = jest.fn();
+
+    jest.spyOn(actions, 'createLinkToken').mockResolvedValue('link_token');
+    const error = new MaffinError('message', 'code');
+    jest.spyOn(error, 'show');
+    jest.spyOn(plaidDTO, 'createConfig').mockImplementation(async () => { throw error; });
+
+    render(
+      <DataSourceContext.Provider value={{ isLoaded: true } as DataSourceContextType}>
+        <ImportButton onImport={mockOnImport} />
+      </DataSourceContext.Provider>,
+    );
+
+    const importButton = await screen.findByRole('button');
+    await user.click(importButton);
+    const { onSuccess } = (plaidLink.usePlaidLink as jest.Mock).mock.calls[0][0];
+
+    await onSuccess('public_token', { institution: { institution_id: 'inst_123' } });
+
+    expect(plaidDTO.createConfig).toHaveBeenCalledWith('inst_123');
+    expect(error.show).toHaveBeenCalled();
+    expect(actions.createAccessToken).not.toHaveBeenCalled();
+    expect(actions.getTransactions).not.toHaveBeenCalled();
+    expect(plaidDTO.createAccounts).not.toHaveBeenCalled();
+    expect(mockOnImport).toHaveBeenCalled();
   });
 });
