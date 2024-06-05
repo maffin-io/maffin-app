@@ -1,32 +1,43 @@
 import { AccountType } from 'plaid';
 import type { TransactionsSyncResponse } from 'plaid';
 
-import { Account, Commodity } from '@/book/entities';
+import {
+  Account,
+  BankConfig,
+  Commodity,
+} from '@/book/entities';
+import { MaffinError } from '@/helpers/errors';
 
 /**
- * Transform the response returned from transactionsSync to our entities.
- *  - If the currency exists we re-used, if not we create a new one.
- *  - If the account is a depository, the type is BANK. If credit 'CREDIT' and if
- *    loan then 'LIABILITY'. I'm aware there are more types, we can add them
- *    whenever is needed
+ * Check if the institution already exists. If it does we don't let the user
+ * create another one as Plaid charges for each config Item that is create
  */
-export async function createEntitiesFromData(data: TransactionsSyncResponse) {
-  const { accounts } = data;
+export async function createConfig(guid: string): Promise<BankConfig> {
+  const config = await BankConfig.findOneBy({ guid });
 
-  await Promise.all(
+  if (config) {
+    throw new MaffinError(
+      'This institution is already linked',
+      'PLAID_DUPLICATE',
+    );
+  }
+
+  return BankConfig.create({
+    guid,
+    token: '',
+  }).save();
+}
+
+/**
+ * Given a transactions response from Plaid, creates the accounts
+ * and links them to the bank config object
+ */
+export async function createAccounts(
+  config: BankConfig,
+  accounts: TransactionsSyncResponse['accounts'],
+): Promise<Account[]> {
+  const accs = await Promise.all(
     accounts.map(async (account) => {
-      let commodity = await Commodity.findOneBy({
-        namespace: 'CURRENCY',
-        mnemonic: account.balances.iso_currency_code as string,
-      });
-
-      if (!commodity) {
-        commodity = await Commodity.create({
-          namespace: 'CURRENCY',
-          mnemonic: account.balances.iso_currency_code as string,
-        }).save();
-      }
-
       let type = 'BANK';
       let parent = await Account.findOneByOrFail({
         type: 'ASSET',
@@ -44,14 +55,34 @@ export async function createEntitiesFromData(data: TransactionsSyncResponse) {
         });
       }
 
-      await Account.create({
-        guid: `plaid-${account.persistent_account_id}`,
+      const currency = await getOrCreateCurrency(account.balances.iso_currency_code as string);
+      return Account.create({
+        guid: `${account.account_id}`,
         name: account.name,
-        fk_commodity: commodity,
+        fk_commodity: currency,
         type,
-        description: 'Synced account',
+        description: 'Online banking account',
         parent,
+        fk_config: config,
       }).save();
     }),
   );
+
+  return accs;
+}
+
+async function getOrCreateCurrency(mnemonic: string): Promise<Commodity> {
+  let currency = await Commodity.findOneBy({
+    namespace: 'CURRENCY',
+    mnemonic,
+  });
+
+  if (!currency) {
+    currency = await Commodity.create({
+      namespace: 'CURRENCY',
+      mnemonic,
+    }).save();
+  }
+
+  return currency;
 }

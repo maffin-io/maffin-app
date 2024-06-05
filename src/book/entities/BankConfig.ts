@@ -6,9 +6,10 @@ import {
 import {
   IsString,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 import BaseEntity from './BaseEntity';
-import type Account from './Account';
+import Account from './Account';
 
 @Entity('bank_config')
 export default class BankConfig extends BaseEntity {
@@ -21,8 +22,9 @@ export default class BankConfig extends BaseEntity {
 
   @OneToMany(
     'Account',
-    (account: Account) => account.config,
+    (account: Account) => account.fk_config,
   )
+  @Type(() => Account)
     accounts!: Account[];
 }
 

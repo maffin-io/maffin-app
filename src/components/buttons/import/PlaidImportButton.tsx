@@ -5,9 +5,13 @@ import { usePlaidLink, PlaidLinkOnSuccess } from 'react-plaid-link';
 import useSession from '@/hooks/useSession';
 import { Tooltip } from '@/components/tooltips';
 import { DataSourceContext } from '@/hooks';
-import { createEntitiesFromData } from '@/lib/external/plaid';
+import {
+  createConfig,
+  createAccounts,
+} from '@/lib/external/plaid';
 import { createLinkToken, createAccessToken, getTransactions } from '@/app/actions';
 import plaidLogo from '@/assets/images/plaid_logo.png';
+import { MaffinError } from '@/helpers/errors';
 
 export interface ImportButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
@@ -34,12 +38,23 @@ export default function PlaidImportButton({
   const [linkToken, setLinkToken] = React.useState('');
   const { isLoaded } = React.useContext(DataSourceContext);
 
-  const onSuccess = React.useCallback<PlaidLinkOnSuccess>(async (publicToken) => {
-    const accessToken = await createAccessToken(publicToken);
-    const data = await getTransactions(accessToken);
-    await createEntitiesFromData(data);
-    onImport?.();
-  }, [onImport]);
+  const onSuccess = React.useCallback<PlaidLinkOnSuccess>(
+    async (publicToken, metadata) => {
+      try {
+        const config = await createConfig(metadata.institution?.institution_id as string);
+        const accessToken = await createAccessToken(publicToken);
+        config.token = accessToken;
+        await config.save();
+
+        const data = await getTransactions(accessToken);
+        await createAccounts(config, data.accounts);
+      } catch (e) {
+        (e as MaffinError).show();
+      }
+      onImport?.();
+    },
+    [onImport],
+  );
 
   const { open } = usePlaidLink({
     token: linkToken,
