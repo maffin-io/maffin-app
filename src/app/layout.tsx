@@ -1,7 +1,9 @@
 import React from 'react';
+import type { Metadata, Viewport } from 'next';
+
 import RootLayout from '@/layout/RootLayout';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: {
     template: '%s | Maffin',
     default: 'Maffin',
@@ -26,6 +28,10 @@ export const metadata = {
     ],
     apple: '/favicon/apple-touch-icon.png',
   },
+};
+
+export const viewport: Viewport = {
+  initialScale: 1.0,
 };
 
 export default function Layout({

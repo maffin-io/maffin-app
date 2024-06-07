@@ -11,24 +11,26 @@ export default function ProfileDropdown(): JSX.Element {
   const { user } = useSession();
 
   return (
-    <div className="group relative h-full bg-light-100/60 hover:bg-light-100 dark:bg-dark-800/50 dark:hover:bg-dark-800">
+    <div
+      className="group relative h-full px-3 hover:bg-light-100 dark:hover:bg-dark-800"
+    >
       <button
         type="button"
-        className="flex h-full w-full pl-3 pr-4 items-center"
+        className="flex h-full w-full items-center"
       >
         {
           user && user.picture && (
             <Image
-              src={user.picture}
+              src={user.picture as string}
               width={24}
               height={24}
               referrerPolicy="no-referrer"
-              className="rounded-full mx-2 w-8 h-8"
+              className="rounded-full md:mr-2 w-8 h-8"
               alt="user"
             />
           )
         }
-        <div>
+        <div className="hidden md:inline-block">
           <p className="fontsemibold capitalize">
             {user?.name || '...'}
           </p>
@@ -37,7 +39,8 @@ export default function ProfileDropdown(): JSX.Element {
           </p>
         </div>
       </button>
-      <ul className="absolute rounded-md w-40 hidden py-1 group-hover:block bg-white dark:bg-dark-700 ">
+
+      <ul className="absolute right-0 md:left-0 rounded-md w-40 hidden py-1 group-hover:inline-block bg-white dark:bg-dark-700 ">
         <li className="text-sm hover:bg-light-100 dark:hover:bg-dark-800">
           <ImportButton
             className="text-left px-3 py-2 w-full text-cyan-700 hover:text-cyan-600 whitespace-nowrap"
