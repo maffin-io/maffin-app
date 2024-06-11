@@ -1,14 +1,12 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
+import type { Config } from 'tailwindcss';
 
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  darkMode: 'class',
+const config = {
+  darkMode: ["class"],
   content: [
     './src/**/*.{js,ts,jsx,tsx,mdx}',
     './node_modules/react-tailwindcss-datepicker/dist/index.esm.js',
-  ],
-  // Tailwind optimises which classes are brought in. This breaks
-  // dynamic behavior in some cases.
+	],
   safelist: [
     // We use dynamic cols for TransactionForm when showing exchange rate
     'visible',
@@ -20,14 +18,12 @@ module.exports = {
       pattern: /pl-.*/,
     },
   ],
+  prefix: "",
   theme: {
+    fontFamily: {
+      sans: ['InterVariable', ...defaultTheme.fontFamily.sans],
+    },
     extend: {
-      fontFamily: {
-        sans: ['InterVariable', ...defaultTheme.fontFamily.sans],
-      },
-      gridTemplateColumns: {
-        '13': 'repeat(13, minmax(0, 1fr))'
-      },
       colors: {
         dark: {
           50: '#f3f4f5',
@@ -56,6 +52,6 @@ module.exports = {
       },
     },
   },
-  plugins: [],
-}
+} satisfies Config
 
+export default config

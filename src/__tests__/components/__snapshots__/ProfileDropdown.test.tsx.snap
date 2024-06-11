@@ -3,13 +3,15 @@
 exports[`ProfileDropdown renders with empty user 1`] = `
 <div>
   <div
-    class="group relative h-full bg-light-100/60 hover:bg-light-100 dark:bg-dark-800/50 dark:hover:bg-dark-800"
+    class="group relative h-full px-3 hover:bg-light-100 dark:hover:bg-dark-800"
   >
     <button
-      class="flex h-full w-full pl-3 pr-4 items-center"
+      class="flex h-full w-full items-center"
       type="button"
     >
-      <div>
+      <div
+        class="hidden md:inline-block"
+      >
         <p
           class="fontsemibold capitalize"
         >
@@ -21,7 +23,7 @@ exports[`ProfileDropdown renders with empty user 1`] = `
       </div>
     </button>
     <ul
-      class="absolute rounded-md w-40 hidden py-1 group-hover:block bg-white dark:bg-dark-700 "
+      class="absolute right-0 md:left-0 rounded-md w-40 hidden py-1 group-hover:inline-block bg-white dark:bg-dark-700 "
     >
       <li
         class="text-sm hover:bg-light-100 dark:hover:bg-dark-800"
@@ -79,15 +81,15 @@ exports[`ProfileDropdown renders with empty user 1`] = `
 exports[`ProfileDropdown renders with user 1`] = `
 <div>
   <div
-    class="group relative h-full bg-light-100/60 hover:bg-light-100 dark:bg-dark-800/50 dark:hover:bg-dark-800"
+    class="group relative h-full px-3 hover:bg-light-100 dark:hover:bg-dark-800"
   >
     <button
-      class="flex h-full w-full pl-3 pr-4 items-center"
+      class="flex h-full w-full items-center"
       type="button"
     >
       <img
         alt="user"
-        class="rounded-full mx-2 w-8 h-8"
+        class="rounded-full md:mr-2 w-8 h-8"
         data-nimg="1"
         decoding="async"
         height="24"
@@ -98,7 +100,9 @@ exports[`ProfileDropdown renders with user 1`] = `
         style="color: transparent;"
         width="24"
       />
-      <div>
+      <div
+        class="hidden md:inline-block"
+      >
         <p
           class="fontsemibold capitalize"
         >
@@ -112,7 +116,7 @@ exports[`ProfileDropdown renders with user 1`] = `
       </div>
     </button>
     <ul
-      class="absolute rounded-md w-40 hidden py-1 group-hover:block bg-white dark:bg-dark-700 "
+      class="absolute right-0 md:left-0 rounded-md w-40 hidden py-1 group-hover:inline-block bg-white dark:bg-dark-700 "
     >
       <li
         class="text-sm hover:bg-light-100 dark:hover:bg-dark-800"

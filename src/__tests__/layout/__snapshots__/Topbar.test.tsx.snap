@@ -3,42 +3,42 @@
 exports[`Topbar renders as expected 1`] = `
 <div>
   <div
-    class="grid grid-cols-12 bg-white dark:bg-dark-700 shadow-sm h-20 fixed z-10 top-0 px-6 left-20 right-0"
+    class="flex justify-end lg:justify-between items-center bg-white dark:bg-dark-700 shadow-sm h-20 fixed z-10 top-0 pl-6 left-20 right-0"
   >
     <div
-      class="col-span-3"
+      class="hidden lg:inline-block lg:w-1/4"
     >
       <div
         data-testid="accountSelector"
       />
     </div>
     <div
-      class="col-span-9"
+      class="flex h-full gap-x-4 items-center"
     >
-      <div
-        class="flex h-full items-center justify-end"
+      <span
+        class="hidden lg:inline-block"
       >
-        <span
-          class="mr-3"
-        >
-          <div
-            data-testid="DateRangeInput"
-          />
-        </span>
         <div
-          class="px-2"
-        >
-          <div
-            data-testid="SaveButton"
-          />
-        </div>
+          data-testid="DateRangeInput"
+        />
+      </span>
+      <span
+        class="hidden lg:inline-block"
+      >
         <div
-          class="px-2"
-        >
-          <div
-            data-testid="ThemeButton"
-          />
-        </div>
+          data-testid="SaveButton"
+        />
+      </span>
+      <div
+        class="hidden lg:inline-block"
+      >
+        <div
+          data-testid="ThemeButton"
+        />
+      </div>
+      <div
+        class="h-full justify-self-end"
+      >
         <div
           data-testid="ProfileDropdown"
         />
