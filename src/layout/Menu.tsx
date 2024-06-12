@@ -105,7 +105,7 @@ function SubMenu({
 }): JSX.Element {
   if (items && items.length) {
     return (
-      <ul className="hidden float-right w-44 bg-dark-700 shadow-md group-hover:inline-block">
+      <ul className="hidden float-right w-44 bg-background-700 shadow-md group-hover:inline-block">
         {items.map((item, idx) => (
           <li key={idx} className="text-sm ml-2 text-left py-2">
             <Link

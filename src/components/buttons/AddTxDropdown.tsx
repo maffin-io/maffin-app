@@ -30,8 +30,8 @@ export default function AddTxDropdown({
         <BiPlusCircle className="mr-1" />
         Add
       </button>
-      <ul className="absolute rounded-md w-40 hidden py-2 group-hover:block bg-white dark:bg-dark-800 ">
-        <li className="text-sm hover:bg-light-100 dark:hover:bg-dark-700">
+      <ul className="absolute rounded-md w-40 hidden py-2 group-hover:block bg-background-800">
+        <li className="text-sm hover:bg-background-700">
           <FormButton
             id="add-tx"
             className="flex items-center text-left px-3 py-2 w-full text-cyan-700 hover:text-cyan-600 whitespace-nowrap"

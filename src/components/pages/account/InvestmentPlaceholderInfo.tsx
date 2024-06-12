@@ -98,8 +98,8 @@ export default function InvestmentPlaceholderInfo({
               <StatisticsWidget
                 className="mr-2"
                 statsTextClass={classNames({
-                  'amount-positive': unrealizedProfitPct >= 0,
-                  'amount-negative': unrealizedProfitPct < 0,
+                  'text-success': unrealizedProfitPct >= 0,
+                  'text-danger': unrealizedProfitPct < 0,
                 })}
                 title="Unrealized Profit"
                 stats={`${unrealizedProfitAbs.format()} (${toFixed(unrealizedProfitPct)}%)`}
@@ -113,8 +113,8 @@ export default function InvestmentPlaceholderInfo({
               <StatisticsWidget
                 className="mr-2"
                 statsTextClass={classNames({
-                  'amount-positive': totalRealized.add(totalDividends).toNumber() >= 0,
-                  'amount-negative': totalRealized.add(totalDividends).toNumber() < 0,
+                  'text-success': totalRealized.add(totalDividends).toNumber() >= 0,
+                  'text-danger': totalRealized.add(totalDividends).toNumber() < 0,
                 })}
                 title="Realized"
                 stats={totalRealized.add(totalDividends).format()}

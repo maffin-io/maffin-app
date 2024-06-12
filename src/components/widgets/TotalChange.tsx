@@ -28,11 +28,11 @@ export default function TotalChange({
     <div className={`flex items-center ${className}`}>
       {
         difference.toNumber() >= 0
-        && <BiTrendingUp className="mr-1 amount-positive" />
+        && <BiTrendingUp className="mr-1 text-success" />
       }
       {
         difference.toNumber() < 0
-        && <BiTrendingDown className="mr-1 amount-negative" />
+        && <BiTrendingDown className="mr-1 text-danger" />
       }
       {difference.format()}
       {' '}

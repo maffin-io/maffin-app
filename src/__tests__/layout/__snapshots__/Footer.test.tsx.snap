@@ -6,7 +6,7 @@ exports[`Footer renders as expected 1`] = `
     class="fixed bottom-0 w-full"
   >
     <div
-      class="w-full flex justify-end bg-white dark:bg-dark-700 text-sm px-5"
+      class="w-full flex justify-end bg-background-700 text-sm px-5"
     >
       2024
       ©

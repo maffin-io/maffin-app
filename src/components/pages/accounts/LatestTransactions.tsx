@@ -35,8 +35,8 @@ export default function LatestTransactions(): JSX.Element {
                   <div className="mr-2">
                     {
                       (selectedSplit.quantity || 0) > 0
-                        ? <BiUpArrowAlt className="text-xl amount-positive" />
-                        : <BiDownArrowAlt className="text-xl amount-negative" />
+                        ? <BiUpArrowAlt className="text-xl text-success" />
+                        : <BiDownArrowAlt className="text-xl text-danger" />
                     }
                   </div>
                   <div className="w-full">
@@ -49,8 +49,8 @@ export default function LatestTransactions(): JSX.Element {
                     <div className="flex items-center">
                       <span
                         className={classNames('', {
-                          'amount-positive': (selectedSplit.quantity || 0) > 0,
-                          'amount-negative': (selectedSplit.quantity || 0) < 0,
+                          'text-success': (selectedSplit.quantity || 0) > 0,
+                          'text-danger': (selectedSplit.quantity || 0) < 0,
                         })}
                       >
                         {moneyToString(

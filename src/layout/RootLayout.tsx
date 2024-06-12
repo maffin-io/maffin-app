@@ -48,7 +48,7 @@ export default function RootLayout({
         <div id="modals" />
         <Toaster
           toastOptions={{
-            className: 'text-sm bg-light text-light-600/90 dark:text-slate-400 dark:bg-dark-800',
+            className: 'text-sm',
             error: {
               duration: 7000,
             },

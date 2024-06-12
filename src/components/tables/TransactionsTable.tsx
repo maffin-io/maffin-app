@@ -171,8 +171,8 @@ function AmountPartial(
       <span
         className={
           classNames({
-            'amount-positive': value.toNumber() > 0,
-            'amount-negative': value.toNumber() < 0,
+            'text-success': value.toNumber() > 0,
+            'text-danger': value.toNumber() < 0,
           }, 'flex items-center')
         }
       >

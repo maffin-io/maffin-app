@@ -62,7 +62,7 @@ export default function MainSplit({
 
   return (
     <div className="flex w-1/2">
-      <div className="flex items-center rounded-md bg-light-100 dark:bg-dark-800">
+      <div className="flex items-center rounded-md bg-background-800">
         <input
           {...form.register(
             'splits.0.quantity',
@@ -123,7 +123,7 @@ export default function MainSplit({
         <div
           className={
             classNames(
-              'flex items-center rounded-md  bg-light-100 dark:bg-dark-800',
+              'flex items-center rounded-md  bg-background-800',
               {
                 'outline outline-red-500/50': form.formState.errors.splits?.type === 'splitsBalance',
               },

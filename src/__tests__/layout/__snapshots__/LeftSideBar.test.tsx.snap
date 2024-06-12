@@ -3,7 +3,7 @@
 exports[`LeftSidebar renders as expected 1`] = `
 <div>
   <div
-    class="fixed bg-dark-700 text-center h-screen pt-20 w-20 pb-5 z-10"
+    class="fixed bg-background-700 text-center h-screen pt-20 w-20 pb-5 z-10"
   >
     <a
       class="fixed block top-0 h-20 w-20 z-2"

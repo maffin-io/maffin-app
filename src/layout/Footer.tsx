@@ -5,7 +5,7 @@ export default function Footer(): JSX.Element {
 
   return (
     <footer className="fixed bottom-0 w-full">
-      <div className="w-full flex justify-end bg-white dark:bg-dark-700 text-sm px-5">
+      <div className="w-full flex justify-end bg-background-700 text-sm px-5">
         {currentYear}
         ©
         {' '}

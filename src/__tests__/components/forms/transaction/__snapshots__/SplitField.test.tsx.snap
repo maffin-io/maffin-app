@@ -121,7 +121,7 @@ exports[`SplitField renders with empty data 1`] = `
         class="col-span-4"
       >
         <div
-          class="flex items-center rounded-none bg-light-100 dark:bg-dark-800 rounded-r-md"
+          class="flex items-center rounded-none bg-background-800 rounded-r-md"
         >
           <input
             aria-label="splits.1.quantity"
@@ -140,7 +140,7 @@ exports[`SplitField renders with empty data 1`] = `
         hidden=""
       >
         <div
-          class="flex items-center rounded-r-md bg-light-100 dark:bg-dark-800"
+          class="flex items-center rounded-r-md bg-background-800"
         >
           <input
             aria-label="splits.1.value"

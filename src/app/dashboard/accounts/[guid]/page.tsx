@@ -59,7 +59,7 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
       {
         !account.placeholder
         && (
-          <div className="card p-0 mt-4 bg-light-100 dark:bg-dark-800">
+          <div className="card p-0 mt-4 bg-background-800">
             <TransactionsTable account={account} />
           </div>
         )

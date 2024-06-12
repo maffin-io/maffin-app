@@ -14,7 +14,7 @@ export default function Topbar(): JSX.Element {
   const router = useRouter();
 
   return (
-    <div className="flex justify-end lg:justify-between items-center bg-white dark:bg-dark-700 shadow-sm h-20 fixed z-10 top-0 pl-6 left-20 right-0">
+    <div className="flex justify-end lg:justify-between items-center bg-background-700 shadow-sm h-20 fixed z-10 top-0 pl-6 left-20 right-0">
       <div className="hidden lg:inline-block lg:w-1/4">
         <AccountSelector
           id="globalSearch"

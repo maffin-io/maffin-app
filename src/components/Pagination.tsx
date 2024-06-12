@@ -41,7 +41,7 @@ export default function Pagination<T>({
         <button
           type="button"
           onClick={() => table.setPageIndex(0)}
-          className="bg-white dark:bg-dark-700 rounded-full disabled:opacity-50 px-3 py-1"
+          className="bg-background-700 rounded-full disabled:opacity-50 px-3 py-1"
           disabled={!table.getCanPreviousPage()}
         >
           {'<<'}
@@ -50,7 +50,7 @@ export default function Pagination<T>({
         <button
           type="button"
           onClick={() => table.previousPage()}
-          className="bg-white dark:bg-dark-700 rounded-full disabled:opacity-50 px-3 py-1"
+          className="bg-background-700 rounded-full disabled:opacity-50 px-3 py-1"
           disabled={!table.getCanPreviousPage()}
         >
           {'<'}
@@ -59,7 +59,7 @@ export default function Pagination<T>({
         <button
           type="button"
           onClick={() => table.nextPage()}
-          className="bg-white dark:bg-dark-700 rounded-full disabled:opacity-50 px-3 py-1"
+          className="bg-background-700 rounded-full disabled:opacity-50 px-3 py-1"
           disabled={!table.getCanNextPage()}
         >
           {'>'}
@@ -68,7 +68,7 @@ export default function Pagination<T>({
         <button
           type="button"
           onClick={() => table.setPageIndex(table.getPageOptions().length - 1)}
-          className="bg-white dark:bg-dark-700 rounded-full disabled:opacity-50 px-3 py-1"
+          className="bg-background-700 rounded-full disabled:opacity-50 px-3 py-1"
           disabled={!table.getCanNextPage()}
         >
           {'>>'}

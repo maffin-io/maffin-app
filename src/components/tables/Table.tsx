@@ -60,7 +60,7 @@ export default function Table<T extends object = {}>(
           {
             showHeader
             && (
-              <thead className="bg-white dark:bg-dark-700">
+              <thead className="bg-background-700">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <tr key={headerGroup.id}>
                     {headerGroup.headers.map(header => (
@@ -113,7 +113,7 @@ export default function Table<T extends object = {}>(
 
           <tbody>
             {table.getRowModel().rows.map(row => (
-              <tr key={row.id} className="border-b border-white/70 dark:border-dark-700">
+              <tr key={row.id} className="border-b border-background-700">
                 {row.getVisibleCells().map(cell => (
                   <td key={cell.id} className={tdClassName}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
