@@ -60,7 +60,7 @@ export default function DashboardMenu(): JSX.Element {
         <MenuItem
           key={idx}
           item={item}
-          className={pathname === item.url ? 'text-white' : ''}
+          className={pathname === item.url ? 'text-foreground' : ''}
         />
       ))}
       <div className="mt-auto">
@@ -68,7 +68,7 @@ export default function DashboardMenu(): JSX.Element {
           <MenuItem
             key={idx}
             item={item}
-            className={pathname === item.url ? 'text-white' : ''}
+            className={pathname === item.url ? 'text-foreground' : ''}
           />
         ))}
       </div>
