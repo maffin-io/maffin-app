@@ -13,7 +13,7 @@ exports[`MainSplit renders with empty data 1`] = `
     class="flex w-1/2"
   >
     <div
-      class="flex items-center rounded-md bg-light-100 dark:bg-dark-800"
+      class="flex items-center rounded-md bg-background-800"
     >
       <input
         aria-label="splits.0.quantity"
@@ -50,7 +50,7 @@ exports[`MainSplit renders with empty data 1`] = `
         </svg>
       </span>
       <div
-        class="flex items-center rounded-md  bg-light-100 dark:bg-dark-800"
+        class="flex items-center rounded-md  bg-background-800"
       >
         <input
           aria-label="splits.0.value"

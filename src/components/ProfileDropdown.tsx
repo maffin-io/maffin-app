@@ -12,7 +12,7 @@ export default function ProfileDropdown(): JSX.Element {
 
   return (
     <div
-      className="group relative h-full px-3 hover:bg-light-100 dark:hover:bg-dark-800"
+      className="group relative h-full px-3 hover:bg-background-800"
     >
       <button
         type="button"
@@ -40,20 +40,20 @@ export default function ProfileDropdown(): JSX.Element {
         </div>
       </button>
 
-      <ul className="absolute right-0 md:left-0 rounded-md w-40 hidden py-1 group-hover:inline-block bg-white dark:bg-dark-700 ">
-        <li className="text-sm hover:bg-light-100 dark:hover:bg-dark-800">
+      <ul className="absolute right-0 md:left-0 rounded-md w-40 hidden py-1 group-hover:inline-block bg-background-700">
+        <li className="text-sm hover:bg-background-800">
           <ImportButton
             className="text-left px-3 py-2 w-full text-cyan-700 hover:text-cyan-600 whitespace-nowrap"
             role="menuitem"
           />
         </li>
-        <li className="text-sm hover:bg-light-100 dark:hover:bg-dark-800">
+        <li className="text-sm hover:bg-background-800">
           <ExportButton
             className="text-left px-3 py-2 w-full text-cyan-700 hover:text-cyan-600 whitespace-nowrap"
             role="menuitem"
           />
         </li>
-        <li className="block px-3 py-2 text-sm hover:bg-light-100 dark:hover:bg-dark-800">
+        <li className="block px-3 py-2 text-sm hover:bg-background-800">
           <Link
             id="menu-item-1"
             role="menuitem"

@@ -115,7 +115,7 @@ describe('InvestmentInfo', () => {
       {
         className: 'col-span-6',
         title: 'Value',
-        statsTextClass: 'amount-positive',
+        statsTextClass: 'text-success',
         stats: '€150.00',
         description: 'from €100.00 invested',
       },
@@ -137,7 +137,7 @@ describe('InvestmentInfo', () => {
       {
         className: 'col-span-6',
         title: 'Unrealized Profit',
-        statsTextClass: 'amount-positive',
+        statsTextClass: 'text-success',
         stats: '50 %',
         description: expect.anything(),
       },
@@ -148,7 +148,7 @@ describe('InvestmentInfo', () => {
       {
         className: 'col-span-6',
         title: 'Realized Profit',
-        statsTextClass: 'amount-positive',
+        statsTextClass: 'text-success',
         stats: '€10.00',
         description: '+ €20.00 from dividends',
       },
@@ -192,7 +192,7 @@ describe('InvestmentInfo', () => {
       {
         className: 'col-span-6',
         title: 'Realized Profit',
-        statsTextClass: 'amount-positive',
+        statsTextClass: 'text-success',
         stats: '€10.00',
         description: '+ $20.00 from dividends',
       },

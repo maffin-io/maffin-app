@@ -97,8 +97,8 @@ export default function InvestmentInfo({
                   title="Value"
                   stats={`${investment.value.format()}`}
                   statsTextClass={classNames({
-                    'amount-positive': investment.unrealizedProfitPct >= 0,
-                    'amount-negative': investment.unrealizedProfitPct < 0,
+                    'text-success': investment.unrealizedProfitPct >= 0,
+                    'text-danger': investment.unrealizedProfitPct < 0,
                   })}
                   description={
                     `from ${investment.cost.format()} invested`
@@ -124,8 +124,8 @@ export default function InvestmentInfo({
           <StatisticsWidget
             className="col-span-6"
             statsTextClass={classNames({
-              'amount-positive': investment.unrealizedProfitPct >= 0,
-              'amount-negative': investment.unrealizedProfitPct < 0,
+              'text-success': investment.unrealizedProfitPct >= 0,
+              'text-danger': investment.unrealizedProfitPct < 0,
             })}
             title="Unrealized Profit"
             stats={
@@ -135,11 +135,11 @@ export default function InvestmentInfo({
               <div className="flex items-center">
                 {
                   investment.unrealizedProfitPct >= 0
-                  && <BiTrendingUp className="mr-1 amount-positive" />
+                  && <BiTrendingUp className="mr-1 text-success" />
                 }
                 {
                   investment.unrealizedProfitPct < 0
-                  && <BiTrendingDown className="mr-1 amount-negative" />
+                  && <BiTrendingDown className="mr-1 text-danger" />
                 }
                 {investment.unrealizedProfitAbs.format()}
               </div>
@@ -150,8 +150,8 @@ export default function InvestmentInfo({
             title="Realized Profit"
             stats={investment.realizedProfit.format()}
             statsTextClass={classNames({
-              'amount-positive': investment.realizedProfitPct >= 0,
-              'amount-negative': investment.realizedProfitPct < 0,
+              'text-success': investment.realizedProfitPct >= 0,
+              'text-danger': investment.realizedProfitPct < 0,
             })}
             description={`+ ${investment.realizedDividends.format()} from dividends`}
           />

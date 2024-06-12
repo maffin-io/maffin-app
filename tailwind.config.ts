@@ -24,7 +24,21 @@ const config = {
       sans: ['InterVariable', ...defaultTheme.fontFamily.sans],
     },
     extend: {
+      gridTemplateColumns: {
+        '13': 'repeat(13, minmax(0, 1fr))'
+      },
       colors: {
+        background: {
+          700: 'var(--background-700)',
+          800: 'var(--background-800)',
+        },
+        foreground: "var(--foreground)",
+        primary: "var(--primary)",
+        success: "var(--success)",
+        misc: "var(--misc)",
+        info: "var(--info)",
+        warning: "var(--warning)",
+        danger: "var(--danger)",
         dark: {
           50: '#f3f4f5',
           100: '#e5e7e9',

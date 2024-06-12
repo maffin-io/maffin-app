@@ -1,8 +1,38 @@
 @tailwind base;
 
 @layer base {
+  :root {
+    --background-800: #f3f4f6;
+    --background-700: #ffffff;
+    --foreground: #4b5563e6;
+
+    --primary: #0e7490;
+
+    --success: #16A34A;
+    --warning: #f97316;
+    --danger: #ef4444;
+    --info: #06b6d4;
+    --misc: #7c3aed;
+  }
+
+  .dark {
+    --background-800: #323b44;
+    --background-700: #3a444e;
+    --foreground: #94a3b8;
+
+    --primary: #0e7490b3;
+
+    --success: #16A34A;
+    --warning: #f97316b3;
+    --danger: #ef4444b3;
+    --info: #06b6d4b3;
+    --misc: #7c3aed;
+  }
+}
+
+@layer base {
   body {
-    @apply bg-light-100 text-light-600/90 dark:bg-dark-800 dark:text-slate-400;
+    @apply bg-background-800 text-foreground;
   } 
 
   h1 {
@@ -18,15 +48,16 @@
   }
 
   a {
-    @apply text-cyan-700 hover:text-cyan-600;
+    @apply text-primary hover:text-opacity-95;
   }
 
   form input, form select, .input, input {
-    @apply bg-light-100 dark:bg-dark-800 rounded-md border-none my-3 p-2 focus:outline-dark-700;
+    @apply bg-background-800 rounded-md border-none my-3 p-2 focus:outline-background-700;
   }
 
   input:disabled, select:disabled, button:disabled {
     @apply opacity-50;
+    @apply hover:opacity-50;
   }
 
   input[type="number"]::-webkit-inner-spin-button,
@@ -36,7 +67,7 @@
   }
 
   input[type="checkbox"] {
-    @apply appearance-none checked:bg-cyan-700 cursor-pointer disabled:cursor-default rounded-md border-solid border-2 border-dark-800;
+    @apply appearance-none checked:bg-primary cursor-pointer disabled:cursor-default rounded-md border-solid border-2 border-background-800;
   }
 }
 
@@ -45,7 +76,7 @@
 
 @layer components {
   .card {
-    @apply bg-white dark:bg-dark-700 m-2 p-4 rounded-md shadow-md;
+    @apply bg-background-700 m-2 p-4 rounded-md shadow-md;
   }
 
   .overlay {
@@ -57,7 +88,10 @@
   }
   
   .btn {
-    @apply inline-flex items-center uppercase font-bold text-xs text-white shadow-sm rounded-lg py-2 px-4;
+    @apply inline-flex items-center;
+    @apply uppercase font-bold text-xs text-white;
+    @apply shadow-sm rounded-lg py-2 px-4;
+    @apply hover:opacity-90;
   }
 
   .btn-cta {
@@ -67,60 +101,26 @@
   }
 
   .btn-primary {
-    @apply bg-cyan-700 dark:bg-cyan-700/70;
-    @apply hover:bg-cyan-700/80 dark:hover:bg-cyan-600;
-    @apply disabled:hover:bg-cyan-700 disabled:dark:hover:bg-cyan-700/70;
-    @apply shadow-cyan-700/20;
+    @apply bg-primary;
+    @apply shadow-primary;
   }
 
   .btn-warn {
-    @apply bg-orange-500 dark:bg-orange-500/70;
-    @apply hover:bg-orange-500/80 dark:hover:bg-orange-400;
-    @apply disabled:hover:bg-orange-500 disabled:dark:hover:bg-orange-500/70;
-    @apply shadow-orange-500/20;
+    @apply bg-warning;
+    @apply shadow-warning;
   }
 
   .btn-danger {
-    @apply bg-red-500 dark:bg-red-500/70;
-    @apply hover:bg-red-500/80 dark:hover:bg-red-400;
-    @apply disabled:hover:bg-red-500 disabled:dark:hover:bg-red-500/70;
-    @apply shadow-red-500/20;
+    @apply bg-danger;
+    @apply shadow-danger;
   }
 
   .badge {
-    @apply text-white inline-block py-0.5 px-2 text-xs text-center rounded-md;
-  }
-
-  .default {
-    @apply bg-cyan-700 dark:bg-cyan-700/70;
-  }
-
-  .success {
-    @apply bg-green-600;
-  }
-
-  .warning {
-    @apply bg-orange-600/70;
-  }
-
-  .danger {
-    @apply bg-red-600/70;
-  }
-
-  .info {
-    @apply bg-cyan-600;
-  }
-
-  .misc {
-    @apply bg-violet-600;
-  }
-
-  .disabled {
-    @apply bg-gray-400 dark:bg-gray-600/70;
+    @apply text-white bg-info inline-block py-0.5 px-2 text-xs text-center rounded-md;
   }
 
   .invalid-feedback {
-    @apply text-xs mt-1 text-red-600 dark:text-red-400/70
+    @apply text-xs mt-1 text-danger;
   }
 
   .selector.selector--is-disabled {
@@ -128,23 +128,15 @@
   }
 
   .selector .selector__control {
-    @apply !h-9 !min-h-fit text-sm pl-10 bg-light-100 dark:bg-dark-800 !border-none;
+    @apply !h-9 !min-h-fit text-sm pl-10 bg-background-800 !border-none;
   }
 
   .selector .selector__menu {
-    @apply text-sm bg-light-100 dark:bg-dark-800;
+    @apply text-sm bg-background-800;
   }
 
   .selector .selector__option {
     @apply w-full cursor-default px-4 py-2;
-  }
-
-  .amount-positive {
-    @apply text-green-600 dark:text-green-500;
-  }
-
-  .amount-negative {
-    @apply text-red-600 dark:text-red-400/90;
   }
 
   .header {
@@ -156,6 +148,6 @@
   }
 
   .tooltip {
-    @apply bg-black text-xs text-white rounded-lg p-2 z-50;
+    @apply bg-black text-xs rounded-lg p-2 z-50;
   }
 }

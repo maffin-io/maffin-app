@@ -5,11 +5,11 @@ import type { Account } from '@/book/entities';
 
 export function accountColorCode(account?: Account, defaults?: string) {
   return classNames(defaults, {
-    misc: account && isInvestment(account),
-    default: account?.type === 'EQUITY',
-    success: account?.type === 'INCOME',
-    danger: account?.type === 'EXPENSE',
-    warning: account && isLiability(account),
-    info: account && isAsset(account),
+    'bg-misc': account && isInvestment(account),
+    'bg-primary': account?.type === 'EQUITY',
+    'bg-info': account && isAsset(account),
+    'bg-success': account?.type === 'INCOME',
+    'bg-danger': account?.type === 'EXPENSE',
+    'bg-warning': account && isLiability(account),
   });
 }

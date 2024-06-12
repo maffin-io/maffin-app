@@ -111,7 +111,7 @@ describe('InvestmentPlaceholderInfo', () => {
         title: 'Unrealized Profit',
         stats: '€1.00 (25%)',
         description: '€6.00 (150%) with dividends',
-        statsTextClass: 'amount-positive',
+        statsTextClass: 'text-success',
       },
       {},
     );
@@ -122,7 +122,7 @@ describe('InvestmentPlaceholderInfo', () => {
         title: 'Realized',
         stats: '€15.00',
         description: '€5.00 from dividends',
-        statsTextClass: 'amount-positive',
+        statsTextClass: 'text-success',
       },
       {},
     );
@@ -182,7 +182,7 @@ describe('InvestmentPlaceholderInfo', () => {
         title: 'Unrealized Profit',
         stats: '$1.00 (25%)',
         description: '$6.00 (150%) with dividends',
-        statsTextClass: 'amount-positive',
+        statsTextClass: 'text-success',
       },
       {},
     );
@@ -193,7 +193,7 @@ describe('InvestmentPlaceholderInfo', () => {
         title: 'Realized',
         stats: '$15.00',
         description: '$5.00 from dividends',
-        statsTextClass: 'amount-positive',
+        statsTextClass: 'text-success',
       },
       {},
     );

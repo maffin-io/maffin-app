@@ -6,7 +6,7 @@ exports[`TotalChange renders as expected with decrease 1`] = `
     class="flex items-center "
   >
     <svg
-      class="mr-1 amount-negative"
+      class="mr-1 text-danger"
       fill="currentColor"
       height="1em"
       stroke="currentColor"
@@ -32,7 +32,7 @@ exports[`TotalChange renders as expected with increase 1`] = `
     class="flex items-center "
   >
     <svg
-      class="mr-1 amount-positive"
+      class="mr-1 text-success"
       fill="currentColor"
       height="1em"
       stroke="currentColor"
@@ -58,7 +58,7 @@ exports[`TotalChange renders with no data 1`] = `
     class="flex items-center mt-1"
   >
     <svg
-      class="mr-1 amount-positive"
+      class="mr-1 text-success"
       fill="currentColor"
       height="1em"
       stroke="currentColor"

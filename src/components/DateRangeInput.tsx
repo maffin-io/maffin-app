@@ -82,7 +82,7 @@ export default function DateRangeInput(): JSX.Element {
         shortcuts,
       }}
       containerClassName="relative text-sm"
-      inputClassName="relative transition-all duration-300 text-right py-2.5 px-4 rounded-lg tracking-wide bg-light-100 dark:bg-dark-800 w-[220px]"
+      inputClassName="relative transition-all duration-300 text-right py-2.5 px-4 rounded-lg tracking-wide w-[220px]"
       toggleClassName="hidden"
     />
   );

@@ -23,7 +23,7 @@ export default function ImportButton({
       <Modal
         isOpen={isModalOpen}
         overlayClassName="overlay"
-        className="modal bg-light-100 dark:bg-dark-800"
+        className="modal bg-background-800"
       >
         <button
           type="button"

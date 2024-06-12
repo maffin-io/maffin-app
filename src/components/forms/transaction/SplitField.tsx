@@ -133,7 +133,7 @@ export default function SplitField({
         <div
           className={
             classNames(
-              'flex items-center rounded-none bg-light-100 dark:bg-dark-800',
+              'flex items-center rounded-none bg-background-800',
               {
                 'rounded-r-md': !showValueField,
               },
@@ -170,7 +170,7 @@ export default function SplitField({
         hidden={!showValueField}
         className="col-span-3"
       >
-        <div className="flex items-center rounded-r-md bg-light-100 dark:bg-dark-800">
+        <div className="flex items-center rounded-r-md bg-background-800">
           <input
             {...form.register(
               `splits.${index}.value`,

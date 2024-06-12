@@ -114,7 +114,7 @@ export default function SplitsField({
               Add split
             </button>
             <span
-              className="badge default ml-0.5"
+              className="badge info ml-0.5"
               data-tooltip-id="add-split-help"
             >
               ?

@@ -10,7 +10,7 @@ exports[`Table renders headers with empty data 1`] = `
       id="table"
     >
       <thead
-        class="bg-white dark:bg-dark-700"
+        class="bg-background-700"
       >
         <tr>
           <th
@@ -147,7 +147,7 @@ exports[`Table renders headers with empty data 1`] = `
       class="ms-auto"
     >
       <button
-        class="bg-white dark:bg-dark-700 rounded-full disabled:opacity-50 px-3 py-1"
+        class="bg-background-700 rounded-full disabled:opacity-50 px-3 py-1"
         disabled=""
         type="button"
       >
@@ -155,7 +155,7 @@ exports[`Table renders headers with empty data 1`] = `
       </button>
        
       <button
-        class="bg-white dark:bg-dark-700 rounded-full disabled:opacity-50 px-3 py-1"
+        class="bg-background-700 rounded-full disabled:opacity-50 px-3 py-1"
         disabled=""
         type="button"
       >
@@ -163,7 +163,7 @@ exports[`Table renders headers with empty data 1`] = `
       </button>
        
       <button
-        class="bg-white dark:bg-dark-700 rounded-full disabled:opacity-50 px-3 py-1"
+        class="bg-background-700 rounded-full disabled:opacity-50 px-3 py-1"
         disabled=""
         type="button"
       >
@@ -171,7 +171,7 @@ exports[`Table renders headers with empty data 1`] = `
       </button>
        
       <button
-        class="bg-white dark:bg-dark-700 rounded-full disabled:opacity-50 px-3 py-1"
+        class="bg-background-700 rounded-full disabled:opacity-50 px-3 py-1"
         disabled=""
         type="button"
       >
