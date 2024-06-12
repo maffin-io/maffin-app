@@ -74,8 +74,8 @@ const columns: ColumnDef<InvestmentAccount>[] = [
         <br />
         <span
           className={classNames('badge', {
-            success: getValue<number>() >= 0,
-            danger: getValue<number>() <= 0,
+            'bg-success': getValue<number>() >= 0,
+            'bg-danger': getValue<number>() <= 0,
           })}
         >
           {toFixed(getValue<number>())}
@@ -109,8 +109,8 @@ const columns: ColumnDef<InvestmentAccount>[] = [
         <br />
         <span
           className={classNames('badge', {
-            success: row.original.unrealizedProfitAbs.toNumber() >= 0,
-            danger: row.original.unrealizedProfitAbs.toNumber() < 0,
+            'bg-success': row.original.unrealizedProfitAbs.toNumber() >= 0,
+            'bg-danger': row.original.unrealizedProfitAbs.toNumber() < 0,
           })}
         >
           {toFixed(getValue<number>())}
@@ -143,8 +143,8 @@ const columns: ColumnDef<InvestmentAccount>[] = [
         <br />
         <span
           className={classNames('badge', {
-            success: row.original.unrealizedProfitAbsInCurrency.toNumber() >= 0,
-            danger: row.original.unrealizedProfitAbsInCurrency.toNumber() < 0,
+            'bg-success': row.original.unrealizedProfitAbsInCurrency.toNumber() >= 0,
+            'bg-danger': row.original.unrealizedProfitAbsInCurrency.toNumber() < 0,
           })}
         >
           {toFixed(getValue<number>())}

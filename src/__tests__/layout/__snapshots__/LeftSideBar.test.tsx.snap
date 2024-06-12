@@ -36,7 +36,7 @@ exports[`LeftSidebar renders as expected 1`] = `
           href="/dashboard/accounts"
         >
           <span
-            class="mr-8 text-white"
+            class="mr-8 text-foreground"
           >
             <svg
               class="text-xl"
