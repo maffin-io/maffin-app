@@ -1,14 +1,12 @@
 import React from 'react';
 import {
   render,
-  screen,
-  fireEvent,
 } from '@testing-library/react';
-import Modal from 'react-modal';
 
 import ImportButton from '@/components/buttons/ImportButton';
+import Modal from '@/components/ui/Modal';
 
-jest.mock('react-modal', () => jest.fn(
+jest.mock('@/components/ui/Modal', () => jest.fn(
   (props: React.PropsWithChildren) => (
     <div data-testid="Modal">
       {props.children}
@@ -29,51 +27,20 @@ describe('ImportButton', () => {
     jest.clearAllMocks();
   });
 
-  it('renders hidden modal on mount', async () => {
+  it('renders as expected', async () => {
     const { container } = render(<ImportButton />);
 
-    expect(Modal).toBeCalledWith(
-      expect.objectContaining({
-        isOpen: false,
-      }),
+    expect(Modal).toHaveBeenCalledWith(
+      {
+        showClose: true,
+        className: 'modal bg-background-800',
+        triggerClassName: 'btn btn-primary',
+        triggerContent: expect.anything(),
+        children: expect.anything(),
+      },
       {},
     );
 
     expect(container).toMatchSnapshot();
-  });
-
-  it('opens modal when clicking the button', async () => {
-    render(<ImportButton />);
-
-    const button = await screen.findByRole('button', { name: 'Import' });
-    fireEvent.click(button);
-
-    const modal = await screen.findByTestId('Modal');
-    expect(Modal).toBeCalledWith(
-      expect.objectContaining({
-        isOpen: true,
-      }),
-      {},
-    );
-    expect(modal).toMatchSnapshot();
-  });
-
-  it('closes modal when clicking the X button', async () => {
-    render(<ImportButton />);
-
-    const button = await screen.findByRole('button', { name: 'Import' });
-    fireEvent.click(button);
-
-    await screen.findByTestId('Modal');
-
-    const xButton = screen.getByRole('button', { name: 'X' });
-    fireEvent.click(xButton);
-
-    expect(Modal).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        isOpen: false,
-      }),
-      {},
-    );
   });
 });

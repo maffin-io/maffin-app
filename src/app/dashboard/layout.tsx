@@ -30,7 +30,7 @@ export default function DashboardLayout({
   return (
     <div className="w-full h-full overflow-hidden">
       <LeftSidebar />
-      <div className="mt-20 ml-20 p-3 pb-7">
+      <div className="mt-20 md:ml-20 p-3 pb-7">
         <ErrorBoundary
           FallbackComponent={ErrorComponent}
           onError={(error) => {

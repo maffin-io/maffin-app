@@ -11,7 +11,6 @@ import maffinLogo from '@/assets/images/maffin_logo_sm.png';
 import { DataSourceContext } from '@/hooks';
 import TransactionForm from '@/components/forms/transaction/TransactionForm';
 import { useTheme } from '@/hooks/state';
-import ImportButton from '@/components/buttons/ImportButton';
 import Link from 'next/link';
 
 type OnboardingProps = {
@@ -22,7 +21,7 @@ export default function Onboarding({
   show = false,
 }: OnboardingProps): JSX.Element {
   const { save, datasource } = React.useContext(DataSourceContext);
-  const [run, setRun] = React.useState(show);
+  const [run] = React.useState(show);
   const [stepIndex, setStepIndex] = React.useState(0);
   const { data: accounts } = useAccounts();
   const { data: theme } = useTheme();
@@ -68,10 +67,6 @@ export default function Onboarding({
                 >
                   Show me!
                 </button>
-                <ImportButton
-                  onImport={() => setRun(false)}
-                  className="btn btn-primary"
-                />
               </div>
             </div>
           ),

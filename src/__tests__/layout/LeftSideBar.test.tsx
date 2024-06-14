@@ -12,6 +12,10 @@ jest.mock('next/link', () => jest.fn(
   ),
 ));
 
+jest.mock('@/components/ui/Modal', () => jest.fn(
+  () => <div data-testid="Modal" />,
+));
+
 jest.mock('next/navigation', () => ({
   usePathname: jest.fn(),
 }));

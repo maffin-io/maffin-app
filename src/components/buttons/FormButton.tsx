@@ -1,7 +1,7 @@
 import React from 'react';
-import Modal from 'react-modal';
 
 import { DataSourceContext } from '@/hooks';
+import Modal, { ModalRef } from '@/components/ui/Modal';
 
 export interface FormButtonProps extends Omit<
 React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -17,50 +17,33 @@ export default function FormButton({
   modalTitle,
   children,
   className = 'btn btn-primary',
-  ...props
 }: FormButtonProps): JSX.Element {
   const { save } = React.useContext(DataSourceContext);
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const modalRef = React.useRef<ModalRef>(null);
 
   return (
-    <>
-      {/* @ts-ignore */}
-      <Modal
-        isOpen={isModalOpen}
-        overlayClassName="overlay"
-        className="modal"
-      >
-        <button
-          type="button"
-          className="float-right"
-          onClick={() => setIsModalOpen(false)}
-        >
-          X
-        </button>
-        <span>{modalTitle}</span>
-        <div>
-          {
-            React.cloneElement(
-              children,
-              {
-                onSave: (e: unknown) => {
-                  children.props.onSave?.(e);
-                  save();
-                  setIsModalOpen(false);
-                },
+    <Modal
+      ref={modalRef}
+      className="modal card"
+      triggerContent={buttonContent}
+      triggerClassName={className}
+      showClose
+    >
+      <span>{modalTitle}</span>
+      <div>
+        {
+          React.cloneElement(
+            children,
+            {
+              onSave: (e: unknown) => {
+                children.props.onSave?.(e);
+                save();
+                modalRef.current?.closeModal();
               },
-            )
-          }
-        </div>
-      </Modal>
-      <button
-        type="button"
-        onClick={() => setIsModalOpen(!isModalOpen)}
-        className={className}
-        {...props}
-      >
-        {buttonContent}
-      </button>
-    </>
+            },
+          )
+        }
+      </div>
+    </Modal>
   );
 }
