@@ -9,7 +9,7 @@ exports[`DashboardLayout renders as expected when datasource available 1`] = `
       data-testid="LeftSidebar"
     />
     <div
-      class="mt-20 ml-20 p-3 pb-7"
+      class="mt-20 md:ml-20 p-3 pb-7"
     >
       <div
         data-testid="DashboardPage"

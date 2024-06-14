@@ -84,7 +84,7 @@
   }
 
   .modal {
-    @apply card relative top-20 mx-auto p-5 w-1/3 shadow-lg rounded-md
+    @apply relative top-20 mx-auto p-5 w-1/3 shadow-lg rounded-md
   }
   
   .btn {

@@ -2,77 +2,49 @@
 
 exports[`LeftSidebar renders as expected 1`] = `
 <div>
-  <div
-    class="fixed bg-background-700 text-center h-screen pt-20 w-20 pb-5 z-10"
-  >
-    <a
-      class="fixed block top-0 h-20 w-20 z-2"
-      href="/"
+  <div>
+    <div
+      class="fixed flex bg-background-700 justify-center h-20 w-20 md:hidden"
     >
-      <span
-        class="flex justify-center items-center h-20"
-      >
-        <img
-          alt="logo"
-          data-nimg="1"
-          decoding="async"
-          height="40"
-          loading="lazy"
-          src="/_next/image?url=%2Fimg.jpg&w=96&q=75"
-          srcset="/_next/image?url=%2Fimg.jpg&w=48&q=75 1x, /_next/image?url=%2Fimg.jpg&w=96&q=75 2x"
-          style="color: transparent;"
-          width="40"
-        />
-      </span>
-    </a>
-    <ul
-      class="flex flex-col h-full"
-    >
-      <li
-        class="group h-12 text-slate-400 hover:bg-cyan-700 hover:text-white hover:w-64 hover:rounded-r-sm"
-      >
-        <a
-          class="flex items-center text-inherit hover:text-inherit h-full px-8 py-4"
-          href="/dashboard/accounts"
-        >
-          <span
-            class="mr-8 text-foreground"
-          >
-            <svg
-              class="text-xl"
-              fill="currentColor"
-              height="1em"
-              stroke="currentColor"
-              stroke-width="0"
-              viewBox="0 0 24 24"
-              width="1em"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M5 22h14a2 2 0 0 0 2-2v-9a1 1 0 0 0-.29-.71l-8-8a1 1 0 0 0-1.41 0l-8 8A1 1 0 0 0 3 11v9a2 2 0 0 0 2 2zm5-2v-5h4v5zm-5-8.59 7-7 7 7V20h-3v-5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v5H5z"
-              />
-            </svg>
-          </span>
-          <span
-            class="hidden group-hover:inline-block ml-1"
-          >
-            Home
-          </span>
-        </a>
-        <span />
-      </li>
       <div
-        class="mt-auto"
+        data-testid="Modal"
+      />
+    </div>
+    <div
+      class="hidden md:inline-block fixed bg-background-700 left-0 text-center h-screen pt-20 w-20 pb-5 z-10"
+    >
+      <a
+        class="fixed block top-0 h-20 w-20 z-2"
+        href="/"
+      >
+        <span
+          class="flex justify-center items-center h-20"
+        >
+          <img
+            alt="logo"
+            data-nimg="1"
+            decoding="async"
+            height="40"
+            loading="lazy"
+            src="/_next/image?url=%2Fimg.jpg&w=96&q=75"
+            srcset="/_next/image?url=%2Fimg.jpg&w=48&q=75 1x, /_next/image?url=%2Fimg.jpg&w=96&q=75 2x"
+            style="color: transparent;"
+            width="40"
+          />
+        </span>
+      </a>
+      <ul
+        class="flex flex-col h-full"
       >
         <li
-          class="group h-12 text-slate-400 hover:bg-cyan-700 hover:text-white hover:w-64 hover:rounded-r-sm"
+          class="group h-12 text-slate-400 lg:hover:bg-cyan-700 lg:hover:text-white lg:hover:w-64 lg:hover:rounded-r-sm"
         >
           <a
-            class="flex items-center text-inherit hover:text-inherit h-full px-8 py-4"
-            href="/dashboard/commodities"
+            class="flex items-center text-inherit lg:hover:text-inherit h-full px-8 py-4"
+            href="/dashboard/accounts"
           >
             <span
-              class="mr-8 "
+              class="mr-8 text-foreground"
             >
               <svg
                 class="text-xl"
@@ -85,89 +57,126 @@ exports[`LeftSidebar renders as expected 1`] = `
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  d="M12 6C7.03 6 2 7.546 2 10.5v4C2 17.454 7.03 19 12 19s10-1.546 10-4.5v-4C22 7.546 16.97 6 12 6zm-8 8.5v-1.197a9.989 9.989 0 0 0 2 .86v1.881c-1.312-.514-2-1.126-2-1.544zm12 .148v1.971c-.867.179-1.867.31-3 .358v-2a21.75 21.75 0 0 0 3-.329zm-5 2.33a18.788 18.788 0 0 1-3-.358v-1.971c.959.174 1.972.287 3 .33v1.999zm7-.934v-1.881a9.931 9.931 0 0 0 2-.86V14.5c0 .418-.687 1.03-2 1.544zM12 13c-5.177 0-8-1.651-8-2.5S6.823 8 12 8s8 1.651 8 2.5-2.823 2.5-8 2.5z"
+                  d="M5 22h14a2 2 0 0 0 2-2v-9a1 1 0 0 0-.29-.71l-8-8a1 1 0 0 0-1.41 0l-8 8A1 1 0 0 0 3 11v9a2 2 0 0 0 2 2zm5-2v-5h4v5zm-5-8.59 7-7 7 7V20h-3v-5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v5H5z"
                 />
               </svg>
             </span>
             <span
-              class="hidden group-hover:inline-block ml-1"
+              class="hidden lg:group-hover:inline-block ml-1"
             >
-              Commodities
+              Home
             </span>
           </a>
           <span />
         </li>
-        <li
-          class="group h-12 text-slate-400 hover:bg-cyan-700 hover:text-white hover:w-64 hover:rounded-r-sm"
+        <div
+          class="mt-auto"
         >
-          <a
-            class="flex items-center text-inherit hover:text-inherit h-full px-8 py-4"
-            href="/dashboard/editor"
+          <li
+            class="group h-12 text-slate-400 lg:hover:bg-cyan-700 lg:hover:text-white lg:hover:w-64 lg:hover:rounded-r-sm"
           >
-            <span
-              class="mr-8 "
+            <a
+              class="flex items-center text-inherit lg:hover:text-inherit h-full px-8 py-4"
+              href="/dashboard/commodities"
             >
-              <svg
-                class="text-xl"
-                fill="currentColor"
-                height="1em"
-                stroke="currentColor"
-                stroke-width="0"
-                viewBox="0 0 24 24"
-                width="1em"
-                xmlns="http://www.w3.org/2000/svg"
+              <span
+                class="mr-8 "
               >
-                <path
-                  d="M8.293 6.293 2.586 12l5.707 5.707 1.414-1.414L5.414 12l4.293-4.293zm7.414 11.414L21.414 12l-5.707-5.707-1.414 1.414L18.586 12l-4.293 4.293z"
-                />
-              </svg>
-            </span>
-            <span
-              class="hidden group-hover:inline-block ml-1"
-            >
-              SQL Editor
-            </span>
-          </a>
-          <span />
-        </li>
-        <li
-          class="group h-12 text-slate-400 hover:bg-cyan-700 hover:text-white hover:w-64 hover:rounded-r-sm"
-        >
-          <a
-            class="flex items-center text-inherit hover:text-inherit h-full px-8 py-4"
-            href="http://docs.maffin.io"
+                <svg
+                  class="text-xl"
+                  fill="currentColor"
+                  height="1em"
+                  stroke="currentColor"
+                  stroke-width="0"
+                  viewBox="0 0 24 24"
+                  width="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 6C7.03 6 2 7.546 2 10.5v4C2 17.454 7.03 19 12 19s10-1.546 10-4.5v-4C22 7.546 16.97 6 12 6zm-8 8.5v-1.197a9.989 9.989 0 0 0 2 .86v1.881c-1.312-.514-2-1.126-2-1.544zm12 .148v1.971c-.867.179-1.867.31-3 .358v-2a21.75 21.75 0 0 0 3-.329zm-5 2.33a18.788 18.788 0 0 1-3-.358v-1.971c.959.174 1.972.287 3 .33v1.999zm7-.934v-1.881a9.931 9.931 0 0 0 2-.86V14.5c0 .418-.687 1.03-2 1.544zM12 13c-5.177 0-8-1.651-8-2.5S6.823 8 12 8s8 1.651 8 2.5-2.823 2.5-8 2.5z"
+                  />
+                </svg>
+              </span>
+              <span
+                class="hidden lg:group-hover:inline-block ml-1"
+              >
+                Commodities
+              </span>
+            </a>
+            <span />
+          </li>
+          <li
+            class="group h-12 text-slate-400 lg:hover:bg-cyan-700 lg:hover:text-white lg:hover:w-64 lg:hover:rounded-r-sm"
           >
-            <span
-              class="mr-8 "
+            <a
+              class="flex items-center text-inherit lg:hover:text-inherit h-full px-8 py-4"
+              href="/dashboard/editor"
             >
-              <svg
-                class="text-xl"
-                fill="currentColor"
-                height="1em"
-                stroke="currentColor"
-                stroke-width="0"
-                viewBox="0 0 24 24"
-                width="1em"
-                xmlns="http://www.w3.org/2000/svg"
+              <span
+                class="mr-8 "
               >
-                <path
-                  d="M6 22h15v-2H6.012C5.55 19.988 5 19.805 5 19s.55-.988 1.012-1H21V4c0-1.103-.897-2-2-2H6c-1.206 0-3 .799-3 3v14c0 2.201 1.794 3 3 3zM5 8V5c0-.805.55-.988 1-1h13v12H5V8z"
-                />
-                <path
-                  d="M8 6h9v2H8z"
-                />
-              </svg>
-            </span>
-            <span
-              class="hidden group-hover:inline-block ml-1"
+                <svg
+                  class="text-xl"
+                  fill="currentColor"
+                  height="1em"
+                  stroke="currentColor"
+                  stroke-width="0"
+                  viewBox="0 0 24 24"
+                  width="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M8.293 6.293 2.586 12l5.707 5.707 1.414-1.414L5.414 12l4.293-4.293zm7.414 11.414L21.414 12l-5.707-5.707-1.414 1.414L18.586 12l-4.293 4.293z"
+                  />
+                </svg>
+              </span>
+              <span
+                class="hidden lg:group-hover:inline-block ml-1"
+              >
+                SQL Editor
+              </span>
+            </a>
+            <span />
+          </li>
+          <li
+            class="group h-12 text-slate-400 lg:hover:bg-cyan-700 lg:hover:text-white lg:hover:w-64 lg:hover:rounded-r-sm"
+          >
+            <a
+              class="flex items-center text-inherit lg:hover:text-inherit h-full px-8 py-4"
+              href="http://docs.maffin.io"
             >
-              Help
-            </span>
-          </a>
-          <span />
-        </li>
-      </div>
-    </ul>
+              <span
+                class="mr-8 "
+              >
+                <svg
+                  class="text-xl"
+                  fill="currentColor"
+                  height="1em"
+                  stroke="currentColor"
+                  stroke-width="0"
+                  viewBox="0 0 24 24"
+                  width="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6 22h15v-2H6.012C5.55 19.988 5 19.805 5 19s.55-.988 1.012-1H21V4c0-1.103-.897-2-2-2H6c-1.206 0-3 .799-3 3v14c0 2.201 1.794 3 3 3zM5 8V5c0-.805.55-.988 1-1h13v12H5V8z"
+                  />
+                  <path
+                    d="M8 6h9v2H8z"
+                  />
+                </svg>
+              </span>
+              <span
+                class="hidden lg:group-hover:inline-block ml-1"
+              >
+                Help
+              </span>
+            </a>
+            <span />
+          </li>
+        </div>
+      </ul>
+    </div>
   </div>
 </div>
 `;

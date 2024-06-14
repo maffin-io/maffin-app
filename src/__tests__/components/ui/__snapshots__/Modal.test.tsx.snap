@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Modal opens modal when clicking the trigger 1`] = `
+<div
+  data-testid="RModal"
+>
+  <button
+    type="button"
+  >
+    submit form
+  </button>
+</div>
+`;
+
+exports[`Modal renders hidden modal on mount with trigger 1`] = `
+<div>
+  <div
+    data-testid="RModal"
+  >
+    <button
+      type="button"
+    >
+      submit form
+    </button>
+  </div>
+  <button
+    class=""
+    type="button"
+  >
+    <span>
+      open
+    </span>
+  </button>
+</div>
+`;

@@ -3,10 +3,10 @@
 exports[`Topbar renders as expected 1`] = `
 <div>
   <div
-    class="flex justify-end lg:justify-between items-center bg-background-700 shadow-sm h-20 fixed z-10 top-0 pl-6 left-20 right-0"
+    class="fixed flex justify-end lg:justify-between items-center bg-background-700 shadow-sm h-20 z-10 left-20 right-0 top-0"
   >
     <div
-      class="hidden lg:inline-block lg:w-1/4"
+      class="hidden lg:inline-block lg:w-1/4 lg:pl-3"
     >
       <div
         data-testid="accountSelector"

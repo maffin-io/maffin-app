@@ -79,17 +79,17 @@ export default function DashboardMenu(): JSX.Element {
 function MenuItem({ item, className }: MenuItemProps): JSX.Element {
   return (
     <li
-      className="group h-12 text-slate-400 hover:bg-cyan-700 hover:text-white hover:w-64 hover:rounded-r-sm"
+      className="group h-12 text-slate-400 lg:hover:bg-cyan-700 lg:hover:text-white lg:hover:w-64 lg:hover:rounded-r-sm"
     >
       <Link
         href={item.url}
         target={item.target}
-        className="flex items-center text-inherit hover:text-inherit h-full px-8 py-4"
+        className="flex items-center text-inherit lg:hover:text-inherit h-full px-8 py-4"
       >
         <span className={`mr-8 ${className}`}>
           {item.icon}
         </span>
-        <span className="hidden group-hover:inline-block ml-1">
+        <span className="hidden lg:group-hover:inline-block ml-1">
           {item.label}
         </span>
       </Link>
