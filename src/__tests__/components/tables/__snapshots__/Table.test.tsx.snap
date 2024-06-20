@@ -6,7 +6,7 @@ exports[`Table renders headers with empty data 1`] = `
     class="relative rounded-md"
   >
     <table
-      class="w-full text-sm text-left"
+      class="w-full text-sm text-center md:text-left"
       id="table"
     >
       <thead
@@ -18,7 +18,7 @@ exports[`Table renders headers with empty data 1`] = `
             scope="col"
           >
             <div
-              class="flex"
+              class="flex justify-center md:justify-start"
             >
               Name
               <div
@@ -60,7 +60,7 @@ exports[`Table renders headers with empty data 1`] = `
             scope="col"
           >
             <div
-              class="flex"
+              class="flex justify-center md:justify-start"
             >
               Amount
               <div
@@ -102,7 +102,7 @@ exports[`Table renders headers with empty data 1`] = `
             scope="col"
           >
             <div
-              class="flex"
+              class="flex justify-center md:justify-start"
             >
               Info
             </div>
@@ -130,7 +130,7 @@ exports[`Table renders headers with empty data 1`] = `
        
     </span>
     <span
-      class="flex justify-start items-center"
+      class="hidden md:flex justify-start items-center"
     >
       <label
         class="mr-1"

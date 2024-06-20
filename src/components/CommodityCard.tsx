@@ -111,7 +111,7 @@ export default function CommodityCard({
       <Link
         key={commodity.guid}
         href={`/dashboard/commodities/${commodity.guid}`}
-        className="card col-span-2 cursor-pointer hover:shadow-lg text-slate-400 dark:hover:text-white"
+        className="card cursor-pointer hover:shadow-lg text-slate-400 dark:hover:text-white"
       >
         <div className="flex items-center">
           {iconComponent}

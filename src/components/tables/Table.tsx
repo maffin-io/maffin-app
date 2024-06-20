@@ -56,7 +56,7 @@ export default function Table<T extends object = {}>(
   return (
     <>
       <div className="relative rounded-md">
-        <table id={id} className="w-full text-sm text-left">
+        <table id={id} className="w-full text-sm text-center md:text-left">
           {
             showHeader
             && (
@@ -70,7 +70,7 @@ export default function Table<T extends object = {}>(
                         className="px-6 py-3"
                         onClick={header.column.getToggleSortingHandler()}
                       >
-                        <div className="flex">
+                        <div className="flex justify-center md:justify-start">
                           {flexRender(header.column.columnDef.header, header.getContext())}
                           {(
                             header.column.columnDef.header !== ''

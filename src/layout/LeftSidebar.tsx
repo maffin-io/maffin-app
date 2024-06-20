@@ -10,7 +10,7 @@ import Menu from './Menu';
 export default function LeftSideBar(): JSX.Element {
   return (
     <div>
-      <div className="fixed flex bg-background-700 justify-center h-20 w-20 md:hidden">
+      <div className="fixed flex bg-background-700 justify-center h-20 w-20 md:hidden z-10">
         <Modal
           className="flex justify-items-center bg-background-700 left-0 h-screen w-20 rounded-r-md"
           triggerContent={<BiMenu className="text-2xl" />}

@@ -3,7 +3,7 @@
 exports[`CommodityCard renders as expected without warning when prices for CURRENCY 1`] = `
 <div>
   <a
-    class="card col-span-2 cursor-pointer hover:shadow-lg text-slate-400 dark:hover:text-white"
+    class="card cursor-pointer hover:shadow-lg text-slate-400 dark:hover:text-white"
     href="/dashboard/commodities/undefined"
   >
     <div
