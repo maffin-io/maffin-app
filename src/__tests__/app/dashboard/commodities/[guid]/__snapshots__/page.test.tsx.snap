@@ -59,18 +59,14 @@ exports[`CommodityPage renders as expected with commodity 1`] = `
         </span>
       </div>
       <div
-        class="grid grid-cols-12 card"
+        class="grid grid-flow-row md:grid-flow-col gap-4 card"
       >
-        <div
-          class="col-span-7"
-        >
+        <div>
           <div
             data-testid="PricesChart"
           />
         </div>
-        <div
-          class="col-span-5"
-        >
+        <div>
           <div
             data-testid="PricesTable"
           />
@@ -95,18 +91,14 @@ exports[`CommodityPage renders as expected with commodity 1`] = `
         </span>
       </div>
       <div
-        class="grid grid-cols-12 card"
+        class="grid grid-flow-row md:grid-flow-col gap-4 card"
       >
-        <div
-          class="col-span-7"
-        >
+        <div>
           <div
             data-testid="PricesChart"
           />
         </div>
-        <div
-          class="col-span-5"
-        >
+        <div>
           <div
             data-testid="PricesTable"
           />

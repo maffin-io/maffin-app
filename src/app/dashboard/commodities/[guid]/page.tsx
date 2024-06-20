@@ -160,11 +160,11 @@ export default function CommodityPage({ params }: CommodityPageProps): JSX.Eleme
                     price data
                   </span>
                 </div>
-                <div className="grid grid-cols-12 card">
-                  <div className="col-span-7">
+                <div className="grid grid-flow-row md:grid-flow-col gap-4 card">
+                  <div>
                     <PricesChart prices={byCurrencyPrices} />
                   </div>
-                  <div className="col-span-5">
+                  <div>
                     <PricesTable prices={byCurrencyPrices} />
                   </div>
                 </div>

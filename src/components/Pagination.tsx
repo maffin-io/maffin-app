@@ -24,7 +24,7 @@ export default function Pagination<T>({
         {' '}
       </span>
 
-      <span className="flex justify-start items-center">
+      <span className="hidden md:flex justify-start items-center">
         <label className="mr-1">Go to page:</label>
         <input
           type="number"

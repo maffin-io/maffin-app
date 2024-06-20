@@ -32,7 +32,7 @@ exports[`CommoditiesPage renders as expected 1`] = `
     </span>
   </div>
   <div
-    class="grid grid-cols-12"
+    class="grid grid-cols-3 md:grid-cols-10"
   >
     <div
       data-testid="CommodityCard"
@@ -48,7 +48,7 @@ exports[`CommoditiesPage renders as expected 1`] = `
     </span>
   </div>
   <div
-    class="grid grid-cols-12"
+    class="grid grid-cols-3 md:grid-cols-10"
   >
     <div
       data-testid="CommodityCard"
@@ -64,7 +64,7 @@ exports[`CommoditiesPage renders as expected 1`] = `
     </span>
   </div>
   <div
-    class="grid grid-cols-12"
+    class="grid grid-cols-3 md:grid-cols-10"
   >
     <div
       data-testid="CommodityCard"

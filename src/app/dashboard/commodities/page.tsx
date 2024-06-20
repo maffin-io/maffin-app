@@ -55,7 +55,7 @@ export default function CommoditiesPage(): JSX.Element {
           Currencies
         </span>
       </div>
-      <div className="grid grid-cols-12">
+      <div className="grid grid-cols-3 md:grid-cols-10">
         {currencies.map(commodity => <CommodityCard key={commodity.guid} guid={commodity.guid} />)}
       </div>
       {
@@ -67,7 +67,7 @@ export default function CommoditiesPage(): JSX.Element {
                 Financial
               </span>
             </div>
-            <div className="grid grid-cols-12">
+            <div className="grid grid-cols-3 md:grid-cols-10">
               {financial.map(
                 commodity => <CommodityCard key={commodity.guid} guid={commodity.guid} />,
               )}
@@ -84,7 +84,7 @@ export default function CommoditiesPage(): JSX.Element {
                 Other
               </span>
             </div>
-            <div className="grid grid-cols-12">
+            <div className="grid grid-cols-3 md:grid-cols-10">
               {other.map(commodity => <CommodityCard key={commodity.guid} guid={commodity.guid} />)}
             </div>
           </>

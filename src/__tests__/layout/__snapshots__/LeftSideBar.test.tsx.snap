@@ -4,7 +4,7 @@ exports[`LeftSidebar renders as expected 1`] = `
 <div>
   <div>
     <div
-      class="fixed flex bg-background-700 justify-center h-20 w-20 md:hidden"
+      class="fixed flex bg-background-700 justify-center h-20 w-20 md:hidden z-10"
     >
       <div
         data-testid="Modal"
