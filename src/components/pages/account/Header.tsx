@@ -46,12 +46,10 @@ export default function Header({
 
   return (
     <div className="header">
-      <span className="title">
-        <span className={accountColorCode(account, 'text-xl font-medium badge')}>
-          {title}
-        </span>
+      <span className={accountColorCode(account, 'title basis-full md:basis-auto text-center text-xl font-medium badge')}>
+        {title}
       </span>
-      <div className="ml-auto">
+      <div className="text-center">
         <div
           className={classNames(
             'flex gap-1',

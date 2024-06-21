@@ -3,49 +3,42 @@
 exports[`AssetInfo renders as expected when not placeholder Asset 1`] = `
 <div>
   <div
-    class="grid grid-cols-12 items-start"
+    class="grid md:grid-cols-12 items-start"
   >
+    <div
+      class="grid md:grid-cols-12 auto-cols-fr items-start col-span-6"
+    >
+      <div
+        class="md:col-span-4"
+      >
+        <div
+          data-testid="TotalWidget"
+        />
+        <div
+          data-testid="SpendWidget"
+        />
+        <div
+          data-testid="EarnWidget"
+        />
+      </div>
+      <div
+        class="card md:col-span-8"
+      >
+        <div
+          data-testid="AssetSankey"
+        />
+      </div>
+    </div>
     <div
       class="col-span-6"
     >
       <div
-        class="grid grid-cols-12 items-start"
-      >
-        <div
-          class="col-span-4"
-        >
-          <div
-            data-testid="TotalWidget"
-          />
-          <div
-            data-testid="SpendWidget"
-          />
-          <div
-            data-testid="EarnWidget"
-          />
-        </div>
-        <div
-          class="card col-span-8"
-        >
-          <div
-            data-testid="AssetSankey"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      class="grid grid-cols-12 col-span-6"
-    >
-      <div
-        class="card col-span-12"
+        class="card"
       >
         <div
           data-testid="NetWorthHistogram"
         />
       </div>
-      <div
-        class="col-span-12"
-      />
     </div>
   </div>
 </div>
@@ -54,53 +47,46 @@ exports[`AssetInfo renders as expected when not placeholder Asset 1`] = `
 exports[`AssetInfo renders as expected when placeholder 1`] = `
 <div>
   <div
-    class="grid grid-cols-12 items-start"
+    class="grid md:grid-cols-12 items-start"
   >
+    <div
+      class="grid md:grid-cols-12 auto-cols-fr items-start col-span-6"
+    >
+      <div
+        class="card md:col-span-6"
+      >
+        <div
+          class="items-center"
+        >
+          <div
+            data-testid="TotalsPie"
+          />
+          <div
+            data-testid="TotalChange"
+          />
+          <div
+            class="mt-4"
+          >
+            <div
+              data-testid="AccountsTable"
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        class="card md:col-span-6"
+      />
+    </div>
     <div
       class="col-span-6"
     >
       <div
-        class="grid grid-cols-12 items-start"
-      >
-        <div
-          class="card col-span-6"
-        >
-          <div
-            class="items-center"
-          >
-            <div
-              data-testid="TotalsPie"
-            />
-            <div
-              data-testid="TotalChange"
-            />
-            <div
-              class="mt-4"
-            >
-              <div
-                data-testid="AccountsTable"
-              />
-            </div>
-          </div>
-        </div>
-        <div
-          class="card col-span-6"
-        />
-      </div>
-    </div>
-    <div
-      class="grid grid-cols-12 col-span-6"
-    >
-      <div
-        class="card col-span-12"
+        class="card"
       >
         <div
           data-testid="NetWorthHistogram"
         />
       </div>
-      <div
-        class="col-span-12"
-      />
     </div>
   </div>
 </div>

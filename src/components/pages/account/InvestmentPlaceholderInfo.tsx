@@ -76,16 +76,15 @@ export default function InvestmentPlaceholderInfo({
 
   return (
     <>
-      <div className="grid grid-cols-12 mt-4">
-        <div className="col-span-4 mt-2">
+      <div className="grid md:grid-cols-12 auto-cols-fr mt-4">
+        <div className="md:col-span-4 mt-2">
           <WeightsChart accounts={accounts} totalValue={totalValue} />
         </div>
 
-        <div className="col-span-8 ml-4">
-          <div className="grid grid-cols-12">
-            <div className="col-span-4">
+        <div className="md:col-span-8">
+          <div className="grid md:grid-cols-12 auto-cols-fr">
+            <div className="md:col-span-4">
               <StatisticsWidget
-                className="mr-2"
                 title="Value/Cost"
                 stats={totalValue.format()}
                 description={
@@ -94,9 +93,8 @@ export default function InvestmentPlaceholderInfo({
               />
             </div>
 
-            <div className="col-span-4">
+            <div className="md:col-span-4">
               <StatisticsWidget
-                className="mr-2"
                 statsTextClass={classNames({
                   'text-success': unrealizedProfitPct >= 0,
                   'text-danger': unrealizedProfitPct < 0,
@@ -109,9 +107,8 @@ export default function InvestmentPlaceholderInfo({
               />
             </div>
 
-            <div className="col-span-4">
+            <div className="md:col-span-4">
               <StatisticsWidget
-                className="mr-2"
                 statsTextClass={classNames({
                   'text-success': totalRealized.add(totalDividends).toNumber() >= 0,
                   'text-danger': totalRealized.add(totalDividends).toNumber() < 0,

@@ -93,11 +93,10 @@ describe('InvestmentPlaceholderInfo', () => {
       {},
     );
     expect(WeightsChartMock.mock.calls[0][0].totalValue.toString()).toEqual('5 EUR');
-    expect(StatisticsWidget).toBeCalledTimes(3);
+    expect(StatisticsWidget).toHaveBeenCalledTimes(3);
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       1,
       {
-        className: 'mr-2',
         title: 'Value/Cost',
         stats: '€5.00',
         description: '€4.00 total invested',
@@ -107,7 +106,6 @@ describe('InvestmentPlaceholderInfo', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       2,
       {
-        className: 'mr-2',
         title: 'Unrealized Profit',
         stats: '€1.00 (25%)',
         description: '€6.00 (150%) with dividends',
@@ -118,7 +116,6 @@ describe('InvestmentPlaceholderInfo', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       3,
       {
-        className: 'mr-2',
         title: 'Realized',
         stats: '€15.00',
         description: '€5.00 from dividends',
@@ -164,11 +161,10 @@ describe('InvestmentPlaceholderInfo', () => {
 
     await screen.findByTestId('InvestmentsTable');
     expect(WeightsChartMock.mock.calls[0][0].totalValue.toString()).toEqual('5 USD');
-    expect(StatisticsWidget).toBeCalledTimes(3);
+    expect(StatisticsWidget).toHaveBeenCalledTimes(3);
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       1,
       {
-        className: 'mr-2',
         title: 'Value/Cost',
         stats: '$5.00',
         description: '$4.00 total invested',
@@ -178,7 +174,6 @@ describe('InvestmentPlaceholderInfo', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       2,
       {
-        className: 'mr-2',
         title: 'Unrealized Profit',
         stats: '$1.00 (25%)',
         description: '$6.00 (150%) with dividends',
@@ -189,7 +184,6 @@ describe('InvestmentPlaceholderInfo', () => {
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       3,
       {
-        className: 'mr-2',
         title: 'Realized',
         stats: '$15.00',
         description: '$5.00 from dividends',
