@@ -24,7 +24,6 @@ exports[`Modal renders hidden modal on mount with trigger 1`] = `
     </button>
   </div>
   <button
-    class=""
     type="button"
   >
     <span>
