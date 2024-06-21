@@ -24,7 +24,7 @@ export default function ImportButton({
           <span className="inline-block align-middle">Import</span>
         </>
       )}
-      triggerClassName={className}
+      triggerProps={{ className }}
       showClose
     >
       <div className="grid grid-cols-2 justify-center mt-5">

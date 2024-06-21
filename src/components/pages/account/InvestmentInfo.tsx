@@ -26,8 +26,8 @@ export default function InvestmentInfo({
   }
 
   return (
-    <div className="grid grid-cols-12 items-stretch">
-      <div className="col-span-4">
+    <div className="grid md:grid-cols-12 auto-cols-fr items-stretch">
+      <div className="md:col-span-4">
         {
           (
             investment.account.commodity.namespace !== 'CURRENCY'
@@ -157,7 +157,7 @@ export default function InvestmentInfo({
           />
         </div>
       </div>
-      <div className="card col-span-8">
+      <div className="card md:col-span-8">
         <InvestmentChart account={account} />
       </div>
     </div>

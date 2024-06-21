@@ -7,7 +7,7 @@ import SQLExplorer from '@/components/SQLExplorer';
 
 export default function EditorPage(): JSX.Element {
   return (
-    <div className="grid grid-cols-12 items-start">
+    <div className="grid md:grid-cols-12 items-start">
       <div className="col-span-9">
         <SQLEditor />
       </div>
