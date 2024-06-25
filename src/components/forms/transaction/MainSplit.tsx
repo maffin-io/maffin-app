@@ -7,7 +7,6 @@ import Link from 'next/link';
 
 import { Tooltip } from '@/components/tooltips';
 import { Price } from '@/book/entities';
-import { toFixed } from '@/helpers/number';
 import { currencyToSymbol } from '@/helpers/currency';
 import { usePrices } from '@/hooks/api';
 import type { Account } from '@/book/entities';
@@ -55,7 +54,7 @@ export default function MainSplit({
 
   React.useEffect(() => {
     if (form.formState.isDirty && splits.length > 1) {
-      form.setValue('splits.0.value', toFixed(quantity * exchangeRate.value, 3));
+      form.setValue('splits.0.value', quantity * exchangeRate.value);
       form.trigger('splits');
     }
   }, [quantity, exchangeRate, splits.length, form]);
