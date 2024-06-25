@@ -550,7 +550,7 @@ describe('SplitField', () => {
       expect(q1).toBeVisible();
       expect(v1).toBeVisible();
       await user.type(v1, '200');
-      await waitFor(() => expect(q1).toHaveValue(202.634));
+      await waitFor(() => expect(q1).toHaveValue(202.634245));
     });
 
     /**
@@ -655,7 +655,7 @@ describe('SplitField', () => {
       expect(q1).toBeVisible();
       expect(v1).toBeVisible();
       await user.type(v1, '200');
-      await waitFor(() => expect(q1).toHaveValue(202.634));
+      await waitFor(() => expect(q1).toHaveValue(202.634245));
 
       await user.click(screen.getByLabelText('splits.1.account'));
       await user.click(screen.getByText('path3'));
@@ -743,7 +743,7 @@ describe('SplitField', () => {
       expect(q1).toBeVisible();
       expect(v1).toBeVisible();
       await user.type(v1, '200');
-      await waitFor(() => expect(q1).toHaveValue(202.634));
+      await waitFor(() => expect(q1).toHaveValue(202.634245));
     });
 
     it('recalculates when date changes', async () => {
@@ -800,11 +800,11 @@ describe('SplitField', () => {
       expect(q1).toBeVisible();
       expect(v1).toBeVisible();
       await user.type(v1, '200');
-      await waitFor(() => expect(q1).toHaveValue(202.634));
+      await waitFor(() => expect(q1).toHaveValue(202.634245));
 
       user.clear(dateField);
       await user.type(dateField, '2023-01-11');
-      await waitFor(() => expect(q1).toHaveValue(190.476));
+      await waitFor(() => expect(q1).toHaveValue(190.47619));
       await waitFor(() => expect(v1).toHaveValue(200));
     });
   });

@@ -204,7 +204,7 @@ exports[`SplitsField renders with default values 1`] = `
                 aria-label="splits.1.quantity"
                 class="w-full text-right m-0"
                 name="splits.1.quantity"
-                step="0.001"
+                step="any"
                 type="number"
               />
               <span
@@ -223,7 +223,7 @@ exports[`SplitsField renders with default values 1`] = `
                 aria-label="splits.1.value"
                 class="w-full text-right m-0"
                 name="splits.1.value"
-                step="0.001"
+                step="any"
                 type="number"
               />
               <span

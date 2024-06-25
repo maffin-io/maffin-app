@@ -4,7 +4,7 @@ import RModal from 'react-modal';
 export type ModalProps = {
   className?: string;
   triggerContent: string | JSX.Element;
-  triggerClassName?: string;
+  triggerProps?: Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'>;
   showClose?: boolean;
 } & React.PropsWithChildren;
 
@@ -15,8 +15,8 @@ export interface ModalRef {
 
 function Modal({
   className = 'modal',
-  triggerClassName = '',
   triggerContent,
+  triggerProps,
   showClose = false,
   children,
 }: ModalProps, ref: React.Ref<ModalRef>): JSX.Element {
@@ -54,7 +54,7 @@ function Modal({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={triggerClassName}
+        {...triggerProps}
       >
         {triggerContent}
       </button>

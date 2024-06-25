@@ -120,7 +120,7 @@ export default function CommodityCard({
             !priceAvailable
             && (
               <div
-                className="badge warning ml-auto"
+                className="badge bg-warning ml-auto"
                 data-tooltip-id={`missing-price-${guid}`}
               >
                 !

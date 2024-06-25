@@ -246,7 +246,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                   aria-label="splits.1.quantity"
                   class="w-full text-right m-0"
                   name="splits.1.quantity"
-                  step="0.001"
+                  step="any"
                   type="number"
                 />
                 <span
@@ -265,7 +265,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                   aria-label="splits.1.value"
                   class="w-full text-right m-0"
                   name="splits.1.value"
-                  step="0.001"
+                  step="any"
                   type="number"
                 />
                 <span
@@ -564,7 +564,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                   class="w-full text-right m-0"
                   disabled=""
                   name="splits.1.quantity"
-                  step="0.001"
+                  step="any"
                   type="number"
                 />
                 <span
@@ -586,7 +586,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                   class="w-full text-right m-0"
                   disabled=""
                   name="splits.1.value"
-                  step="0.001"
+                  step="any"
                   type="number"
                 />
                 <span
@@ -805,7 +805,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                   aria-label="splits.0.quantity"
                   class="w-full text-right m-0"
                   name="splits.0.quantity"
-                  step="0.001"
+                  step="any"
                   type="number"
                 />
                 <span
@@ -826,7 +826,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                   aria-label="splits.0.value"
                   class="w-full text-right m-0"
                   name="splits.0.value"
-                  step="0.001"
+                  step="any"
                   type="number"
                 />
                 <span
@@ -960,7 +960,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                   aria-label="splits.1.quantity"
                   class="w-full text-right m-0"
                   name="splits.1.quantity"
-                  step="0.001"
+                  step="any"
                   type="number"
                 />
                 <span
@@ -981,7 +981,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                   aria-label="splits.1.value"
                   class="w-full text-right m-0"
                   name="splits.1.value"
-                  step="0.001"
+                  step="any"
                   type="number"
                 />
                 <span
