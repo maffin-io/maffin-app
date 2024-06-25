@@ -55,7 +55,7 @@ export default function MainSplit({
 
   React.useEffect(() => {
     if (form.formState.isDirty && splits.length > 1) {
-      form.setValue('splits.0.value', toFixed(quantity * exchangeRate.value, 3));
+      form.setValue('splits.0.value', toFixed(quantity * exchangeRate.value, 6));
       form.trigger('splits');
     }
   }, [quantity, exchangeRate, splits.length, form]);

@@ -63,7 +63,7 @@ export default function SplitField({
     if (value && action === 'add') {
       form.setValue(
         `splits.${index}.quantity`,
-        toFixed(value / exchangeRate.value, 3),
+        toFixed(value / exchangeRate.value, 6),
       );
     }
     form.trigger('splits');
@@ -150,13 +150,13 @@ export default function SplitField({
             aria-label={`splits.${index}.quantity`}
             className="w-full text-right m-0"
             type="number"
-            step="0.001"
+            step="any"
             disabled={disabled}
             onChange={(e) => {
               const splits = form.getValues('splits');
               if (!showValueField && splits.length > 1) {
                 const quantity = Number(e.target.value);
-                form.setValue(`splits.${index}.value`, toFixed(quantity * exchangeRate.value, 3));
+                form.setValue(`splits.${index}.value`, quantity * exchangeRate.value);
               }
             }}
           />
@@ -181,7 +181,7 @@ export default function SplitField({
             aria-label={`splits.${index}.value`}
             className="w-full text-right m-0"
             type="number"
-            step="0.001"
+            step="any"
             disabled={disabled}
           />
           <span className="pr-2">
