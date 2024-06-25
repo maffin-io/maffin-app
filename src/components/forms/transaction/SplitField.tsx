@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import type { SingleValue } from 'react-select';
 
 import { getMainCurrency } from '@/lib/queries';
+import { toFixed } from '@/helpers/number';
 import { AccountSelector } from '@/components/selectors';
 import { currencyToSymbol } from '@/helpers/currency';
 import { usePrices } from '@/hooks/api';
@@ -62,7 +63,7 @@ export default function SplitField({
     if (value && action === 'add') {
       form.setValue(
         `splits.${index}.quantity`,
-        value / exchangeRate.value,
+        toFixed(value / exchangeRate.value, 6),
       );
     }
     form.trigger('splits');
@@ -149,6 +150,7 @@ export default function SplitField({
             aria-label={`splits.${index}.quantity`}
             className="w-full text-right m-0"
             type="number"
+            step="any"
             disabled={disabled}
             onChange={(e) => {
               const splits = form.getValues('splits');
@@ -179,7 +181,7 @@ export default function SplitField({
             aria-label={`splits.${index}.value`}
             className="w-full text-right m-0"
             type="number"
-            step="0.001"
+            step="any"
             disabled={disabled}
           />
           <span className="pr-2">
