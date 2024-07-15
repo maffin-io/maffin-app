@@ -16,7 +16,7 @@
     "@hookform/resolvers": "^3.6.0",
     "@tanstack/react-query": "^5.45.1",
     "@tanstack/react-query-devtools": "^5.45.1",
-    "@tanstack/react-table": "^8.17.3",
+    "@tanstack/react-table": "^8.19.3",
     "@testing-library/jest-dom": "^6.4.6",
     "axios": "^1.7.2",
     "chart.js": "^4.4.3",
