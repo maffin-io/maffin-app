@@ -30,7 +30,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "classnames": "^2.5.1",
-    "dayjs": "^1.11.11",
+    "dayjs": "^1.11.12",
     "dinero.js": "^2.0.0-alpha.14",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.1.0",
