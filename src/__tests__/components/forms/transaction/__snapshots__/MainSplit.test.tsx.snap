@@ -19,7 +19,7 @@ exports[`MainSplit renders with empty data 1`] = `
         aria-label="splits.0.quantity"
         class="w-full text-right m-0"
         name="splits.0.quantity"
-        step="0.001"
+        step="any"
         type="number"
       />
       <span

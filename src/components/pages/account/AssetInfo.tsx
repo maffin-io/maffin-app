@@ -18,66 +18,64 @@ export default function AssetInfo({
   account,
 }: AssetInfoProps): JSX.Element {
   return (
-    <div className="grid grid-cols-12 items-start">
-      <div className="col-span-6">
-        <div className="grid grid-cols-12 items-start">
-          <div
-            className={classNames({
-              'card col-span-6': account.placeholder,
-              'col-span-4': !account.placeholder,
-            })}
-          >
-            {
-              (
-                account.placeholder
-                && (
-                  <div className="items-center">
-                    <TotalsPie
-                      title=""
-                      guids={account.childrenIds}
-                      showTooltip
-                      showDataLabels={false}
-                    />
-                    <TotalChange
-                      account={account}
-                      className="justify-center text-sm mt-1"
-                    />
-                    <div className="mt-4">
-                      <AccountsTable
-                        guids={account.childrenIds}
-                      />
-                    </div>
-                  </div>
-                )
-              ) || (
-                <>
-                  <TotalWidget account={account} />
-                  <SpendWidget account={account} />
-                  <EarnWidget account={account} />
-                </>
-              )
-            }
-          </div>
-          <div
-            className={classNames('card', {
-              'col-span-6': account.placeholder,
-              'col-span-8': !account.placeholder,
-            })}
-          >
-            {
-              !account.placeholder
+    <div className="grid md:grid-cols-12 items-start">
+      <div className="grid md:grid-cols-12 auto-cols-fr items-start col-span-6">
+        <div
+          className={classNames({
+            'card md:col-span-6': account.placeholder,
+            'md:col-span-4': !account.placeholder,
+          })}
+        >
+          {
+            (
+              account.placeholder
               && (
-                <AssetSankey
-                  height={428}
-                  account={account}
-                />
+                <div className="items-center">
+                  <TotalsPie
+                    title=""
+                    guids={account.childrenIds}
+                    showTooltip
+                    showDataLabels={false}
+                  />
+                  <TotalChange
+                    account={account}
+                    className="justify-center text-sm mt-1"
+                  />
+                  <div className="mt-4">
+                    <AccountsTable
+                      guids={account.childrenIds}
+                    />
+                  </div>
+                </div>
               )
-            }
-          </div>
+            ) || (
+              <>
+                <TotalWidget account={account} />
+                <SpendWidget account={account} />
+                <EarnWidget account={account} />
+              </>
+            )
+          }
+        </div>
+        <div
+          className={classNames('card', {
+            'md:col-span-6': account.placeholder,
+            'md:col-span-8': !account.placeholder,
+          })}
+        >
+          {
+            !account.placeholder
+            && (
+              <AssetSankey
+                height={428}
+                account={account}
+              />
+            )
+          }
         </div>
       </div>
-      <div className="grid grid-cols-12 col-span-6">
-        <div className="card col-span-12">
+      <div className="col-span-6">
+        <div className="card">
           {
             (
               isAsset(account)
@@ -109,7 +107,6 @@ export default function AssetInfo({
             )
           }
         </div>
-        <div className="col-span-12" />
       </div>
     </div>
   );

@@ -516,7 +516,7 @@ describe('TransactionForm', () => {
 
       await waitFor(() => expect(q0).toHaveValue(-100)); // 100 EUR
       await waitFor(() => expect(v1).toHaveValue(100)); // 100 EUR
-      await waitFor(() => expect(q1).toHaveValue(142.857)); // 142.857 SGD
+      await waitFor(() => expect(q1).toHaveValue(142.857143)); // 142.857 SGD
 
       expect(screen.getByText('add')).not.toBeDisabled();
       await user.click(screen.getByText('add'));
@@ -553,8 +553,8 @@ describe('TransactionForm', () => {
             fk_account: {
               guid: 'account_guid_2',
             },
-            quantityNum: 142857,
-            quantityDenom: 1000,
+            quantityNum: 142857143,
+            quantityDenom: 1000000,
             valueNum: 100,
             valueDenom: 1,
           },
@@ -978,9 +978,11 @@ describe('TransactionForm', () => {
       // the imbalance disappear
       await user.clear(v0);
       await user.type(v0, '995');
+      await waitFor(() => expect(v0).toHaveValue(995));
 
-      expect(screen.getByText('add')).not.toBeDisabled();
-      await user.click(screen.getByText('add'));
+      const addButton = screen.getByText('add');
+      expect(addButton).not.toBeDisabled();
+      await user.click(addButton);
 
       const tx = await Transaction.findOneOrFail({
         where: { description: 'Buy TICKER' },

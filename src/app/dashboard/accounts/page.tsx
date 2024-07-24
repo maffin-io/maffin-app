@@ -59,9 +59,9 @@ export default function AccountsPage(): JSX.Element {
           </FormButton>
         </div>
       </div>
-      <div className="grid grid-cols-12 items-start">
-        <div className="grid grid-cols-12 col-span-3">
-          <div className="card col-span-12">
+      <div className="grid md:grid-cols-12 items-start">
+        <div className="col-span-12 md:col-span-3">
+          <div className="card">
             <TotalsPie
               title="Net worth"
               backgroundColor={[ASSET, LIABILITY]}
@@ -88,12 +88,12 @@ export default function AccountsPage(): JSX.Element {
               </div>
             </div>
           </div>
-          <div className="card col-span-12">
+          <div className="card">
             <LatestTransactions />
           </div>
         </div>
-        <div className="grid grid-cols-12 col-span-9">
-          <div className="card col-span-8">
+        <div className="grid grid-cols-12 col-span-12 md:col-span-9">
+          <div className="card col-span-12 md:col-span-8">
             <NetWorthHistogram
               assetsGuid="type_asset"
               assetsConfig={{
@@ -105,16 +105,16 @@ export default function AccountsPage(): JSX.Element {
               }}
             />
           </div>
-          <div className="card col-span-4">
+          <div className="card col-span-12 md:col-span-4">
             <MonthlyTotalHistogram
               guids={accountsMap?.type_income?.childrenIds}
               title="Income"
             />
           </div>
-          <div className="card col-span-8">
+          <div className="card col-span-12 md:col-span-8">
             <IncomeExpenseHistogram />
           </div>
-          <div className="card col-span-4">
+          <div className="card col-span-12 md:col-span-4">
             <MonthlyTotalHistogram
               guids={accountsMap?.type_expense?.childrenIds}
               title="Expenses"

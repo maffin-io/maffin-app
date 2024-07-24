@@ -6,16 +6,12 @@ exports[`Header renders as expected with account 1`] = `
     class="header"
   >
     <span
-      class="title"
+      class="title basis-full md:basis-auto text-center text-xl font-medium badge"
     >
-      <span
-        class="text-xl font-medium badge"
-      >
-        path
-      </span>
+      path
     </span>
     <div
-      class="ml-auto"
+      class="text-center"
     >
       <div
         class="flex gap-1"
@@ -53,25 +49,21 @@ exports[`Header shows parent link 1`] = `
     class="header"
   >
     <span
-      class="title"
+      class="title basis-full md:basis-auto text-center text-xl font-medium badge"
     >
-      <span
-        class="text-xl font-medium badge"
-      >
-        <span>
-          <a
-            class="text-white text-opacity-50 hover:text-current"
-            href="/dashboard/accounts/parent"
-          >
-            Assets
-          </a>
-          :
-          account
-        </span>
+      <span>
+        <a
+          class="text-white text-opacity-50 hover:text-current"
+          href="/dashboard/accounts/parent"
+        >
+          Assets
+        </a>
+        :
+        account
       </span>
     </span>
     <div
-      class="ml-auto"
+      class="text-center"
     >
       <div
         class="flex gap-1"

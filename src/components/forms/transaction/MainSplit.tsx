@@ -55,7 +55,7 @@ export default function MainSplit({
 
   React.useEffect(() => {
     if (form.formState.isDirty && splits.length > 1) {
-      form.setValue('splits.0.value', toFixed(quantity * exchangeRate.value, 3));
+      form.setValue('splits.0.value', toFixed(quantity * exchangeRate.value, 6));
       form.trigger('splits');
     }
   }, [quantity, exchangeRate, splits.length, form]);
@@ -73,7 +73,7 @@ export default function MainSplit({
           aria-label="splits.0.quantity"
           className="w-full text-right m-0"
           type="number"
-          step="0.001"
+          step="any"
           disabled={disabled}
         />
         <span className="pr-2">

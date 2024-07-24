@@ -49,7 +49,7 @@ describe('FormButton', () => {
       {
         showClose: true,
         className: 'modal card',
-        triggerClassName: 'btn btn-primary',
+        triggerProps: { className: 'btn btn-primary' },
         triggerContent: expect.anything(),
         children: expect.anything(),
       },

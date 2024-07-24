@@ -3,7 +3,7 @@
 exports[`EditorPage renders as expected 1`] = `
 <div>
   <div
-    class="grid grid-cols-12 items-start"
+    class="grid md:grid-cols-12 items-start"
   >
     <div
       class="col-span-9"
