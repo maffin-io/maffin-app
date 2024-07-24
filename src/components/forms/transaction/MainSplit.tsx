@@ -73,7 +73,7 @@ export default function MainSplit({
           aria-label="splits.0.quantity"
           className="w-full text-right m-0"
           type="number"
-          step="0.001"
+          step="any"
           disabled={disabled}
         />
         <span className="pr-2">
