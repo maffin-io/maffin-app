@@ -52,7 +52,7 @@
     "react-plaid-link": "^3.5.1",
     "react-select": "^5.8.0",
     "react-tailwindcss-datepicker": "^1.6.6",
-    "react-tooltip": "^5.27.1",
+    "react-tooltip": "^5.28.0",
     "reflect-metadata": "^0.2.2",
     "sharp": "^0.33.4",
     "sql.js": "^1.10.3",
