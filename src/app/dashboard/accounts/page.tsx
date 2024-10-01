@@ -20,6 +20,7 @@ import Onboarding from '@/components/onboarding/Onboarding';
 import { useAccounts } from '@/hooks/api';
 import mapAccounts from '@/helpers/mapAccounts';
 import { ASSET, LIABILITY } from '@/constants/colors';
+import ReportsDropdown from '@/components/buttons/ReportsDropdown';
 
 export default function AccountsPage(): JSX.Element {
   const { data, isLoading } = useAccounts();
@@ -44,7 +45,8 @@ export default function AccountsPage(): JSX.Element {
         <span className="title">
           Dashboard
         </span>
-        <div className="ml-auto">
+        <div className="flex ml-auto gap-4">
+          <ReportsDropdown />
           <FormButton
             id="add-account"
             modalTitle="Add account"

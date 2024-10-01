@@ -3,13 +3,20 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import { DateTime, Interval } from 'luxon';
 
 import { useStartDate } from '@/hooks/api';
-import { useInterval } from '@/hooks/state';
-import { useQueryClient } from '@tanstack/react-query';
 
-export default function DateRangeInput(): JSX.Element {
+export type DateRangeInputProps = {
+  id?: string;
+  interval: Interval;
+  onChange?: (interval: Interval) => void;
+};
+
+export default function DateRangeInput({
+  id,
+  interval,
+  onChange,
+}: DateRangeInputProps): JSX.Element {
   const { data: earliestDate } = useStartDate();
-  const queryClient = useQueryClient();
-  const { data: interval } = useInterval();
+  const [value, setValue] = React.useState(interval);
 
   const now = DateTime.now();
   const shortcuts: { [key: string]: { text: string, period: { start: Date, end: Date } } } = {
@@ -39,8 +46,8 @@ export default function DateRangeInput(): JSX.Element {
   Array.from(
     { length: now.year - (earliestDate?.year || now.year) },
     (x, i) => i + 1,
-  ).forEach(value => {
-    const yearDiff = value as number;
+  ).forEach(v => {
+    const yearDiff = v as number;
     const key = now.year - yearDiff;
     shortcuts[key] = {
       text: `Year ${now.year - yearDiff}`,
@@ -55,9 +62,10 @@ export default function DateRangeInput(): JSX.Element {
 
   return (
     <Datepicker
+      inputId={id}
       value={{
-        startDate: interval.start?.toJSDate() || null,
-        endDate: interval.end?.toJSDate() || null,
+        startDate: value.start?.toJSDate() || null,
+        endDate: value.end?.toJSDate() || null,
       }}
       minDate={earliestDate && earliestDate.toJSDate()}
       maxDate={now.toJSDate()}
@@ -66,13 +74,12 @@ export default function DateRangeInput(): JSX.Element {
       primaryColor="cyan"
       onChange={(newValue) => {
         if (newValue) {
-          queryClient.setQueryData(
-            ['state', 'interval'],
-            Interval.fromDateTimes(
-              DateTime.fromISO(newValue.startDate as string),
-              DateTime.fromISO(newValue.endDate as string).endOf('day'),
-            ),
+          const v = Interval.fromDateTimes(
+            DateTime.fromISO(newValue.startDate as string),
+            DateTime.fromISO(newValue.endDate as string).endOf('day'),
           );
+          setValue(v);
+          onChange?.(v);
         }
       }}
       startWeekOn="mon"

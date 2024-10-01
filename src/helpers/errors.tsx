@@ -78,6 +78,7 @@ function ToastComponent({
       <button
         onClick={() => toast.dismiss(toastId)}
         className="cursor-pointer"
+        aria-label="Close"
         type="button"
       >
         <BiX className="text-lg ml-2" />

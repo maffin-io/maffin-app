@@ -10,6 +10,7 @@ import type { Account } from '@/book/entities';
 import AccountsPage from '@/app/dashboard/accounts/page';
 import FormButton from '@/components/buttons/FormButton';
 import AccountForm from '@/components/forms/account/AccountForm';
+import ReportsDropdown from '@/components/buttons/ReportsDropdown';
 import Onboarding from '@/components/onboarding/Onboarding';
 import {
   LatestTransactions,
@@ -34,6 +35,10 @@ jest.mock('@/components/buttons/FormButton', () => jest.fn(
 
 jest.mock('@/components/forms/account/AccountForm', () => jest.fn(
   () => <div data-testid="AccountForm" />,
+));
+
+jest.mock('@/components/buttons/ReportsDropdown', () => jest.fn(
+  () => <div data-testid="ReportsDropdown" />,
 ));
 
 jest.mock('@/components/tables/AccountsTable', () => jest.fn(
@@ -100,6 +105,7 @@ describe('AccountsPage', () => {
       {},
       {},
     );
+    expect(ReportsDropdown).toHaveBeenLastCalledWith({}, {});
 
     await screen.findByTestId('Onboarding');
     expect(Onboarding).toHaveBeenLastCalledWith(
