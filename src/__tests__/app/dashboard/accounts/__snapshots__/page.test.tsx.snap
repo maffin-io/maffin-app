@@ -14,8 +14,11 @@ exports[`AccountsPage renders as expected when no data showing onboarding 1`] = 
       Dashboard
     </span>
     <div
-      class="ml-auto"
+      class="flex ml-auto gap-4"
     >
+      <div
+        data-testid="ReportsDropdown"
+      />
       <div
         data-testid="FormButton"
       >

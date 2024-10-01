@@ -8,10 +8,14 @@ import DateRangeInput from '@/components/DateRangeInput';
 import SaveButton from '@/components/buttons/SaveButton';
 import { AccountSelector } from '@/components/selectors';
 import ThemeButton from '@/components/buttons/ThemeButton';
+import { useQueryClient } from '@tanstack/react-query';
+import { useInterval } from '@/hooks/state';
 import type { Account } from '@/book/entities';
 
 export default function Topbar(): JSX.Element {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const { data: interval } = useInterval();
 
   return (
     <div className="fixed flex justify-end lg:justify-between items-center bg-background-700 shadow-sm h-20 z-10 left-20 right-0 top-0">
@@ -31,7 +35,16 @@ export default function Topbar(): JSX.Element {
 
       <div className="flex h-full gap-x-4 items-center">
         <span className="hidden lg:inline-block">
-          <DateRangeInput />
+          <DateRangeInput
+            interval={interval}
+            onChange={
+              (newValue) => {
+                if (newValue) {
+                  queryClient.setQueryData(['state', 'interval'], interval);
+                }
+              }
+            }
+          />
         </span>
         <span className="hidden lg:inline-block">
           <SaveButton />
