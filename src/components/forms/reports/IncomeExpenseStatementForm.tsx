@@ -29,7 +29,13 @@ export default function IncomeExpenseStatementForm(): JSX.Element {
   const { data: totals } = useIncomeStatement(i);
 
   return (
-    <form onSubmit={form.handleSubmit(data => onSubmit(data, accounts, totals))}>
+    <form
+      onSubmit={form.handleSubmit(data => onSubmit(
+        data,
+        accounts as Account[],
+        totals as AccountsTotals,
+      ))}
+    >
       <div className="flex flex-col items-center text-sm gap-2 pt-5">
         <fieldset>
           <label htmlFor="intervalInput" className="inline-block text-sm my-2">Select dates</label>
