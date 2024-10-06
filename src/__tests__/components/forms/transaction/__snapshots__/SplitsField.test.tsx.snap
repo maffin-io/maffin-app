@@ -64,7 +64,7 @@ exports[`SplitsField renders with default values 1`] = `
               class="w-full text-right m-0"
               hidden=""
               name="splits.0.value"
-              step="0.001"
+              step="any"
               type="number"
             />
             <span

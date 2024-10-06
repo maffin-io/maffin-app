@@ -40,7 +40,7 @@ export default function Topbar(): JSX.Element {
             onChange={
               (newValue) => {
                 if (newValue) {
-                  queryClient.setQueryData(['state', 'interval'], interval);
+                  queryClient.setQueryData(['state', 'interval'], newValue);
                 }
               }
             }
