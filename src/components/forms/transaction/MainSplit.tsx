@@ -140,7 +140,7 @@ export default function MainSplit({
             aria-label="splits.0.value"
             className="w-full text-right m-0"
             type="number"
-            step="0.001"
+            step="any"
             disabled={disabled}
             hidden={txCurrency.mnemonic === account.commodity.mnemonic}
             onChange={(e) => {
