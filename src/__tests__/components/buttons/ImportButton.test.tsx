@@ -34,7 +34,7 @@ describe('ImportButton', () => {
       {
         showClose: true,
         className: 'modal bg-background-800',
-        triggerClassName: 'btn btn-primary',
+        triggerProps: { className: 'btn btn-primary' },
         triggerContent: expect.anything(),
         children: expect.anything(),
       },

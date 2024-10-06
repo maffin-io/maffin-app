@@ -17,6 +17,7 @@ export default function FormButton({
   modalTitle,
   children,
   className = 'btn btn-primary',
+  ...props
 }: FormButtonProps): JSX.Element {
   const { save } = React.useContext(DataSourceContext);
   const modalRef = React.useRef<ModalRef>(null);
@@ -26,7 +27,7 @@ export default function FormButton({
       ref={modalRef}
       className="modal card"
       triggerContent={buttonContent}
-      triggerClassName={className}
+      triggerProps={{ ...props, className }}
       showClose
     >
       <span>{modalTitle}</span>

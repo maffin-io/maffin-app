@@ -14,48 +14,46 @@ export default function IEInfo({
   account,
 }: IEInfoProps): JSX.Element {
   return (
-    <div className="grid grid-cols-12 items-start">
-      <div className="col-span-6">
-        <div className="grid grid-cols-12 items-start">
-          <div
-            className={classNames({
-              'card col-span-6': account.placeholder,
-              'col-span-4': !account.placeholder,
-            })}
-          >
-            {
-              (
-                account.placeholder
-                && (
-                  <>
-                    <TotalsPie
-                      title={account.type === 'EXPENSE' ? 'Total spent' : 'Total earned'}
+    <div className="grid md:grid-cols-12 items-start">
+      <div className="grid md:grid-cols-12 auto-cols-fr items-start col-span-6">
+        <div
+          className={classNames({
+            'card md:col-span-6': account.placeholder,
+            'md:col-span-4': !account.placeholder,
+          })}
+        >
+          {
+            (
+              account.placeholder
+              && (
+                <>
+                  <TotalsPie
+                    title={account.type === 'EXPENSE' ? 'Total spent' : 'Total earned'}
+                    guids={account.childrenIds}
+                    showTooltip
+                    showDataLabels={false}
+                  />
+                  <div className="mt-4">
+                    <AccountsTable
                       guids={account.childrenIds}
-                      showTooltip
-                      showDataLabels={false}
                     />
-                    <div className="mt-4">
-                      <AccountsTable
-                        guids={account.childrenIds}
-                      />
-                    </div>
-                  </>
-                )
-              ) || (
-                <TotalWidget account={account} />
+                  </div>
+                </>
               )
-            }
-          </div>
-          <div
-            className={classNames('card', {
-              'col-span-6': account.placeholder,
-              'col-span-8': !account.placeholder,
-            })}
-          />
+            ) || (
+              <TotalWidget account={account} />
+            )
+          }
         </div>
+        <div
+          className={classNames('card', {
+            'md:col-span-6': account.placeholder,
+            'md:col-span-8': !account.placeholder,
+          })}
+        />
       </div>
-      <div className="grid grid-cols-12 col-span-6">
-        <div className="card col-span-12">
+      <div className="col-span-6">
+        <div className="card">
           <MonthlyTotalHistogram
             title=""
             guids={account.placeholder ? account.childrenIds : [account.guid]}

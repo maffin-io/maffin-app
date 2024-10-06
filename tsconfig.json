@@ -38,7 +38,8 @@
   "include": [
     "src",
     "src/book/types/**/*.ts",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "tailwind.config.ts"
   ],
   "types": [
     "gapi",

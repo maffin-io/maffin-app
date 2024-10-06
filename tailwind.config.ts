@@ -2,11 +2,11 @@ import defaultTheme from 'tailwindcss/defaultTheme';
 import type { Config } from 'tailwindcss';
 
 const config = {
-  darkMode: ["class"],
+  darkMode: ['class'],
   content: [
     './src/**/*.{js,ts,jsx,tsx,mdx}',
     './node_modules/react-tailwindcss-datepicker/dist/index.esm.js',
-	],
+  ],
   safelist: [
     // We use dynamic cols for TransactionForm when showing exchange rate
     'visible',
@@ -18,27 +18,27 @@ const config = {
       pattern: /pl-.*/,
     },
   ],
-  prefix: "",
+  prefix: '',
   theme: {
     fontFamily: {
       sans: ['InterVariable', ...defaultTheme.fontFamily.sans],
     },
     extend: {
       gridTemplateColumns: {
-        '13': 'repeat(13, minmax(0, 1fr))'
+        13: 'repeat(13, minmax(0, 1fr))',
       },
       colors: {
         background: {
           700: 'var(--background-700)',
           800: 'var(--background-800)',
         },
-        foreground: "var(--foreground)",
-        primary: "var(--primary)",
-        success: "var(--success)",
-        misc: "var(--misc)",
-        info: "var(--info)",
-        warning: "var(--warning)",
-        danger: "var(--danger)",
+        foreground: 'var(--foreground)',
+        primary: 'var(--primary)',
+        success: 'var(--success)',
+        misc: 'var(--misc)',
+        info: 'var(--info)',
+        warning: 'var(--warning)',
+        danger: 'var(--danger)',
         dark: {
           50: '#f3f4f5',
           100: '#e5e7e9',
@@ -66,6 +66,6 @@ const config = {
       },
     },
   },
-} satisfies Config
+} satisfies Config;
 
-export default config
+export default config;

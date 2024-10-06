@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`IncomeExpenseStatementForm renders as expected 1`] = `
+<div>
+  <form>
+    <div
+      class="flex flex-col items-center text-sm gap-2 pt-5"
+    >
+      <fieldset>
+        <label
+          class="inline-block text-sm my-2"
+          for="intervalInput"
+        >
+          Select dates
+        </label>
+        <input
+          data-testid="DateRangeInput"
+          id="intervalInput"
+        />
+      </fieldset>
+    </div>
+    <div
+      class="flex w-full justify-center mt-5"
+    >
+      <button
+        class="btn btn-primary capitalize"
+        type="submit"
+      >
+        Submit
+      </button>
+    </div>
+  </form>
+</div>
+`;

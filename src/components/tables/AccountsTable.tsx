@@ -6,11 +6,11 @@ import { BiCircle, BiSolidRightArrow, BiSolidDownArrow } from 'react-icons/bi';
 import Money from '@/book/Money';
 import { Tooltip } from '@/components/tooltips';
 import Table from '@/components/tables/Table';
-import type { AccountsMap } from '@/types/book';
 import { Account } from '@/book/entities';
 import { useAccounts, useAccountsTotals } from '@/hooks/api';
 import mapAccounts from '@/helpers/mapAccounts';
 import { accountColorCode } from '@/helpers/classNames';
+import getAccountsTree from '@/lib/getAccountsTree';
 
 export type AccountsTableProps = {
   guids: string[],
@@ -30,7 +30,7 @@ export default function AccountsTable(
   const trees: AccountsTableRow[] = [];
   guids.forEach(guid => {
     if (accounts[guid] && !accounts[guid].hidden) {
-      trees.push(getTree(
+      trees.push(getAccountsTree(
         accounts[guid],
         accounts,
         accountsTotal || {},
@@ -52,28 +52,6 @@ export default function AccountsTable(
       isExpanded={isExpanded}
     />
   );
-}
-
-function getTree(
-  current: Account,
-  accounts: AccountsMap,
-  accountsTotal: { [guid: string]: Money },
-): AccountsTableRow {
-  const leaves: AccountsTableRow[] = [];
-  current.childrenIds.forEach(childId => {
-    const childAccount = accounts[childId];
-    if (!childAccount.hidden && childAccount.parentId === current.guid) {
-      leaves.push(getTree(childAccount, accounts, accountsTotal));
-    }
-  });
-
-  const accountTotal = accountsTotal[current.guid] || new Money(0, current.commodity?.mnemonic || '');
-
-  return {
-    account: current,
-    total: accountTotal,
-    leaves,
-  };
 }
 
 const columns: ColumnDef<AccountsTableRow>[] = [
@@ -98,12 +76,9 @@ const columns: ColumnDef<AccountsTableRow>[] = [
             )}
           </button>
         ) : (
-          <button
-            type="button"
-            className="cursor-default"
-          >
+          <span>
             <BiCircle className="mr-1 text-xs opacity-50" />
-          </button>
+          </span>
         )}
         <Link
           data-tooltip-id={row.original.account.guid}

@@ -24,6 +24,7 @@ exports[`MaffinError show shows toast 1`] = `
     </svg>
     message
     <button
+      aria-label="Close"
       class="cursor-pointer"
       type="button"
     >

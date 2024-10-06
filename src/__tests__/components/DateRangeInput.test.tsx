@@ -1,14 +1,12 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
 import Datepicker from 'react-tailwindcss-datepicker';
 import { DateTime, Interval } from 'luxon';
-import { DefinedUseQueryResult, QueryClientProvider } from '@tanstack/react-query';
 import * as query from '@tanstack/react-query';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import DateRangeInput from '@/components/DateRangeInput';
 import * as apiHook from '@/hooks/api';
-import * as stateHooks from '@/hooks/state';
 
 jest.mock('react-tailwindcss-datepicker', () => jest.fn(
   () => <div data-testid="DatePicker" />,
@@ -24,20 +22,10 @@ jest.mock('@/hooks/api', () => ({
   ...jest.requireActual('@/hooks/api'),
 }));
 
-jest.mock('@/hooks/state', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/state'),
-}));
-
-const wrapper = ({ children }: React.PropsWithChildren) => (
-  <QueryClientProvider client={QUERY_CLIENT}>{children}</QueryClientProvider>
-);
-
 describe('DateRangeInput', () => {
   beforeEach(() => {
     jest.spyOn(DateTime, 'now').mockReturnValue(DateTime.fromISO('2023-01-30') as DateTime<true>);
     jest.spyOn(apiHook, 'useStartDate').mockReturnValue({ data: undefined } as UseQueryResult<DateTime>);
-    jest.spyOn(stateHooks, 'useInterval').mockReturnValue({ data: TEST_INTERVAL } as DefinedUseQueryResult<Interval>);
   });
 
   afterEach(() => {
@@ -45,10 +33,10 @@ describe('DateRangeInput', () => {
   });
 
   it('creates datepicker with expected params', () => {
-    render(<DateRangeInput />, { wrapper });
+    render(<DateRangeInput interval={TEST_INTERVAL} />);
 
-    expect(Datepicker).toBeCalledTimes(1);
-    expect(Datepicker).toBeCalledWith(
+    expect(Datepicker).toHaveBeenCalledTimes(1);
+    expect(Datepicker).toHaveBeenCalledWith(
       {
         containerClassName: 'relative text-sm',
         displayFormat: 'DD-MM-YYYY',
@@ -101,9 +89,9 @@ describe('DateRangeInput', () => {
       data: DateTime.fromISO('2022-01-01'),
     } as UseQueryResult<DateTime>);
 
-    render(<DateRangeInput />, { wrapper });
+    render(<DateRangeInput interval={TEST_INTERVAL} />);
 
-    expect(Datepicker).toBeCalledWith(
+    expect(Datepicker).toHaveBeenCalledWith(
       expect.objectContaining({
         value: {
           startDate: TEST_INTERVAL.start?.toJSDate(),
@@ -132,24 +120,19 @@ describe('DateRangeInput', () => {
    * end date as 1st of the month without setting end of day, that month
    * will not be included
    */
-  it('updates query data with selection setting end of day for end date', () => {
-    const mockSetQueryData = jest.fn();
-    jest.spyOn(query, 'useQueryClient').mockReturnValue({
-      setQueryData: mockSetQueryData as QueryClient['setQueryData'],
-    } as QueryClient);
-    render(<DateRangeInput />, { wrapper });
+  it('calls on change with end of date for end date', () => {
+    const onChange = jest.fn();
+    render(<DateRangeInput interval={TEST_INTERVAL} onChange={onChange} />);
 
-    const { onChange } = (Datepicker as jest.Mock).mock.calls[0][0];
-    onChange({
-      startDate: DateTime.fromISO('2022-01-01'),
-      endDate: DateTime.fromISO('2023-01-01'),
-    });
-
-    expect(mockSetQueryData).toBeCalledWith(
-      ['state', 'interval'],
+    const { onChange: f } = (Datepicker as jest.Mock).mock.calls[0][0];
+    act(() => f({
+      startDate: '2023-01-01',
+      endDate: '2023-01-09',
+    }));
+    expect(onChange).toHaveBeenCalledWith(
       Interval.fromDateTimes(
-        DateTime.fromISO('2022-01-01'),
-        DateTime.fromISO('2023-01-01').endOf('day'),
+        DateTime.fromISO('2023-01-01'),
+        DateTime.fromISO('2023-01-09').endOf('day'),
       ),
     );
   });

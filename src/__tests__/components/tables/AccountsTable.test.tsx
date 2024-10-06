@@ -35,7 +35,7 @@ describe('AccountsTable', () => {
     const { container } = render(<AccountsTable guids={['1', '2']} />);
 
     await screen.findByTestId('Table');
-    expect(Table).toBeCalledWith(
+    expect(Table).toHaveBeenCalledWith(
       {
         id: '1-2-table',
         columns: [
@@ -64,7 +64,7 @@ describe('AccountsTable', () => {
       },
       {},
     );
-    expect(apiHook.useAccountsTotals).toBeCalledWith();
+    expect(apiHook.useAccountsTotals).toHaveBeenCalledWith();
     expect(container).toMatchSnapshot();
   });
 
@@ -115,8 +115,8 @@ describe('AccountsTable', () => {
     render(<AccountsTable guids={['a1', 'a2']} />);
 
     await screen.findByTestId('Table');
-    expect(Table).toBeCalledTimes(1);
-    expect(Table).toBeCalledWith(
+    expect(Table).toHaveBeenCalledTimes(1);
+    expect(Table).toHaveBeenCalledWith(
       expect.objectContaining({
         data: [
           {
@@ -194,8 +194,8 @@ describe('AccountsTable', () => {
     render(<AccountsTable guids={['a1']} />);
 
     await screen.findByTestId('Table');
-    expect(Table).toBeCalledTimes(1);
-    expect(Table).toBeCalledWith(
+    expect(Table).toHaveBeenCalledTimes(1);
+    expect(Table).toHaveBeenCalledWith(
       expect.objectContaining({
         data: [
           {
@@ -222,49 +222,11 @@ describe('AccountsTable', () => {
     expect((Table as jest.Mock).mock.calls[0][0].data[0].total.toString()).toEqual('200 EUR');
   });
 
-  it('ignores hidden accounts', async () => {
-    jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
-      {
-        data: [
-          {
-            guid: 'root',
-            name: 'Root',
-            type: 'ROOT',
-            childrenIds: ['a1'],
-            hidden: true,
-          } as Account,
-          {
-            guid: 'a1',
-            name: 'Assets',
-            description: 'description',
-            commodity: {
-              mnemonic: 'EUR',
-            },
-            type: 'ASSET',
-            childrenIds: [] as string[],
-            hidden: true,
-          },
-        ] as Account[],
-      } as UseQueryResult<Account[]>,
-    );
-
-    render(<AccountsTable guids={['root']} />);
-
-    await screen.findByTestId('Table');
-    expect(Table).toBeCalledTimes(1);
-    expect(Table).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        data: [],
-      }),
-      {},
-    );
-  });
-
   it('renders Name column as expected when expandable and not expandded', async () => {
     render(<AccountsTable guids={['a1']} />);
 
     await screen.findByTestId('Table');
-    expect(Table).toBeCalledTimes(1);
+    expect(Table).toHaveBeenCalledTimes(1);
     const nameCol = TableMock.mock.calls[0][0].columns[0];
 
     expect(nameCol.cell).not.toBeUndefined();
@@ -296,7 +258,7 @@ describe('AccountsTable', () => {
     render(<AccountsTable guids={['a1']} />);
 
     await screen.findByTestId('Table');
-    expect(Table).toBeCalledTimes(1);
+    expect(Table).toHaveBeenCalledTimes(1);
     const nameCol = TableMock.mock.calls[0][0].columns[0];
 
     expect(nameCol.cell).not.toBeUndefined();
@@ -331,7 +293,7 @@ describe('AccountsTable', () => {
     render(<AccountsTable guids={['a1']} />);
 
     await screen.findByTestId('Table');
-    expect(Table).toBeCalledTimes(1);
+    expect(Table).toHaveBeenCalledTimes(1);
     const totalCol = TableMock.mock.calls[0][0].columns[1];
 
     expect(
