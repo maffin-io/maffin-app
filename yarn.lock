@@ -2234,10 +2234,10 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
-"@types/gapi.auth2@^0.0.60":
-  version "0.0.60"
-  resolved "https://registry.yarnpkg.com/@types/gapi.auth2/-/gapi.auth2-0.0.60.tgz#a1623ef3ca6f47535d7445ff8691de2da030c846"
-  integrity sha512-KQiyTHRyAcat6marTRAixrkHhkS7mqclcbQvInfxyp7IeUDSUzLBlgH1s0SFaLl1m1jRY6b+qh4NMlmVm0wPEw==
+"@types/gapi.auth2@^0.0.61":
+  version "0.0.61"
+  resolved "https://registry.yarnpkg.com/@types/gapi.auth2/-/gapi.auth2-0.0.61.tgz#a01c1878915eef270a9b91a01bfbf46bff9be334"
+  integrity sha512-cn+omiRoE/LTxZncnVl1QhcLggOT0sJ8Yz9RXIsw5R2zLyRf+0o6kaZzJ/Gr3Sxz6i7J/+PbXAF8yeZipCaiWw==
   dependencies:
     "@types/gapi" "*"
 
