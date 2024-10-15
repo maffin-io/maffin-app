@@ -57,7 +57,7 @@
     "reflect-metadata": "^0.2.2",
     "sharp": "^0.33.5",
     "sql.js": "^1.11.0",
-    "tailwindcss": "^3.4.10",
+    "tailwindcss": "^3.4.14",
     "typeorm": "^0.3.20",
     "winston-react": "^1.0.0-RC.0"
   },
