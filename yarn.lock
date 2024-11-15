@@ -2972,16 +2972,7 @@ axe-core@=4.7.0:
   resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-4.7.0.tgz#34ba5a48a8b564f67e103f0aa5768d76e15bbbbf"
   integrity sha512-M0JtH+hlOL5pLQwHOLNYZaXuhqmvS8oExsqB1SBYgA4Dk7u/xx+YdGHXaK5pyUfed5mYXdlYiphWq3G8cRi5JQ==
 
-axios@^1.6.2:
-  version "1.7.2"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-1.7.2.tgz#b625db8a7051fbea61c35a3cbb3a1daa7b9c7621"
-  integrity sha512-2A8QhOMrbomlDuiLeK9XibIBzuHeRcqqNOHp0Cyp5EoJ1IFDh+XZH3A6BkXtv0K4gFGCI0Y4BM7B1wOEi0Rmgw==
-  dependencies:
-    follow-redirects "^1.15.6"
-    form-data "^4.0.0"
-    proxy-from-env "^1.1.0"
-
-axios@^1.7.4:
+axios@^1.6.2, axios@^1.7.4:
   version "1.7.7"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.7.7.tgz#2f554296f9892a72ac8d8e4c5b79c14a91d0a47f"
   integrity sha512-S4kL7XrjgBmvdGut0sN3yJxqYzrDOnivkBiN0OFs6hLiUam3UPvswUo0kqGyhqUZGEOytHyumEdXsAkgCOUf3Q==
@@ -6453,10 +6444,10 @@ pkg-dir@^4.2.0:
   dependencies:
     find-up "^4.0.0"
 
-plaid@^24.0.0:
-  version "24.0.0"
-  resolved "https://registry.yarnpkg.com/plaid/-/plaid-24.0.0.tgz#983a7b6e938c13558a5e87b165cac0910db1e4cd"
-  integrity sha512-k6cKvZGKLmbvA8dr7kH/mY/9VBeApyvzcZr8pJEa7vcMMOGcgAQSvlm3mO6i+Z3pnZUr6Gr5S2f3MDXivsPkBA==
+plaid@^30.0.0:
+  version "30.0.0"
+  resolved "https://registry.yarnpkg.com/plaid/-/plaid-30.0.0.tgz#72d0c4c542491645302c657091532eb074057a86"
+  integrity sha512-BO6xny2+jtMYFKu3gl3GycA7lFZL6rTIydbADrYXMlrCJlR+MwJy9R7RU8AyxqE6i6UGrojUm30QIGnZtGXCSg==
   dependencies:
     axios "^1.6.2"
 
