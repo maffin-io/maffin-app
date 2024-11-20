@@ -140,7 +140,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "postcss": "^8.4.41",
     "prettier": "^3.3.3",
-    "prettier-plugin-tailwindcss": "^0.6.6",
+    "prettier-plugin-tailwindcss": "^0.6.9",
     "snapshot-diff": "^0.10.0",
     "typescript": "^5.5.4",
     "webpack-filter-warnings-plugin": "^1.2.1"
