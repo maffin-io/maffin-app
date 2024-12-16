@@ -12,7 +12,7 @@ export type UpgradeTooltipProps = {
 export default function UpgradeTooltip({
   id,
   message,
-}: UpgradeTooltipProps): JSX.Element {
+}: UpgradeTooltipProps): React.JSX.Element {
   return (
     <Tooltip
       id={id}

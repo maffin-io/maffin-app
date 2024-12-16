@@ -17,7 +17,7 @@ export const OPTIONS: ChartOptions<'treemap'> = {};
 export default function Tree({
   options,
   ...props
-}: Omit<ChartProps<'treemap'>, 'type'>): JSX.Element {
+}: Omit<ChartProps<'treemap'>, 'type'>): React.JSX.Element {
   return (
     <ChartJS<'treemap'>
       {...props}

@@ -62,6 +62,6 @@ function TestComponent({
   onSave = () => {},
 }: {
   onSave?: Function,
-}): JSX.Element {
+}): React.JSX.Element {
   return <button onClick={() => onSave()} type="button">submit form</button>;
 }

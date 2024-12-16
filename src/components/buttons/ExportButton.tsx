@@ -10,7 +10,7 @@ export interface ImportButtonProps extends React.ButtonHTMLAttributes<HTMLButton
 export default function ImportButton({
   className = 'btn btn-primary',
   ...props
-}: ImportButtonProps): JSX.Element {
+}: ImportButtonProps): React.JSX.Element {
   const { isLoaded, datasource } = React.useContext(DataSourceContext);
   const ref = React.useRef<HTMLAnchorElement>(null);
 

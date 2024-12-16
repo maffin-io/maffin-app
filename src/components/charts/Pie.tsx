@@ -29,7 +29,7 @@ export const OPTIONS: ChartOptions<'doughnut'> = {
 export default function Doughnut({
   options,
   ...props
-}: Omit<ChartProps<'doughnut'>, 'type'>): JSX.Element {
+}: Omit<ChartProps<'doughnut'>, 'type'>): React.JSX.Element {
   return (
     <ChartJS<'doughnut'>
       {...props}

@@ -22,7 +22,7 @@ export default function AccountsTable(
     guids,
     isExpanded = false,
   }: AccountsTableProps,
-): JSX.Element {
+): React.JSX.Element {
   const { data } = useAccounts();
   const { data: accountsTotal } = useAccountsTotals();
 

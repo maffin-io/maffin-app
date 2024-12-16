@@ -7,7 +7,7 @@ import { useMonthlyTotals, useMainCurrency } from '@/hooks/api';
 import { useInterval } from '@/hooks/state';
 import { intervalToDates } from '@/helpers/dates';
 
-export default function IncomeExpenseHistogram(): JSX.Element {
+export default function IncomeExpenseHistogram(): React.JSX.Element {
   const { data: interval } = useInterval();
   const { data: monthlyTotals } = useMonthlyTotals(interval);
   const incomeSeries = monthlyTotals?.map(m => m.type_income?.toNumber() || 0);

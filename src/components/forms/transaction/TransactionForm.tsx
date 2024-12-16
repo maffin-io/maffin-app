@@ -36,7 +36,7 @@ export default function TransactionForm({
   onSave = () => {},
   defaultValues,
   guid = '',
-}: TransactionFormProps): JSX.Element {
+}: TransactionFormProps): React.JSX.Element {
   const { data: tx, isLoading } = useTransaction({
     guid,
     enabled: !!guid,

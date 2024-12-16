@@ -2,7 +2,6 @@ import React from 'react';
 import { act, render } from '@testing-library/react';
 import Datepicker from 'react-tailwindcss-datepicker';
 import { DateTime, Interval } from 'luxon';
-import * as query from '@tanstack/react-query';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 import DateRangeInput from '@/components/DateRangeInput';

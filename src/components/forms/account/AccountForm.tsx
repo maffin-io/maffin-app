@@ -43,7 +43,7 @@ export default function AccountForm({
   defaultValues = {},
   onSave = () => {},
   hideDefaults = false,
-}: AccountFormProps): JSX.Element {
+}: AccountFormProps): React.JSX.Element {
   const { data: mainCurrency } = useMainCurrency();
   defaultValues.fk_commodity = defaultValues?.fk_commodity || mainCurrency;
   const form = useForm<FormValues>({

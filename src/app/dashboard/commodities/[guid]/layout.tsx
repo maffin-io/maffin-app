@@ -6,7 +6,7 @@ export const metadata = {
 
 export default function CommodityLayout({
   children,
-}: React.PropsWithChildren): JSX.Element {
+}: React.PropsWithChildren): React.JSX.Element {
   return (
     <div>
       {children}

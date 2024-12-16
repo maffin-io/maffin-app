@@ -3,7 +3,7 @@ import RModal from 'react-modal';
 
 export type ModalProps = {
   className?: string;
-  triggerContent: string | JSX.Element;
+  triggerContent: string | React.JSX.Element;
   triggerProps?: Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'>;
   showClose?: boolean;
 } & React.PropsWithChildren;
@@ -19,7 +19,7 @@ function Modal({
   triggerProps,
   showClose = false,
   children,
-}: ModalProps, ref: React.Ref<ModalRef>): JSX.Element {
+}: ModalProps, ref: React.Ref<ModalRef>): React.JSX.Element {
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
 
   // Expose actions to the parent

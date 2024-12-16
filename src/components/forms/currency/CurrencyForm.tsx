@@ -17,7 +17,7 @@ export type CurrencyFormProps = {
   onSave: Function,
 };
 
-export default function CurrencyForm({ onSave }: CurrencyFormProps): JSX.Element {
+export default function CurrencyForm({ onSave }: CurrencyFormProps): React.JSX.Element {
   const form = useForm<Commodity>({
     mode: 'onChange',
     resolver,

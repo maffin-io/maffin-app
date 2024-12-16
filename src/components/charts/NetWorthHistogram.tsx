@@ -57,7 +57,7 @@ export default function NetWorthHistogram({
   liabilitiesConfig = {},
   showLegend = true,
   height = 400,
-}: NetWorthHistogramProps): JSX.Element {
+}: NetWorthHistogramProps): React.JSX.Element {
   const { data: interval } = useInterval();
   const { data: monthlyWorth } = useMonthlyWorth();
   const assetSeries = monthlyWorth?.map(m => m[assetsGuid]?.toNumber() || 0);

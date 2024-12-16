@@ -18,7 +18,7 @@ export default function SplitsField({
   action = 'add',
   form,
   disabled = false,
-}: SplitsFieldProps): JSX.Element {
+}: SplitsFieldProps): React.JSX.Element {
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'splits',
