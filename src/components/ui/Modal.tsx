@@ -2,11 +2,12 @@ import React from 'react';
 import RModal from 'react-modal';
 
 export type ModalProps = {
-  className?: string;
+  className: string;
   triggerContent: string | React.JSX.Element;
   triggerProps?: Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'>;
   showClose?: boolean;
-} & React.PropsWithChildren;
+  children: ReactModal.Props['children'],
+};
 
 export interface ModalRef {
   openModal: () => void;
@@ -30,6 +31,7 @@ function Modal({
 
   return (
     <>
+      {/* @ts-ignore */}
       <RModal
         isOpen={isOpen}
         overlayClassName="overlay"

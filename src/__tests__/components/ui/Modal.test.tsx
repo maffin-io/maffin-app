@@ -30,7 +30,7 @@ describe('Modal', () => {
       expect.objectContaining({
         isOpen: false,
       }),
-      {},
+      undefined,
     );
 
     expect(container).toMatchSnapshot();
@@ -54,7 +54,7 @@ describe('Modal', () => {
       expect.objectContaining({
         isOpen: true,
       }),
-      {},
+      undefined,
     );
     expect(modal).toMatchSnapshot();
   });
@@ -78,7 +78,7 @@ describe('Modal', () => {
       expect.objectContaining({
         isOpen: true,
       }),
-      {},
+      undefined,
     );
 
     const xButton = screen.getByRole('button', { name: 'X' });
@@ -88,7 +88,7 @@ describe('Modal', () => {
       expect.objectContaining({
         isOpen: false,
       }),
-      {},
+      undefined,
     );
   });
 });

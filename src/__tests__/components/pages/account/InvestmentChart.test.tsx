@@ -417,7 +417,7 @@ describe('InvestmentChart', () => {
           },
         },
       },
-      {},
+      undefined,
     );
 
     const { plugins } = (Line as jest.Mock).mock.calls[0][0].options;
@@ -656,7 +656,7 @@ describe('InvestmentChart', () => {
           },
         }),
       },
-      {},
+      undefined,
     );
   });
 });

@@ -52,8 +52,11 @@ describe('FormButton', () => {
         triggerProps: { className: 'btn btn-primary' },
         triggerContent: expect.anything(),
         children: expect.anything(),
+        ref: {
+          current: null,
+        },
       },
-      {},
+      undefined,
     );
   });
 });

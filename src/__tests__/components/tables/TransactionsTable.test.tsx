@@ -153,7 +153,7 @@ describe('TransactionsTable', () => {
         ],
         data: [],
       },
-      {},
+      undefined,
     );
     expect(apiHook.useSplitsCount).toBeCalledWith('account_guid_1', '');
     expect(apiHook.useSplitsPagination).toBeCalledWith('account_guid_1', { pageIndex: 0, pageSize: 10 }, '');
@@ -172,7 +172,7 @@ describe('TransactionsTable', () => {
       id: 'transactions-table',
       pageCount: 1,
       data: [split],
-    }), {});
+    }), undefined);
   });
 
   it('filters with search text', async () => {
@@ -382,7 +382,7 @@ describe('TransactionsTable', () => {
         id: 'edit-tx',
         modalTitle: 'Edit transaction',
       }),
-      {},
+      undefined,
     );
     expect(TransactionForm).toHaveBeenNthCalledWith(
       1,
@@ -391,7 +391,7 @@ describe('TransactionsTable', () => {
         guid: 'tx_guid',
         onSave: expect.any(Function),
       },
-      {},
+      undefined,
     );
     expect(FormButton).toHaveBeenNthCalledWith(
       2,
@@ -400,7 +400,7 @@ describe('TransactionsTable', () => {
         id: 'delete-tx',
         modalTitle: 'Confirm you want to remove this transaction',
       }),
-      {},
+      undefined,
     );
     expect(TransactionForm).toHaveBeenNthCalledWith(
       2,
@@ -408,7 +408,7 @@ describe('TransactionsTable', () => {
         action: 'delete',
         guid: 'tx_guid',
       },
-      {},
+      undefined,
     );
 
     const updateOnSave = (TransactionForm as jest.Mock).mock.calls[0][0].onSave;

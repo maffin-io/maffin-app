@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { useParams } from 'next/navigation';
 
 import {
   Header,
@@ -15,8 +14,13 @@ import { useAccount } from '@/hooks/api';
 import Loading from '@/components/Loading';
 import { isAsset, isLiability, isInvestment } from '@/book/helpers';
 
-export default function AccountPage(): React.JSX.Element {
-  const params = useParams<{ guid: string }>();
+export type AccountPageProps = {
+  params: {
+    guid: string,
+  },
+};
+
+export default function AccountPage({ params }: AccountPageProps): React.JSX.Element {
   const { data: account, isLoading } = useAccount(params.guid);
 
   if (isLoading) {

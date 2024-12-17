@@ -58,13 +58,13 @@ describe('Topbar', () => {
   it('renders as expected', () => {
     const { container } = render(<Topbar />, { wrapper });
 
-    expect(ProfileDropdown).toHaveBeenLastCalledWith({}, {});
+    expect(ProfileDropdown).toHaveBeenLastCalledWith({}, undefined);
     expect(DateRangeInput).toHaveBeenCalledWith({
       interval: TEST_INTERVAL,
       onChange: expect.any(Function),
-    }, {});
-    expect(SaveButton).toHaveBeenLastCalledWith({}, {});
-    expect(ThemeButton).toHaveBeenLastCalledWith({}, {});
+    }, undefined);
+    expect(SaveButton).toHaveBeenLastCalledWith({}, undefined);
+    expect(ThemeButton).toHaveBeenLastCalledWith({}, undefined);
     expect(AccountSelector).toHaveBeenLastCalledWith(
       {
         id: 'globalSearch',
@@ -73,7 +73,7 @@ describe('Topbar', () => {
         placeholder: 'Search (cmd + k)...',
         ignoreHidden: false,
       },
-      {},
+      undefined,
     );
     const { onChange } = (AccountSelector as jest.Mock).mock.calls[0][0];
     onChange({ guid: '123' });

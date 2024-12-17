@@ -72,7 +72,7 @@ describe('Header', () => {
         account,
         latestDate: DateTime.now(),
       },
-      {},
+      undefined,
     );
     await screen.findAllByTestId('FormButton');
     expect(FormButton).toHaveBeenNthCalledWith(
@@ -81,7 +81,7 @@ describe('Header', () => {
         id: 'edit-account',
         modalTitle: 'Edit account',
       }),
-      {},
+      undefined,
     );
     expect(AccountForm).toHaveBeenNthCalledWith(
       1,
@@ -94,7 +94,7 @@ describe('Header', () => {
           },
         },
       },
-      {},
+      undefined,
     );
     expect(FormButton).toHaveBeenNthCalledWith(
       2,
@@ -105,7 +105,7 @@ describe('Header', () => {
         id: 'delete-account',
         modalTitle: 'Confirm you want to remove this account',
       }),
-      {},
+      undefined,
     );
     expect(AccountForm).toHaveBeenNthCalledWith(
       2,
@@ -119,7 +119,7 @@ describe('Header', () => {
         },
         onSave: expect.any(Function),
       },
-      {},
+      undefined,
     );
     expect(container).toMatchSnapshot();
   });

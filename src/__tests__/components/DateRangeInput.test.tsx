@@ -79,7 +79,7 @@ describe('DateRangeInput', () => {
           },
         },
       },
-      {},
+      undefined,
     );
   });
 
@@ -109,7 +109,7 @@ describe('DateRangeInput', () => {
           }),
         },
       }),
-      {},
+      undefined,
     );
   });
 
@@ -125,8 +125,8 @@ describe('DateRangeInput', () => {
 
     const { onChange: f } = (Datepicker as jest.Mock).mock.calls[0][0];
     act(() => f({
-      startDate: '2023-01-01',
-      endDate: '2023-01-09',
+      startDate: new Date('2023-01-01'),
+      endDate: new Date('2023-01-09'),
     }));
     expect(onChange).toHaveBeenCalledWith(
       Interval.fromDateTimes(

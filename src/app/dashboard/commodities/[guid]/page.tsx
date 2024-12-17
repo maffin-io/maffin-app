@@ -3,7 +3,7 @@
 import React from 'react';
 import { BiEdit, BiPlusCircle, BiXCircle } from 'react-icons/bi';
 import Link from 'next/link';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { Tooltip } from '@/components/tooltips';
 import { useCommodity, usePrices } from '@/hooks/api';
@@ -15,8 +15,13 @@ import { PricesChart } from '@/components/pages/commodity';
 import { PricesTable } from '@/components/tables';
 import { Account, Price } from '@/book/entities';
 
-export default function CommodityPage(): React.JSX.Element {
-  const params = useParams<{ guid: string }>();
+export type CommodityPageProps = {
+  params: {
+    guid: string,
+  },
+};
+
+export default function CommodityPage({ params }: CommodityPageProps): React.JSX.Element {
   const router = useRouter();
 
   const { data: commodity, isLoading } = useCommodity(params.guid);
