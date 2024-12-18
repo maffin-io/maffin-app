@@ -26,7 +26,7 @@ export default function TotalsPie({
   backgroundColor,
   showTooltip = false,
   showDataLabels = true,
-}: TotalsPieProps): JSX.Element {
+}: TotalsPieProps): React.JSX.Element {
   const { data: interval } = useInterval();
   const { data: totals } = useAccountsTotals();
   const { data: accounts } = useAccounts();

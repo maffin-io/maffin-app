@@ -40,7 +40,7 @@ describe('Pie', () => {
         },
         type: 'doughnut',
       },
-      {},
+      undefined,
     );
   });
 
@@ -80,7 +80,7 @@ describe('Pie', () => {
         },
         type: 'doughnut',
       },
-      {},
+      undefined,
     );
   });
 });

@@ -7,7 +7,7 @@ import ImportButton from '@/components/buttons/ImportButton';
 import ExportButton from '@/components/buttons/ExportButton';
 import useSession from '@/hooks/useSession';
 
-export default function ProfileDropdown(): JSX.Element {
+export default function ProfileDropdown(): React.JSX.Element {
   const { user } = useSession();
 
   return (

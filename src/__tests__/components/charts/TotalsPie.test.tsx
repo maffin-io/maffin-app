@@ -80,7 +80,7 @@ describe('TotalsPie', () => {
           },
         },
       },
-      {},
+      undefined,
     );
   });
 
@@ -104,7 +104,7 @@ describe('TotalsPie', () => {
           labels: ['', ''],
         },
       }),
-      {},
+      undefined,
     );
   });
 
@@ -148,7 +148,7 @@ describe('TotalsPie', () => {
           labels: ['Assets', 'Liabilities'],
         },
       }),
-      {},
+      undefined,
     );
 
     const { plugins } = (Pie as jest.Mock).mock.calls[0][0].options;
@@ -199,7 +199,7 @@ describe('TotalsPie', () => {
           labels: ['Groceries', 'Rent', 'Electricity', 'Water'],
         },
       }),
-      {},
+      undefined,
     );
 
     const { plugins } = (Pie as jest.Mock).mock.calls[0][0].options;
@@ -254,7 +254,7 @@ describe('TotalsPie', () => {
           labels: ['ticker1', 'ticker2'],
         },
       }),
-      {},
+      undefined,
     );
   });
 });

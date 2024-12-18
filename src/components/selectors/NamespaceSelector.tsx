@@ -20,7 +20,7 @@ export default function AccountTypeSelector(
     id = 'namespaceSelector',
     ...props
   }: SelectProps<Namespace, false, GroupBase<Namespace>>,
-): JSX.Element {
+): React.JSX.Element {
   return (
     <Selector<Namespace>
       {...props}

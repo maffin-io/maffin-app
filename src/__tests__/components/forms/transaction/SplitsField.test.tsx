@@ -129,7 +129,7 @@ describe('SplitsField', () => {
   });
 });
 
-function FormWrapper({ disabled = false }: { disabled?: boolean }): JSX.Element {
+function FormWrapper({ disabled = false }: { disabled?: boolean }): React.JSX.Element {
   const account = {
     guid: 'account_guid_1',
     path: 'path1',

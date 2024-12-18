@@ -16,7 +16,7 @@ export type MonthlyTotalHistogramProps = {
 export default function MonthlyTotalHistogram({
   title,
   guids = [],
-}: MonthlyTotalHistogramProps): JSX.Element {
+}: MonthlyTotalHistogramProps): React.JSX.Element {
   const { data: interval } = useInterval();
   const { data: monthlyTotals } = useMonthlyTotals(interval);
   const { data: accounts } = useAccounts();

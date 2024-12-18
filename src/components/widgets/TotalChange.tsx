@@ -15,7 +15,7 @@ export type TotalChangeProps = {
 export default function TotalChange({
   account,
   className = '',
-}: TotalChangeProps): JSX.Element {
+}: TotalChangeProps): React.JSX.Element {
   const { data: interval } = useInterval();
   const { data: t0 } = useBalanceSheet(interval.start?.minus({ day: 1 }) as DateTime<true>);
   const { data: t1 } = useBalanceSheet(interval.end as DateTime<true>);

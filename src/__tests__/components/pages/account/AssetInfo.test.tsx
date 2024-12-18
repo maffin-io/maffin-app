@@ -86,20 +86,20 @@ describe('AssetInfo', () => {
         },
         showLegend: false,
       },
-      {},
+      undefined,
     );
-    expect(AssetSankey).toBeCalledWith({ height: 428, account }, {});
+    expect(AssetSankey).toBeCalledWith({ height: 428, account }, undefined);
     expect(TotalWidget).toBeCalledWith(
       { account },
-      {},
+      undefined,
     );
     expect(SpendWidget).toBeCalledWith(
       { account },
-      {},
+      undefined,
     );
     expect(EarnWidget).toBeCalledWith(
       { account },
-      {},
+      undefined,
     );
     expect(container).toMatchSnapshot();
   });
@@ -124,7 +124,7 @@ describe('AssetInfo', () => {
         },
         showLegend: false,
       },
-      {},
+      undefined,
     );
   });
 
@@ -148,9 +148,9 @@ describe('AssetInfo', () => {
         },
         showLegend: false,
       },
-      {},
+      undefined,
     );
-    expect(AccountsTable).toBeCalledWith({ guids: ['1', '2'] }, {});
+    expect(AccountsTable).toBeCalledWith({ guids: ['1', '2'] }, undefined);
     expect(TotalsPie).toBeCalledWith(
       {
         guids: ['1', '2'],
@@ -158,14 +158,14 @@ describe('AssetInfo', () => {
         showTooltip: true,
         title: '',
       },
-      {},
+      undefined,
     );
     expect(TotalChange).toBeCalledWith(
       {
         account,
         className: 'justify-center text-sm mt-1',
       },
-      {},
+      undefined,
     );
     expect(container).toMatchSnapshot();
   });

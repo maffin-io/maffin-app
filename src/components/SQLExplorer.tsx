@@ -7,7 +7,7 @@ import type { PropsWithChildren } from 'react';
 import { useDataSource } from '@/hooks';
 import Loading from './Loading';
 
-export default function SQLExplorer(): JSX.Element {
+export default function SQLExplorer(): React.JSX.Element {
   const { datasource } = useDataSource();
 
   if (!datasource) {
@@ -67,7 +67,7 @@ export default function SQLExplorer(): JSX.Element {
 function Expandable({
   content,
   children,
-}: { content: JSX.Element } & PropsWithChildren): JSX.Element {
+}: { content: React.JSX.Element } & PropsWithChildren): React.JSX.Element {
   const [expanded, setExpanded] = React.useState(false);
 
   return (

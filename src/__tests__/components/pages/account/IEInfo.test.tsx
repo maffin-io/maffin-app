@@ -56,11 +56,11 @@ describe('IEInfo', () => {
         guids: [account.guid],
         title: '',
       },
-      {},
+      undefined,
     );
     expect(TotalWidget).toBeCalledWith(
       { account },
-      {},
+      undefined,
     );
     expect(container).toMatchSnapshot();
   });
@@ -72,7 +72,7 @@ describe('IEInfo', () => {
       <IEInfo account={account} />,
     );
 
-    expect(AccountsTable).toBeCalledWith({ guids: ['1', '2'] }, {});
+    expect(AccountsTable).toBeCalledWith({ guids: ['1', '2'] }, undefined);
     expect(TotalsPie).toBeCalledWith(
       {
         guids: ['1', '2'],
@@ -80,14 +80,14 @@ describe('IEInfo', () => {
         showTooltip: true,
         title: 'Total spent',
       },
-      {},
+      undefined,
     );
     expect(MonthlyTotalHistogram).toBeCalledWith(
       {
         guids: ['1', '2'],
         title: '',
       },
-      {},
+      undefined,
     );
     expect(container).toMatchSnapshot();
   });

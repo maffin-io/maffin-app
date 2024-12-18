@@ -46,7 +46,7 @@ describe('EarnWidgetTest', () => {
         stats: '€0.00',
         title: 'Income',
       },
-      {},
+      undefined,
     );
   });
 
@@ -121,7 +121,7 @@ describe('EarnWidgetTest', () => {
         stats: '€30.00',
         title: 'Income',
       },
-      {},
+      undefined,
     );
   });
 });

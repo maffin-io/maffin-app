@@ -17,7 +17,7 @@ export type CommodityCardProps = {
 
 export default function CommodityCard({
   guid,
-}: CommodityCardProps): JSX.Element {
+}: CommodityCardProps): React.JSX.Element {
   const { data: commodity } = useCommodity(guid);
   const { data: mainCurrency } = useMainCurrency();
   const { data: prices } = usePrices({ from: commodity });
