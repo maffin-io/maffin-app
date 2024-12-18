@@ -94,6 +94,10 @@ export default function TotalsPie({
               ),
               padding: 6,
             },
+            autocolors: {
+              mode: 'data',
+              enabled: (backgroundColor?.length || 0) > 0,
+            },
           },
         }}
       />

@@ -77,6 +77,10 @@ describe('TotalsPie', () => {
                 label: expect.any(Function),
               },
             },
+            autocolors: {
+              mode: 'data',
+              enabled: false,
+            },
           },
         },
       },
@@ -147,6 +151,14 @@ describe('TotalsPie', () => {
           ],
           labels: ['Assets', 'Liabilities'],
         },
+        options: expect.objectContaining({
+          plugins: expect.objectContaining({
+            autocolors: {
+              mode: 'data',
+              enabled: true,
+            },
+          }),
+        }),
       }),
       undefined,
     );
