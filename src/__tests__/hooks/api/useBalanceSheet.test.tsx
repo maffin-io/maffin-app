@@ -89,9 +89,9 @@ describe('useBalanceSheet', () => {
         }],
     );
 
-    expect(useAccountsHook.useAccounts).toBeCalledWith();
-    expect(usePricesHook.usePrices).toBeCalledWith({});
-    expect(queries.getAccountsTotals).toBeCalledWith(
+    expect(useAccountsHook.useAccounts).toHaveBeenCalledWith();
+    expect(usePricesHook.usePrices).toHaveBeenCalledWith({});
+    expect(queries.getAccountsTotals).toHaveBeenCalledWith(
       [],
       Interval.fromDateTimes(
         DateTime.fromISO('1970'),
@@ -99,8 +99,8 @@ describe('useBalanceSheet', () => {
       ),
     );
     expect(result.current.data?.type_asset.toString()).toEqual('0 EUR');
-    expect(aggregations.aggregateChildrenTotals).toBeCalledWith(
-      ['type_asset', 'type_liability'],
+    expect(aggregations.aggregateChildrenTotals).toHaveBeenCalledWith(
+      ['type_asset', 'type_liability', 'type_equity'],
       [],
       {},
       DateTime.now(),

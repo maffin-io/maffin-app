@@ -12,7 +12,7 @@ import CommodityForm from '@/components/forms/commodity/CommodityForm';
 import { insertTodayPrices } from '@/lib/prices';
 import CommodityCard from '@/components/CommodityCard';
 
-export default function CommoditiesPage(): JSX.Element {
+export default function CommoditiesPage(): React.JSX.Element {
   const { data: commodities = [], isLoading } = useCommodities();
 
   if (isLoading) {

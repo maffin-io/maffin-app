@@ -20,7 +20,7 @@ export type AccountPageProps = {
   },
 };
 
-export default function AccountPage({ params }: AccountPageProps): JSX.Element {
+export default function AccountPage({ params }: AccountPageProps): React.JSX.Element {
   const { data: account, isLoading } = useAccount(params.guid);
 
   if (isLoading) {
@@ -39,14 +39,14 @@ export default function AccountPage({ params }: AccountPageProps): JSX.Element {
     );
   }
 
-  let infoComponent: JSX.Element;
+  let infoComponent: React.JSX.Element;
   if (isInvestment(account) && account.placeholder) {
     infoComponent = <InvestmentPlaceholderInfo account={account} />;
   } else if (isInvestment(account)) {
     infoComponent = <InvestmentInfo account={account} />;
   } else if (isAsset(account) || isLiability(account)) {
     infoComponent = <AssetInfo account={account} />;
-  } else if (account.type === 'EXPENSE' || account.type === 'INCOME') {
+  } else if (account.type === 'EXPENSE' || account.type === 'INCOME' || account.type === 'EQUITY') {
     infoComponent = <IEInfo account={account} />;
   } else {
     infoComponent = <span />;

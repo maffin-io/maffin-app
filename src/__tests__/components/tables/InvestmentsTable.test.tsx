@@ -78,7 +78,7 @@ describe('InvestmentsTable', () => {
           sorting: [{ id: 'unrealizedProfit', desc: true }],
         },
       },
-      {},
+      undefined,
     );
   });
 
@@ -101,7 +101,7 @@ describe('InvestmentsTable', () => {
       expect.objectContaining({
         data: [],
       }),
-      {},
+      undefined,
     );
   });
 });

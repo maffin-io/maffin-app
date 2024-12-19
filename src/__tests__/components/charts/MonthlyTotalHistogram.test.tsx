@@ -126,7 +126,7 @@ describe('MonthlyTotalHistogram', () => {
           },
         },
       },
-      {},
+      undefined,
     );
 
     const { plugins } = (Bar as jest.Mock).mock.calls[0][0].options;
@@ -206,7 +206,7 @@ describe('MonthlyTotalHistogram', () => {
           labels: expect.any(Array),
         },
       }),
-      {},
+      undefined,
     );
   });
 
@@ -266,7 +266,7 @@ describe('MonthlyTotalHistogram', () => {
           labels: expect.any(Array),
         },
       }),
-      {},
+      undefined,
     );
   });
 });

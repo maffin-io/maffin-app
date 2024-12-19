@@ -23,7 +23,8 @@ export default function Selector<T extends object = {}>(
     id = 'selector',
     ...props
   }: SelectorProps<T>,
-): JSX.Element {
+): React.JSX.Element {
+  // @ts-ignore
   const ref = React.useRef<SelectInstance<T, false, GroupBase<T>>>();
   useHotkeys('meta+k', () => {
     ref.current?.focus();
@@ -79,7 +80,7 @@ function Control(
     children,
     ...props
   }: any,
-): JSX.Element {
+): React.JSX.Element {
   return (
     <components.Control {...props}>
       <BiSearch className="absolute text-md left-[10px]" />

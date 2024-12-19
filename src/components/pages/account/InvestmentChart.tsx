@@ -19,7 +19,7 @@ export type InvestmentChartProps = {
 
 export default function InvestmentChart({
   account,
-}: InvestmentChartProps): JSX.Element {
+}: InvestmentChartProps): React.JSX.Element {
   const { data: investment } = useInvestment(account.guid);
   const { data: pricesMap } = usePrices({ from: account.commodity });
   const { data: interval } = useInterval();

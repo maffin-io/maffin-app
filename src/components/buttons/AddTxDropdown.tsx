@@ -20,7 +20,7 @@ export type AddTxDropdownProps = {
 export default function AddTxDropdown({
   account,
   latestDate,
-}: AddTxDropdownProps): JSX.Element {
+}: AddTxDropdownProps): React.JSX.Element {
   return (
     <div className="group relative h-full">
       <button

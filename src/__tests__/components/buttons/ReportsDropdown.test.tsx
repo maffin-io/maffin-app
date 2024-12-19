@@ -39,10 +39,10 @@ describe('ReportsDropdown', () => {
         id: 'IE report',
         modalTitle: 'Income statement',
       }),
-      {},
+      undefined,
     );
     expect(IncomeExpenseStatementForm).toHaveBeenCalledTimes(1);
-    expect(IncomeExpenseStatementForm).toHaveBeenNthCalledWith(1, {}, {});
+    expect(IncomeExpenseStatementForm).toHaveBeenNthCalledWith(1, {}, undefined);
 
     expect(container).toMatchSnapshot();
   });

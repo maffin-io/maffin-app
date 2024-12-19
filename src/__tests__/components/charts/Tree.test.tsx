@@ -29,7 +29,7 @@ describe('Tree', () => {
         options: {},
         type: 'treemap',
       },
-      {},
+      undefined,
     );
   });
 
@@ -53,7 +53,7 @@ describe('Tree', () => {
         },
         type: 'treemap',
       },
-      {},
+      undefined,
     );
   });
 });

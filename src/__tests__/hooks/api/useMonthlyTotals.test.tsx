@@ -125,7 +125,7 @@ describe('useMonthlyTotals', () => {
     expect(aggregations.aggregateChildrenTotals).toBeCalledTimes(2);
     expect(aggregations.aggregateChildrenTotals).nthCalledWith(
       1,
-      ['type_income', 'type_expense', 'type_asset', 'type_liability'],
+      ['type_income', 'type_expense', 'type_asset', 'type_liability', 'type_equity'],
       [],
       {},
       interval.start?.endOf('month').startOf('day'),
@@ -135,7 +135,7 @@ describe('useMonthlyTotals', () => {
     );
     expect(aggregations.aggregateChildrenTotals).nthCalledWith(
       2,
-      ['type_income', 'type_expense', 'type_asset', 'type_liability'],
+      ['type_income', 'type_expense', 'type_asset', 'type_liability', 'type_equity'],
       [],
       {},
       interval.start?.plus({ month: 1 }).endOf('month').startOf('day'),

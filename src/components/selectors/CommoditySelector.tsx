@@ -25,7 +25,7 @@ export default function CommoditySelector(
     id = 'commoditySelector',
     ...props
   }: CommoditySelectorProps,
-): JSX.Element {
+): React.JSX.Element {
   let { data: commodities } = useCommodities();
   commodities = commodities || [];
 

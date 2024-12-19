@@ -17,7 +17,7 @@ export type EarnWidgetProps = {
  */
 export default function EarnWidget({
   account,
-}: EarnWidgetProps): JSX.Element {
+}: EarnWidgetProps): React.JSX.Element {
   const zero = new Money(0, account.commodity.mnemonic || '');
 
   const { data: periodCashflow } = useCashFlow(account.guid);

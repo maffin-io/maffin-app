@@ -52,7 +52,7 @@ describe('ChartJS', () => {
         },
         type: 'doughnut',
       },
-      {},
+      undefined,
     );
   });
 
@@ -103,7 +103,7 @@ describe('ChartJS', () => {
         },
         type: 'doughnut',
       },
-      {},
+      undefined,
     );
   });
 });

@@ -37,8 +37,11 @@ describe('ImportButton', () => {
         triggerProps: { className: 'btn btn-primary' },
         triggerContent: expect.anything(),
         children: expect.anything(),
+        ref: {
+          current: null,
+        },
       },
-      {},
+      undefined,
     );
 
     expect(container).toMatchSnapshot();

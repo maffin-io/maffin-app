@@ -77,10 +77,14 @@ describe('TotalsPie', () => {
                 label: expect.any(Function),
               },
             },
+            autocolors: {
+              mode: 'data',
+              enabled: true,
+            },
           },
         },
       },
-      {},
+      undefined,
     );
   });
 
@@ -104,7 +108,7 @@ describe('TotalsPie', () => {
           labels: ['', ''],
         },
       }),
-      {},
+      undefined,
     );
   });
 
@@ -147,8 +151,16 @@ describe('TotalsPie', () => {
           ],
           labels: ['Assets', 'Liabilities'],
         },
+        options: expect.objectContaining({
+          plugins: expect.objectContaining({
+            autocolors: {
+              mode: 'data',
+              enabled: false,
+            },
+          }),
+        }),
       }),
-      {},
+      undefined,
     );
 
     const { plugins } = (Pie as jest.Mock).mock.calls[0][0].options;
@@ -199,7 +211,7 @@ describe('TotalsPie', () => {
           labels: ['Groceries', 'Rent', 'Electricity', 'Water'],
         },
       }),
-      {},
+      undefined,
     );
 
     const { plugins } = (Pie as jest.Mock).mock.calls[0][0].options;
@@ -254,7 +266,7 @@ describe('TotalsPie', () => {
           labels: ['ticker1', 'ticker2'],
         },
       }),
-      {},
+      undefined,
     );
   });
 });

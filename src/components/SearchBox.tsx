@@ -7,7 +7,7 @@ export type SearchBoxProps = {
 
 export default function SearchBox({
   onChange,
-}: SearchBoxProps): JSX.Element {
+}: SearchBoxProps): React.JSX.Element {
   const debounced = debounce(
     (e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target?.value),
     500,

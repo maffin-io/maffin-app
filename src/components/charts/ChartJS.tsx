@@ -40,7 +40,7 @@ C.defaults.scale.grid.color = '#777f8522';
 export default function ChartJS<T extends keyof ChartTypeRegistry>({
   options,
   ...props
-}: ChartProps<T>): JSX.Element {
+}: ChartProps<T>): React.JSX.Element {
   // @ts-ignore
   const OPTIONS: ChartOptions<T> = {
     responsive: true,

@@ -3,7 +3,7 @@ import { BiBarChartAlt, BiNotepad } from 'react-icons/bi';
 import IncomeExpenseStatementForm from '../forms/reports/IncomeExpenseStatementForm';
 import FormButton from './FormButton';
 
-export default function ReportsDropdown(): JSX.Element {
+export default function ReportsDropdown(): React.JSX.Element {
   return (
     <div className="group relative h-full">
       <button

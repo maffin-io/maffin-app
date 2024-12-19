@@ -53,14 +53,14 @@ describe('ProfileDropdown', () => {
         role: 'menuitem',
         className: 'text-left px-3 py-2 w-full text-cyan-700 hover:text-cyan-600 whitespace-nowrap',
       },
-      {},
+      undefined,
     );
     expect(ExportButton).toBeCalledWith(
       {
         role: 'menuitem',
         className: 'text-left px-3 py-2 w-full text-cyan-700 hover:text-cyan-600 whitespace-nowrap',
       },
-      {},
+      undefined,
     );
   });
 });

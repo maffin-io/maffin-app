@@ -39,7 +39,7 @@ exports[`CurrencyForm renders as expected 1`] = `
             />
           </svg>
           <div
-            class="selector__value-container css-1fdsijx-ValueContainer"
+            class="selector__value-container css-hlgwow"
           >
             <div
               class="selector__placeholder css-1jqq78o-placeholder"
@@ -48,7 +48,7 @@ exports[`CurrencyForm renders as expected 1`] = `
               Choose or type your currency
             </div>
             <div
-              class="!text-inherit selector__input-container css-qbdosj-Input"
+              class="!text-inherit selector__input-container css-19bb58m"
               data-value=""
             >
               <input
@@ -73,7 +73,7 @@ exports[`CurrencyForm renders as expected 1`] = `
             </div>
           </div>
           <div
-            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1wy0on6"
           >
             <span
               class="hidden selector__indicator-separator css-1u9des2-indicatorSeparator"

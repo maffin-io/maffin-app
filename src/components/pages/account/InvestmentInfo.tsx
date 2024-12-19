@@ -18,7 +18,7 @@ export type InvestmentInfoProps = {
 
 export default function InvestmentInfo({
   account,
-}: InvestmentInfoProps): JSX.Element {
+}: InvestmentInfoProps): React.JSX.Element {
   const { data: investment } = useInvestment(account.guid);
 
   if (!investment) {

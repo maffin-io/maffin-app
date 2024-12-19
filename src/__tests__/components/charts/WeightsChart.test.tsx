@@ -68,7 +68,7 @@ describe('WeightsChart', () => {
           },
         },
       },
-      {},
+      undefined,
     );
   });
 
@@ -146,7 +146,7 @@ describe('WeightsChart', () => {
           ],
         },
       }),
-      {},
+      undefined,
     );
   });
 });

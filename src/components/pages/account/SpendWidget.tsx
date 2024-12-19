@@ -18,7 +18,7 @@ export type SpendWidgetProps = {
  */
 export default function SpendWidget({
   account,
-}: SpendWidgetProps): JSX.Element {
+}: SpendWidgetProps): React.JSX.Element {
   const zero = new Money(0, account.commodity.mnemonic || '');
 
   const { data: periodCashflow } = useCashFlow(account.guid);

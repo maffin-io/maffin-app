@@ -37,7 +37,7 @@ describe('SQLEditor', () => {
         id: 'sql-table',
         showPagination: true,
       },
-      {},
+      undefined,
     );
   });
 
@@ -82,7 +82,7 @@ describe('SQLEditor', () => {
           },
         ],
       }),
-      {},
+      undefined,
     );
   });
 

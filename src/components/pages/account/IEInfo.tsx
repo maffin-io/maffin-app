@@ -12,7 +12,7 @@ export type IEInfoProps = {
 
 export default function IEInfo({
   account,
-}: IEInfoProps): JSX.Element {
+}: IEInfoProps): React.JSX.Element {
   return (
     <div className="grid md:grid-cols-12 items-start">
       <div className="grid md:grid-cols-12 auto-cols-fr items-start col-span-6">
@@ -28,7 +28,7 @@ export default function IEInfo({
               && (
                 <>
                   <TotalsPie
-                    title={account.type === 'EXPENSE' ? 'Total spent' : 'Total earned'}
+                    title={getTitle(account.type)}
                     guids={account.childrenIds}
                     showTooltip
                     showDataLabels={false}
@@ -63,4 +63,16 @@ export default function IEInfo({
       </div>
     </div>
   );
+}
+
+function getTitle(type: string): string {
+  if (type === 'INCOME') {
+    return 'Total earned';
+  }
+
+  if (type === 'EXPENSE') {
+    return 'Total spent';
+  }
+
+  return 'Total';
 }

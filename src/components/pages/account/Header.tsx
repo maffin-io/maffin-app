@@ -19,7 +19,7 @@ export type HeaderProps = {
 
 export default function Header({
   account,
-}: HeaderProps): JSX.Element {
+}: HeaderProps): React.JSX.Element {
   const { data: parent } = useAccount(account.parentId);
   const { data: splits } = useSplitsPagination(account.guid);
   const router = useRouter();
@@ -27,7 +27,7 @@ export default function Header({
   const latestDate = splits?.[0]?.transaction?.date;
   const deletable = splits?.length === 0;
 
-  let title: string | JSX.Element = account.path;
+  let title: string | React.JSX.Element = account.path;
   if (account.path.lastIndexOf(':') > 0) {
     const parentPath = account.path.slice(0, account.path.lastIndexOf(':'));
     title = (

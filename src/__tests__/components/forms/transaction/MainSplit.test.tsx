@@ -332,7 +332,7 @@ function FormWrapper(
     disabled?: boolean,
     defaults?: FormValues,
   },
-): JSX.Element {
+): React.JSX.Element {
   const defaultValues = {
     date: '2023-01-01',
     splits: [

@@ -26,7 +26,7 @@ export default function SplitField({
   form,
   action = 'add',
   disabled = false,
-}: SplitFieldProps): JSX.Element {
+}: SplitFieldProps): React.JSX.Element {
   const account = form.watch(`splits.${index}.fk_account`) as Account;
   const txCurrency = form.watch('fk_currency');
   const date = form.watch('date');

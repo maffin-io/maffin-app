@@ -10,7 +10,7 @@ export type PricesChartProps = {
 
 export default function PricesChart({
   prices,
-}: PricesChartProps): JSX.Element {
+}: PricesChartProps): React.JSX.Element {
   const currency = (prices.length && prices[0].currency.mnemonic) || '';
 
   const data: { x: number, y: number }[] = [];

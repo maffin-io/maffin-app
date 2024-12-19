@@ -16,7 +16,7 @@ export type AssetInfoProps = {
 
 export default function AssetInfo({
   account,
-}: AssetInfoProps): JSX.Element {
+}: AssetInfoProps): React.JSX.Element {
   return (
     <div className="grid md:grid-cols-12 items-start">
       <div className="grid md:grid-cols-12 auto-cols-fr items-start col-span-6">

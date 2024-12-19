@@ -4,7 +4,7 @@ import { TooltipRenderProps } from 'react-joyride';
 export default function CustomTooltip({
   step,
   tooltipProps,
-}: TooltipRenderProps): JSX.Element {
+}: TooltipRenderProps): React.JSX.Element {
   return (
     <div
       className="card m-0 max-w-md text-sm rounded-md"

@@ -161,7 +161,7 @@ describe('IncomeExpenseHistogram', () => {
           },
         },
       },
-      {},
+      undefined,
     );
   });
 
@@ -212,7 +212,7 @@ describe('IncomeExpenseHistogram', () => {
           ],
         },
       }),
-      {},
+      undefined,
     );
   });
 
@@ -282,7 +282,7 @@ describe('IncomeExpenseHistogram', () => {
           ],
         },
       }),
-      {},
+      undefined,
     );
   });
 });

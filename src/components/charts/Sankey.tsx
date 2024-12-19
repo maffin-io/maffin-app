@@ -23,7 +23,7 @@ export const OPTIONS: ChartOptions<'sankey'> = {
 export default function Bar({
   options,
   ...props
-}: Omit<ChartProps<'sankey'>, 'type'>): JSX.Element {
+}: Omit<ChartProps<'sankey'>, 'type'>): React.JSX.Element {
   return (
     <ChartJS<'sankey'>
       {...props}

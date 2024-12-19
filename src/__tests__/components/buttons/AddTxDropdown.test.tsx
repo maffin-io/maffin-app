@@ -50,7 +50,7 @@ describe('AddTxDropdown', () => {
         id: 'add-tx',
         modalTitle: 'Add transaction to account',
       }),
-      {},
+      undefined,
     );
     expect(TransactionForm).toBeCalledTimes(1);
     expect(TransactionForm).nthCalledWith(
@@ -70,7 +70,7 @@ describe('AddTxDropdown', () => {
           ],
         },
       },
-      {},
+      undefined,
     );
 
     expect(container).toMatchSnapshot();
@@ -101,7 +101,7 @@ describe('AddTxDropdown', () => {
         id: 'add-tx',
         modalTitle: 'Add transaction to account',
       }),
-      {},
+      undefined,
     );
     expect(TransactionForm).nthCalledWith(
       1,
@@ -120,7 +120,7 @@ describe('AddTxDropdown', () => {
           ],
         },
       },
-      {},
+      undefined,
     );
 
     expect(FormButton).nthCalledWith(
@@ -129,7 +129,7 @@ describe('AddTxDropdown', () => {
         id: 'add-dividend',
         modalTitle: 'Add dividend to account',
       }),
-      {},
+      undefined,
     );
     expect(TransactionForm).nthCalledWith(
       2,
@@ -161,7 +161,7 @@ describe('AddTxDropdown', () => {
           ],
         },
       },
-      {},
+      undefined,
     );
 
     expect(FormButton).nthCalledWith(
@@ -170,7 +170,7 @@ describe('AddTxDropdown', () => {
         id: 'add-split',
         modalTitle: 'Add split event to account',
       }),
-      {},
+      undefined,
     );
     expect(TransactionForm).nthCalledWith(
       3,
@@ -192,7 +192,7 @@ describe('AddTxDropdown', () => {
           ],
         },
       },
-      {},
+      undefined,
     );
 
     expect(container).toMatchSnapshot();

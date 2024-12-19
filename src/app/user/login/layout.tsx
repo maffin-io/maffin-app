@@ -8,7 +8,7 @@ export default function LoginLayout({
   children,
 }: {
   children: React.ReactNode
-}): JSX.Element {
+}): React.JSX.Element {
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
 
   React.useEffect(() => {

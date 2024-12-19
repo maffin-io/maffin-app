@@ -19,7 +19,7 @@ type OnboardingProps = {
 
 export default function Onboarding({
   show = false,
-}: OnboardingProps): JSX.Element {
+}: OnboardingProps): React.JSX.Element {
   const { save, datasource } = React.useContext(DataSourceContext);
   const [run] = React.useState(show);
   const [stepIndex, setStepIndex] = React.useState(0);

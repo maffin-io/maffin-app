@@ -18,7 +18,7 @@ export default function FormButton({
   children,
   className = 'btn btn-primary',
   ...props
-}: FormButtonProps): JSX.Element {
+}: FormButtonProps): React.JSX.Element {
   const { save } = React.useContext(DataSourceContext);
   const modalRef = React.useRef<ModalRef>(null);
 
@@ -36,7 +36,9 @@ export default function FormButton({
           React.cloneElement(
             children,
             {
+              // @ts-ignore
               onSave: (e: unknown) => {
+                // @ts-ignore
                 children.props.onSave?.(e);
                 save();
                 modalRef.current?.closeModal();

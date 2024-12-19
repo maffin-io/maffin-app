@@ -90,7 +90,7 @@ describe('InvestmentPlaceholderInfo', () => {
         accounts: [investment1.account.guid],
         totalValue: expect.any(Money),
       },
-      {},
+      undefined,
     );
     expect(WeightsChartMock.mock.calls[0][0].totalValue.toString()).toEqual('5 EUR');
     expect(StatisticsWidget).toHaveBeenCalledTimes(3);
@@ -101,7 +101,7 @@ describe('InvestmentPlaceholderInfo', () => {
         stats: '€5.00',
         description: '€4.00 total invested',
       },
-      {},
+      undefined,
     );
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       2,
@@ -111,7 +111,7 @@ describe('InvestmentPlaceholderInfo', () => {
         description: '€6.00 (150%) with dividends',
         statsTextClass: 'text-success',
       },
-      {},
+      undefined,
     );
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       3,
@@ -121,19 +121,19 @@ describe('InvestmentPlaceholderInfo', () => {
         description: '€5.00 from dividends',
         statsTextClass: 'text-success',
       },
-      {},
+      undefined,
     );
     expect(DividendChart).toHaveBeenLastCalledWith(
       {
         accounts: [investment1.account.guid],
       },
-      {},
+      undefined,
     );
     expect(InvestmentsTable).toHaveBeenLastCalledWith(
       {
         accounts: [investment1.account.guid],
       },
-      {},
+      undefined,
     );
     expect(container).toMatchSnapshot();
   });
@@ -169,7 +169,7 @@ describe('InvestmentPlaceholderInfo', () => {
         stats: '$5.00',
         description: '$4.00 total invested',
       },
-      {},
+      undefined,
     );
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       2,
@@ -179,7 +179,7 @@ describe('InvestmentPlaceholderInfo', () => {
         description: '$6.00 (150%) with dividends',
         statsTextClass: 'text-success',
       },
-      {},
+      undefined,
     );
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       3,
@@ -189,7 +189,7 @@ describe('InvestmentPlaceholderInfo', () => {
         description: '$5.00 from dividends',
         statsTextClass: 'text-success',
       },
-      {},
+      undefined,
     );
   });
 });

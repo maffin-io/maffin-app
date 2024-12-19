@@ -5,7 +5,7 @@ import React from 'react';
 import SQLEditor from '@/components/SQLEditor';
 import SQLExplorer from '@/components/SQLExplorer';
 
-export default function EditorPage(): JSX.Element {
+export default function EditorPage(): React.JSX.Element {
   return (
     <div className="grid md:grid-cols-12 items-start">
       <div className="col-span-9">

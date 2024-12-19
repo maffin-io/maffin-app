@@ -88,18 +88,18 @@ describe('AccountPage', () => {
     const { container } = render(<AccountPage params={{ guid: 'guid' }} />);
 
     await screen.findByTestId('TransactionsTable');
-    expect(Header).toBeCalledWith({ account }, {});
+    expect(Header).toBeCalledWith({ account }, undefined);
     expect(TransactionsTable).toHaveBeenLastCalledWith(
       {
         account,
       },
-      {},
+      undefined,
     );
     expect(IEInfo).toHaveBeenLastCalledWith(
       {
         account,
       },
-      {},
+      undefined,
     );
     expect(container).toMatchSnapshot();
   });
@@ -124,7 +124,7 @@ describe('AccountPage', () => {
       {
         account,
       },
-      {},
+      undefined,
     );
   });
 
@@ -148,7 +148,7 @@ describe('AccountPage', () => {
       {
         account,
       },
-      {},
+      undefined,
     );
   });
 });

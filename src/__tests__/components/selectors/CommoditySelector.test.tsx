@@ -44,7 +44,7 @@ describe('CommoditySelector', () => {
         getOptionValue: expect.any(Function),
         options: [],
       },
-      {},
+      undefined,
     );
   });
 
@@ -76,7 +76,7 @@ describe('CommoditySelector', () => {
       expect.objectContaining({
         options: [options[2]],
       }),
-      {},
+      undefined,
     );
   });
 
@@ -111,7 +111,7 @@ describe('CommoditySelector', () => {
       expect.objectContaining({
         options: [options[0]],
       }),
-      {},
+      undefined,
     );
   });
 });

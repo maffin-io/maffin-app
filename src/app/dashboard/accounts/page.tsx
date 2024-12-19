@@ -22,7 +22,7 @@ import mapAccounts from '@/helpers/mapAccounts';
 import { ASSET, LIABILITY } from '@/constants/colors';
 import ReportsDropdown from '@/components/buttons/ReportsDropdown';
 
-export default function AccountsPage(): JSX.Element {
+export default function AccountsPage(): React.JSX.Element {
   const { data, isLoading } = useAccounts();
 
   if (isLoading) {

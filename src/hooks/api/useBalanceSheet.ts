@@ -25,7 +25,7 @@ export function useBalanceSheet(
 
   const aggregate = React.useCallback(
     ((data: AccountsTotals) => aggregateChildrenTotals(
-      ['type_asset', 'type_liability'],
+      ['type_asset', 'type_liability', 'type_equity'],
       accounts as Account[],
       prices as PriceDBMap,
       selectedDate,

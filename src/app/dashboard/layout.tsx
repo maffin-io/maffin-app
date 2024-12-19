@@ -16,7 +16,7 @@ Modal.setAppElement('#modals');
 
 export default function DashboardLayout({
   children,
-}: React.PropsWithChildren): JSX.Element {
+}: React.PropsWithChildren): React.JSX.Element {
   const router = useRouter();
   useTheme();
   const { isLoading, isAuthenticated } = useSession();
@@ -50,6 +50,6 @@ export default function DashboardLayout({
   );
 }
 
-function ErrorComponent(): JSX.Element {
+function ErrorComponent(): React.JSX.Element {
   return <span />;
 }

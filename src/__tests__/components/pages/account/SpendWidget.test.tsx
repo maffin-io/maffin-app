@@ -46,7 +46,7 @@ describe('SpendWidgetTest', () => {
         stats: '€0.00',
         title: 'Expenses',
       },
-      {},
+      undefined,
     );
   });
 
@@ -121,7 +121,7 @@ describe('SpendWidgetTest', () => {
         stats: '€20.00',
         title: 'Expenses',
       },
-      {},
+      undefined,
     );
   });
 });

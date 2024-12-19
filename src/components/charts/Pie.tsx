@@ -19,17 +19,12 @@ export const OPTIONS: ChartOptions<'doughnut'> = {
       borderWidth: 0,
     },
   },
-  plugins: {
-    autocolors: {
-      mode: 'data',
-    },
-  },
 };
 
 export default function Doughnut({
   options,
   ...props
-}: Omit<ChartProps<'doughnut'>, 'type'>): JSX.Element {
+}: Omit<ChartProps<'doughnut'>, 'type'>): React.JSX.Element {
   return (
     <ChartJS<'doughnut'>
       {...props}

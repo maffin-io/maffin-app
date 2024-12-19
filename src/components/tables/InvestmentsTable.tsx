@@ -15,7 +15,7 @@ export type InvestmentsTableProps = {
 
 export default function InvestmentsTable({
   accounts,
-}: InvestmentsTableProps): JSX.Element {
+}: InvestmentsTableProps): React.JSX.Element {
   let { data: investments = [] } = useInvestments(
     data => data.filter(d => accounts.includes(d.account.guid)),
   );

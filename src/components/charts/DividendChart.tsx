@@ -14,7 +14,7 @@ export type DividendChartProps = {
 
 export default function DividendChart({
   accounts,
-}: DividendChartProps): JSX.Element {
+}: DividendChartProps): React.JSX.Element {
   const [selectedYear, setSelectedYear] = React.useState(DateTime.now().year);
 
   const { data: investments = [] } = useInvestments(

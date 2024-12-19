@@ -19,7 +19,7 @@ export type InvestmentPlaceholderInfoProps = {
 
 export default function InvestmentPlaceholderInfo({
   account,
-}: InvestmentPlaceholderInfoProps): JSX.Element {
+}: InvestmentPlaceholderInfoProps): React.JSX.Element {
   const { data: investments = [], isPending } = useInvestments(
     data => data.filter(d => d.account.path.startsWith(account.path)),
   );

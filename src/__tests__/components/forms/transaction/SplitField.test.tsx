@@ -874,7 +874,7 @@ function FormWrapper(
     defaults?: Partial<FormValues>,
     submit?: Function,
   },
-): JSX.Element {
+): React.JSX.Element {
   const account = {
     name: 'path1',
     guid: 'account_guid_1',

@@ -65,7 +65,7 @@ describe('PricesTable', () => {
           },
         ],
       },
-      {},
+      undefined,
     );
     expect(
       (Table as jest.Mock).mock.calls[0][0].columns[0].accessorFn({ date: DateTime.fromISO('2023-01-01') }),
@@ -111,7 +111,7 @@ describe('PricesTable', () => {
       expect.objectContaining({
         data: prices,
       }),
-      {},
+      undefined,
     );
   });
 
@@ -147,7 +147,7 @@ describe('PricesTable', () => {
         id: 'edit-price',
         modalTitle: 'Edit price',
       }),
-      {},
+      undefined,
     );
     expect(PriceForm).toHaveBeenNthCalledWith(
       1,
@@ -161,7 +161,7 @@ describe('PricesTable', () => {
           value: 100,
         },
       },
-      {},
+      undefined,
     );
     expect(FormButton).toHaveBeenNthCalledWith(
       2,
@@ -170,7 +170,7 @@ describe('PricesTable', () => {
         id: 'delete-price',
         modalTitle: 'Confirm you want to remove this price',
       }),
-      {},
+      undefined,
     );
     expect(PriceForm).toHaveBeenNthCalledWith(
       2,
@@ -184,7 +184,7 @@ describe('PricesTable', () => {
           value: 100,
         },
       },
-      {},
+      undefined,
     );
 
     expect(container).toMatchSnapshot();
