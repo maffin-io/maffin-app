@@ -79,7 +79,7 @@ describe('TotalsPie', () => {
             },
             autocolors: {
               mode: 'data',
-              enabled: false,
+              enabled: true,
             },
           },
         },
@@ -155,7 +155,7 @@ describe('TotalsPie', () => {
           plugins: expect.objectContaining({
             autocolors: {
               mode: 'data',
-              enabled: true,
+              enabled: false,
             },
           }),
         }),
