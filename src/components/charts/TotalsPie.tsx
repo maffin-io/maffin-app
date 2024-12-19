@@ -96,7 +96,7 @@ export default function TotalsPie({
             },
             autocolors: {
               mode: 'data',
-              enabled: (backgroundColor?.length || 0) > 0,
+              enabled: (backgroundColor?.length || 0) === 0,
             },
           },
         }}
