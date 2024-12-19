@@ -32,11 +32,7 @@ describe('Pie', () => {
               borderWidth: 0,
             },
           },
-          plugins: {
-            autocolors: {
-              mode: 'data',
-            },
-          },
+          plugins: {},
         },
         type: 'doughnut',
       },
@@ -72,9 +68,6 @@ describe('Pie', () => {
           plugins: {
             title: {
               display: true,
-            },
-            autocolors: {
-              mode: 'data',
             },
           },
         },

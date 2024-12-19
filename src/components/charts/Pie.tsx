@@ -19,11 +19,6 @@ export const OPTIONS: ChartOptions<'doughnut'> = {
       borderWidth: 0,
     },
   },
-  plugins: {
-    autocolors: {
-      mode: 'data',
-    },
-  },
 };
 
 export default function Doughnut({

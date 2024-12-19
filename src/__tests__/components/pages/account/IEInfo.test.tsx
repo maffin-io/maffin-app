@@ -51,38 +51,43 @@ describe('IEInfo', () => {
       <IEInfo account={account} />,
     );
 
-    expect(MonthlyTotalHistogram).toBeCalledWith(
+    expect(MonthlyTotalHistogram).toHaveBeenCalledWith(
       {
         guids: [account.guid],
         title: '',
       },
       undefined,
     );
-    expect(TotalWidget).toBeCalledWith(
+    expect(TotalWidget).toHaveBeenCalledWith(
       { account },
       undefined,
     );
     expect(container).toMatchSnapshot();
   });
 
-  it('renders as expected when placeholder', () => {
+  it.each([
+    ['INCOME', 'Total earned'],
+    ['EXPENSE', 'Total spent'],
+    ['EQUITY', 'Total'],
+  ])('renders as expected when placeholder with %s', (type, title) => {
     account.placeholder = true;
     account.childrenIds = ['1', '2'];
+    account.type = type;
     const { container } = render(
       <IEInfo account={account} />,
     );
 
-    expect(AccountsTable).toBeCalledWith({ guids: ['1', '2'] }, undefined);
-    expect(TotalsPie).toBeCalledWith(
+    expect(AccountsTable).toHaveBeenCalledWith({ guids: ['1', '2'] }, undefined);
+    expect(TotalsPie).toHaveBeenCalledWith(
       {
         guids: ['1', '2'],
         showDataLabels: false,
         showTooltip: true,
-        title: 'Total spent',
+        title,
       },
       undefined,
     );
-    expect(MonthlyTotalHistogram).toBeCalledWith(
+    expect(MonthlyTotalHistogram).toHaveBeenCalledWith(
       {
         guids: ['1', '2'],
         title: '',
