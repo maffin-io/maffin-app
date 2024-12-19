@@ -37,7 +37,95 @@ exports[`IEInfo renders as expected when not placeholder 1`] = `
 </div>
 `;
 
-exports[`IEInfo renders as expected when placeholder 1`] = `
+exports[`IEInfo renders as expected when placeholder with EQUITY 1`] = `
+<div>
+  <div
+    class="grid md:grid-cols-12 items-start"
+  >
+    <div
+      class="grid md:grid-cols-12 auto-cols-fr items-start col-span-6"
+    >
+      <div
+        class="card md:col-span-6"
+      >
+        <div
+          data-testid="TotalsPie"
+        />
+        <div
+          class="mt-4"
+        >
+          <div
+            data-testid="AccountsTable"
+          />
+        </div>
+      </div>
+      <div
+        class="card md:col-span-6"
+      />
+    </div>
+    <div
+      class="col-span-6"
+    >
+      <div
+        class="card"
+      >
+        <div
+          data-testid="MonthlyTotalHistogram"
+        />
+      </div>
+      <div
+        class="col-span-12"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`IEInfo renders as expected when placeholder with EXPENSE 1`] = `
+<div>
+  <div
+    class="grid md:grid-cols-12 items-start"
+  >
+    <div
+      class="grid md:grid-cols-12 auto-cols-fr items-start col-span-6"
+    >
+      <div
+        class="card md:col-span-6"
+      >
+        <div
+          data-testid="TotalsPie"
+        />
+        <div
+          class="mt-4"
+        >
+          <div
+            data-testid="AccountsTable"
+          />
+        </div>
+      </div>
+      <div
+        class="card md:col-span-6"
+      />
+    </div>
+    <div
+      class="col-span-6"
+    >
+      <div
+        class="card"
+      >
+        <div
+          data-testid="MonthlyTotalHistogram"
+        />
+      </div>
+      <div
+        class="col-span-12"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`IEInfo renders as expected when placeholder with INCOME 1`] = `
 <div>
   <div
     class="grid md:grid-cols-12 items-start"
