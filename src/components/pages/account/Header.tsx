@@ -25,7 +25,7 @@ export default function Header({
   const router = useRouter();
 
   const latestDate = splits?.[0]?.transaction?.date;
-  const deletable = splits?.length === 0 && account.childrenIds.length === 0;
+  const deletable = splits?.length === 0 && account.childrenIds?.length === 0;
 
   let title: string | React.JSX.Element = account.path;
   if (account.path.lastIndexOf(':') > 0) {
