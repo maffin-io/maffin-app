@@ -1821,17 +1821,17 @@
     "@react-pdf/png-js" "^3.0.0"
     jay-peg "^1.1.0"
 
-"@react-pdf/layout@^4.1.3":
-  version "4.1.3"
-  resolved "https://registry.yarnpkg.com/@react-pdf/layout/-/layout-4.1.3.tgz#388a22f4c94bcf735705be08bb33d2aa259fbba2"
-  integrity sha512-EvIRg/QGACGyDB/+N6OCpaxBg4r3dTF1sXEQev9yrunq+f5HpoGsYEGt+wC7I63Gbza+k2/+NqJitlsDRrt9nA==
+"@react-pdf/layout@^4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf/layout/-/layout-4.2.0.tgz#e2489992d4b6409a6cecf62b1b9391143ad30495"
+  integrity sha512-/0jMhDKwZH0lQs3umNsOduaPtkK0IUpaBRUEv4udHVD9lB2VzYoSNeYsCu+MJMPJyByXj70OSWV7IMjWTCKwWw==
   dependencies:
     "@babel/runtime" "^7.20.13"
     "@react-pdf/fns" "3.0.0"
     "@react-pdf/image" "^3.0.1"
     "@react-pdf/pdfkit" "^4.0.0"
     "@react-pdf/primitives" "^4.0.0"
-    "@react-pdf/stylesheet" "^5.1.0"
+    "@react-pdf/stylesheet" "^5.2.0"
     "@react-pdf/textkit" "^5.0.1"
     "@react-pdf/types" "^2.7.0"
     emoji-regex "^10.3.0"
@@ -1887,14 +1887,14 @@
     parse-svg-path "^0.1.2"
     svg-arc-to-cubic-bezier "^3.2.0"
 
-"@react-pdf/renderer@^4.1.5":
-  version "4.1.5"
-  resolved "https://registry.yarnpkg.com/@react-pdf/renderer/-/renderer-4.1.5.tgz#46a0ca69e2b1db39f34b86cced0122370100928b"
-  integrity sha512-SGaaVloGtBNCsgu7TrS9C8QrcMegqEzgaw2Y/DnpZJtru13WgBs+auM9ana58ytQ7PIMB1RYJtFVvYhM1hf/+w==
+"@react-pdf/renderer@^4.1.6":
+  version "4.1.6"
+  resolved "https://registry.yarnpkg.com/@react-pdf/renderer/-/renderer-4.1.6.tgz#257d4871192edb4d1716bc6399b5a7cf73ee3db3"
+  integrity sha512-hfQ0PsuVqfoYxkYgmkj+HFkylbB1QTpXY1rnlgnzJlrlSoNXjzPrCa/ty8jcHOwYA2lNoazIAoDatBIsc8K5pw==
   dependencies:
     "@babel/runtime" "^7.20.13"
     "@react-pdf/font" "^3.0.1"
-    "@react-pdf/layout" "^4.1.3"
+    "@react-pdf/layout" "^4.2.0"
     "@react-pdf/pdfkit" "^4.0.0"
     "@react-pdf/primitives" "^4.0.0"
     "@react-pdf/reconciler" "^1.1.3"
@@ -1905,10 +1905,10 @@
     prop-types "^15.6.2"
     queue "^6.0.1"
 
-"@react-pdf/stylesheet@^5.1.0":
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/@react-pdf/stylesheet/-/stylesheet-5.1.0.tgz#94161d06e365fa37fec0bee109cfca93174e6244"
-  integrity sha512-QOPCGzlTz+irGLXbsQtKkEqkf78n9l3hRU0Omkvpk/gwLf/IchBBt358dV6FEtc+ujMFEpN+a+fWSS6v2tB0AQ==
+"@react-pdf/stylesheet@^5.2.0":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf/stylesheet/-/stylesheet-5.2.0.tgz#01ed0462c363842babf5e21de913bbfe3fff23c6"
+  integrity sha512-ST19VumM9iRG0z8EjDJnyQCG+NhPFtYUCAh5B8HY237MrsRGvMgzcwrpyyqcyuLwHHYy7S4iw8EY0mK9+Qa2XQ==
   dependencies:
     "@babel/runtime" "^7.20.13"
     "@react-pdf/fns" "3.0.0"
