@@ -41,7 +41,7 @@
     "pako": "^2.1.0",
     "plaid": "^30.0.0",
     "react": "^19.0.0",
-    "react-chartjs-2": "^5.2.0",
+    "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
     "react-error-boundary": "^4.1.2",
     "react-hook-form": "^7.54.1",
