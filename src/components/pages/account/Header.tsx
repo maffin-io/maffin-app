@@ -25,7 +25,7 @@ export default function Header({
   const router = useRouter();
 
   const latestDate = splits?.[0]?.transaction?.date;
-  const deletable = splits?.length === 0;
+  const deletable = splits?.length === 0 && account.childrenIds?.length === 0;
 
   let title: string | React.JSX.Element = account.path;
   if (account.path.lastIndexOf(':') > 0) {
@@ -100,10 +100,10 @@ export default function Header({
                 id="delete-help"
               >
                 <p>
-                  Accounts that contain transactions can&apos;t be deleted.
+                  Accounts that contain transactions or children can&apos;t be deleted.
                 </p>
                 <p>
-                  Move the transactions to another account first.
+                  Move the transactions or children to another account first.
                 </p>
               </Tooltip>
             )
