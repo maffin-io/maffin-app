@@ -43,7 +43,7 @@ describe('Header', () => {
   beforeEach(() => {
     jest.spyOn(Split, 'create').mockReturnValue({ guid: 'createdSplit' } as Split);
     jest.spyOn(apiHook, 'useAccount').mockReturnValue({ data: undefined } as UseQueryResult<Account>);
-    jest.spyOn(apiHook, 'useSplitsPagination').mockReturnValue({ data: undefined } as UseQueryResult<Split[]>);
+    jest.spyOn(apiHook, 'useSplitsPagination').mockReturnValue({ data: [] as Split[] } as UseQueryResult<Split[]>);
   });
 
   afterEach(() => {
@@ -59,6 +59,7 @@ describe('Header', () => {
       commodity: {
         mnemonic: 'EUR',
       },
+      childrenIds: [] as String[],
     } as Account;
 
     jest.spyOn(apiHook, 'useAccount').mockReturnValueOnce({
@@ -72,7 +73,7 @@ describe('Header', () => {
         account,
         latestDate: DateTime.now(),
       },
-      {},
+      undefined,
     );
     await screen.findAllByTestId('FormButton');
     expect(FormButton).toHaveBeenNthCalledWith(
@@ -81,7 +82,7 @@ describe('Header', () => {
         id: 'edit-account',
         modalTitle: 'Edit account',
       }),
-      {},
+      undefined,
     );
     expect(AccountForm).toHaveBeenNthCalledWith(
       1,
@@ -94,18 +95,18 @@ describe('Header', () => {
           },
         },
       },
-      {},
+      undefined,
     );
     expect(FormButton).toHaveBeenNthCalledWith(
       2,
       expect.objectContaining({
         className: 'btn btn-danger',
         'data-tooltip-id': 'delete-help',
-        disabled: true,
+        disabled: false,
         id: 'delete-account',
         modalTitle: 'Confirm you want to remove this account',
       }),
-      {},
+      undefined,
     );
     expect(AccountForm).toHaveBeenNthCalledWith(
       2,
@@ -119,7 +120,7 @@ describe('Header', () => {
         },
         onSave: expect.any(Function),
       },
-      {},
+      undefined,
     );
     expect(container).toMatchSnapshot();
   });
@@ -134,6 +135,7 @@ describe('Header', () => {
       commodity: {
         mnemonic: 'EUR',
       },
+      childrenIds: [] as String[]
     } as Account;
 
     jest.spyOn(apiHook, 'useAccount').mockReturnValueOnce({
@@ -142,5 +144,65 @@ describe('Header', () => {
 
     const { container } = render(<Header account={account} />);
     expect(container).toMatchSnapshot();
+  });
+
+  it('delete is disabled if contains children', async () => {
+    const account = {
+      guid: 'guid',
+      path: 'Assets:account',
+      name: 'account',
+      type: 'TYPE',
+      parentId: 'parent',
+      commodity: {
+        mnemonic: 'EUR',
+      },
+      childrenIds: [
+        "child_guid"
+      ]
+    } as Account;
+
+    render(<Header account={account} />);
+
+    expect(FormButton).toHaveBeenCalledWith(
+      expect.objectContaining({
+        className: 'btn btn-danger',
+        'data-tooltip-id': 'delete-help',
+        disabled: true,
+        id: 'delete-account',
+        modalTitle: 'Confirm you want to remove this account',
+      }),
+      undefined,
+    );
+  });
+
+  it('delete is disabled if contains splits', async () => {
+    const account = {
+      guid: 'guid',
+      path: 'Assets:account',
+      name: 'account',
+      type: 'TYPE',
+      parentId: 'parent',
+      commodity: {
+        mnemonic: 'EUR',
+      },
+      childrenIds: [] as String[]
+    } as Account;
+
+    jest.spyOn(apiHook, 'useSplitsPagination').mockReturnValueOnce({
+      data: { length: 1 } as Split[],
+    } as UseQueryResult<Split[]>);
+
+    render(<Header account={account} />);
+
+    expect(FormButton).toHaveBeenCalledWith(
+      expect.objectContaining({
+        className: 'btn btn-danger',
+        'data-tooltip-id': 'delete-help',
+        disabled: true,
+        id: 'delete-account',
+        modalTitle: 'Confirm you want to remove this account',
+      }),
+      undefined,
+    );
   });
 });

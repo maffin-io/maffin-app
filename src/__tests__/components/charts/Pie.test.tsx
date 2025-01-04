@@ -32,15 +32,11 @@ describe('Pie', () => {
               borderWidth: 0,
             },
           },
-          plugins: {
-            autocolors: {
-              mode: 'data',
-            },
-          },
+          plugins: {},
         },
         type: 'doughnut',
       },
-      {},
+      undefined,
     );
   });
 
@@ -73,14 +69,11 @@ describe('Pie', () => {
             title: {
               display: true,
             },
-            autocolors: {
-              mode: 'data',
-            },
           },
         },
         type: 'doughnut',
       },
-      {},
+      undefined,
     );
   });
 });

@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useAuth0 } from '@auth0/auth0-react';
 
-export default function LogoutPage(): JSX.Element {
+export default function LogoutPage(): React.JSX.Element {
   const { logout } = useAuth0();
 
   React.useEffect(() => {

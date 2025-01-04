@@ -13,7 +13,7 @@ import { usePathname } from 'next/navigation';
 
 type ItemType = {
   url: string;
-  icon: JSX.Element;
+  icon: React.JSX.Element;
   label: string;
   target?: string;
   submenu?: { label: string, url: string }[],
@@ -51,7 +51,7 @@ const BOTTOM_MENU: ItemType[] = [
   },
 ];
 
-export default function DashboardMenu(): JSX.Element {
+export default function DashboardMenu(): React.JSX.Element {
   const pathname = usePathname();
 
   return (
@@ -76,7 +76,7 @@ export default function DashboardMenu(): JSX.Element {
   );
 }
 
-function MenuItem({ item, className }: MenuItemProps): JSX.Element {
+function MenuItem({ item, className }: MenuItemProps): React.JSX.Element {
   return (
     <li
       className="group h-12 text-slate-400 lg:hover:bg-cyan-700 lg:hover:text-white lg:hover:w-64 lg:hover:rounded-r-sm"
@@ -102,7 +102,7 @@ function SubMenu({
   items,
 }: {
   items: { label: string, url: string }[] | undefined,
-}): JSX.Element {
+}): React.JSX.Element {
   if (items && items.length) {
     return (
       <ul className="hidden float-right w-44 bg-background-700 shadow-md group-hover:inline-block">

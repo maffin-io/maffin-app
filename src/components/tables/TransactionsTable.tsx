@@ -34,7 +34,7 @@ export type TransactionsTableProps = {
 
 export default function TransactionsTable({
   account,
-}: TransactionsTableProps): JSX.Element {
+}: TransactionsTableProps): React.JSX.Element {
   const [search, setSearch] = React.useState('');
   const [{ pageIndex, pageSize }, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
@@ -121,7 +121,7 @@ const columns: ColumnDef<Split>[] = [
   },
 ];
 
-function DescriptionCell({ row }: CellContext<Split, unknown>): JSX.Element {
+function DescriptionCell({ row }: CellContext<Split, unknown>): React.JSX.Element {
   const { data: tx } = useTransaction({ guid: row.original.txId });
   return (
     <span>
@@ -130,7 +130,7 @@ function DescriptionCell({ row }: CellContext<Split, unknown>): JSX.Element {
   );
 }
 
-function FromToAccountCell({ row }: CellContext<Split, unknown>): JSX.Element {
+function FromToAccountCell({ row }: CellContext<Split, unknown>): React.JSX.Element {
   const { data: tx } = useTransaction({ guid: row.original.txId });
   const { data: accounts } = useAccounts();
 
@@ -161,7 +161,7 @@ function FromToAccountCell({ row }: CellContext<Split, unknown>): JSX.Element {
 function AmountPartial(
   account: Account,
 ) {
-  return function AmountCell({ row }: CellContext<Split, unknown>): JSX.Element {
+  return function AmountCell({ row }: CellContext<Split, unknown>): React.JSX.Element {
     let value = new Money(row.original.quantity, account.commodity.mnemonic || '');
 
     if (account?.type === 'INCOME') {
@@ -187,7 +187,7 @@ function AmountPartial(
 function BalancePartial(
   account: Account,
 ) {
-  return function BalanceCell({ row }: CellContext<Split, unknown>): JSX.Element {
+  return function BalanceCell({ row }: CellContext<Split, unknown>): React.JSX.Element {
     return (
       <span>
         {new Money(row.original.balance, account.commodity.mnemonic).format()}
@@ -196,7 +196,7 @@ function BalancePartial(
   };
 }
 
-function ActionsCell({ row }: CellContext<Split, unknown>): JSX.Element {
+function ActionsCell({ row }: CellContext<Split, unknown>): React.JSX.Element {
   const { data: tx } = useTransaction({ guid: row.original.txId });
 
   if (!tx || tx.guid !== row.original.txId) {

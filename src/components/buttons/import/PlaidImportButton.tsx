@@ -33,7 +33,7 @@ export default function PlaidImportButton({
   className = '',
   onImport,
   ...props
-}: Readonly<ImportButtonProps>): JSX.Element {
+}: Readonly<ImportButtonProps>): React.JSX.Element {
   const { user, roles } = useSession();
   const [linkToken, setLinkToken] = React.useState('');
   const { isLoaded } = React.useContext(DataSourceContext);

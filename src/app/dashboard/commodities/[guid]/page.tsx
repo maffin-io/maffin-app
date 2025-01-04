@@ -21,7 +21,7 @@ export type CommodityPageProps = {
   },
 };
 
-export default function CommodityPage({ params }: CommodityPageProps): JSX.Element {
+export default function CommodityPage({ params }: CommodityPageProps): React.JSX.Element {
   const router = useRouter();
 
   const { data: commodity, isLoading } = useCommodity(params.guid);

@@ -15,7 +15,7 @@ type FormValues = {
   interval?: Interval;
 };
 
-export default function IncomeExpenseStatementForm(): JSX.Element {
+export default function IncomeExpenseStatementForm(): React.JSX.Element {
   const { data: interval } = useInterval();
   const form = useForm<FormValues>({
     defaultValues: {

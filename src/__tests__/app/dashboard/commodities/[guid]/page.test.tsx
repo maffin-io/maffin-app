@@ -126,7 +126,7 @@ describe('CommodityPage', () => {
         modalTitle: 'Add price',
         id: 'add-price',
       }),
-      {},
+      undefined,
     );
     expect(PriceForm).toHaveBeenNthCalledWith(
       1,
@@ -140,7 +140,7 @@ describe('CommodityPage', () => {
         },
         hideDefaults: true,
       },
-      {},
+      undefined,
     );
 
     expect(FormButton).toHaveBeenNthCalledWith(
@@ -149,7 +149,7 @@ describe('CommodityPage', () => {
         modalTitle: 'Edit EUR',
         id: 'edit-commodity',
       }),
-      {},
+      undefined,
     );
     expect(CommodityForm).toHaveBeenNthCalledWith(
       1,
@@ -160,7 +160,7 @@ describe('CommodityPage', () => {
           mnemonic: 'EUR',
         },
       },
-      {},
+      undefined,
     );
 
     expect(FormButton).lastCalledWith(
@@ -170,7 +170,7 @@ describe('CommodityPage', () => {
         className: 'btn btn-danger',
         disabled: true,
       }),
-      {},
+      undefined,
     );
     expect(CommodityForm).lastCalledWith(
       {
@@ -181,7 +181,7 @@ describe('CommodityPage', () => {
         },
         onSave: expect.any(Function),
       },
-      {},
+      undefined,
     );
 
     expect(PricesTable).toHaveBeenNthCalledWith(
@@ -191,7 +191,7 @@ describe('CommodityPage', () => {
           prices[0],
         ],
       },
-      {},
+      undefined,
     );
     expect(PricesTable).toHaveBeenNthCalledWith(
       2,
@@ -200,7 +200,7 @@ describe('CommodityPage', () => {
           prices[1],
         ],
       },
-      {},
+      undefined,
     );
     expect(PricesChart).toHaveBeenNthCalledWith(
       1,
@@ -209,7 +209,7 @@ describe('CommodityPage', () => {
           prices[0],
         ],
       },
-      {},
+      undefined,
     );
     expect(PricesChart).toHaveBeenNthCalledWith(
       2,
@@ -218,7 +218,7 @@ describe('CommodityPage', () => {
           prices[1],
         ],
       },
-      {},
+      undefined,
     );
     expect(container).toMatchSnapshot();
   });
@@ -239,7 +239,7 @@ describe('CommodityPage', () => {
         className: 'btn btn-danger',
         disabled: false,
       }),
-      {},
+      undefined,
     );
   });
 
@@ -283,7 +283,7 @@ describe('CommodityPage', () => {
         },
         hideDefaults: true,
       },
-      {},
+      undefined,
     );
   });
 });

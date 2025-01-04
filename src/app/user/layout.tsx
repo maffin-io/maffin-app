@@ -10,7 +10,7 @@ export default function UserLayout({
   children,
 }: {
   children: React.ReactNode
-}): JSX.Element {
+}): React.JSX.Element {
   useTheme();
 
   return (

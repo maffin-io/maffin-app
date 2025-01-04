@@ -34,7 +34,7 @@ export default async function getAccountsTotals(
 
   rows.forEach(row => {
     totals[row.accountId] = new Money(
-      accountsMap[row.accountId].type === 'INCOME' ? Math.abs(row.total) : row.total,
+      ['INCOME', 'EQUITY'].includes(accountsMap[row.accountId].type) ? Math.abs(row.total) : row.total,
       accountsMap[row.accountId].commodity.mnemonic,
     );
   });

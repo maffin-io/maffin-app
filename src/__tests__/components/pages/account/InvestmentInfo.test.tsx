@@ -108,7 +108,7 @@ describe('InvestmentInfo', () => {
       {
         account,
       },
-      {},
+      undefined,
     );
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       1,
@@ -119,7 +119,7 @@ describe('InvestmentInfo', () => {
         stats: '€150.00',
         description: 'from €100.00 invested',
       },
-      {},
+      undefined,
     );
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       2,
@@ -130,7 +130,7 @@ describe('InvestmentInfo', () => {
         stats: '€15.00',
         description: 'on 1/1/2023',
       },
-      {},
+      undefined,
     );
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       3,
@@ -141,7 +141,7 @@ describe('InvestmentInfo', () => {
         stats: '50 %',
         description: expect.anything(),
       },
-      {},
+      undefined,
     );
     expect(StatisticsWidget).toHaveBeenNthCalledWith(
       4,
@@ -152,7 +152,7 @@ describe('InvestmentInfo', () => {
         stats: '€10.00',
         description: '+ €20.00 from dividends',
       },
-      {},
+      undefined,
     );
 
     expect(container).toMatchSnapshot();
@@ -196,7 +196,7 @@ describe('InvestmentInfo', () => {
         stats: '€10.00',
         description: '+ $20.00 from dividends',
       },
-      {},
+      undefined,
     );
   });
 

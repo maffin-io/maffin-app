@@ -8,7 +8,7 @@ import { useOnline } from '@/hooks/state';
 import { UpgradeTooltip } from '@/components/tooltips';
 import useSession from '@/hooks/useSession';
 
-export default function SaveButton(): JSX.Element {
+export default function SaveButton(): React.JSX.Element {
   const { data: isSaving } = useQuery({
     queryKey: ['state', 'isSaving'],
     queryFn: () => false,

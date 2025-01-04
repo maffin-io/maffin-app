@@ -13,7 +13,7 @@ import type { Split, Transaction } from '@/book/entities';
 import { moneyToString } from '@/helpers/number';
 import { accountColorCode } from '@/helpers/classNames';
 
-export default function LatestTransactions(): JSX.Element {
+export default function LatestTransactions(): React.JSX.Element {
   let { data: txs } = useLatestTxs();
   txs = txs || [];
 

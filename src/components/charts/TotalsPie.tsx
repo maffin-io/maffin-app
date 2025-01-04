@@ -26,7 +26,7 @@ export default function TotalsPie({
   backgroundColor,
   showTooltip = false,
   showDataLabels = true,
-}: TotalsPieProps): JSX.Element {
+}: TotalsPieProps): React.JSX.Element {
   const { data: interval } = useInterval();
   const { data: totals } = useAccountsTotals();
   const { data: accounts } = useAccounts();
@@ -93,6 +93,10 @@ export default function TotalsPie({
                 `${labels[context.dataIndex]}\n${moneyToString(value, unit)}`
               ),
               padding: 6,
+            },
+            autocolors: {
+              mode: 'data',
+              enabled: (backgroundColor?.length || 0) === 0,
             },
           },
         }}

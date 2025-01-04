@@ -20,7 +20,7 @@ export const OPTIONS: ChartOptions<'line'> = {};
 export default function Line({
   options,
   ...props
-}: Omit<ChartProps<'line'>, 'type'>): JSX.Element {
+}: Omit<ChartProps<'line'>, 'type'>): React.JSX.Element {
   return (
     <ChartJS<'line'>
       {...props}
