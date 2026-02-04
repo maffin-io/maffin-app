@@ -24,7 +24,7 @@ export default function ImportButton({
         onClick={() => {
           if (ref.current) {
             const rawBook = datasource?.sqljsManager.exportDatabase() as Uint8Array;
-            const blob = new Blob([rawBook], { type: 'application/vnd.sqlite3' });
+            const blob = new Blob([rawBook as unknown as BlobPart], { type: 'application/vnd.sqlite3' });
             ref.current.href = window.URL.createObjectURL(blob);
             ref.current.click();
           }
