@@ -27,6 +27,12 @@ jest.mock('@/hooks/state', () => ({
 }));
 
 describe('TotalsPie', () => {
+  const ROOT_ACCOUNT = {
+    guid: 'root',
+    name: 'Root',
+    type: 'ROOT',
+  } as Account;
+
   beforeEach(() => {
     jest.spyOn(apiHook, 'useMainCurrency').mockReturnValue({ data: { guid: 'eur', mnemonic: 'EUR' } } as UseQueryResult<Commodity>);
     jest.spyOn(apiHook, 'useAccountsTotals').mockReturnValue({ data: {} });
@@ -117,6 +123,7 @@ describe('TotalsPie', () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [
+          ROOT_ACCOUNT,
           { guid: 'type_asset', name: 'Assets', commodity: { guid: 'eur' } },
           { guid: 'type_liability', name: 'Liabilities', commodity: { guid: 'eur' } },
         ],
@@ -173,6 +180,7 @@ describe('TotalsPie', () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [
+          ROOT_ACCOUNT,
           { guid: '1', name: 'Groceries', commodity: { guid: 'eur' } },
           { guid: '2', name: 'Rent', commodity: { guid: 'eur' } },
           { guid: '3', name: 'Electricity', commodity: { guid: 'eur' } },
@@ -224,6 +232,7 @@ describe('TotalsPie', () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [
+          ROOT_ACCOUNT,
           { guid: '1', name: 'ticker1', commodity: { guid: 'ticker1' } },
           { guid: '2', name: 'ticker2', commodity: { guid: 'ticker2' } },
         ],

@@ -140,6 +140,11 @@ describe('MonthlyTotalHistogram', () => {
       {
         data: [
           {
+            guid: 'root',
+            name: 'Root',
+            type: 'ROOT',
+          } as Account,
+          {
             guid: 'salary',
             name: 'Salary',
             type: 'INCOME',
@@ -219,6 +224,11 @@ describe('MonthlyTotalHistogram', () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [
+          {
+            guid: 'root',
+            name: 'Root',
+            type: 'ROOT',
+          } as Account,
           {
             guid: 'salary',
             name: 'Salary',

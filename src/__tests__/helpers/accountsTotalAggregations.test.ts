@@ -389,5 +389,114 @@ describe('accountsTotalAggregations', () => {
       expect(totals.type_asset.toString()).toEqual('0 EUR');
       expect(totals.a5.toString()).toEqual('0 EUR');
     });
+
+    it('excludes hidden children from parent and type totals', () => {
+      accounts[3].childrenIds = ['a5', 'a6'];
+      accounts = [
+        ...accounts,
+        {
+          guid: 'a5',
+          type: 'INCOME',
+          commodity: eur,
+          parentId: 'a3',
+          childrenIds: [] as string[],
+          hidden: false,
+        } as Account,
+        {
+          guid: 'a6',
+          type: 'INCOME',
+          commodity: eur,
+          parentId: 'a3',
+          childrenIds: [] as string[],
+          hidden: true,
+        } as Account,
+      ];
+
+      const aggregatedTotals = aggregateChildrenTotals(
+        ['type_income'],
+        accounts,
+        {} as PriceDBMap,
+        DateTime.now(),
+        {
+          a5: new Money(300, 'EUR'),
+          a6: new Money(200, 'EUR'),
+        },
+      );
+
+      expect(aggregatedTotals.type_income.toString()).toEqual('300 EUR');
+      expect(aggregatedTotals.a3.toString()).toEqual('300 EUR');
+      expect(aggregatedTotals.a6).toBeUndefined();
+    });
+
+    it('excludes hidden expense children from type totals', () => {
+      accounts[4].childrenIds = ['a5', 'a6'];
+      accounts = [
+        ...accounts,
+        {
+          guid: 'a5',
+          type: 'EXPENSE',
+          commodity: eur,
+          parentId: 'a4',
+          childrenIds: [] as string[],
+        } as Account,
+        {
+          guid: 'a6',
+          type: 'EXPENSE',
+          commodity: eur,
+          parentId: 'a4',
+          childrenIds: [] as string[],
+          hidden: true,
+        } as Account,
+      ];
+
+      const aggregatedTotals = aggregateChildrenTotals(
+        ['type_expense'],
+        accounts,
+        {} as PriceDBMap,
+        DateTime.now(),
+        {
+          a5: new Money(100, 'EUR'),
+          a6: new Money(50, 'EUR'),
+        },
+      );
+
+      expect(aggregatedTotals.type_expense.toString()).toEqual('100 EUR');
+    });
+  });
+
+  describe('aggregateMonthlyWorth with hidden accounts', () => {
+    it('does not accumulate totals for hidden accounts', () => {
+      accounts[1].childrenIds = ['a5', 'a6'];
+      accounts = [
+        ...accounts,
+        {
+          guid: 'a5',
+          type: 'ASSET',
+          commodity: eur,
+          parentId: 'a1',
+          childrenIds: [] as string[],
+        } as Account,
+        {
+          guid: 'a6',
+          type: 'ASSET',
+          commodity: eur,
+          parentId: 'a1',
+          childrenIds: [] as string[],
+          hidden: true,
+        } as Account,
+      ];
+
+      const monthlyTotals = [
+        { a5: new Money(100, 'EUR'), a6: new Money(50, 'EUR') },
+        { a5: new Money(200, 'EUR'), a6: new Money(50, 'EUR') },
+      ];
+
+      const aggregated = aggregateMonthlyWorth(['a1'], accounts, monthlyTotals);
+
+      expect(aggregated[0].a5.toString()).toEqual('100 EUR');
+      expect(aggregated[1].a5.toString()).toEqual('300 EUR');
+      expect(aggregated[0].a6).toBeUndefined();
+      expect(aggregated[1].a6).toBeUndefined();
+    });
   });
 });

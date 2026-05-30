@@ -5,6 +5,7 @@ import { Account } from '@/book/entities';
 import type { AccountsTotals, AccountsMap } from '@/types/book';
 import type { PriceDBMap } from '@/book/prices';
 import mapAccounts from './mapAccounts';
+import { visibleChildIds } from './visibleAccountGuids';
 
 /**
  * For some account types like Asset and Liabilities, we want to accumulate monthly
@@ -46,7 +47,7 @@ function aggregateWorth(
     aggregatedTotals[i][guid] = currentMonth.add(previousMonth);
   });
 
-  current.childrenIds.forEach(childId => {
+  visibleChildIds(accounts, current).forEach(childId => {
     aggregateWorth(childId, accounts, monthlyTotals, aggregatedTotals);
   });
 }
@@ -94,7 +95,7 @@ function aggregateTotals(
   const current = accounts[guid];
   aggregatedTotals[current.guid] = totals[current.guid] || new Money(0, current.commodity.mnemonic);
 
-  current.childrenIds.forEach((childId: string) => {
+  visibleChildIds(accounts, current).forEach((childId: string) => {
     aggregatedTotals[current.guid] = aggregatedTotals[current.guid].add(
       convert(
         aggregateTotals(childId, accounts, prices, selectedDate, totals, aggregatedTotals),
