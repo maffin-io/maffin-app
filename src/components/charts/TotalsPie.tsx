@@ -9,7 +9,7 @@ import {
   useMainCurrency,
   usePrices,
 } from '@/hooks/api';
-import mapAccounts from '@/helpers/mapAccounts';
+import visibleAccountGuids from '@/helpers/visibleAccountGuids';
 import { useInterval } from '@/hooks/state';
 import { moneyToString, toFixed } from '@/helpers/number';
 
@@ -36,13 +36,10 @@ export default function TotalsPie({
   const { data: prices } = usePrices({});
   const unit = currency?.mnemonic || '';
 
-  const visibleGuids = React.useMemo(() => {
-    if (!accounts) {
-      return guids;
-    }
-    const accountsMap = mapAccounts(accounts);
-    return guids.filter(guid => !accountsMap[guid]?.hidden);
-  }, [guids, accounts]);
+  const visibleGuids = React.useMemo(
+    () => visibleAccountGuids(guids, accounts),
+    [guids, accounts],
+  );
 
   const data = React.useMemo(() => {
     if (!accounts || !prices || !currency || !totals) {
