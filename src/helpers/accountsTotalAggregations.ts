@@ -47,6 +47,9 @@ function aggregateWorth(
   });
 
   current.childrenIds.forEach(childId => {
+    if (accounts[childId]?.hidden) {
+      return;
+    }
     aggregateWorth(childId, accounts, monthlyTotals, aggregatedTotals);
   });
 }
@@ -95,6 +98,9 @@ function aggregateTotals(
   aggregatedTotals[current.guid] = totals[current.guid] || new Money(0, current.commodity.mnemonic);
 
   current.childrenIds.forEach((childId: string) => {
+    if (accounts[childId]?.hidden) {
+      return;
+    }
     aggregatedTotals[current.guid] = aggregatedTotals[current.guid].add(
       convert(
         aggregateTotals(childId, accounts, prices, selectedDate, totals, aggregatedTotals),

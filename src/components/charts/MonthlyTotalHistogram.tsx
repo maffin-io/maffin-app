@@ -4,6 +4,7 @@ import type { ChartDataset } from 'chart.js';
 import Bar from '@/components/charts/Bar';
 import type { Account } from '@/book/entities';
 import { useAccounts, useMonthlyTotals, useMainCurrency } from '@/hooks/api';
+import mapAccounts from '@/helpers/mapAccounts';
 import { moneyToString } from '@/helpers/number';
 import { useInterval } from '@/hooks/state';
 import { intervalToDates } from '@/helpers/dates';
@@ -24,10 +25,18 @@ export default function MonthlyTotalHistogram({
   const { data: currency } = useMainCurrency();
   const unit = currency?.mnemonic || '';
 
+  const visibleGuids = React.useMemo(() => {
+    if (!accounts) {
+      return guids;
+    }
+    const accountsMap = mapAccounts(accounts);
+    return guids.filter(guid => !accountsMap[guid]?.hidden);
+  }, [guids, accounts]);
+
   const datasets: ChartDataset<'bar'>[] = [];
 
   if (accounts && monthlyTotals) {
-    guids.forEach(guid => {
+    visibleGuids.forEach(guid => {
       const data = monthlyTotals.map(m => m[guid]?.toNumber() || 0);
       if (!data.every(v => v === 0)) {
         datasets.push({

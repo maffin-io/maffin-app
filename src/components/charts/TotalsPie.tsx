@@ -9,6 +9,7 @@ import {
   useMainCurrency,
   usePrices,
 } from '@/hooks/api';
+import mapAccounts from '@/helpers/mapAccounts';
 import { useInterval } from '@/hooks/state';
 import { moneyToString, toFixed } from '@/helpers/number';
 
@@ -35,12 +36,20 @@ export default function TotalsPie({
   const { data: prices } = usePrices({});
   const unit = currency?.mnemonic || '';
 
+  const visibleGuids = React.useMemo(() => {
+    if (!accounts) {
+      return guids;
+    }
+    const accountsMap = mapAccounts(accounts);
+    return guids.filter(guid => !accountsMap[guid]?.hidden);
+  }, [guids, accounts]);
+
   const data = React.useMemo(() => {
     if (!accounts || !prices || !currency || !totals) {
       return [];
     }
 
-    return guids.map(guid => {
+    return visibleGuids.map(guid => {
       let total = totals?.[guid] || new Money(0, unit);
       const account = accounts?.find(a => a.guid === guid);
       if (account && currency && account.commodity.guid !== currency?.guid) {
@@ -48,13 +57,13 @@ export default function TotalsPie({
       }
       return total;
     });
-  }, [guids, currency, totals, unit, accounts, prices, interval.end]);
+  }, [visibleGuids, currency, totals, unit, accounts, prices, interval.end]);
 
   const total = data.reduce(
     (t, d) => t.add(d),
     new Money(0, unit),
   );
-  const labels = guids.map(guid => accounts?.find(a => a.guid === guid)?.name || '');
+  const labels = visibleGuids.map(guid => accounts?.find(a => a.guid === guid)?.name || '');
 
   return (
     <>
