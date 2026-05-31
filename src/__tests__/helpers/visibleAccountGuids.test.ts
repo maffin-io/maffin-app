@@ -35,6 +35,11 @@ describe('visibleAccountGuids', () => {
     expect(visibleAccountGuids(['visible', 'hidden'], accounts)).toEqual(['visible']);
   });
 
+  it('includes explicitly requested hidden account guids', () => {
+    expect(visibleAccountGuids(['visible', 'hidden'], accounts, ['hidden'])).toEqual(['visible', 'hidden']);
+    expect(visibleAccountGuids(['hidden'], accounts, ['hidden'])).toEqual(['hidden']);
+  });
+
   it('returns visible child ids', () => {
     const accountsMap = mapAccounts(accounts);
 

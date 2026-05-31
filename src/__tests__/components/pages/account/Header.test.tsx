@@ -135,7 +135,7 @@ describe('Header', () => {
       commodity: {
         mnemonic: 'EUR',
       },
-      childrenIds: [] as String[]
+      childrenIds: [] as String[],
     } as Account;
 
     jest.spyOn(apiHook, 'useAccount').mockReturnValueOnce({
@@ -157,8 +157,8 @@ describe('Header', () => {
         mnemonic: 'EUR',
       },
       childrenIds: [
-        "child_guid"
-      ]
+        'child_guid',
+      ],
     } as Account;
 
     render(<Header account={account} />);
@@ -185,7 +185,7 @@ describe('Header', () => {
       commodity: {
         mnemonic: 'EUR',
       },
-      childrenIds: [] as String[]
+      childrenIds: [] as String[],
     } as Account;
 
     jest.spyOn(apiHook, 'useSplitsPagination').mockReturnValueOnce({

@@ -47,8 +47,14 @@ function aggregateWorth(
     aggregatedTotals[i][guid] = currentMonth.add(previousMonth);
   });
 
-  visibleChildIds(accounts, current).forEach(childId => {
+  visibleChildIds(accounts, current).forEach((childId: string) => {
     aggregateWorth(childId, accounts, monthlyTotals, aggregatedTotals);
+  });
+
+  current.childrenIds.forEach((childId: string) => {
+    if (accounts[childId]?.hidden) {
+      aggregateWorth(childId, accounts, monthlyTotals, aggregatedTotals);
+    }
   });
 }
 
@@ -105,6 +111,12 @@ function aggregateTotals(
         selectedDate,
       ),
     );
+  });
+
+  current.childrenIds.forEach((childId: string) => {
+    if (accounts[childId]?.hidden) {
+      aggregateTotals(childId, accounts, prices, selectedDate, totals, aggregatedTotals);
+    }
   });
 
   // This is kind of a hack to be able to access root asset/liability
