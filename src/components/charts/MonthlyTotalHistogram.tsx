@@ -12,11 +12,13 @@ import { intervalToDates } from '@/helpers/dates';
 export type MonthlyTotalHistogramProps = {
   title?: string,
   guids: string[],
+  includeHiddenGuids?: string[],
 };
 
 export default function MonthlyTotalHistogram({
   title,
   guids = [],
+  includeHiddenGuids = [],
 }: MonthlyTotalHistogramProps): React.JSX.Element {
   const { data: interval } = useInterval();
   const { data: monthlyTotals } = useMonthlyTotals(interval);
@@ -26,8 +28,8 @@ export default function MonthlyTotalHistogram({
   const unit = currency?.mnemonic || '';
 
   const visibleGuids = React.useMemo(
-    () => visibleAccountGuids(guids, accounts),
-    [guids, accounts],
+    () => visibleAccountGuids(guids, accounts, includeHiddenGuids),
+    [guids, accounts, includeHiddenGuids],
   );
 
   const datasets: ChartDataset<'bar'>[] = [];

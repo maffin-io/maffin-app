@@ -425,7 +425,7 @@ describe('accountsTotalAggregations', () => {
 
       expect(aggregatedTotals.type_income.toString()).toEqual('300 EUR');
       expect(aggregatedTotals.a3.toString()).toEqual('300 EUR');
-      expect(aggregatedTotals.a6).toBeUndefined();
+      expect(aggregatedTotals.a6.toString()).toEqual('200 EUR');
     });
 
     it('excludes hidden expense children from type totals', () => {
@@ -465,7 +465,7 @@ describe('accountsTotalAggregations', () => {
   });
 
   describe('aggregateMonthlyWorth with hidden accounts', () => {
-    it('does not accumulate totals for hidden accounts', () => {
+    it('excludes hidden children from parent but keeps direct totals', () => {
       accounts[1].childrenIds = ['a5', 'a6'];
       accounts = [
         ...accounts,
@@ -495,8 +495,10 @@ describe('accountsTotalAggregations', () => {
 
       expect(aggregated[0].a5.toString()).toEqual('100 EUR');
       expect(aggregated[1].a5.toString()).toEqual('300 EUR');
-      expect(aggregated[0].a6).toBeUndefined();
-      expect(aggregated[1].a6).toBeUndefined();
+      expect(aggregated[0].a6.toString()).toEqual('50 EUR');
+      expect(aggregated[1].a6.toString()).toEqual('100 EUR');
+      expect(aggregated[0].a1.toString()).toEqual('0 EUR');
+      expect(aggregated[1].a1.toString()).toEqual('0 EUR');
     });
   });
 });
