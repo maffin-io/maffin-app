@@ -17,7 +17,7 @@ import {
   AccountTypeSelector,
 } from '@/components/selectors';
 import { useMainCurrency } from '@/hooks/api';
-import { getAllowedSubAccounts } from '@/book/helpers/accountType';
+import { getAllowedSubAccounts, isAsset, isLiability } from '@/book/helpers/accountType';
 import { toAmountWithScale } from '@/helpers/number';
 import createEquityAccount from '@/lib/createEquityAccount';
 import type { FormValues } from '@/components/forms/account/types';
@@ -43,11 +43,15 @@ export default function AccountForm({
   defaultValues = {},
   onSave = () => {},
   hideDefaults = false,
-}: AccountFormProps): JSX.Element {
+}: AccountFormProps): React.JSX.Element {
   const { data: mainCurrency } = useMainCurrency();
   defaultValues.fk_commodity = defaultValues?.fk_commodity || mainCurrency;
   const form = useForm<FormValues>({
-    defaultValues,
+    defaultValues: {
+      report: true,
+      hidden: false,
+      ...defaultValues,
+    },
     mode: 'onChange',
     resolver,
   });
@@ -61,6 +65,12 @@ export default function AccountForm({
     && Account.TYPES.filter(type => !getAllowedSubAccounts(parent.type).includes(type))
   ) || [];
   const type = form.watch('type');
+  const showReport = action !== 'add' && !!type && (
+    type === 'INCOME'
+    || type === 'EXPENSE'
+    || isAsset(type)
+    || isLiability(type)
+  );
 
   return (
     <form onSubmit={form.handleSubmit((data) => onSubmit(data, action, onSave))}>
@@ -79,7 +89,7 @@ export default function AccountForm({
 
         <fieldset
           className={classNames(
-            'col-start-8 col-span-2',
+            'col-span-2',
             {
               hidden: action === 'add',
             },
@@ -110,8 +120,44 @@ export default function AccountForm({
 
         <fieldset
           className={classNames(
-            'col-start-10 col-span-2',
+            'col-span-2',
             {
+              hidden: !showReport,
+            },
+          )}
+        >
+          <label htmlFor="reportInput" className="inline-block mb-2">Report</label>
+          <span
+            className="badge ml-0.5"
+            data-tooltip-id="report-help"
+          >
+            ?
+          </span>
+          <Tooltip
+            id="report-help"
+          >
+            <p>
+              {
+                (type === 'INCOME' || type === 'EXPENSE')
+                  ? 'When unchecked, this account is left out of PDF reports. It still appears in the accounts list and counts toward parent totals.'
+                  : 'When unchecked, this account is hidden from the accounts list and its balance is not included in net worth or parent totals.'
+              }
+            </p>
+          </Tooltip>
+          <input
+            id="reportInput"
+            disabled={disabled}
+            className="block m-0"
+            {...form.register('report')}
+            type="checkbox"
+          />
+        </fieldset>
+
+        <fieldset
+          className={classNames(
+            'col-span-2',
+            {
+              'col-start-11': !showReport,
               hidden: hideDefaults && 'placeholder' in defaultValues,
             },
           )}

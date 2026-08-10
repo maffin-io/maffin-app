@@ -34,7 +34,7 @@ export default function Table<T extends object = {}>(
     isExpanded = false,
     ...props
   }: TableProps<T>,
-): JSX.Element {
+): React.JSX.Element {
   const tableConfig: TableOptions<T> = {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),

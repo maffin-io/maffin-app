@@ -40,7 +40,7 @@ export default async function getMonthlyTotals(
     rows.filter(r => r.date === date.toFormat('yyyy-MM')).forEach(row => {
       const account = accountsMap[row.accountId];
       totals[row.accountId] = new Money(
-        account.type !== 'INCOME' ? row.total : -row.total,
+        ['INCOME', 'EQUITY'].includes(account.type) ? Math.abs(row.total) : row.total,
         account.commodity.mnemonic,
       );
     });

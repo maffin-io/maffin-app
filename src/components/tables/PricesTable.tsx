@@ -16,7 +16,7 @@ export type PricesTableProps = {
 
 export default function PricesTable({
   prices,
-}: PricesTableProps): JSX.Element {
+}: PricesTableProps): React.JSX.Element {
   return (
     <Table<Price>
       id="prices-table"

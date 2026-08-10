@@ -161,7 +161,7 @@ describe('AssetSankey', () => {
           ],
         },
       },
-      {},
+      undefined,
     );
 
     const { colorTo, colorFrom } = (Sankey as jest.Mock).mock.calls[0][0].data.datasets[0];

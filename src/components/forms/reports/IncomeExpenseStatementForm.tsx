@@ -15,7 +15,7 @@ type FormValues = {
   interval?: Interval;
 };
 
-export default function IncomeExpenseStatementForm(): JSX.Element {
+export default function IncomeExpenseStatementForm(): React.JSX.Element {
   const { data: interval } = useInterval();
   const form = useForm<FormValues>({
     defaultValues: {
@@ -26,7 +26,8 @@ export default function IncomeExpenseStatementForm(): JSX.Element {
   const i = form.watch('interval');
 
   const { data: accounts } = useAccounts();
-  const { data: totals } = useIncomeStatement(i);
+  // Raw totals — the PDF re-aggregates using the report flag
+  const { data: totals } = useIncomeStatement(i, data => data);
 
   return (
     <form

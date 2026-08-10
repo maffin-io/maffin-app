@@ -134,7 +134,7 @@ describe('NetWorthHistogram', () => {
           },
         },
       },
-      {},
+      undefined,
     );
 
     const { plugins } = (Bar as jest.Mock).mock.calls[0][0].options;
@@ -289,7 +289,7 @@ describe('NetWorthHistogram', () => {
           },
         },
       },
-      {},
+      undefined,
     );
   });
 
@@ -315,7 +315,7 @@ describe('NetWorthHistogram', () => {
           ],
         }),
       }),
-      {},
+      undefined,
     );
   });
 
@@ -341,7 +341,7 @@ describe('NetWorthHistogram', () => {
           ],
         }),
       }),
-      {},
+      undefined,
     );
   });
 
@@ -417,7 +417,7 @@ describe('NetWorthHistogram', () => {
           ],
         },
       }),
-      {},
+      undefined,
     );
   });
 });

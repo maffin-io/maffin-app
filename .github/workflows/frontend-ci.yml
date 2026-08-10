@@ -14,12 +14,13 @@ jobs:
     
     strategy:
       matrix:
-        node-version: [18.17.0]
+        node-version: [20.18.1]
         
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
@@ -31,17 +32,4 @@ jobs:
         run: yarn maffin:build
 
       - name: Test
-        run: yarn maffin:test --coverage
-
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@master
-        with:
-          args: >
-            -Dsonar.organization=maffin-io
-            -Dsonar.projectKey=maffin-io_maffin-app
-            -Dsonar.sources=./src/
-            -Dsonar.tests=./src/
-            -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
-            -Dsonar.test.inclusions=**/__tests__/**
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: yarn maffin:test

@@ -168,7 +168,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                     />
                   </svg>
                   <div
-                    class="selector__value-container css-1fdsijx-ValueContainer"
+                    class="selector__value-container css-hlgwow"
                   >
                     <div
                       class="selector__placeholder css-1jqq78o-placeholder"
@@ -177,7 +177,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                       &lt;Choose an account&gt;
                     </div>
                     <div
-                      class="!text-inherit selector__input-container css-qbdosj-Input"
+                      class="!text-inherit selector__input-container css-19bb58m"
                       data-value=""
                     >
                       <input
@@ -202,7 +202,7 @@ exports[`TransactionForm renders as expected with action add 1`] = `
                     </div>
                   </div>
                   <div
-                    class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+                    class="selector__indicators css-1wy0on6"
                   >
                     <span
                       class="hidden selector__indicator-separator css-1u9des2-indicatorSeparator"
@@ -491,7 +491,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                     />
                   </svg>
                   <div
-                    class="selector__value-container selector__value-container--has-value css-1fdsijx-ValueContainer"
+                    class="selector__value-container selector__value-container--has-value css-hlgwow"
                   >
                     <div
                       class="!text-inherit selector__single-value selector__single-value--is-disabled css-olqui2-singleValue"
@@ -499,7 +499,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                       Expenses:random
                     </div>
                     <div
-                      class="!text-inherit selector__input-container css-1h01tm3-Input"
+                      class="!text-inherit selector__input-container css-1mkvw8y"
                       data-value=""
                     >
                       <input
@@ -524,7 +524,7 @@ exports[`TransactionForm renders as expected with action delete 1`] = `
                     </div>
                   </div>
                   <div
-                    class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+                    class="selector__indicators css-1wy0on6"
                   >
                     <span
                       class="hidden selector__indicator-separator css-894a34-indicatorSeparator"
@@ -729,7 +729,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                     />
                   </svg>
                   <div
-                    class="selector__value-container selector__value-container--has-value css-1fdsijx-ValueContainer"
+                    class="selector__value-container selector__value-container--has-value css-hlgwow"
                   >
                     <div
                       class="!text-inherit selector__single-value css-1dimb5e-singleValue"
@@ -737,7 +737,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                       Assets:asset1
                     </div>
                     <div
-                      class="!text-inherit selector__input-container css-qbdosj-Input"
+                      class="!text-inherit selector__input-container css-19bb58m"
                       data-value=""
                     >
                       <input
@@ -761,7 +761,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                     </div>
                   </div>
                   <div
-                    class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+                    class="selector__indicators css-1wy0on6"
                   >
                     <span
                       class="hidden selector__indicator-separator css-1u9des2-indicatorSeparator"
@@ -884,7 +884,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                     />
                   </svg>
                   <div
-                    class="selector__value-container selector__value-container--has-value css-1fdsijx-ValueContainer"
+                    class="selector__value-container selector__value-container--has-value css-hlgwow"
                   >
                     <div
                       class="!text-inherit selector__single-value css-1dimb5e-singleValue"
@@ -892,7 +892,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                       Expenses:random
                     </div>
                     <div
-                      class="!text-inherit selector__input-container css-qbdosj-Input"
+                      class="!text-inherit selector__input-container css-19bb58m"
                       data-value=""
                     >
                       <input
@@ -916,7 +916,7 @@ exports[`TransactionForm renders as expected with action update 1`] = `
                     </div>
                   </div>
                   <div
-                    class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+                    class="selector__indicators css-1wy0on6"
                   >
                     <span
                       class="hidden selector__indicator-separator css-1u9des2-indicatorSeparator"

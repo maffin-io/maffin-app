@@ -52,8 +52,11 @@ describe('FormButton', () => {
         triggerProps: { className: 'btn btn-primary' },
         triggerContent: expect.anything(),
         children: expect.anything(),
+        ref: {
+          current: null,
+        },
       },
-      {},
+      undefined,
     );
   });
 });
@@ -62,6 +65,6 @@ function TestComponent({
   onSave = () => {},
 }: {
   onSave?: Function,
-}): JSX.Element {
+}): React.JSX.Element {
   return <button onClick={() => onSave()} type="button">submit form</button>;
 }

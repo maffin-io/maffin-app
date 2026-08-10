@@ -85,13 +85,13 @@ describe('CommoditiesPage', () => {
         modalTitle: 'Add commodity',
         id: 'add-commodity',
       }),
-      {},
+      undefined,
     );
     expect(CommodityForm).toBeCalledWith(
       {
         onSave: expect.any(Function),
       },
-      {},
+      undefined,
     );
     expect(container).toMatchSnapshot();
   });

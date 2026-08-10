@@ -10,7 +10,7 @@ import { Actions } from '@/app/actions';
 
 export default function Provider({
   children,
-}: React.PropsWithChildren): JSX.Element {
+}: React.PropsWithChildren): React.JSX.Element {
   return (
     <Auth0Provider
       domain={process.env.NEXT_PUBLIC_AUTH0_DOMAIN as string}
@@ -29,7 +29,7 @@ export default function Provider({
 
 function AccessTokenActionProvider({
   children,
-}: React.PropsWithChildren): JSX.Element {
+}: React.PropsWithChildren): React.JSX.Element {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
   React.useEffect(() => {

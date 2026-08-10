@@ -30,7 +30,7 @@ export default function PriceForm({
   defaultValues,
   onSave = () => {},
   hideDefaults = false,
-}: PriceFormProps): JSX.Element {
+}: PriceFormProps): React.JSX.Element {
   const form = useForm<FormValues>({
     defaultValues,
     mode: 'onChange',

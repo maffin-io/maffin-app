@@ -13,7 +13,7 @@ export type WeightsChartProps = {
 export default function WeightsChart({
   accounts,
   totalValue,
-}: WeightsChartProps): JSX.Element {
+}: WeightsChartProps): React.JSX.Element {
   const { data: investments = [] } = useInvestments(
     data => data.filter(d => accounts.includes(d.account.guid)),
   );

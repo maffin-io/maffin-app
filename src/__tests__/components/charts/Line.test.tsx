@@ -29,7 +29,7 @@ describe('Line', () => {
         options: {},
         type: 'line',
       },
-      {},
+      undefined,
     );
   });
 
@@ -53,7 +53,7 @@ describe('Line', () => {
         },
         type: 'line',
       },
-      {},
+      undefined,
     );
   });
 });

@@ -14,7 +14,7 @@ export default function DateRangeInput({
   id,
   interval,
   onChange,
-}: DateRangeInputProps): JSX.Element {
+}: DateRangeInputProps): React.JSX.Element {
   const { data: earliestDate } = useStartDate();
   const [value, setValue] = React.useState(interval);
 
@@ -75,8 +75,8 @@ export default function DateRangeInput({
       onChange={(newValue) => {
         if (newValue) {
           const v = Interval.fromDateTimes(
-            DateTime.fromISO(newValue.startDate as string),
-            DateTime.fromISO(newValue.endDate as string).endOf('day'),
+            DateTime.fromJSDate(newValue.startDate as Date),
+            DateTime.fromJSDate(newValue.endDate as Date).endOf('day'),
           );
           setValue(v);
           onChange?.(v);

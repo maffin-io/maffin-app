@@ -9,6 +9,7 @@ import {
   useMainCurrency,
   usePrices,
 } from '@/hooks/api';
+import reportAccountGuids from '@/helpers/visibleAccountGuids';
 import { useInterval } from '@/hooks/state';
 import { moneyToString, toFixed } from '@/helpers/number';
 
@@ -26,7 +27,7 @@ export default function TotalsPie({
   backgroundColor,
   showTooltip = false,
   showDataLabels = true,
-}: TotalsPieProps): JSX.Element {
+}: TotalsPieProps): React.JSX.Element {
   const { data: interval } = useInterval();
   const { data: totals } = useAccountsTotals();
   const { data: accounts } = useAccounts();
@@ -35,12 +36,17 @@ export default function TotalsPie({
   const { data: prices } = usePrices({});
   const unit = currency?.mnemonic || '';
 
+  const reportGuids = React.useMemo(
+    () => reportAccountGuids(guids, accounts),
+    [guids, accounts],
+  );
+
   const data = React.useMemo(() => {
     if (!accounts || !prices || !currency || !totals) {
       return [];
     }
 
-    return guids.map(guid => {
+    return reportGuids.map(guid => {
       let total = totals?.[guid] || new Money(0, unit);
       const account = accounts?.find(a => a.guid === guid);
       if (account && currency && account.commodity.guid !== currency?.guid) {
@@ -48,13 +54,13 @@ export default function TotalsPie({
       }
       return total;
     });
-  }, [guids, currency, totals, unit, accounts, prices, interval.end]);
+  }, [reportGuids, currency, totals, unit, accounts, prices, interval.end]);
 
   const total = data.reduce(
     (t, d) => t.add(d),
     new Money(0, unit),
   );
-  const labels = guids.map(guid => accounts?.find(a => a.guid === guid)?.name || '');
+  const labels = reportGuids.map(guid => accounts?.find(a => a.guid === guid)?.name || '');
 
   return (
     <>
@@ -93,6 +99,10 @@ export default function TotalsPie({
                 `${labels[context.dataIndex]}\n${moneyToString(value, unit)}`
               ),
               padding: 6,
+            },
+            autocolors: {
+              mode: 'data',
+              enabled: (backgroundColor?.length || 0) === 0,
             },
           },
         }}

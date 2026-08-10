@@ -12,7 +12,7 @@ export type TotalWidgetProps = {
 
 export default function TotalWidget({
   account,
-}: TotalWidgetProps): JSX.Element {
+}: TotalWidgetProps): React.JSX.Element {
   const { data: t0 } = useAccountsTotals();
   const total0 = t0?.[account.guid] || new Money(0, account.commodity.mnemonic);
 

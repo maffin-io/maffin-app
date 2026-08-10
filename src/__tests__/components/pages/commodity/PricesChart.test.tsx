@@ -83,7 +83,7 @@ describe('PricesChart', () => {
           },
         },
       },
-      {},
+      undefined,
     );
   });
 });

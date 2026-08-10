@@ -21,7 +21,7 @@ export type MainSplitProps = {
 export default function MainSplit({
   form,
   disabled = false,
-}: MainSplitProps): JSX.Element {
+}: MainSplitProps): React.JSX.Element {
   const account = form.getValues('splits.0.fk_account') as Account;
   const date = form.watch('date');
   const txCurrency = form.watch('fk_currency');

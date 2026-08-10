@@ -35,7 +35,7 @@ describe('Sankey', () => {
         },
         type: 'sankey',
       },
-      {},
+      undefined,
     );
   });
 });

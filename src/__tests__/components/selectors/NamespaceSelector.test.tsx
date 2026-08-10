@@ -31,7 +31,7 @@ describe('NamespaceSelector', () => {
         getOptionValue: expect.any(Function),
         onChange: expect.any(Function),
       },
-      {},
+      undefined,
     );
 
     expect((Selector as jest.Mock).mock.calls[0][0].getOptionLabel({ namespace: 'n' })).toEqual('n');

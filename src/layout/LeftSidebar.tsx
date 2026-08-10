@@ -7,7 +7,7 @@ import Logo from '@/assets/images/logo-image.png';
 import Modal from '@/components/ui/Modal';
 import Menu from './Menu';
 
-export default function LeftSideBar(): JSX.Element {
+export default function LeftSideBar(): React.JSX.Element {
   return (
     <div>
       <div className="fixed flex bg-background-700 justify-center h-20 w-20 md:hidden z-10">
