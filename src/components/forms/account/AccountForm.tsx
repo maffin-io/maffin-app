@@ -17,7 +17,7 @@ import {
   AccountTypeSelector,
 } from '@/components/selectors';
 import { useMainCurrency } from '@/hooks/api';
-import { getAllowedSubAccounts } from '@/book/helpers/accountType';
+import { getAllowedSubAccounts, isAsset, isLiability } from '@/book/helpers/accountType';
 import { toAmountWithScale } from '@/helpers/number';
 import createEquityAccount from '@/lib/createEquityAccount';
 import type { FormValues } from '@/components/forms/account/types';
@@ -65,7 +65,12 @@ export default function AccountForm({
     && Account.TYPES.filter(type => !getAllowedSubAccounts(parent.type).includes(type))
   ) || [];
   const type = form.watch('type');
-  const showReport = action !== 'add' && (type === 'INCOME' || type === 'EXPENSE');
+  const showReport = action !== 'add' && !!type && (
+    type === 'INCOME'
+    || type === 'EXPENSE'
+    || isAsset(type)
+    || isLiability(type)
+  );
 
   return (
     <form onSubmit={form.handleSubmit((data) => onSubmit(data, action, onSave))}>
@@ -132,7 +137,11 @@ export default function AccountForm({
             id="report-help"
           >
             <p>
-              Include this account in PDF reports.
+              {
+                (type === 'INCOME' || type === 'EXPENSE')
+                  ? 'When unchecked, this account is left out of PDF reports. It still appears in the accounts list and counts toward parent totals.'
+                  : 'When unchecked, this account is hidden from the accounts list and its balance is not included in net worth or parent totals.'
+              }
             </p>
           </Tooltip>
           <input

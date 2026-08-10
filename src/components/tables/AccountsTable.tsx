@@ -11,6 +11,7 @@ import { useAccounts, useAccountsTotals } from '@/hooks/api';
 import mapAccounts from '@/helpers/mapAccounts';
 import { accountColorCode } from '@/helpers/classNames';
 import getAccountsTree from '@/lib/getAccountsTree';
+import { isVisibleInAccountsTree } from '@/helpers/visibleAccountGuids';
 
 export type AccountsTableProps = {
   guids: string[],
@@ -29,7 +30,7 @@ export default function AccountsTable(
   const accounts = mapAccounts(data);
   const trees: AccountsTableRow[] = [];
   guids.forEach(guid => {
-    if (accounts[guid] && !accounts[guid].hidden) {
+    if (accounts[guid] && isVisibleInAccountsTree(accounts[guid])) {
       trees.push(getAccountsTree(
         accounts[guid],
         accounts,

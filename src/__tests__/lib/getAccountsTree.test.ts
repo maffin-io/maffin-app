@@ -156,6 +156,60 @@ describe('getAccountsTree', () => {
     });
   });
 
+  it('ignores non-report asset accounts by default', () => {
+    const accounts = mapAccounts([
+      {
+        guid: 'root',
+        name: 'Root',
+        type: 'ROOT',
+        childrenIds: ['a1', 'a2', 'a3'],
+      } as Account,
+      {
+        guid: 'a1',
+        name: 'Bank',
+        commodity: {
+          mnemonic: 'EUR',
+        },
+        type: 'ASSET',
+        parentId: 'root',
+        childrenIds: [] as string[],
+        report: true,
+      },
+      {
+        guid: 'a2',
+        name: 'Static',
+        commodity: {
+          mnemonic: 'EUR',
+        },
+        type: 'ASSET',
+        parentId: 'root',
+        childrenIds: [] as string[],
+        report: false,
+      },
+      {
+        guid: 'a3',
+        name: 'Private income',
+        commodity: {
+          mnemonic: 'EUR',
+        },
+        type: 'INCOME',
+        parentId: 'root',
+        childrenIds: [] as string[],
+        report: false,
+      },
+    ] as Account[]);
+
+    const totals = {
+      a1: new Money(300, 'EUR'),
+      a2: new Money(100, 'EUR'),
+      a3: new Money(50, 'EUR'),
+    } as AccountsTotals;
+
+    const tree = getAccountsTree(accounts.root, accounts, totals);
+
+    expect(tree.leaves.map(leaf => leaf.account.guid)).toEqual(['a1', 'a3']);
+  });
+
   it('ignores non-report accounts when shouldInclude uses report flag', () => {
     const accounts = mapAccounts([
       {

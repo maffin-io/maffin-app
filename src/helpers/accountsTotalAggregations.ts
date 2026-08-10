@@ -5,24 +5,23 @@ import { Account } from '@/book/entities';
 import type { AccountsTotals, AccountsMap } from '@/types/book';
 import type { PriceDBMap } from '@/book/prices';
 import mapAccounts from './mapAccounts';
+import { totalsChildIds } from './visibleAccountGuids';
 
 export type ChildIdsFn = (accounts: AccountsMap, parent: Account) => string[];
 
 export type AggregateChildrenOptions = {
   /**
    * Which children to roll into the parent total.
-   * Defaults to all children. Reports pass reportChildIds to skip
-   * accounts with report=false.
+   * Defaults to totalsChildIds (IE always included; assets/liabilities
+   * respect the report flag).
    */
   getChildIds?: ChildIdsFn,
   /**
    * When true, children excluded from the rollup still get their own totals
-   * computed. Reports set this to false.
+   * computed (so account detail pages still work).
    */
   keepExcludedTotals?: boolean,
 };
-
-const allChildIds: ChildIdsFn = (_accounts, parent) => parent.childrenIds;
 
 /**
  * For some account types like Asset and Liabilities, we want to accumulate monthly
@@ -85,8 +84,8 @@ export function aggregateChildrenTotals(
   options: AggregateChildrenOptions = {},
 ): AccountsTotals {
   const {
-    getChildIds = allChildIds,
-    keepExcludedTotals = false,
+    getChildIds = totalsChildIds,
+    keepExcludedTotals = true,
   } = options;
   const accountsMap = mapAccounts(accounts);
   const aggregatedTotals: AccountsTotals = {};
