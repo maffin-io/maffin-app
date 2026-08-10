@@ -52,4 +52,38 @@ describe('getTransactionsReport', () => {
     });
     expect(txs).toEqual([incomeTx, expenseTx]);
   });
+
+  it('excludes income/expense accounts with report disabled', async () => {
+    const reportableTx = {
+      guid: 'tx1',
+      splits: [
+        { account: { type: 'EXPENSE', report: true } },
+        { account: { type: 'ASSET' } },
+      ],
+    } as Transaction;
+    const nonReportTx = {
+      guid: 'tx2',
+      splits: [
+        { account: { type: 'EXPENSE', report: false } },
+        { account: { type: 'ASSET' } },
+      ],
+    } as Transaction;
+    const hiddenButReportableTx = {
+      guid: 'tx3',
+      splits: [
+        { account: { type: 'INCOME', report: true, hidden: true } },
+        { account: { type: 'ASSET' } },
+      ],
+    } as Transaction;
+
+    jest.spyOn(Transaction, 'find').mockResolvedValue([
+      reportableTx,
+      nonReportTx,
+      hiddenButReportableTx,
+    ]);
+
+    const txs = await getTransactionsReport(TEST_INTERVAL);
+
+    expect(txs).toEqual([reportableTx, hiddenButReportableTx]);
+  });
 });

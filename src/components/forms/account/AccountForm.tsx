@@ -47,7 +47,11 @@ export default function AccountForm({
   const { data: mainCurrency } = useMainCurrency();
   defaultValues.fk_commodity = defaultValues?.fk_commodity || mainCurrency;
   const form = useForm<FormValues>({
-    defaultValues,
+    defaultValues: {
+      report: true,
+      hidden: false,
+      ...defaultValues,
+    },
     mode: 'onChange',
     resolver,
   });
@@ -79,7 +83,7 @@ export default function AccountForm({
 
         <fieldset
           className={classNames(
-            'col-start-8 col-span-2',
+            'col-span-2',
             {
               hidden: action === 'add',
             },
@@ -110,8 +114,40 @@ export default function AccountForm({
 
         <fieldset
           className={classNames(
-            'col-start-10 col-span-2',
+            'col-span-2',
             {
+              hidden: action === 'add',
+            },
+          )}
+        >
+          <label htmlFor="reportInput" className="inline-block mb-2">Report</label>
+          <span
+            className="badge ml-0.5"
+            data-tooltip-id="report-help"
+          >
+            ?
+          </span>
+          <Tooltip
+            id="report-help"
+          >
+            <p>
+              Include this account in PDF reports.
+            </p>
+          </Tooltip>
+          <input
+            id="reportInput"
+            disabled={disabled}
+            className="block m-0"
+            {...form.register('report')}
+            type="checkbox"
+          />
+        </fieldset>
+
+        <fieldset
+          className={classNames(
+            'col-span-2',
+            {
+              'col-start-11': action === 'add',
               hidden: hideDefaults && 'placeholder' in defaultValues,
             },
           )}

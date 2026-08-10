@@ -8,16 +8,26 @@ export type AccountsTableRow = {
   leaves: AccountsTableRow[],
 };
 
+export type GetAccountsTreeOptions = {
+  /**
+   * Whether a child account should appear in the tree.
+   * Defaults to excluding hidden accounts (dashboard behavior).
+   */
+  shouldInclude?: (account: Account) => boolean,
+};
+
 export default function getAccountsTree(
   current: Account,
   accounts: AccountsMap,
   accountsTotal: { [guid: string]: Money },
+  options: GetAccountsTreeOptions = {},
 ): AccountsTableRow {
+  const { shouldInclude = (account: Account) => !account.hidden } = options;
   const leaves: AccountsTableRow[] = [];
   current.childrenIds.forEach(childId => {
     const childAccount = accounts[childId];
-    if (!childAccount.hidden && childAccount.parentId === current.guid) {
-      leaves.push(getAccountsTree(childAccount, accounts, accountsTotal));
+    if (shouldInclude(childAccount) && childAccount.parentId === current.guid) {
+      leaves.push(getAccountsTree(childAccount, accounts, accountsTotal, options));
     }
   });
 

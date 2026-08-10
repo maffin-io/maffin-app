@@ -7,6 +7,17 @@ import type { PriceDBMap } from '@/book/prices';
 import mapAccounts from './mapAccounts';
 import { visibleChildIds } from './visibleAccountGuids';
 
+export type ChildIdsFn = (accounts: AccountsMap, parent: Account) => string[];
+
+export type AggregateChildrenOptions = {
+  getChildIds?: ChildIdsFn,
+  /**
+   * When true, children excluded from the rollup still get their own totals
+   * computed (used for hidden accounts on the dashboard detail pages).
+   */
+  keepExcludedTotals?: boolean,
+};
+
 /**
  * For some account types like Asset and Liabilities, we want to accumulate monthly
  * net worth.
@@ -71,7 +82,12 @@ export function aggregateChildrenTotals(
   prices: PriceDBMap,
   selectedDate: DateTime,
   totals: AccountsTotals,
+  options: AggregateChildrenOptions = {},
 ): AccountsTotals {
+  const {
+    getChildIds = visibleChildIds,
+    keepExcludedTotals = true,
+  } = options;
   const accountsMap = mapAccounts(accounts);
   const aggregatedTotals: AccountsTotals = {};
   guids.forEach((guid: string) => {
@@ -83,6 +99,8 @@ export function aggregateChildrenTotals(
         selectedDate,
         totals,
         aggregatedTotals,
+        getChildIds,
+        keepExcludedTotals,
       );
     }
   });
@@ -97,14 +115,26 @@ function aggregateTotals(
   selectedDate: DateTime,
   totals: AccountsTotals,
   aggregatedTotals: AccountsTotals,
+  getChildIds: ChildIdsFn,
+  keepExcludedTotals: boolean,
 ): Money {
   const current = accounts[guid];
   aggregatedTotals[current.guid] = totals[current.guid] || new Money(0, current.commodity.mnemonic);
 
-  visibleChildIds(accounts, current).forEach((childId: string) => {
+  const includedChildIds = getChildIds(accounts, current);
+  includedChildIds.forEach((childId: string) => {
     aggregatedTotals[current.guid] = aggregatedTotals[current.guid].add(
       convert(
-        aggregateTotals(childId, accounts, prices, selectedDate, totals, aggregatedTotals),
+        aggregateTotals(
+          childId,
+          accounts,
+          prices,
+          selectedDate,
+          totals,
+          aggregatedTotals,
+          getChildIds,
+          keepExcludedTotals,
+        ),
         accounts[childId].commodity,
         current.commodity,
         prices,
@@ -113,11 +143,23 @@ function aggregateTotals(
     );
   });
 
-  current.childrenIds.forEach((childId: string) => {
-    if (accounts[childId]?.hidden) {
-      aggregateTotals(childId, accounts, prices, selectedDate, totals, aggregatedTotals);
-    }
-  });
+  if (keepExcludedTotals) {
+    const included = new Set(includedChildIds);
+    current.childrenIds.forEach((childId: string) => {
+      if (!included.has(childId)) {
+        aggregateTotals(
+          childId,
+          accounts,
+          prices,
+          selectedDate,
+          totals,
+          aggregatedTotals,
+          getChildIds,
+          keepExcludedTotals,
+        );
+      }
+    });
+  }
 
   // This is kind of a hack to be able to access root asset/liability
   // accounts for global networth, etc. We should find a better way.

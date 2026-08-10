@@ -77,7 +77,7 @@ function buildRows(transactions: Transaction[], type: 'INCOME' | 'EXPENSE'): Rep
 
   transactions.forEach(tx => {
     tx.splits
-      .filter(split => split.account.type === type)
+      .filter(split => split.account.type === type && split.account.report !== false)
       .forEach(split => {
         rows.push({
           guid: `${tx.guid}-${split.guid}`,

@@ -26,7 +26,8 @@ export default function IncomeExpenseStatementForm(): React.JSX.Element {
   const i = form.watch('interval');
 
   const { data: accounts } = useAccounts();
-  const { data: totals } = useIncomeStatement(i);
+  // Raw totals — the PDF re-aggregates using the report flag
+  const { data: totals } = useIncomeStatement(i, data => data);
 
   return (
     <form
