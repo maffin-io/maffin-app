@@ -391,7 +391,7 @@ describe('accountsTotalAggregations', () => {
       expect(totals.a5.toString()).toEqual('0 EUR');
     });
 
-    it('excludes hidden children from parent and type totals', () => {
+    it('includes hidden children in parent and type totals', () => {
       accounts[3].childrenIds = ['a5', 'a6'];
       accounts = [
         ...accounts,
@@ -424,12 +424,12 @@ describe('accountsTotalAggregations', () => {
         },
       );
 
-      expect(aggregatedTotals.type_income.toString()).toEqual('300 EUR');
-      expect(aggregatedTotals.a3.toString()).toEqual('300 EUR');
+      expect(aggregatedTotals.type_income.toString()).toEqual('500 EUR');
+      expect(aggregatedTotals.a3.toString()).toEqual('500 EUR');
       expect(aggregatedTotals.a6.toString()).toEqual('200 EUR');
     });
 
-    it('excludes hidden expense children from type totals', () => {
+    it('includes hidden expense children in type totals', () => {
       accounts[4].childrenIds = ['a5', 'a6'];
       accounts = [
         ...accounts,
@@ -461,7 +461,7 @@ describe('accountsTotalAggregations', () => {
         },
       );
 
-      expect(aggregatedTotals.type_expense.toString()).toEqual('100 EUR');
+      expect(aggregatedTotals.type_expense.toString()).toEqual('150 EUR');
     });
 
     it('excludes non-report children from parent totals when using reportChildIds', () => {
@@ -510,7 +510,7 @@ describe('accountsTotalAggregations', () => {
   });
 
   describe('aggregateMonthlyWorth with hidden accounts', () => {
-    it('excludes hidden children from parent but keeps direct totals', () => {
+    it('accumulates monthly totals for hidden accounts', () => {
       accounts[1].childrenIds = ['a5', 'a6'];
       accounts = [
         ...accounts,
