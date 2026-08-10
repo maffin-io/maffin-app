@@ -1,10 +1,14 @@
 import React from 'react';
 import { Interval } from 'luxon';
+import type { DateTime } from 'luxon';
 
 import type { Account } from '@/book/entities';
 import type { AccountsTotals } from '@/types/book';
 import getAccountsTree, { AccountsTableRow } from '@/lib/getAccountsTree';
 import mapAccounts from '@/helpers/mapAccounts';
+import { aggregateChildrenTotals } from '@/helpers/accountsTotalAggregations';
+import { isReportAccount, reportChildIds } from '@/helpers/visibleAccountGuids';
+import { PriceDBMap } from '@/book/prices';
 
 export type IncomeStatementProps = {
   interval: Interval;
@@ -26,11 +30,34 @@ export default async function IncomeExpenseStatement({
     Document,
   } = await import('@react-pdf/renderer');
 
+  const reportTotals = aggregateChildrenTotals(
+    ['type_income', 'type_expense'],
+    accounts,
+    new PriceDBMap(),
+    interval.end as DateTime,
+    totals,
+    {
+      getChildIds: reportChildIds,
+      keepExcludedTotals: false,
+    },
+  );
+
   const accountsMap = mapAccounts(accounts);
-  const expensesTree = getAccountsTree(accountsMap.type_expense, accountsMap, totals);
+  const treeOptions = { shouldInclude: isReportAccount };
+  const expensesTree = getAccountsTree(
+    accountsMap.type_expense,
+    accountsMap,
+    reportTotals,
+    treeOptions,
+  );
   const ExpensesTable = buildTable(expensesTree, View, Text);
 
-  const incomeTree = getAccountsTree(accountsMap.type_income, accountsMap, totals);
+  const incomeTree = getAccountsTree(
+    accountsMap.type_income,
+    accountsMap,
+    reportTotals,
+    treeOptions,
+  );
   const IncomeTable = buildTable(incomeTree, View, Text);
 
   return (

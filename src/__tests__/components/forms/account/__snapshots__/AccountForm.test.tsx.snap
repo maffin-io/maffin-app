@@ -26,7 +26,7 @@ exports[`AccountForm renders as expected with add 1`] = `
         />
       </fieldset>
       <fieldset
-        class="col-start-8 col-span-2 hidden"
+        class="col-span-2 hidden"
       >
         <label
           class="inline-block mb-2"
@@ -48,7 +48,29 @@ exports[`AccountForm renders as expected with add 1`] = `
         />
       </fieldset>
       <fieldset
-        class="col-start-10 col-span-2"
+        class="col-span-2 hidden"
+      >
+        <label
+          class="inline-block mb-2"
+          for="reportInput"
+        >
+          Report
+        </label>
+        <span
+          class="badge ml-0.5"
+          data-tooltip-id="report-help"
+        >
+          ?
+        </span>
+        <input
+          class="block m-0"
+          id="reportInput"
+          name="report"
+          type="checkbox"
+        />
+      </fieldset>
+      <fieldset
+        class="col-span-2 col-start-11"
       >
         <label
           class="inline-block mb-2"
@@ -521,7 +543,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
         />
       </fieldset>
       <fieldset
-        class="col-start-8 col-span-2"
+        class="col-span-2"
       >
         <label
           class="inline-block mb-2"
@@ -544,7 +566,30 @@ exports[`AccountForm renders as expected with delete 1`] = `
         />
       </fieldset>
       <fieldset
-        class="col-start-10 col-span-2"
+        class="col-span-2"
+      >
+        <label
+          class="inline-block mb-2"
+          for="reportInput"
+        >
+          Report
+        </label>
+        <span
+          class="badge ml-0.5"
+          data-tooltip-id="report-help"
+        >
+          ?
+        </span>
+        <input
+          class="block m-0"
+          disabled=""
+          id="reportInput"
+          name="report"
+          type="checkbox"
+        />
+      </fieldset>
+      <fieldset
+        class="col-span-2"
       >
         <label
           class="inline-block mb-2"
@@ -1013,7 +1058,7 @@ exports[`AccountForm renders as expected with update 1`] = `
         />
       </fieldset>
       <fieldset
-        class="col-start-8 col-span-2"
+        class="col-span-2"
       >
         <label
           class="inline-block mb-2"
@@ -1035,7 +1080,29 @@ exports[`AccountForm renders as expected with update 1`] = `
         />
       </fieldset>
       <fieldset
-        class="col-start-10 col-span-2"
+        class="col-span-2"
+      >
+        <label
+          class="inline-block mb-2"
+          for="reportInput"
+        >
+          Report
+        </label>
+        <span
+          class="badge ml-0.5"
+          data-tooltip-id="report-help"
+        >
+          ?
+        </span>
+        <input
+          class="block m-0"
+          id="reportInput"
+          name="report"
+          type="checkbox"
+        />
+      </fieldset>
+      <fieldset
+        class="col-span-2"
       >
         <label
           class="inline-block mb-2"

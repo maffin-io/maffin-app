@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 
 import { aggregateChildrenTotals, aggregateMonthlyWorth } from '@/helpers/accountsTotalAggregations';
+import { reportChildIds } from '@/helpers/visibleAccountGuids';
 import Money from '@/book/Money';
 import { PriceDBMap } from '@/book/prices';
 import { Price } from '@/book/entities';
@@ -461,6 +462,50 @@ describe('accountsTotalAggregations', () => {
       );
 
       expect(aggregatedTotals.type_expense.toString()).toEqual('100 EUR');
+    });
+
+    it('excludes non-report children from parent totals when using reportChildIds', () => {
+      accounts[3].childrenIds = ['a5', 'a6'];
+      accounts = [
+        ...accounts,
+        {
+          guid: 'a5',
+          type: 'INCOME',
+          commodity: eur,
+          parentId: 'a3',
+          childrenIds: [] as string[],
+          hidden: true,
+          report: true,
+        } as Account,
+        {
+          guid: 'a6',
+          type: 'INCOME',
+          commodity: eur,
+          parentId: 'a3',
+          childrenIds: [] as string[],
+          report: false,
+        } as Account,
+      ];
+
+      const aggregatedTotals = aggregateChildrenTotals(
+        ['type_income'],
+        accounts,
+        {} as PriceDBMap,
+        DateTime.now(),
+        {
+          a5: new Money(300, 'EUR'),
+          a6: new Money(200, 'EUR'),
+        },
+        {
+          getChildIds: reportChildIds,
+          keepExcludedTotals: false,
+        },
+      );
+
+      expect(aggregatedTotals.type_income.toString()).toEqual('300 EUR');
+      expect(aggregatedTotals.a3.toString()).toEqual('300 EUR');
+      expect(aggregatedTotals.a5.toString()).toEqual('300 EUR');
+      expect(aggregatedTotals.a6).toBeUndefined();
     });
   });
 

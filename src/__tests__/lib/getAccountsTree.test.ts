@@ -155,4 +155,92 @@ describe('getAccountsTree', () => {
       ],
     });
   });
+
+  it('ignores non-report accounts when shouldInclude uses report flag', () => {
+    const accounts = mapAccounts([
+      {
+        guid: 'root',
+        name: 'Root',
+        type: 'ROOT',
+        childrenIds: ['a1', 'a2'],
+      } as Account,
+      {
+        guid: 'a1',
+        name: 'Assets',
+        description: 'description',
+        commodity: {
+          mnemonic: 'EUR',
+        },
+        type: 'ASSET',
+        parentId: 'root',
+        childrenIds: [] as string[],
+        placeholder: true,
+        report: true,
+      },
+      {
+        guid: 'a2',
+        name: 'Salary',
+        commodity: {
+          mnemonic: 'EUR',
+        },
+        type: 'INCOME',
+        parentId: 'root',
+        childrenIds: [] as string[],
+        hidden: true,
+        report: false,
+      },
+    ] as Account[]);
+
+    const totals = {
+      a1: new Money(300, 'EUR'),
+      a2: new Money(100, 'EUR'),
+    } as AccountsTotals;
+
+    const tree = getAccountsTree(
+      accounts.root,
+      accounts,
+      totals,
+      { shouldInclude: account => account.report !== false },
+    );
+
+    expect(tree.leaves).toHaveLength(1);
+    expect(tree.leaves[0].account.guid).toEqual('a1');
+  });
+
+  it('includes hidden accounts in report trees when report is true', () => {
+    const accounts = mapAccounts([
+      {
+        guid: 'root',
+        name: 'Root',
+        type: 'ROOT',
+        childrenIds: ['a1'],
+      } as Account,
+      {
+        guid: 'a1',
+        name: 'Old salary',
+        commodity: {
+          mnemonic: 'EUR',
+        },
+        type: 'INCOME',
+        parentId: 'root',
+        childrenIds: [] as string[],
+        hidden: true,
+        report: true,
+      },
+    ] as Account[]);
+
+    const totals = {
+      a1: new Money(100, 'EUR'),
+    } as AccountsTotals;
+
+    const tree = getAccountsTree(
+      accounts.root,
+      accounts,
+      totals,
+      { shouldInclude: account => account.report !== false },
+    );
+
+    expect(tree.leaves).toHaveLength(1);
+    expect(tree.leaves[0].account.guid).toEqual('a1');
+  });
 });

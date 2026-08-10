@@ -30,7 +30,10 @@ export default async function getTransactionsReport(
 
   return txs.filter(
     tx => tx.splits.some(
-      split => split.account.type === 'INCOME' || split.account.type === 'EXPENSE',
+      split => (
+        (split.account.type === 'INCOME' || split.account.type === 'EXPENSE')
+        && split.account.report !== false
+      ),
     ),
   );
 }
