@@ -7,8 +7,8 @@ import { Controller, useForm } from 'react-hook-form';
 import DateRangeInput from '@/components/DateRangeInput';
 import { useInterval } from '@/hooks/state';
 import TransactionReport from '@/templates/pdf/TransactionReport';
-import { useTransactionsReport } from '@/hooks/api';
-import type { Transaction } from '@/book/entities';
+import { useAccounts, useTransactionsReport } from '@/hooks/api';
+import type { Account, Transaction } from '@/book/entities';
 
 type FormValues = {
   interval?: Interval;
@@ -23,6 +23,7 @@ export default function TransactionReportForm(): React.JSX.Element {
   });
 
   const i = form.watch('interval');
+  const { data: accounts } = useAccounts();
   const { data: transactions } = useTransactionsReport(i);
 
   return (
@@ -30,6 +31,7 @@ export default function TransactionReportForm(): React.JSX.Element {
       onSubmit={form.handleSubmit(data => onSubmit(
         data,
         transactions as Transaction[],
+        accounts as Account[],
       ))}
     >
       <div className="flex flex-col items-center text-sm gap-2 pt-5">
@@ -61,11 +63,16 @@ export default function TransactionReportForm(): React.JSX.Element {
   );
 }
 
-async function onSubmit(data: FormValues, transactions: Transaction[]) {
+async function onSubmit(
+  data: FormValues,
+  transactions: Transaction[],
+  accounts: Account[],
+) {
   const { pdf } = await import('@react-pdf/renderer');
   const myDoc = await TransactionReport({
     interval: data.interval as Interval,
     transactions,
+    accounts,
   });
   const blob = await pdf(myDoc).toBlob();
   window.open(URL.createObjectURL(blob));

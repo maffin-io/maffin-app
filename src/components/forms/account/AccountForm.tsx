@@ -65,6 +65,7 @@ export default function AccountForm({
     && Account.TYPES.filter(type => !getAllowedSubAccounts(parent.type).includes(type))
   ) || [];
   const type = form.watch('type');
+  const showReport = action !== 'add' && (type === 'INCOME' || type === 'EXPENSE');
 
   return (
     <form onSubmit={form.handleSubmit((data) => onSubmit(data, action, onSave))}>
@@ -116,7 +117,7 @@ export default function AccountForm({
           className={classNames(
             'col-span-2',
             {
-              hidden: action === 'add',
+              hidden: !showReport,
             },
           )}
         >
@@ -147,7 +148,7 @@ export default function AccountForm({
           className={classNames(
             'col-span-2',
             {
-              'col-start-11': action === 'add',
+              'col-start-11': !showReport,
               hidden: hideDefaults && 'placeholder' in defaultValues,
             },
           )}

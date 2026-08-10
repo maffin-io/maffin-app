@@ -2,11 +2,13 @@ import React from 'react';
 import { Interval } from 'luxon';
 
 import Money from '@/book/Money';
-import type { Split, Transaction } from '@/book/entities';
+import type { Account, Split, Transaction } from '@/book/entities';
+import mapAccounts from '@/helpers/mapAccounts';
 
 export type TransactionReportProps = {
   interval: Interval;
   transactions: Transaction[],
+  accounts: Account[],
 };
 
 type ReportRow = {
@@ -20,6 +22,7 @@ type ReportRow = {
 export default async function TransactionReport({
   interval,
   transactions,
+  accounts,
 }: TransactionReportProps) {
   // This is horrible but couldn't manage to import react-pdf properly as it is giving
   // errors even when using nextjs dynamic
@@ -30,8 +33,9 @@ export default async function TransactionReport({
     Document,
   } = await import('@react-pdf/renderer');
 
-  const expenseRows = buildRows(transactions, 'EXPENSE');
-  const incomeRows = buildRows(transactions, 'INCOME');
+  const accountsMap = mapAccounts(accounts);
+  const expenseRows = buildRows(transactions, 'EXPENSE', accountsMap);
+  const incomeRows = buildRows(transactions, 'INCOME', accountsMap);
 
   return (
     <Document>
@@ -72,24 +76,38 @@ export default async function TransactionReport({
   );
 }
 
-function buildRows(transactions: Transaction[], type: 'INCOME' | 'EXPENSE'): ReportRow[] {
+function buildRows(
+  transactions: Transaction[],
+  type: 'INCOME' | 'EXPENSE',
+  accountsMap: ReturnType<typeof mapAccounts>,
+): ReportRow[] {
   const rows: ReportRow[] = [];
 
   transactions.forEach(tx => {
     tx.splits
       .filter(split => split.account.type === type && split.account.report !== false)
       .forEach(split => {
+        const account = accountsMap[split.account.guid] || split.account;
         rows.push({
           guid: `${tx.guid}-${split.guid}`,
           date: tx.date.toFormat('dd/MM/yyyy'),
           description: tx.description,
-          accountName: split.account.name,
+          accountName: formatAccountPath(account.path || account.name),
           amount: formatSplitAmount(split, type),
         });
       });
   });
 
   return rows;
+}
+
+/**
+ * Drops the top-level type root from the path so
+ * "Expenses:Utilities:Internet" becomes "Utilities:Internet".
+ */
+function formatAccountPath(path: string): string {
+  const colonIndex = path.indexOf(':');
+  return colonIndex >= 0 ? path.slice(colonIndex + 1) : path;
 }
 
 function formatSplitAmount(split: Split, type: 'INCOME' | 'EXPENSE'): string {
@@ -119,9 +137,9 @@ function buildTable(
           marginBottom: 4,
         }}
       >
-        <Text style={{ width: '18%' }}>Date</Text>
-        <Text style={{ width: '42%' }}>Description</Text>
-        <Text style={{ width: '22%' }}>Account</Text>
+        <Text style={{ width: '16%' }}>Date</Text>
+        <Text style={{ width: '36%' }}>Description</Text>
+        <Text style={{ width: '30%' }}>Account</Text>
         <Text style={{ width: '18%', textAlign: 'right' }}>Amount</Text>
       </View>
       {rows.map(row => (
@@ -132,9 +150,9 @@ function buildTable(
             marginTop: 3,
           }}
         >
-          <Text style={{ width: '18%' }}>{row.date}</Text>
-          <Text style={{ width: '42%' }}>{row.description}</Text>
-          <Text style={{ width: '22%' }}>{row.accountName}</Text>
+          <Text style={{ width: '16%' }}>{row.date}</Text>
+          <Text style={{ width: '36%' }}>{row.description}</Text>
+          <Text style={{ width: '30%' }}>{row.accountName}</Text>
           <Text style={{ width: '18%', textAlign: 'right' }}>{row.amount}</Text>
         </View>
       ))}

@@ -566,7 +566,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
         />
       </fieldset>
       <fieldset
-        class="col-span-2"
+        class="col-span-2 hidden"
       >
         <label
           class="inline-block mb-2"
@@ -589,7 +589,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
         />
       </fieldset>
       <fieldset
-        class="col-span-2"
+        class="col-span-2 col-start-11"
       >
         <label
           class="inline-block mb-2"
@@ -1080,7 +1080,7 @@ exports[`AccountForm renders as expected with update 1`] = `
         />
       </fieldset>
       <fieldset
-        class="col-span-2"
+        class="col-span-2 hidden"
       >
         <label
           class="inline-block mb-2"
@@ -1102,7 +1102,7 @@ exports[`AccountForm renders as expected with update 1`] = `
         />
       </fieldset>
       <fieldset
-        class="col-span-2"
+        class="col-span-2 col-start-11"
       >
         <label
           class="inline-block mb-2"
