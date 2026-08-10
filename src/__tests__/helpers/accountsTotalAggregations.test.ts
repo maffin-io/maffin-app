@@ -1,7 +1,6 @@
 import { DateTime } from 'luxon';
 
 import { aggregateChildrenTotals, aggregateMonthlyWorth } from '@/helpers/accountsTotalAggregations';
-import { reportChildIds } from '@/helpers/visibleAccountGuids';
 import Money from '@/book/Money';
 import { PriceDBMap } from '@/book/prices';
 import { Price } from '@/book/entities';
@@ -464,7 +463,7 @@ describe('accountsTotalAggregations', () => {
       expect(aggregatedTotals.type_expense.toString()).toEqual('150 EUR');
     });
 
-    it('excludes non-report children from parent totals when using reportChildIds', () => {
+    it('includes non-report income children in parent totals', () => {
       accounts[3].childrenIds = ['a5', 'a6'];
       accounts = [
         ...accounts,
@@ -474,7 +473,6 @@ describe('accountsTotalAggregations', () => {
           commodity: eur,
           parentId: 'a3',
           childrenIds: [] as string[],
-          hidden: true,
           report: true,
         } as Account,
         {
@@ -496,16 +494,48 @@ describe('accountsTotalAggregations', () => {
           a5: new Money(300, 'EUR'),
           a6: new Money(200, 'EUR'),
         },
+      );
+
+      expect(aggregatedTotals.type_income.toString()).toEqual('500 EUR');
+      expect(aggregatedTotals.a3.toString()).toEqual('500 EUR');
+      expect(aggregatedTotals.a6.toString()).toEqual('200 EUR');
+    });
+
+    it('excludes non-report asset children from type totals', () => {
+      accounts[1].childrenIds = ['a5', 'a6'];
+      accounts = [
+        ...accounts,
         {
-          getChildIds: reportChildIds,
-          keepExcludedTotals: false,
+          guid: 'a5',
+          type: 'ASSET',
+          commodity: eur,
+          parentId: 'a1',
+          childrenIds: [] as string[],
+        } as Account,
+        {
+          guid: 'a6',
+          type: 'ASSET',
+          commodity: eur,
+          parentId: 'a1',
+          childrenIds: [] as string[],
+          report: false,
+        } as Account,
+      ];
+
+      const aggregatedTotals = aggregateChildrenTotals(
+        ['type_asset'],
+        accounts,
+        {} as PriceDBMap,
+        DateTime.now(),
+        {
+          a5: new Money(1000, 'EUR'),
+          a6: new Money(500, 'EUR'),
         },
       );
 
-      expect(aggregatedTotals.type_income.toString()).toEqual('300 EUR');
-      expect(aggregatedTotals.a3.toString()).toEqual('300 EUR');
-      expect(aggregatedTotals.a5.toString()).toEqual('300 EUR');
-      expect(aggregatedTotals.a6).toBeUndefined();
+      expect(aggregatedTotals.type_asset.toString()).toEqual('1000 EUR');
+      expect(aggregatedTotals.a1.toString()).toEqual('1000 EUR');
+      expect(aggregatedTotals.a6.toString()).toEqual('500 EUR');
     });
   });
 

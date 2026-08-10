@@ -1,6 +1,7 @@
 import Money from '@/book/Money';
 import type { Account } from '@/book/entities';
 import type { AccountsMap } from '@/types/book';
+import { isVisibleInAccountsTree } from '@/helpers/visibleAccountGuids';
 
 export type AccountsTableRow = {
   account: Account,
@@ -11,7 +12,7 @@ export type AccountsTableRow = {
 export type GetAccountsTreeOptions = {
   /**
    * Whether a child account should appear in the tree.
-   * Defaults to excluding hidden accounts (dashboard behavior).
+   * Defaults to dashboard visibility (hidden + asset/liability report).
    */
   shouldInclude?: (account: Account) => boolean,
 };
@@ -22,7 +23,7 @@ export default function getAccountsTree(
   accountsTotal: { [guid: string]: Money },
   options: GetAccountsTreeOptions = {},
 ): AccountsTableRow {
-  const { shouldInclude = (account: Account) => !account.hidden } = options;
+  const { shouldInclude = isVisibleInAccountsTree } = options;
   const leaves: AccountsTableRow[] = [];
   current.childrenIds.forEach(childId => {
     const childAccount = accounts[childId];
