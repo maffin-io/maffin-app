@@ -57,7 +57,6 @@ export default function IEInfo({
           <MonthlyTotalHistogram
             title=""
             guids={account.placeholder ? account.childrenIds : [account.guid]}
-            includeHiddenGuids={account.placeholder ? [] : [account.guid]}
           />
         </div>
         <div className="col-span-12" />

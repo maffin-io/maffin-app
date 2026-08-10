@@ -5,18 +5,24 @@ import { Account } from '@/book/entities';
 import type { AccountsTotals, AccountsMap } from '@/types/book';
 import type { PriceDBMap } from '@/book/prices';
 import mapAccounts from './mapAccounts';
-import { visibleChildIds } from './visibleAccountGuids';
 
 export type ChildIdsFn = (accounts: AccountsMap, parent: Account) => string[];
 
 export type AggregateChildrenOptions = {
+  /**
+   * Which children to roll into the parent total.
+   * Defaults to all children. Reports pass reportChildIds to skip
+   * accounts with report=false.
+   */
   getChildIds?: ChildIdsFn,
   /**
    * When true, children excluded from the rollup still get their own totals
-   * computed (used for hidden accounts on the dashboard detail pages).
+   * computed. Reports set this to false.
    */
   keepExcludedTotals?: boolean,
 };
+
+const allChildIds: ChildIdsFn = (_accounts, parent) => parent.childrenIds;
 
 /**
  * For some account types like Asset and Liabilities, we want to accumulate monthly
@@ -58,14 +64,8 @@ function aggregateWorth(
     aggregatedTotals[i][guid] = currentMonth.add(previousMonth);
   });
 
-  visibleChildIds(accounts, current).forEach((childId: string) => {
-    aggregateWorth(childId, accounts, monthlyTotals, aggregatedTotals);
-  });
-
   current.childrenIds.forEach((childId: string) => {
-    if (accounts[childId]?.hidden) {
-      aggregateWorth(childId, accounts, monthlyTotals, aggregatedTotals);
-    }
+    aggregateWorth(childId, accounts, monthlyTotals, aggregatedTotals);
   });
 }
 
@@ -85,8 +85,8 @@ export function aggregateChildrenTotals(
   options: AggregateChildrenOptions = {},
 ): AccountsTotals {
   const {
-    getChildIds = visibleChildIds,
-    keepExcludedTotals = true,
+    getChildIds = allChildIds,
+    keepExcludedTotals = false,
   } = options;
   const accountsMap = mapAccounts(accounts);
   const aggregatedTotals: AccountsTotals = {};

@@ -54,7 +54,6 @@ describe('IEInfo', () => {
     expect(MonthlyTotalHistogram).toHaveBeenCalledWith(
       {
         guids: [account.guid],
-        includeHiddenGuids: [account.guid],
         title: '',
       },
       undefined,
@@ -91,7 +90,6 @@ describe('IEInfo', () => {
     expect(MonthlyTotalHistogram).toHaveBeenCalledWith(
       {
         guids: ['1', '2'],
-        includeHiddenGuids: [],
         title: '',
       },
       undefined,
