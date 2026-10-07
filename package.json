@@ -59,7 +59,8 @@
     "sql.js": "^1.12.0",
     "tailwindcss": "^3.4.16",
     "typeorm": "^0.3.20",
-    "winston-react": "^1.0.0-RC.0"
+    "winston-react": "^1.0.0-RC.0",
+    "write-excel-file": "^4.1.1"
   },
   "eslintConfig": {
     "plugins": [
