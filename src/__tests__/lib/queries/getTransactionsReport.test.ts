@@ -2,7 +2,9 @@ import { Between } from 'typeorm';
 import { DateTime } from 'luxon';
 
 import { getTransactionsReport } from '@/lib/queries';
+import { isOrphanSplit } from '@/lib/queries/getTransactionsReport';
 import { Transaction } from '@/book/entities';
+import type { Split } from '@/book/entities';
 
 describe('getTransactionsReport', () => {
   it('calls find as expected and filters income/expense txs', async () => {
@@ -85,5 +87,35 @@ describe('getTransactionsReport', () => {
     const txs = await getTransactionsReport(TEST_INTERVAL);
 
     expect(txs).toEqual([reportableTx, hiddenButReportableTx]);
+  });
+
+  it('includes transactions with splits whose account no longer exists', async () => {
+    const orphanTx = {
+      guid: 'tx1',
+      splits: [
+        { account: null },
+        { account: { type: 'EQUITY' } },
+      ],
+    } as unknown as Transaction;
+    const transferTx = {
+      guid: 'tx2',
+      splits: [
+        { account: { type: 'ASSET' } },
+        { account: { type: 'EQUITY' } },
+      ],
+    } as unknown as Transaction;
+
+    jest.spyOn(Transaction, 'find').mockResolvedValue([orphanTx, transferTx]);
+
+    const txs = await getTransactionsReport(TEST_INTERVAL);
+
+    expect(txs).toEqual([orphanTx]);
+  });
+});
+
+describe('isOrphanSplit', () => {
+  it('returns true only when the split has no account', () => {
+    expect(isOrphanSplit({ account: null } as unknown as Split)).toBe(true);
+    expect(isOrphanSplit({ account: { type: 'EXPENSE' } } as Split)).toBe(false);
   });
 });

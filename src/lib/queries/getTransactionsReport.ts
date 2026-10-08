@@ -2,10 +2,12 @@ import { Between } from 'typeorm';
 import type { DateTime, Interval } from 'luxon';
 
 import { Transaction } from '@/book/entities';
+import type { Split } from '@/book/entities';
 
 /**
  * Returns transactions in the given interval that involve
- * at least one INCOME or EXPENSE account.
+ * at least one INCOME or EXPENSE account or that have orphan
+ * splits (splits whose account no longer exists).
  */
 export default async function getTransactionsReport(
   interval: Interval,
@@ -31,9 +33,16 @@ export default async function getTransactionsReport(
   return txs.filter(
     tx => tx.splits.some(
       split => (
-        (split.account.type === 'INCOME' || split.account.type === 'EXPENSE')
-        && split.account.report !== false
+        isOrphanSplit(split)
+        || (
+          (split.account.type === 'INCOME' || split.account.type === 'EXPENSE')
+          && split.account.report !== false
+        )
       ),
     ),
   );
+}
+
+export function isOrphanSplit(split: Split): boolean {
+  return !split.account;
 }

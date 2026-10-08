@@ -1,22 +1,14 @@
 import React from 'react';
 import { Interval } from 'luxon';
 
-import Money from '@/book/Money';
-import type { Account, Split, Transaction } from '@/book/entities';
-import mapAccounts from '@/helpers/mapAccounts';
+import type { Account, Transaction } from '@/book/entities';
+import getTransactionReportSections from '@/lib/reports/transactionReport';
+import type { TransactionReportRow } from '@/lib/reports/transactionReport';
 
 export type TransactionReportProps = {
   interval: Interval;
   transactions: Transaction[],
   accounts: Account[],
-};
-
-type ReportRow = {
-  guid: string,
-  date: string,
-  description: string,
-  accountName: string,
-  amount: string,
 };
 
 export default async function TransactionReport({
@@ -33,9 +25,7 @@ export default async function TransactionReport({
     Document,
   } = await import('@react-pdf/renderer');
 
-  const accountsMap = mapAccounts(accounts);
-  const expenseRows = buildRows(transactions, 'EXPENSE', accountsMap);
-  const incomeRows = buildRows(transactions, 'INCOME', accountsMap);
+  const { expenses, income, orphans } = getTransactionReportSections(transactions, accounts);
 
   return (
     <Document>
@@ -52,6 +42,11 @@ export default async function TransactionReport({
             {' '}
             {interval.toISODate()}
           </Text>
+          {orphans.length > 0 && (
+            <Text style={{ marginTop: 8, fontSize: 11, color: '#b45309' }}>
+              {`Warning: ${orphans.length} split(s) belong to accounts that no longer exist. See the Orphan section below.`}
+            </Text>
+          )}
         </View>
         <View
           style={{
@@ -60,7 +55,7 @@ export default async function TransactionReport({
           }}
         >
           <Text style={{ marginBottom: 8, fontSize: 14 }}>Expenses</Text>
-          {buildTable(expenseRows, View, Text)}
+          {buildTable(expenses, View, Text)}
         </View>
         <View
           style={{
@@ -69,54 +64,29 @@ export default async function TransactionReport({
           }}
         >
           <Text style={{ marginBottom: 8, fontSize: 14 }}>Income</Text>
-          {buildTable(incomeRows, View, Text)}
+          {buildTable(income, View, Text)}
         </View>
+        {orphans.length > 0 && (
+          <View
+            style={{
+              fontSize: 12,
+              padding: 20,
+            }}
+          >
+            <Text style={{ marginBottom: 4, fontSize: 14 }}>Orphan</Text>
+            <Text style={{ marginBottom: 8, fontSize: 10 }}>
+              These transactions reference deleted accounts. Assign them to an existing account.
+            </Text>
+            {buildTable(orphans, View, Text)}
+          </View>
+        )}
       </Page>
     </Document>
   );
 }
 
-function buildRows(
-  transactions: Transaction[],
-  type: 'INCOME' | 'EXPENSE',
-  accountsMap: ReturnType<typeof mapAccounts>,
-): ReportRow[] {
-  const rows: ReportRow[] = [];
-
-  transactions.forEach(tx => {
-    tx.splits
-      .filter(split => split.account.type === type && split.account.report !== false)
-      .forEach(split => {
-        const account = accountsMap[split.account.guid] || split.account;
-        rows.push({
-          guid: `${tx.guid}-${split.guid}`,
-          date: tx.date.toFormat('dd/MM/yyyy'),
-          description: tx.description,
-          accountName: formatAccountPath(account.path || account.name),
-          amount: formatSplitAmount(split, type),
-        });
-      });
-  });
-
-  return rows;
-}
-
-/**
- * Drops the top-level type root from the path so
- * "Expenses:Utilities:Internet" becomes "Utilities:Internet".
- */
-function formatAccountPath(path: string): string {
-  const colonIndex = path.indexOf(':');
-  return colonIndex >= 0 ? path.slice(colonIndex + 1) : path;
-}
-
-function formatSplitAmount(split: Split, type: 'INCOME' | 'EXPENSE'): string {
-  const quantity = type === 'INCOME' ? Math.abs(split.quantity) : split.quantity;
-  return new Money(quantity, split.account.commodity.mnemonic).format();
-}
-
 function buildTable(
-  rows: ReportRow[],
+  rows: TransactionReportRow[],
   View: any,
   Text: any,
 ) {
@@ -150,10 +120,10 @@ function buildTable(
             marginTop: 3,
           }}
         >
-          <Text style={{ width: '16%' }}>{row.date}</Text>
+          <Text style={{ width: '16%' }}>{row.date.toFormat('dd/MM/yyyy')}</Text>
           <Text style={{ width: '36%' }}>{row.description}</Text>
           <Text style={{ width: '30%' }}>{row.accountName}</Text>
-          <Text style={{ width: '18%', textAlign: 'right' }}>{row.amount}</Text>
+          <Text style={{ width: '18%', textAlign: 'right' }}>{row.amount.format()}</Text>
         </View>
       ))}
     </View>
