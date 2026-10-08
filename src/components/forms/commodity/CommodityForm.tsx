@@ -24,7 +24,7 @@ export default function CommodityForm({
   action = 'add',
   onSave = () => {},
   defaultValues,
-}: CommodityFormProps): JSX.Element {
+}: CommodityFormProps): React.JSX.Element {
   const form = useForm<Commodity>({
     defaultValues,
     mode: 'onChange',

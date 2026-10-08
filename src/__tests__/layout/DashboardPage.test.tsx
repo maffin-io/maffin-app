@@ -50,6 +50,6 @@ describe('DashboardPage', () => {
     );
 
     await screen.findByTestId('child');
-    expect(Topbar).toHaveBeenLastCalledWith({}, {});
+    expect(Topbar).toHaveBeenLastCalledWith({}, undefined);
   });
 });

@@ -43,6 +43,7 @@ import type BankConfig from './BankConfig';
  *   code            text(2048),
  *   description     text(2048),
  *   hidden          integer NOT NULL,
+ *   report          integer NOT NULL,
  *   placeholder     integer NOT NULL
  * );
  */
@@ -131,6 +132,11 @@ export default class Account extends BaseEntity {
     default: false,
   })
     hidden!: boolean;
+
+  @Column({
+    default: true,
+  })
+    report!: boolean;
 
   @CheckPlaceholder()
   @Column({

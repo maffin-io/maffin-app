@@ -94,7 +94,7 @@ describe('DividendChart', () => {
           },
         },
       },
-      {},
+      undefined,
     );
 
     expect(Bar).toHaveBeenNthCalledWith(
@@ -150,7 +150,7 @@ describe('DividendChart', () => {
           },
         },
       },
-      {},
+      undefined,
     );
   });
 
@@ -209,7 +209,7 @@ describe('DividendChart', () => {
           labels: [2022, 2023],
         },
       }),
-      {},
+      undefined,
     );
 
     expect(Bar).toHaveBeenNthCalledWith(
@@ -228,7 +228,7 @@ describe('DividendChart', () => {
           ],
         }),
       }),
-      {},
+      undefined,
     );
 
     expect(container).toMatchSnapshot();
@@ -285,7 +285,7 @@ describe('DividendChart', () => {
           ],
         }),
       }),
-      {},
+      undefined,
     );
 
     expect(Bar).toHaveBeenNthCalledWith(
@@ -300,7 +300,7 @@ describe('DividendChart', () => {
           ],
         }),
       }),
-      {},
+      undefined,
     );
   });
 
@@ -343,7 +343,7 @@ describe('DividendChart', () => {
           ],
         }),
       }),
-      {},
+      undefined,
     );
   });
 });

@@ -126,7 +126,7 @@ describe('MonthlyTotalHistogram', () => {
           },
         },
       },
-      {},
+      undefined,
     );
 
     const { plugins } = (Bar as jest.Mock).mock.calls[0][0].options;
@@ -139,6 +139,11 @@ describe('MonthlyTotalHistogram', () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [
+          {
+            guid: 'root',
+            name: 'Root',
+            type: 'ROOT',
+          } as Account,
           {
             guid: 'salary',
             name: 'Salary',
@@ -206,7 +211,7 @@ describe('MonthlyTotalHistogram', () => {
           labels: expect.any(Array),
         },
       }),
-      {},
+      undefined,
     );
   });
 
@@ -219,6 +224,11 @@ describe('MonthlyTotalHistogram', () => {
     jest.spyOn(apiHook, 'useAccounts').mockReturnValue(
       {
         data: [
+          {
+            guid: 'root',
+            name: 'Root',
+            type: 'ROOT',
+          } as Account,
           {
             guid: 'salary',
             name: 'Salary',
@@ -266,7 +276,7 @@ describe('MonthlyTotalHistogram', () => {
           labels: expect.any(Array),
         },
       }),
-      {},
+      undefined,
     );
   });
 });

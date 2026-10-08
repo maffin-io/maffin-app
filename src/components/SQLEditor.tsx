@@ -8,7 +8,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { useDataSource } from '@/hooks';
 import Table from '@/components/tables/Table';
 
-export default function SQLEditor(): JSX.Element {
+export default function SQLEditor(): React.JSX.Element {
   const { datasource } = useDataSource();
   const [rows, setRows] = React.useState<BaseEntity[]>([]);
   const [error, setError] = React.useState<Error | null>();

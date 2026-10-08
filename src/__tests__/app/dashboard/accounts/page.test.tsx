@@ -99,20 +99,20 @@ describe('AccountsPage', () => {
         modalTitle: 'Add account',
         id: 'add-account',
       }),
-      {},
+      undefined,
     );
     expect(AccountForm).toHaveBeenLastCalledWith(
       {},
-      {},
+      undefined,
     );
-    expect(ReportsDropdown).toHaveBeenLastCalledWith({}, {});
+    expect(ReportsDropdown).toHaveBeenLastCalledWith({}, undefined);
 
     await screen.findByTestId('Onboarding');
     expect(Onboarding).toHaveBeenLastCalledWith(
       {
         show: true,
       },
-      {},
+      undefined,
     );
 
     await screen.findAllByTestId('AccountsTable');
@@ -121,14 +121,14 @@ describe('AccountsPage', () => {
         guids: [undefined, undefined],
         isExpanded: true,
       },
-      {},
+      undefined,
     );
     expect(AccountsTable).toBeCalledWith(
       {
         guids: [undefined, undefined],
         isExpanded: true,
       },
-      {},
+      undefined,
     );
 
     await screen.findByTestId('TotalsPie');
@@ -138,14 +138,14 @@ describe('AccountsPage', () => {
         guids: [undefined, undefined],
         title: 'Net worth',
       },
-      {},
+      undefined,
     );
 
     await screen.findByTestId('IncomeExpenseHistogram');
     expect(IncomeExpenseHistogram).toHaveBeenLastCalledWith(
       {
       },
-      {},
+      undefined,
     );
 
     await screen.findByTestId('NetWorthHistogram');
@@ -160,7 +160,7 @@ describe('AccountsPage', () => {
           label: 'Liabilities',
         },
       },
-      {},
+      undefined,
     );
 
     expect(screen.getAllByTestId('MonthlyTotalHistogram')).toHaveLength(2);
@@ -171,7 +171,7 @@ describe('AccountsPage', () => {
         title: 'Income',
         accounts: undefined,
       },
-      {},
+      undefined,
     );
     expect(MonthlyTotalHistogram).toHaveBeenNthCalledWith(
       2,
@@ -179,11 +179,11 @@ describe('AccountsPage', () => {
         title: 'Expenses',
         accounts: undefined,
       },
-      {},
+      undefined,
     );
 
     await screen.findByTestId('LatestTransactions');
-    expect(LatestTransactions).toHaveBeenLastCalledWith({}, {});
+    expect(LatestTransactions).toHaveBeenLastCalledWith({}, undefined);
 
     expect(container).toMatchSnapshot();
   });
@@ -267,7 +267,7 @@ describe('AccountsPage', () => {
       {
         show: false,
       },
-      {},
+      undefined,
     );
 
     await screen.findAllByTestId('AccountsTable');
@@ -275,17 +275,17 @@ describe('AccountsPage', () => {
     expect(AccountsTable).toBeCalledWith({
       guids: ['a7', 'a8'],
       isExpanded: false,
-    }, {});
+    }, undefined);
     expect(AccountsTable).toBeCalledWith({
       guids: ['a5', 'a3'],
       isExpanded: false,
-    }, {});
+    }, undefined);
     expect(TotalsPie).toHaveBeenLastCalledWith({
       backgroundColor: ['#06B6D4', '#FF6600'],
       guids: ['a7', 'a8'],
       title: 'Net worth',
-    }, {});
-    expect(IncomeExpenseHistogram).toHaveBeenLastCalledWith({}, {});
+    }, undefined);
+    expect(IncomeExpenseHistogram).toHaveBeenLastCalledWith({}, undefined);
     expect(NetWorthHistogram).toHaveBeenLastCalledWith(
       {
         assetsGuid: 'type_asset',
@@ -297,7 +297,7 @@ describe('AccountsPage', () => {
           label: 'Liabilities',
         },
       },
-      {},
+      undefined,
     );
     expect(MonthlyTotalHistogram).toHaveBeenNthCalledWith(
       1,
@@ -305,7 +305,7 @@ describe('AccountsPage', () => {
         title: 'Income',
         guids: [accounts[4].guid],
       },
-      {},
+      undefined,
     );
     expect(MonthlyTotalHistogram).toHaveBeenNthCalledWith(
       2,
@@ -313,7 +313,7 @@ describe('AccountsPage', () => {
         title: 'Expenses',
         guids: [accounts[2].guid],
       },
-      {},
+      undefined,
     );
   });
 });

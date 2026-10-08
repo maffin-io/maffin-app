@@ -29,7 +29,7 @@ export default function AccountSelector(
     placeholder = 'Choose account',
     ...props
   }: AccountSelectorProps,
-): JSX.Element {
+): React.JSX.Element {
   const { data: accounts } = useAccounts();
 
   let options = accounts || [];

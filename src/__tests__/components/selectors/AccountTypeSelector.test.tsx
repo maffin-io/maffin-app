@@ -39,7 +39,7 @@ describe('AccountTypeSelector', () => {
         getOptionValue: expect.any(Function),
         onChange: expect.any(Function),
       },
-      {},
+      undefined,
     );
 
     expect((Selector as jest.Mock).mock.calls[0][0].getOptionLabel({ type: 'type' })).toEqual('type');
@@ -65,7 +65,7 @@ describe('AccountTypeSelector', () => {
           { type: 'PAYABLE' },
         ],
       }),
-      {},
+      undefined,
     );
   });
 });

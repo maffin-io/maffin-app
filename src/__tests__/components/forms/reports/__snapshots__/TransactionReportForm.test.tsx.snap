@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TransactionReportForm renders as expected 1`] = `
+<div>
+  <form>
+    <div
+      class="flex flex-col items-center text-sm gap-2 pt-5"
+    >
+      <fieldset>
+        <label
+          class="inline-block text-sm my-2"
+          for="intervalInput"
+        >
+          Select dates
+        </label>
+        <input
+          data-testid="DateRangeInput"
+          id="intervalInput"
+        />
+      </fieldset>
+      <fieldset
+        class="text-center"
+      >
+        <legend
+          class="inline-block text-sm my-2"
+        >
+          Format
+        </legend>
+        <div
+          class="flex justify-center gap-4"
+        >
+          <label
+            class="flex items-center gap-1 cursor-pointer"
+            for="format-pdf"
+          >
+            <input
+              class="accent-primary"
+              id="format-pdf"
+              name="format"
+              type="radio"
+              value="pdf"
+            />
+            PDF
+          </label>
+          <label
+            class="flex items-center gap-1 cursor-pointer"
+            for="format-excel"
+          >
+            <input
+              class="accent-primary"
+              id="format-excel"
+              name="format"
+              type="radio"
+              value="excel"
+            />
+            Excel
+          </label>
+        </div>
+      </fieldset>
+    </div>
+    <div
+      class="flex w-full justify-center mt-5"
+    >
+      <button
+        class="btn btn-primary capitalize"
+        type="submit"
+      >
+        Submit
+      </button>
+    </div>
+  </form>
+</div>
+`;

@@ -11,7 +11,7 @@ export interface ImportButtonProps extends React.ButtonHTMLAttributes<HTMLButton
 
 export default function ImportButton({
   className = 'btn btn-primary',
-}: ImportButtonProps): JSX.Element {
+}: ImportButtonProps): React.JSX.Element {
   const modalRef = React.useRef<ModalRef>(null);
 
   return (

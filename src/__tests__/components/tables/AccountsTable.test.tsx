@@ -62,7 +62,7 @@ describe('AccountsTable', () => {
         tdClassName: 'p-2',
         getSubRows: expect.any(Function),
       },
-      {},
+      undefined,
     );
     expect(apiHook.useAccountsTotals).toHaveBeenCalledWith();
     expect(container).toMatchSnapshot();
@@ -151,7 +151,7 @@ describe('AccountsTable', () => {
           },
         ],
       }),
-      {},
+      undefined,
     );
 
     expect((Table as jest.Mock).mock.calls[0][0].data[0].total.toString()).toEqual('300 EUR');
@@ -216,7 +216,7 @@ describe('AccountsTable', () => {
           },
         ],
       }),
-      {},
+      undefined,
     );
 
     expect((Table as jest.Mock).mock.calls[0][0].data[0].total.toString()).toEqual('200 EUR');

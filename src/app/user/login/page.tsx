@@ -6,7 +6,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 import { AuthError } from '@/helpers/errors';
 
-export default function LoginPage(): JSX.Element {
+export default function LoginPage(): React.JSX.Element {
   const router = useRouter();
   const { isAuthenticated, loginWithPopup, error } = useAuth0();
 

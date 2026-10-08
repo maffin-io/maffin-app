@@ -34,7 +34,7 @@ const queryClient = new QueryClient({
 
 export default function RootLayout({
   children,
-}: React.PropsWithChildren): JSX.Element {
+}: React.PropsWithChildren): React.JSX.Element {
   return (
     <html lang="en">
       <body>

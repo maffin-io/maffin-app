@@ -87,7 +87,7 @@ describe('SQLExplorer', () => {
         ],
         data: metadatas[0].columns,
       },
-      {},
+      undefined,
     );
     expect(Table as jest.Mock).nthCalledWith(
       2,
@@ -105,7 +105,7 @@ describe('SQLExplorer', () => {
         ],
         data: metadatas[1].columns,
       },
-      {},
+      undefined,
     );
     // eslint-disable-next-line testing-library/no-node-access
     expect(screen.getAllByTestId('Table')[0].parentElement).toHaveClass('hidden');
@@ -141,7 +141,7 @@ describe('SQLExplorer', () => {
       expect.objectContaining({
         data: [metadata[0].columns[0]],
       }),
-      {},
+      undefined,
     );
   });
 

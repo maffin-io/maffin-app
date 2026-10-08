@@ -23,7 +23,7 @@ export default function AccountTypeSelector(
     id = 'typeSelector',
     ...props
   }: AccountTypeSelectorProps,
-): JSX.Element {
+): React.JSX.Element {
   const types = Account.TYPES.slice(1).filter(
     type => !ignoreTypes.includes(type),
   ).map(type => ({ type }));

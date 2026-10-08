@@ -186,7 +186,7 @@ describe('AccountForm', () => {
     );
 
     const fieldsets = screen.getAllByRole('group');
-    expect(fieldsets[5]).toHaveClass('hidden');
+    expect(fieldsets[7]).toHaveClass('hidden');
   });
 
   it('renders with defaults as expected', async () => {
@@ -226,9 +226,9 @@ describe('AccountForm', () => {
 
     const fieldsets = screen.getAllByRole('group');
     // Can't check with toBeVisible due tailwindcss not being understood by jest
-    expect(fieldsets[3]).toHaveClass('hidden');
     expect(fieldsets[4]).toHaveClass('hidden');
-    expect(fieldsets[6]).toHaveClass('hidden');
+    expect(fieldsets[5]).toHaveClass('hidden');
+    expect(fieldsets[7]).toHaveClass('hidden');
   });
 
   it('button is disabled when form not valid', async () => {
@@ -315,6 +315,7 @@ describe('AccountForm', () => {
       parentId: assetAccount.guid,
       placeholder: false,
       hidden: false,
+      report: true,
     });
     expect(mockSave).toHaveBeenCalledTimes(1);
   });
@@ -425,6 +426,7 @@ describe('AccountForm', () => {
       parentId: assetAccount.guid,
       placeholder: false,
       hidden: false,
+      report: true,
     });
 
     const txs = await Transaction.find();

@@ -12,7 +12,6 @@
 ---
 
 [![Build](https://img.shields.io/github/actions/workflow/status/maffin-io/maffin-app/frontend-ci.yml?label=Build&logo=github)](https://github.com/maffin-io/maffin-app/actions/workflows/frontend-ci.yml)
-[![Sonar Coverage](https://img.shields.io/sonar/coverage/maffin-io_maffin-app?logo=sonarcloud&server=https://sonarcloud.io&label=Coverage)](https://sonarcloud.io/summary/new_code?id=maffin-io_maffin-app)
 [![Chat](https://img.shields.io/discord/1222940742335463566?logo=discord&label=Chat)](https://discord.gg/xeT2z4c35V)
 
 

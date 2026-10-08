@@ -14,7 +14,7 @@ export default function DBImportButton({
   className = '',
   onImport,
   ...props
-}: ImportButtonProps): JSX.Element {
+}: ImportButtonProps): React.JSX.Element {
   const { isLoaded, importBook } = React.useContext(DataSourceContext);
   const fileImportInput = React.useRef<HTMLInputElement>(null);
 

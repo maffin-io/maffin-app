@@ -34,7 +34,7 @@ export function useMonthlyTotals(
     ((data: AccountsTotals[]) => {
       const dates = intervalToDates(interval);
       return data.map((d, i) => aggregateChildrenTotals(
-        ['type_income', 'type_expense', 'type_asset', 'type_liability'],
+        ['type_income', 'type_expense', 'type_asset', 'type_liability', 'type_equity'],
         accounts as Account[],
         prices as PriceDBMap,
         dates[i],

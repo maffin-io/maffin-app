@@ -7,7 +7,7 @@ type PaginationProps<T> = {
 
 export default function Pagination<T>({
   table,
-}: PaginationProps<T>): JSX.Element {
+}: PaginationProps<T>): React.JSX.Element {
   const { pagination } = table.getState();
   return (
     <div className="flex text-center text-sm items-center px-2 pb-1">

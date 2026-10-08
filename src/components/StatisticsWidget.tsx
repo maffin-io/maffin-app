@@ -2,8 +2,8 @@ import React from 'react';
 
 export type StatisticsWidgetProps = {
   title: string,
-  stats: JSX.Element | string,
-  description: JSX.Element | string,
+  stats: React.JSX.Element | string,
+  description: React.JSX.Element | string,
   className?: string,
   statsTextClass?: string,
 };
@@ -14,7 +14,7 @@ export default function StatisticsWidget({
   description,
   className = '',
   statsTextClass = '',
-}: StatisticsWidgetProps): JSX.Element {
+}: StatisticsWidgetProps): React.JSX.Element {
   return (
     <div className={`card ${className} p-6`}>
       <p>

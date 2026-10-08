@@ -36,6 +36,6 @@ export const viewport: Viewport = {
 
 export default function Layout({
   children,
-}: React.PropsWithChildren): JSX.Element {
+}: React.PropsWithChildren): React.JSX.Element {
   return <RootLayout>{children}</RootLayout>;
 }

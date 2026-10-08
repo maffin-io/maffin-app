@@ -6,7 +6,7 @@ import Topbar from '@/layout/Topbar';
 
 export default function DashboardPage({
   children,
-}: React.PropsWithChildren): JSX.Element {
+}: React.PropsWithChildren): React.JSX.Element {
   const hookData = useDataSource();
 
   if (!hookData.isLoaded) {

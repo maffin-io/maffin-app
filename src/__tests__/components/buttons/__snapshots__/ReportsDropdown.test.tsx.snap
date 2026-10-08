@@ -29,7 +29,7 @@ exports[`ReportsDropdown renders as expected 1`] = `
       Reports
     </button>
     <ul
-      class="absolute rounded-md w-40 hidden py-2 group-hover:block bg-background-800"
+      class="absolute rounded-md w-48 hidden py-2 group-hover:block bg-background-800"
     >
       <li
         class="text-sm hover:bg-background-700"
@@ -39,6 +39,17 @@ exports[`ReportsDropdown renders as expected 1`] = `
         >
           <div
             data-testid="IncomeExpenseStatementForm"
+          />
+        </div>
+      </li>
+      <li
+        class="text-sm hover:bg-background-700"
+      >
+        <div
+          data-testid="FormButton"
+        >
+          <div
+            data-testid="TransactionReportForm"
           />
         </div>
       </li>

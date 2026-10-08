@@ -46,7 +46,7 @@ describe('Auth0Provider', () => {
         clientId: 'mMmnR4NbQOnim9B8QZfe9wfFuaKb8rwW',
         domain: 'maffin-dev.eu.auth0.com',
       },
-      {},
+      undefined,
     );
   });
 

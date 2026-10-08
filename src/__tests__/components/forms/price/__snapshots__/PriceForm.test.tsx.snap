@@ -64,7 +64,7 @@ exports[`PriceForm renders as expected with add 1`] = `
             />
           </svg>
           <div
-            class="selector__value-container css-1fdsijx-ValueContainer"
+            class="selector__value-container css-hlgwow"
           >
             <div
               class="selector__placeholder css-1jqq78o-placeholder"
@@ -73,7 +73,7 @@ exports[`PriceForm renders as expected with add 1`] = `
               Convert from
             </div>
             <div
-              class="!text-inherit selector__input-container css-qbdosj-Input"
+              class="!text-inherit selector__input-container css-19bb58m"
               data-value=""
             >
               <input
@@ -98,7 +98,7 @@ exports[`PriceForm renders as expected with add 1`] = `
             </div>
           </div>
           <div
-            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1wy0on6"
           >
             <span
               class="hidden selector__indicator-separator css-1u9des2-indicatorSeparator"
@@ -177,7 +177,7 @@ exports[`PriceForm renders as expected with add 1`] = `
               />
             </svg>
             <div
-              class="selector__value-container css-1fdsijx-ValueContainer"
+              class="selector__value-container css-hlgwow"
             >
               <div
                 class="selector__placeholder css-1jqq78o-placeholder"
@@ -186,7 +186,7 @@ exports[`PriceForm renders as expected with add 1`] = `
                 Convert to
               </div>
               <div
-                class="!text-inherit selector__input-container css-qbdosj-Input"
+                class="!text-inherit selector__input-container css-19bb58m"
                 data-value=""
               >
                 <input
@@ -211,7 +211,7 @@ exports[`PriceForm renders as expected with add 1`] = `
               </div>
             </div>
             <div
-              class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+              class="selector__indicators css-1wy0on6"
             >
               <span
                 class="hidden selector__indicator-separator css-1u9des2-indicatorSeparator"
@@ -345,7 +345,7 @@ exports[`PriceForm renders as expected with delete 1`] = `
             />
           </svg>
           <div
-            class="selector__value-container css-1fdsijx-ValueContainer"
+            class="selector__value-container css-hlgwow"
           >
             <div
               class="selector__placeholder css-1jqq78o-placeholder"
@@ -354,7 +354,7 @@ exports[`PriceForm renders as expected with delete 1`] = `
               Convert from
             </div>
             <div
-              class="!text-inherit selector__input-container css-1h01tm3-Input"
+              class="!text-inherit selector__input-container css-1mkvw8y"
               data-value=""
             >
               <input
@@ -380,7 +380,7 @@ exports[`PriceForm renders as expected with delete 1`] = `
             </div>
           </div>
           <div
-            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1wy0on6"
           >
             <span
               class="hidden selector__indicator-separator css-894a34-indicatorSeparator"
@@ -455,7 +455,7 @@ exports[`PriceForm renders as expected with delete 1`] = `
               />
             </svg>
             <div
-              class="selector__value-container css-1fdsijx-ValueContainer"
+              class="selector__value-container css-hlgwow"
             >
               <div
                 class="selector__placeholder css-1jqq78o-placeholder"
@@ -464,7 +464,7 @@ exports[`PriceForm renders as expected with delete 1`] = `
                 Convert to
               </div>
               <div
-                class="!text-inherit selector__input-container css-1h01tm3-Input"
+                class="!text-inherit selector__input-container css-1mkvw8y"
                 data-value=""
               >
                 <input
@@ -490,7 +490,7 @@ exports[`PriceForm renders as expected with delete 1`] = `
               </div>
             </div>
             <div
-              class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+              class="selector__indicators css-1wy0on6"
             >
               <span
                 class="hidden selector__indicator-separator css-894a34-indicatorSeparator"
@@ -619,7 +619,7 @@ exports[`PriceForm renders as expected with update 1`] = `
             />
           </svg>
           <div
-            class="selector__value-container css-1fdsijx-ValueContainer"
+            class="selector__value-container css-hlgwow"
           >
             <div
               class="selector__placeholder css-1jqq78o-placeholder"
@@ -628,7 +628,7 @@ exports[`PriceForm renders as expected with update 1`] = `
               Convert from
             </div>
             <div
-              class="!text-inherit selector__input-container css-1h01tm3-Input"
+              class="!text-inherit selector__input-container css-1mkvw8y"
               data-value=""
             >
               <input
@@ -654,7 +654,7 @@ exports[`PriceForm renders as expected with update 1`] = `
             </div>
           </div>
           <div
-            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1wy0on6"
           >
             <span
               class="hidden selector__indicator-separator css-894a34-indicatorSeparator"
@@ -729,7 +729,7 @@ exports[`PriceForm renders as expected with update 1`] = `
               />
             </svg>
             <div
-              class="selector__value-container css-1fdsijx-ValueContainer"
+              class="selector__value-container css-hlgwow"
             >
               <div
                 class="selector__placeholder css-1jqq78o-placeholder"
@@ -738,7 +738,7 @@ exports[`PriceForm renders as expected with update 1`] = `
                 Convert to
               </div>
               <div
-                class="!text-inherit selector__input-container css-1h01tm3-Input"
+                class="!text-inherit selector__input-container css-1mkvw8y"
                 data-value=""
               >
                 <input
@@ -764,7 +764,7 @@ exports[`PriceForm renders as expected with update 1`] = `
               </div>
             </div>
             <div
-              class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+              class="selector__indicators css-1wy0on6"
             >
               <span
                 class="hidden selector__indicator-separator css-894a34-indicatorSeparator"

@@ -40,7 +40,7 @@ describe('AccountSelector', () => {
           option: expect.any(Function),
         },
       },
-      {},
+      undefined,
     );
 
     expect((Selector as jest.Mock).mock.calls[0][0].getOptionLabel({ path: 'path' })).toEqual('path');
@@ -79,7 +79,7 @@ describe('AccountSelector', () => {
       expect.objectContaining({
         options,
       }),
-      {},
+      undefined,
     );
   });
 
@@ -119,7 +119,7 @@ describe('AccountSelector', () => {
       expect.objectContaining({
         options: [options[0]],
       }),
-      {},
+      undefined,
     );
   });
 
@@ -155,7 +155,7 @@ describe('AccountSelector', () => {
       expect.objectContaining({
         options: [options[1]],
       }),
-      {},
+      undefined,
     );
   });
 
@@ -191,7 +191,7 @@ describe('AccountSelector', () => {
       expect.objectContaining({
         options,
       }),
-      {},
+      undefined,
     );
   });
 
@@ -230,7 +230,7 @@ describe('AccountSelector', () => {
       expect.objectContaining({
         options: [options[0]],
       }),
-      {},
+      undefined,
     );
   });
 
@@ -269,7 +269,7 @@ describe('AccountSelector', () => {
       expect.objectContaining({
         options: [options[1]],
       }),
-      {},
+      undefined,
     );
   });
 
@@ -308,7 +308,7 @@ describe('AccountSelector', () => {
       expect.objectContaining({
         options: [options[0]],
       }),
-      {},
+      undefined,
     );
   });
 
@@ -348,7 +348,7 @@ describe('AccountSelector', () => {
       expect.objectContaining({
         options: [options[0]],
       }),
-      {},
+      undefined,
     );
   });
 });

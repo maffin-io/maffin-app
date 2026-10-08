@@ -44,7 +44,7 @@ describe('TotalWidgetTest', () => {
         stats: '€0.00',
         title: 'Total',
       },
-      {},
+      undefined,
     );
   });
 
@@ -62,7 +62,7 @@ describe('TotalWidgetTest', () => {
         stats: '€100.00',
         title: 'Total',
       },
-      {},
+      undefined,
     );
   });
 
@@ -80,7 +80,7 @@ describe('TotalWidgetTest', () => {
         stats: '-€100.00',
         title: 'Total',
       },
-      {},
+      undefined,
     );
   });
 });

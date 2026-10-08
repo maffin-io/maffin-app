@@ -18,7 +18,7 @@ export const OPTIONS: ChartOptions<'bar'> = {};
 export default function Bar({
   options,
   ...props
-}: Omit<ChartProps<'bar'>, 'type'>): JSX.Element {
+}: Omit<ChartProps<'bar'>, 'type'>): React.JSX.Element {
   return (
     <ChartJS<'bar'>
       {...props}

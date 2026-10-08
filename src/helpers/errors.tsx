@@ -12,12 +12,13 @@ export class MaffinError extends Error {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  toUI(): string | JSX.Element {
+  toUI(): string | React.JSX.Element {
     return this.message;
   }
 
   show(options?: ToastOptions) {
     toast(
+      // @ts-ignore
       (t) => <ToastComponent message={this.toUI()} toastId={t.id} />,
       {
         ...options,
@@ -27,7 +28,7 @@ export class MaffinError extends Error {
 }
 
 export class StorageError extends MaffinError {
-  toUI(): string | JSX.Element {
+  toUI(): string | React.JSX.Element {
     if (this.code === 'UNAUTHORIZED') {
       return (
         <>
@@ -55,7 +56,7 @@ export class StorageError extends MaffinError {
 }
 
 export class AuthError extends MaffinError {
-  toUI(): string | JSX.Element {
+  toUI(): string | React.JSX.Element {
     if (this.code === 'INVALID_SUBSCRIPTION') {
       return 'You need a valid subscription';
     }
@@ -69,8 +70,8 @@ function ToastComponent({
   message,
 }: {
   toastId: string,
-  message: string | JSX.Element,
-}): JSX.Element {
+  message: string | React.JSX.Element,
+}): React.JSX.Element {
   return (
     <div className="flex items-center">
       <BiError className="text-red-600 mr-2 text-3xl" />

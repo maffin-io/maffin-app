@@ -26,7 +26,7 @@ exports[`AccountForm renders as expected with add 1`] = `
         />
       </fieldset>
       <fieldset
-        class="col-start-8 col-span-2 hidden"
+        class="col-span-2 hidden"
       >
         <label
           class="inline-block mb-2"
@@ -48,7 +48,29 @@ exports[`AccountForm renders as expected with add 1`] = `
         />
       </fieldset>
       <fieldset
-        class="col-start-10 col-span-2"
+        class="col-span-2 hidden"
+      >
+        <label
+          class="inline-block mb-2"
+          for="reportInput"
+        >
+          Report
+        </label>
+        <span
+          class="badge ml-0.5"
+          data-tooltip-id="report-help"
+        >
+          ?
+        </span>
+        <input
+          class="block m-0"
+          id="reportInput"
+          name="report"
+          type="checkbox"
+        />
+      </fieldset>
+      <fieldset
+        class="col-span-2 col-start-11"
       >
         <label
           class="inline-block mb-2"
@@ -115,7 +137,7 @@ exports[`AccountForm renders as expected with add 1`] = `
             />
           </svg>
           <div
-            class="selector__value-container css-1fdsijx-ValueContainer"
+            class="selector__value-container css-hlgwow"
           >
             <div
               class="selector__placeholder css-1jqq78o-placeholder"
@@ -124,7 +146,7 @@ exports[`AccountForm renders as expected with add 1`] = `
               &lt;parent account&gt;
             </div>
             <div
-              class="!text-inherit selector__input-container css-qbdosj-Input"
+              class="!text-inherit selector__input-container css-19bb58m"
               data-value=""
             >
               <input
@@ -149,7 +171,7 @@ exports[`AccountForm renders as expected with add 1`] = `
             </div>
           </div>
           <div
-            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1wy0on6"
           >
             <span
               class="hidden selector__indicator-separator css-1u9des2-indicatorSeparator"
@@ -226,7 +248,7 @@ exports[`AccountForm renders as expected with add 1`] = `
             />
           </svg>
           <div
-            class="selector__value-container css-1fdsijx-ValueContainer"
+            class="selector__value-container css-hlgwow"
           >
             <div
               class="selector__placeholder css-1jqq78o-placeholder"
@@ -235,7 +257,7 @@ exports[`AccountForm renders as expected with add 1`] = `
               &lt;select parent first&gt;
             </div>
             <div
-              class="!text-inherit selector__input-container css-1h01tm3-Input"
+              class="!text-inherit selector__input-container css-1mkvw8y"
               data-value=""
             >
               <input
@@ -261,7 +283,7 @@ exports[`AccountForm renders as expected with add 1`] = `
             </div>
           </div>
           <div
-            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1wy0on6"
           >
             <span
               class="hidden selector__indicator-separator css-894a34-indicatorSeparator"
@@ -388,7 +410,7 @@ exports[`AccountForm renders as expected with add 1`] = `
             />
           </svg>
           <div
-            class="selector__value-container css-1fdsijx-ValueContainer"
+            class="selector__value-container css-hlgwow"
           >
             <div
               class="selector__placeholder css-1jqq78o-placeholder"
@@ -397,7 +419,7 @@ exports[`AccountForm renders as expected with add 1`] = `
               Choose a commodity for the account
             </div>
             <div
-              class="!text-inherit selector__input-container css-qbdosj-Input"
+              class="!text-inherit selector__input-container css-19bb58m"
               data-value=""
             >
               <input
@@ -422,7 +444,7 @@ exports[`AccountForm renders as expected with add 1`] = `
             </div>
           </div>
           <div
-            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1wy0on6"
           >
             <span
               class="hidden selector__indicator-separator css-1u9des2-indicatorSeparator"
@@ -521,7 +543,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
         />
       </fieldset>
       <fieldset
-        class="col-start-8 col-span-2"
+        class="col-span-2"
       >
         <label
           class="inline-block mb-2"
@@ -544,7 +566,30 @@ exports[`AccountForm renders as expected with delete 1`] = `
         />
       </fieldset>
       <fieldset
-        class="col-start-10 col-span-2"
+        class="col-span-2 hidden"
+      >
+        <label
+          class="inline-block mb-2"
+          for="reportInput"
+        >
+          Report
+        </label>
+        <span
+          class="badge ml-0.5"
+          data-tooltip-id="report-help"
+        >
+          ?
+        </span>
+        <input
+          class="block m-0"
+          disabled=""
+          id="reportInput"
+          name="report"
+          type="checkbox"
+        />
+      </fieldset>
+      <fieldset
+        class="col-span-2 col-start-11"
       >
         <label
           class="inline-block mb-2"
@@ -613,7 +658,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
             />
           </svg>
           <div
-            class="selector__value-container css-1fdsijx-ValueContainer"
+            class="selector__value-container css-hlgwow"
           >
             <div
               class="selector__placeholder css-1jqq78o-placeholder"
@@ -622,7 +667,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
               &lt;parent account&gt;
             </div>
             <div
-              class="!text-inherit selector__input-container css-1h01tm3-Input"
+              class="!text-inherit selector__input-container css-1mkvw8y"
               data-value=""
             >
               <input
@@ -648,7 +693,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
             </div>
           </div>
           <div
-            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1wy0on6"
           >
             <span
               class="hidden selector__indicator-separator css-894a34-indicatorSeparator"
@@ -720,7 +765,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
             />
           </svg>
           <div
-            class="selector__value-container css-1fdsijx-ValueContainer"
+            class="selector__value-container css-hlgwow"
           >
             <div
               class="selector__placeholder css-1jqq78o-placeholder"
@@ -729,7 +774,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
               &lt;select parent first&gt;
             </div>
             <div
-              class="!text-inherit selector__input-container css-1h01tm3-Input"
+              class="!text-inherit selector__input-container css-1mkvw8y"
               data-value=""
             >
               <input
@@ -755,7 +800,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
             </div>
           </div>
           <div
-            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1wy0on6"
           >
             <span
               class="hidden selector__indicator-separator css-894a34-indicatorSeparator"
@@ -884,7 +929,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
             />
           </svg>
           <div
-            class="selector__value-container css-1fdsijx-ValueContainer"
+            class="selector__value-container css-hlgwow"
           >
             <div
               class="selector__placeholder css-1jqq78o-placeholder"
@@ -893,7 +938,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
               Choose a commodity for the account
             </div>
             <div
-              class="!text-inherit selector__input-container css-1h01tm3-Input"
+              class="!text-inherit selector__input-container css-1mkvw8y"
               data-value=""
             >
               <input
@@ -919,7 +964,7 @@ exports[`AccountForm renders as expected with delete 1`] = `
             </div>
           </div>
           <div
-            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1wy0on6"
           >
             <span
               class="hidden selector__indicator-separator css-894a34-indicatorSeparator"
@@ -1013,7 +1058,7 @@ exports[`AccountForm renders as expected with update 1`] = `
         />
       </fieldset>
       <fieldset
-        class="col-start-8 col-span-2"
+        class="col-span-2"
       >
         <label
           class="inline-block mb-2"
@@ -1035,7 +1080,29 @@ exports[`AccountForm renders as expected with update 1`] = `
         />
       </fieldset>
       <fieldset
-        class="col-start-10 col-span-2"
+        class="col-span-2 hidden"
+      >
+        <label
+          class="inline-block mb-2"
+          for="reportInput"
+        >
+          Report
+        </label>
+        <span
+          class="badge ml-0.5"
+          data-tooltip-id="report-help"
+        >
+          ?
+        </span>
+        <input
+          class="block m-0"
+          id="reportInput"
+          name="report"
+          type="checkbox"
+        />
+      </fieldset>
+      <fieldset
+        class="col-span-2 col-start-11"
       >
         <label
           class="inline-block mb-2"
@@ -1102,7 +1169,7 @@ exports[`AccountForm renders as expected with update 1`] = `
             />
           </svg>
           <div
-            class="selector__value-container css-1fdsijx-ValueContainer"
+            class="selector__value-container css-hlgwow"
           >
             <div
               class="selector__placeholder css-1jqq78o-placeholder"
@@ -1111,7 +1178,7 @@ exports[`AccountForm renders as expected with update 1`] = `
               &lt;parent account&gt;
             </div>
             <div
-              class="!text-inherit selector__input-container css-qbdosj-Input"
+              class="!text-inherit selector__input-container css-19bb58m"
               data-value=""
             >
               <input
@@ -1136,7 +1203,7 @@ exports[`AccountForm renders as expected with update 1`] = `
             </div>
           </div>
           <div
-            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1wy0on6"
           >
             <span
               class="hidden selector__indicator-separator css-1u9des2-indicatorSeparator"
@@ -1213,7 +1280,7 @@ exports[`AccountForm renders as expected with update 1`] = `
             />
           </svg>
           <div
-            class="selector__value-container css-1fdsijx-ValueContainer"
+            class="selector__value-container css-hlgwow"
           >
             <div
               class="selector__placeholder css-1jqq78o-placeholder"
@@ -1222,7 +1289,7 @@ exports[`AccountForm renders as expected with update 1`] = `
               &lt;select parent first&gt;
             </div>
             <div
-              class="!text-inherit selector__input-container css-1h01tm3-Input"
+              class="!text-inherit selector__input-container css-1mkvw8y"
               data-value=""
             >
               <input
@@ -1248,7 +1315,7 @@ exports[`AccountForm renders as expected with update 1`] = `
             </div>
           </div>
           <div
-            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1wy0on6"
           >
             <span
               class="hidden selector__indicator-separator css-894a34-indicatorSeparator"
@@ -1376,7 +1443,7 @@ exports[`AccountForm renders as expected with update 1`] = `
             />
           </svg>
           <div
-            class="selector__value-container css-1fdsijx-ValueContainer"
+            class="selector__value-container css-hlgwow"
           >
             <div
               class="selector__placeholder css-1jqq78o-placeholder"
@@ -1385,7 +1452,7 @@ exports[`AccountForm renders as expected with update 1`] = `
               Choose a commodity for the account
             </div>
             <div
-              class="!text-inherit selector__input-container css-1h01tm3-Input"
+              class="!text-inherit selector__input-container css-1mkvw8y"
               data-value=""
             >
               <input
@@ -1411,7 +1478,7 @@ exports[`AccountForm renders as expected with update 1`] = `
             </div>
           </div>
           <div
-            class="selector__indicators css-1hb7zxy-IndicatorsContainer"
+            class="selector__indicators css-1wy0on6"
           >
             <span
               class="hidden selector__indicator-separator css-894a34-indicatorSeparator"

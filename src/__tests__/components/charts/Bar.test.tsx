@@ -29,7 +29,7 @@ describe('Bar', () => {
         options: {},
         type: 'bar',
       },
-      {},
+      undefined,
     );
   });
 });

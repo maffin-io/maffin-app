@@ -3,8 +3,8 @@ import { Interval } from 'luxon';
 
 import type { Account } from '@/book/entities';
 import type { AccountsTotals } from '@/types/book';
-import getAccountsTree, { AccountsTableRow } from '@/lib/getAccountsTree';
-import mapAccounts from '@/helpers/mapAccounts';
+import type { AccountsTableRow } from '@/lib/getAccountsTree';
+import getIncomeStatementTrees, { nonZeroLeaves } from '@/lib/reports/incomeStatement';
 
 export type IncomeStatementProps = {
   interval: Interval;
@@ -26,12 +26,9 @@ export default async function IncomeExpenseStatement({
     Document,
   } = await import('@react-pdf/renderer');
 
-  const accountsMap = mapAccounts(accounts);
-  const expensesTree = getAccountsTree(accountsMap.type_expense, accountsMap, totals);
-  const ExpensesTable = buildTable(expensesTree, View, Text);
-
-  const incomeTree = getAccountsTree(accountsMap.type_income, accountsMap, totals);
-  const IncomeTable = buildTable(incomeTree, View, Text);
+  const { expenses, income } = getIncomeStatementTrees({ interval, accounts, totals });
+  const ExpensesTable = buildTable(expenses, View, Text);
+  const IncomeTable = buildTable(income, View, Text);
 
   return (
     <Document>
@@ -93,8 +90,7 @@ function buildTable(
     </View>
   );
 
-  const leaves = tree.leaves.filter(leaf => leaf.total.toNumber() !== 0);
-  const childViews = leaves.map(leaf => buildTable(leaf, View, Text, padding + 10));
+  const childViews = nonZeroLeaves(tree).map(leaf => buildTable(leaf, View, Text, padding + 10));
 
   return (
     <View

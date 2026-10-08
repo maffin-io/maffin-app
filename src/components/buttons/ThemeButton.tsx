@@ -4,7 +4,7 @@ import { BiSolidMoon, BiSolidSun } from 'react-icons/bi';
 import { Tooltip } from '@/components/tooltips';
 import { useTheme } from '@/hooks/state';
 
-export default function ThemeButton(): JSX.Element {
+export default function ThemeButton(): React.JSX.Element {
   const { data: theme, refetch } = useTheme();
 
   let text = 'Change to dark theme';

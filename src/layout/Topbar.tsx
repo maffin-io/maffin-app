@@ -12,7 +12,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useInterval } from '@/hooks/state';
 import type { Account } from '@/book/entities';
 
-export default function Topbar(): JSX.Element {
+export default function Topbar(): React.JSX.Element {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { data: interval } = useInterval();

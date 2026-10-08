@@ -16,7 +16,7 @@ export type AssetSankeyProps = {
 export default function AssetSankey({
   account,
   height = 250,
-}: AssetSankeyProps): JSX.Element {
+}: AssetSankeyProps): React.JSX.Element {
   const { data: cashflow, isPending } = useCashFlow(account.guid);
 
   const labels: { [guid: string]: string } = {
